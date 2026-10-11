@@ -1,0 +1,199 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
+}
+
+enum UserRole {
+  // SaaS Platform Roles (tenantId = null)
+  SAAS_SUPER_ADMIN
+  SAAS_ADMIN
+  SAAS_MARKETING
+  SAAS_FINANCE
+  SAAS_TECHNICAL
+
+  // Client Roles (tenantId terikat pada Tenant)
+  CLIENT_SUPER_ADMIN
+  CLIENT_ADMIN
+}
+
+enum BusinessSector {
+  AUTOMOTIVE
+  PROPERTY
+  RENTAL
+  RESTAURANT_CAFE
+  GENERAL_SERVICE
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  FOLLOW_UP
+  DEAL
+  LOST
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  name         String
+  role         UserRole  @default(CLIENT_ADMIN)
+
+  tenantId     String?
+  tenant       Tenant?   @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([tenantId])
+}
+
+model TenantCategory {
+  id          String         @id @default(cuid())
+  name        String         // Contoh: "Sales Mobil Baru", "Rental Mobil", "Kafe & Restoran"
+  slug        String         @unique // "sales-mobil", "rental-mobil", dll
+  sector      BusinessSector
+  description String?
+  icon        String?
+  orderIndex  Int            @default(0)
+  isActive    Boolean        @default(true)
+
+  tenants     Tenant[]
+
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([slug])
+  @@index([sector])
+}
+
+model Tenant {
+  id             String          @id @default(cuid())
+  customDomain   String          @unique // Contoh: "salesmobilbandung.com"
+  businessName   String
+
+  categoryId     String
+  category       TenantCategory  @relation(fields: [categoryId], references: [id])
+  sector         BusinessSector
+
+  isActive       Boolean         @default(true)
+  expiresAt      DateTime?
+
+  // Kontak & WhatsApp Floating CTA
+  whatsappNumber String          // Format: 6281234567890 (tanpa simbol +)
+  contactEmail   String?
+  address        String?
+  googleMapsUrl  String?
+
+  // SEO & GEO Local Optimization
+  seoTitle       String?
+  seoDescription String?
+  seoKeywords    String?
+  geoCity        String?         // Contoh: "Bandung"
+  geoRegion      String?         // Contoh: "ID-JB"
+  latitude       Float?
+  longitude      Float?
+
+  // Branding & Visual
+  themeColor     String          @default("#2563eb")
+  logoUrl        String?
+  heroTitle      String?
+  heroSubtitle   String?
+  heroBannerUrl  String?
+
+  // Feature Flags Modular
+  featureFlags   Json?           @default("{}")
+
+  users          User[]
+  catalogs       CatalogItem[]
+  galleries      GalleryItem[]
+  testimonials   Testimonial[]
+  leads          Lead[]
+
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  @@index([customDomain])
+  @@index([sector])
+}
+
+model CatalogItem {
+  id          String   @id @default(cuid())
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  title       String
+  slug        String
+  category    String?
+  price       Decimal?
+  pricePrefix String?  // "Mulai dari", "DP Mulai", "Tarif Harian"
+  description String?  @db.Text
+  imageUrl    String
+  images      String[]
+  isFeatured  Boolean  @default(false)
+  orderIndex  Int      @default(0)
+
+  // Spesifikasi Modular (JSON)
+  specsJson   Json?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([tenantId, slug])
+  @@index([tenantId])
+}
+
+model GalleryItem {
+  id          String   @id @default(cuid())
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  imageUrl    String
+  caption     String?  // Contoh: "Serah terima unit Omoda 5 ke Bpk Hendra"
+  orderIndex  Int      @default(0)
+
+  createdAt   DateTime @default(now())
+
+  @@index([tenantId])
+}
+
+model Testimonial {
+  id          String   @id @default(cuid())
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  clientName  String
+  clientRole  String?
+  comment     String   @db.Text
+  rating      Int      @default(5)
+  avatarUrl   String?
+
+  createdAt   DateTime @default(now())
+
+  @@index([tenantId])
+}
+
+model Lead {
+  id          String     @id @default(cuid())
+  tenantId    String
+  tenant      Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  name        String
+  phone       String
+  moduleType  String     // "INSTALLMENT_SIMULATION", "TABLE_RESERVATION", "RENTAL_BOOKING", "GENERAL_INQUIRY"
+  sourceUrl   String?
+  detailsJson Json?      // DP, tenor, unit, tanggal sewa, dll
+  status      LeadStatus @default(NEW)
+  notes       String?    @db.Text
+
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([tenantId])
+  @@index([status])
+}
