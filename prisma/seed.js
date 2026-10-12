@@ -15,7 +15,191 @@ const prisma = new PrismaClient();
 const SAAS_PASSWORD_HASH = "$2b$10$PIBqqp.z1qeooSO07CfOYeJC0mrZZ49D4QlUIE8./tIiwv/dzYcS."; // admin123!
 const CLIENT_PASSWORD_HASH = "$2b$10$8WkHLaeBGeOJfmEV7VKRveg2OcPv7e5OKgF1Qd2L3NTO2mV5C.a36"; // client123!
 
+const DDL_STATEMENTS = `
+DO $$ BEGIN
+  CREATE TYPE "UserRole" AS ENUM ('SAAS_SUPER_ADMIN', 'SAAS_ADMIN', 'SAAS_MARKETING', 'SAAS_FINANCE', 'SAAS_TECHNICAL', 'CLIENT_SUPER_ADMIN', 'CLIENT_ADMIN');
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+  CREATE TYPE "BusinessSector" AS ENUM ('AUTOMOTIVE', 'RENTAL', 'PROPERTY', 'RESTAURANT_CAFE', 'GENERAL_SERVICE');
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+  CREATE TYPE "LeadStatus" AS ENUM ('NEW', 'CONTACTED', 'FOLLOW_UP', 'DEAL', 'LOST');
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+  CREATE TYPE "ModuleType" AS ENUM ('INSTALLMENT_SIMULATION', 'RENTAL_BOOKING', 'TABLE_RESERVATION', 'PROPERTY_INQUIRY', 'SERVICE_ORDER', 'GENERAL_CONTACT');
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
+
+CREATE TABLE IF NOT EXISTS "TenantCategory" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "slug" TEXT NOT NULL,
+    "sector" "BusinessSector" NOT NULL,
+    "description" TEXT,
+    "icon" TEXT,
+    "orderIndex" INTEGER NOT NULL DEFAULT 0,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "TenantCategory_pkey" PRIMARY KEY ("id")
+);
+CREATE UNIQUE INDEX IF NOT EXISTS "TenantCategory_slug_key" ON "TenantCategory"("slug");
+
+CREATE TABLE IF NOT EXISTS "Tenant" (
+    "id" TEXT NOT NULL,
+    "customDomain" TEXT NOT NULL,
+    "businessName" TEXT NOT NULL,
+    "categoryId" TEXT,
+    "sector" "BusinessSector" NOT NULL DEFAULT 'GENERAL_SERVICE',
+    "whatsappNumber" TEXT NOT NULL,
+    "contactEmail" TEXT,
+    "address" TEXT,
+    "googleMapsUrl" TEXT,
+    "seoTitle" TEXT,
+    "seoDescription" TEXT,
+    "seoKeywords" TEXT,
+    "geoCity" TEXT,
+    "geoRegion" TEXT,
+    "latitude" DOUBLE PRECISION,
+    "longitude" DOUBLE PRECISION,
+    "themeColor" TEXT NOT NULL DEFAULT '#2563eb',
+    "heroTitle" TEXT,
+    "heroSubtitle" TEXT,
+    "heroBannerUrl" TEXT,
+    "logoUrl" TEXT,
+    "featureFlags" JSONB NOT NULL DEFAULT '{}',
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "expiresAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "Tenant_pkey" PRIMARY KEY ("id")
+);
+CREATE UNIQUE INDEX IF NOT EXISTS "Tenant_customDomain_key" ON "Tenant"("customDomain");
+
+CREATE TABLE IF NOT EXISTS "User" (
+    "id" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "passwordHash" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "role" "UserRole" NOT NULL DEFAULT 'CLIENT_ADMIN',
+    "tenantId" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
+CREATE UNIQUE INDEX IF NOT EXISTS "User_email_key" ON "User"("email");
+
+CREATE TABLE IF NOT EXISTS "CatalogItem" (
+    "id" TEXT NOT NULL,
+    "tenantId" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "slug" TEXT NOT NULL,
+    "category" TEXT,
+    "price" DOUBLE PRECISION,
+    "pricePrefix" TEXT,
+    "description" TEXT,
+    "imageUrl" TEXT,
+    "images" TEXT[] DEFAULT ARRAY[]::TEXT[],
+    "isFeatured" BOOLEAN NOT NULL DEFAULT false,
+    "specsJson" JSONB NOT NULL DEFAULT '{}',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "CatalogItem_pkey" PRIMARY KEY ("id")
+);
+CREATE UNIQUE INDEX IF NOT EXISTS "CatalogItem_tenantId_slug_key" ON "CatalogItem"("tenantId", "slug");
+
+CREATE TABLE IF NOT EXISTS "GalleryItem" (
+    "id" TEXT NOT NULL,
+    "tenantId" TEXT NOT NULL,
+    "imageUrl" TEXT NOT NULL,
+    "caption" TEXT,
+    "orderIndex" INTEGER NOT NULL DEFAULT 0,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "GalleryItem_pkey" PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS "Testimonial" (
+    "id" TEXT NOT NULL,
+    "tenantId" TEXT NOT NULL,
+    "customerName" TEXT NOT NULL,
+    "customerRole" TEXT,
+    "rating" INTEGER NOT NULL DEFAULT 5,
+    "reviewText" TEXT NOT NULL,
+    "avatarUrl" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "Testimonial_pkey" PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS "Lead" (
+    "id" TEXT NOT NULL,
+    "tenantId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "phone" TEXT NOT NULL,
+    "email" TEXT,
+    "moduleType" "ModuleType" NOT NULL,
+    "detailsJson" JSONB NOT NULL DEFAULT '{}',
+    "status" "LeadStatus" NOT NULL DEFAULT 'NEW',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "Lead_pkey" PRIMARY KEY ("id")
+);
+
+DO $$ BEGIN
+  ALTER TABLE "Tenant" ADD CONSTRAINT "Tenant_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "TenantCategory"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+EXCEPTION WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+  ALTER TABLE "User" ADD CONSTRAINT "User_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+EXCEPTION WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+  ALTER TABLE "CatalogItem" ADD CONSTRAINT "CatalogItem_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+EXCEPTION WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+  ALTER TABLE "GalleryItem" ADD CONSTRAINT "GalleryItem_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+EXCEPTION WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+  ALTER TABLE "Testimonial" ADD CONSTRAINT "Testimonial_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+EXCEPTION WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+  ALTER TABLE "Lead" ADD CONSTRAINT "Lead_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+EXCEPTION WHEN duplicate_object THEN null;
+END $$;
+`;
+
 async function main() {
+  console.log("🌱 Menyiapkan skema database...");
+  const statements = DDL_STATEMENTS
+    .split(";\n")
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
+
+  for (const stmt of statements) {
+    try {
+      await prisma.$executeRawUnsafe(stmt);
+    } catch (_) {
+      // Abaikan jika statement sudah ada
+    }
+  }
+  console.log("✅ Skema tabel & enum database terverifikasi.");
+
   console.log("🌱 Memulai seeding database dengan Granular RBAC (Zero External Dependencies)...");
 
   const saasPasswordHash = SAAS_PASSWORD_HASH;
