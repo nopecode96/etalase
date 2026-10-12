@@ -22,6 +22,7 @@ import {
   FileText,
   ChevronRight,
   Check,
+  X,
 } from "lucide-react";
 import { submitLeadAction } from "@/actions/lead.actions";
 import { FloatingWhatsApp } from "@/components/common/FloatingWhatsApp";
@@ -93,15 +94,16 @@ export default function RentalTemplate({ tenant }: Props) {
   const [customerName, setCustomerName] = useState<string>("");
   const [customerPhone, setCustomerPhone] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   // Active tab untuk Syarat & Ketentuan
   const [activeTermTab, setActiveTermTab] = useState<number>(0);
 
   // Handle submit form reservasi
-  const handleBookingSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleBookingSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!customerName || !customerPhone || !startDate) {
-      alert("Mohon lengkapi Nama, Nomor WhatsApp, dan Tanggal Mulai Sewa.");
+      setIsModalOpen(true);
       return;
     }
 
@@ -130,6 +132,19 @@ export default function RentalTemplate({ tenant }: Props) {
       alert("Terjadi kesalahan koneksi. Silakan coba kembali.");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // Handler untuk Floating Booking Bar Button
+  const handleFloatingBookingClick = () => {
+    if (!startDate) {
+      alert("Silakan pilih Tanggal Mulai Sewa terlebih dahulu.");
+      return;
+    }
+    if (!customerName || !customerPhone) {
+      setIsModalOpen(true);
+    } else {
+      handleBookingSubmit();
     }
   };
 
@@ -257,121 +272,299 @@ export default function RentalTemplate({ tenant }: Props) {
         </div>
       </header>
 
-      {/* 3. HERO BANNER SECTION (2-KOLOM DENGAN SHOWCASE KANAN) */}
-      <section className="relative overflow-hidden bg-slate-950 text-white py-14 sm:py-20 lg:py-24">
-        {/* Subtle background glow */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-emerald-600/15 blur-[140px] pointer-events-none rounded-full" />
+      {/* 3. HERO BANNER SECTION (CENTERED LUXURY PANORAMIC LAYOUT) */}
+      <section className="relative overflow-hidden bg-slate-950 text-white pt-14 sm:pt-20 pb-20 sm:pb-28">
+        {/* Ambient emerald blur glows */}
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[450px] bg-emerald-600/20 blur-[150px] pointer-events-none rounded-full" />
         <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-950/95 to-slate-950" />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
-            {/* Kolom Kiri: Headline, Value Proposition & CTA (lg:col-span-7) */}
-            <div className="lg:col-span-7 text-left">
-              <div className="inline-flex items-center gap-2 bg-emerald-600/90 text-white text-xs sm:text-sm font-bold px-3.5 py-1.5 rounded-full mb-6 backdrop-blur-sm border border-emerald-400/30">
-                <Sparkles size={15} />
-                <span>{taglineBadge}</span>
-              </div>
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight sm:leading-none text-white mb-6">
-                {heroTitle}
-              </h1>
-              <p className="text-base sm:text-lg text-slate-300 leading-relaxed mb-8 max-w-2xl">
-                {heroSubtitle}
-              </p>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 text-center">
+          {/* Top Pill Badge */}
+          <div className="inline-flex items-center gap-2 bg-emerald-600/20 text-emerald-300 text-xs sm:text-sm font-bold px-4 py-1.5 rounded-full mb-6 backdrop-blur-md border border-emerald-500/30">
+            <Sparkles size={15} className="text-emerald-400" />
+            <span>{taglineBadge}</span>
+          </div>
 
-              <div className="flex flex-wrap items-center gap-3 sm:gap-4 mb-10">
-                <a
-                  href="#armada"
-                  className="inline-flex items-center justify-center gap-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl text-sm sm:text-base shadow-xl shadow-emerald-600/30 transition-all hover:scale-[1.02]"
-                >
-                  <Car size={18} />
-                  <span>Cek Armada &amp; Tarif</span>
-                </a>
-                <a
-                  href={`https://wa.me/${tenant.whatsappNumber}?text=${encodeURIComponent(
-                    `Halo ${businessName}, saya ingin booking mobil rental untuk perjalanan di ${geoCity}.`
-                  )}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-bold px-6 py-3.5 sm:py-4 rounded-xl text-sm sm:text-base backdrop-blur-md border border-white/20 transition-all"
-                >
-                  <MessageCircle size={18} />
-                  <span>Booking via WhatsApp</span>
-                </a>
-              </div>
+          {/* Main Headline Centered */}
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight sm:leading-tight text-white mb-6 max-w-4xl mx-auto">
+            {heroTitle}
+          </h1>
 
-              {/* 4 Poin Komitmen Layanan Rental */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-6 border-t border-white/10 text-xs sm:text-sm text-slate-300">
-                {commitments.map((item, idx) => (
-                  <div key={idx} className="flex items-center gap-2.5">
-                    <CheckCircle2 size={16} className="text-emerald-400 flex-shrink-0" />
-                    <span>{item}</span>
-                  </div>
-                ))}
+          {/* Subtitle Centered */}
+          <p className="text-base sm:text-lg text-slate-300 leading-relaxed mb-8 max-w-2xl mx-auto">
+            {heroSubtitle}
+          </p>
+
+          {/* 2 CTA Buttons Centered */}
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-10">
+            <a
+              href="#armada"
+              className="inline-flex items-center justify-center gap-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black px-7 sm:px-9 py-3.5 sm:py-4 rounded-xl text-sm sm:text-base shadow-xl shadow-emerald-600/30 transition-all hover:scale-[1.02]"
+            >
+              <Car size={18} />
+              <span>Cek Ketersediaan Armada</span>
+            </a>
+            <a
+              href="#syarat"
+              className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-bold px-7 sm:px-9 py-3.5 sm:py-4 rounded-xl text-sm sm:text-base backdrop-blur-md border border-white/20 transition-all"
+            >
+              <FileText size={18} />
+              <span>Syarat Lepas Kunci</span>
+            </a>
+          </div>
+
+          {/* Panoramic Car Showcase with Soft Emerald Glow */}
+          <div className="relative max-w-4xl mx-auto mt-4 sm:mt-8">
+            {/* Center ambient glow directly behind car */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 sm:w-[520px] h-48 sm:h-[260px] bg-emerald-500/25 blur-[100px] rounded-full pointer-events-none" />
+
+            {/* Left Floating Badge (Desktop) */}
+            {heroBadges[0] && (
+              <div className="hidden md:flex absolute top-12 left-0 z-20 bg-slate-900/90 backdrop-blur-md border border-emerald-500/30 px-4 py-2.5 rounded-2xl shadow-2xl items-center gap-3 transform hover:-translate-y-1 transition-transform">
+                <div className="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0">
+                  <Key size={16} />
+                </div>
+                <div className="text-left">
+                  <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">
+                    {heroBadges[0].sublabel || "Kemudahan Sewa"}
+                  </p>
+                  <p className="text-xs sm:text-sm font-extrabold text-white">
+                    {heroBadges[0].label}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Right Floating Badge (Desktop) */}
+            {heroBadges[1] && (
+              <div className="hidden md:flex absolute top-12 right-0 z-20 bg-slate-900/90 backdrop-blur-md border border-emerald-500/30 px-4 py-2.5 rounded-2xl shadow-2xl items-center gap-3 transform hover:-translate-y-1 transition-transform">
+                <div className="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0">
+                  <MapPin size={16} />
+                </div>
+                <div className="text-left">
+                  <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">
+                    {heroBadges[1].sublabel || "Layanan Antar Unit"}
+                  </p>
+                  <p className="text-xs sm:text-sm font-extrabold text-white">
+                    {heroBadges[1].label}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Panoramic Car Showcase Image */}
+            <div className="relative z-10 w-full group">
+              <img
+                src={heroBannerUrl}
+                alt={`${businessName} Showcase`}
+                className="w-full max-h-[360px] sm:max-h-[420px] object-contain mx-auto drop-shadow-[0_25px_35px_rgba(0,0,0,0.7)] group-hover:scale-[1.02] transition-transform duration-500"
+              />
+              <div className="text-center mt-2">
+                <span className="inline-block text-[11px] sm:text-xs font-semibold text-emerald-300 bg-emerald-950/70 border border-emerald-700/50 px-4 py-1.5 rounded-full backdrop-blur-md">
+                  Toyota Kijang Innova Zenix &bull; Pilihan Favorit Wisata &amp; Bisnis Bandung
+                </span>
               </div>
             </div>
 
-            {/* Kolom Kanan: Foto Mobil Unggulan & 2 Floating Badges (lg:col-span-5) */}
-            <div className="lg:col-span-5 relative flex items-center justify-center">
-              {/* Radial glow hijau emerald di belakang mobil */}
-              <div className="absolute w-72 h-72 sm:w-96 sm:h-96 bg-gradient-to-tr from-emerald-600/30 to-teal-500/20 blur-3xl rounded-full pointer-events-none -z-0" />
-
-              <div className="relative z-10 w-full flex flex-col items-center">
-                {/* Floating Badge 1 (Atas Kanan) */}
-                {heroBadges[0] && (
-                  <div className="self-end mr-2 sm:mr-6 mb-2 bg-slate-900/90 backdrop-blur-md border border-emerald-500/30 px-3.5 py-2 rounded-2xl shadow-2xl flex items-center gap-2.5 transform hover:-translate-y-1 transition-transform">
-                    <div className="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0">
-                      <Key size={16} />
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">
-                        {heroBadges[0].sublabel || "Kemudahan Sewa"}
-                      </p>
-                      <p className="text-xs sm:text-sm font-extrabold text-white">
-                        {heroBadges[0].label}
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {/* Foto Mobil Utama Rental */}
-                <div className="relative group w-full my-2">
-                  <img
-                    src={heroBannerUrl}
-                    alt={`${businessName} Showcase`}
-                    className="w-full max-w-lg mx-auto object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="text-center mt-1">
-                    <span className="inline-block text-[11px] font-semibold text-emerald-300 bg-emerald-950/60 border border-emerald-700/50 px-3 py-1 rounded-full backdrop-blur-sm">
-                      Toyota Kijang Innova Zenix • Pilihan Favorit Wisata Bandung
-                    </span>
-                  </div>
+            {/* 4 Poin Komitmen Layanan Rental */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-6 border-t border-white/10 text-xs sm:text-sm text-slate-300 max-w-4xl mx-auto mt-6">
+              {commitments.map((item, idx) => (
+                <div key={idx} className="flex items-center gap-2 justify-center sm:justify-start">
+                  <CheckCircle2 size={16} className="text-emerald-400 flex-shrink-0" />
+                  <span className="truncate">{item}</span>
                 </div>
-
-                {/* Floating Badge 2 (Bawah Kiri) */}
-                {heroBadges[1] && (
-                  <div className="self-start ml-2 sm:ml-4 -mt-3 bg-slate-900/90 backdrop-blur-md border border-emerald-500/30 px-3.5 py-2 rounded-2xl shadow-2xl flex items-center gap-2.5 transform hover:-translate-y-1 transition-transform">
-                    <div className="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0">
-                      <MapPin size={16} />
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">
-                        {heroBadges[1].sublabel || "Layanan Antar Unit"}
-                      </p>
-                      <p className="text-xs sm:text-sm font-extrabold text-white">
-                        {heroBadges[1].label}
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* 4. VALUE PROPOSITION 3 FASILITAS UNGGULAN */}
+      {/* 4. FLOATING QUICK BOOKING BAR (JONAS RENT STYLE OVERLAP) */}
+      <div className="relative z-30 max-w-5xl mx-auto px-4 -mt-10 sm:-mt-14">
+        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-200/90 p-5 sm:p-7 text-slate-800">
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-100">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+                <Calendar size={18} />
+              </div>
+              <div>
+                <h3 className="font-black text-sm sm:text-base text-slate-900">
+                  Cari &amp; Reservasi Jadwal Armada
+                </h3>
+                <p className="text-[11px] text-slate-500">
+                  Pilih unit &amp; paket sewa untuk konfirmasi ketersediaan instan
+                </p>
+              </div>
+            </div>
+            <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+              <Sparkles size={12} /> Unit Terawat 2023-2025
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 items-end">
+            {/* Col 1: Model Mobil */}
+            <div>
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+                Model Armada
+              </label>
+              <select
+                value={selectedUnit}
+                onChange={(e) => setSelectedUnit(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-semibold focus:outline-none focus:border-emerald-500"
+              >
+                {armada.map((item) => (
+                  <option key={item.id} value={item.title}>
+                    {item.title} ({item.seats})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Col 2: Paket Sewa */}
+            <div>
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+                Paket Layanan
+              </label>
+              <select
+                value={rentalPackage}
+                onChange={(e) => setRentalPackage(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-semibold focus:outline-none focus:border-emerald-500"
+              >
+                <option value="Lepas Kunci 24 Jam">Lepas Kunci (24 Jam)</option>
+                <option value="Lepas Kunci 12 Jam">Lepas Kunci (12 Jam)</option>
+                <option value="Paket Mobil + Driver (12 Jam)">Paket + Driver (12 Jam)</option>
+                <option value="Paket All-In (Mobil + Driver + BBM + Tol)">Paket All-In Wisata</option>
+                <option value="Drop Off Bandara / Luar Kota">Drop Off Bandara / Drop</option>
+              </select>
+            </div>
+
+            {/* Col 3: Tanggal Sewa */}
+            <div>
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+                Mulai Sewa
+              </label>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-semibold focus:outline-none focus:border-emerald-500"
+              />
+            </div>
+
+            {/* Col 4: Submit Button */}
+            <div>
+              <button
+                type="button"
+                onClick={handleFloatingBookingClick}
+                disabled={isSubmitting}
+                className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-black py-2.5 sm:py-3 px-4 rounded-xl text-xs sm:text-sm shadow-lg shadow-emerald-600/30 transition-all flex items-center justify-center gap-2"
+              >
+                <Send size={15} />
+                <span>Cek Jadwal &amp; Pesan WA</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* MODAL POPUP RESERVASI CEPAT (JIKA NAMA/PHONE BELUM LENGKAP) */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in-95 duration-200">
+            <button
+              type="button"
+              onClick={() => setIsModalOpen(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 p-1.5 rounded-full hover:bg-slate-100 transition-colors"
+            >
+              <X size={20} />
+            </button>
+
+            <div className="mb-5">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-full">
+                Konfirmasi Reservasi
+              </span>
+              <h3 className="text-xl font-black text-slate-900 mt-2">Lengkapi Data Pemesanan</h3>
+              <p className="text-xs text-slate-500 mt-1">
+                Unit: <strong className="text-slate-800">{selectedUnit}</strong> ({rentalPackage})
+              </p>
+            </div>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                setIsModalOpen(false);
+                handleBookingSubmit();
+              }}
+              className="space-y-4"
+            >
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Nama Lengkap Penyewa
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Contoh: Dimas Prasetyo"
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Nomor WhatsApp Aktif
+                </label>
+                <input
+                  type="tel"
+                  required
+                  placeholder="Contoh: 081298765432"
+                  value={customerPhone}
+                  onChange={(e) => setCustomerPhone(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+
+              {!startDate && (
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Tanggal Mulai Sewa
+                  </label>
+                  <input
+                    type="date"
+                    required
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+              )}
+
+              <div className="pt-2 flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl text-xs transition-colors"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3 px-4 rounded-xl text-xs shadow-md shadow-emerald-600/30 transition-all flex items-center justify-center gap-1.5"
+                >
+                  <Send size={14} />
+                  <span>{isSubmitting ? "Memproses..." : "Konfirmasi & Hubungi WA"}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 5. VALUE PROPOSITION 3 FASILITAS UNGGULAN */}
       {facilities.length > 0 && (
-        <section className="py-12 bg-white border-b border-slate-200">
+        <section className="pt-16 pb-12 bg-white border-b border-slate-200 mt-6">
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {facilities.map((f, i) => (
@@ -391,7 +584,7 @@ export default function RentalTemplate({ tenant }: Props) {
         </section>
       )}
 
-      {/* 5. ARMADA PILIHAN (KATALOG UNIT GRID JONAS RENT STYLE) */}
+      {/* 6. ARMADA PILIHAN (CLEAN LIGHT-THEMED CARDS GAYA JONAS RENT) */}
       <section id="armada" className="py-16 sm:py-24 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-3xl mx-auto mb-14">
@@ -413,14 +606,14 @@ export default function RentalTemplate({ tenant }: Props) {
                 className="bg-white rounded-3xl overflow-hidden border border-slate-200/90 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col justify-between"
               >
                 <div>
-                  {/* Foto Mobil Rental */}
-                  <div className="relative aspect-[16/10] bg-slate-900 overflow-hidden flex items-center justify-center p-4">
+                  {/* Foto Mobil Rental Berlatar Terang Lembut (Clean Light Background) */}
+                  <div className="relative aspect-[16/10] bg-gradient-to-b from-slate-50 via-slate-100/70 to-slate-100 border-b border-slate-100 overflow-hidden flex items-center justify-center p-4">
                     <img
                       src={car.imageUrl}
                       alt={car.title}
-                      className="w-full h-full object-contain hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-contain hover:scale-105 transition-transform duration-500 drop-shadow-md"
                     />
-                    <div className="absolute top-3 left-3 bg-emerald-600 text-white text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shadow-md">
+                    <div className="absolute top-3 left-3 bg-emerald-600 text-white text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm">
                       {car.category || "Favorit"}
                     </div>
                     <div className="absolute top-3 right-3 bg-slate-900/80 text-white text-[10px] font-bold px-2 py-0.5 rounded backdrop-blur-sm">
@@ -449,7 +642,7 @@ export default function RentalTemplate({ tenant }: Props) {
                       </div>
                     </div>
 
-                    {/* Tabel Tarif Ringkas per Durasi */}
+                    {/* Tabel Tarif Ringkas per Durasi (Kontras & Jelas) */}
                     <div className="bg-emerald-50/70 border border-emerald-100 rounded-2xl p-3.5 mb-5 space-y-1.5 text-xs">
                       <div className="flex justify-between items-center text-slate-600">
                         <span>Lepas Kunci 12 Jam:</span>
@@ -473,8 +666,7 @@ export default function RentalTemplate({ tenant }: Props) {
                     type="button"
                     onClick={() => {
                       setSelectedUnit(car.title);
-                      const el = document.getElementById("booking");
-                      if (el) el.scrollIntoView({ behavior: "smooth" });
+                      setIsModalOpen(true);
                     }}
                     className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3 px-3 rounded-xl text-xs transition-colors flex items-center justify-center gap-1.5 shadow-md shadow-emerald-600/20"
                   >
@@ -499,7 +691,7 @@ export default function RentalTemplate({ tenant }: Props) {
         </div>
       </section>
 
-      {/* 6. FORMULIR CEPAT RESERVASI RENTAL (DUAL-ACTION LEADS) */}
+      {/* 7. FORMULIR LENGKAP RESERVASI RENTAL (DUAL-ACTION LEADS) */}
       <section id="booking" className="py-16 sm:py-24 bg-gradient-to-b from-slate-900 to-slate-950 text-white relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-12">
@@ -639,7 +831,7 @@ export default function RentalTemplate({ tenant }: Props) {
         </div>
       </section>
 
-      {/* 7. SYARAT & KETENTUAN SEWA TRANSPARAN (TAB / ACCORDION) */}
+      {/* 8. SYARAT & KETENTUAN SEWA TRANSPARAN (TAB / ACCORDION) */}
       {rentalTerms.length > 0 && (
         <section id="syarat" className="py-16 sm:py-24 bg-white border-b border-slate-200">
           <div className="max-w-5xl mx-auto px-4 sm:px-6">
@@ -694,7 +886,7 @@ export default function RentalTemplate({ tenant }: Props) {
         </section>
       )}
 
-      {/* 8. FOTO PELANGGAN HAPPY & TESTIMONIAL (SOCIAL PROOF) */}
+      {/* 9. FOTO PELANGGAN HAPPY & TESTIMONIAL (SOCIAL PROOF) */}
       <section id="testimoni" className="py-16 sm:py-24 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-14">
@@ -772,7 +964,7 @@ export default function RentalTemplate({ tenant }: Props) {
         </div>
       </section>
 
-      {/* 9. LOKASI POOL & GOOGLE MAPS EMBED */}
+      {/* 10. LOKASI POOL & GOOGLE MAPS EMBED */}
       <section id="lokasi" className="py-16 sm:py-20 bg-white border-t border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
@@ -823,7 +1015,7 @@ export default function RentalTemplate({ tenant }: Props) {
         </div>
       </section>
 
-      {/* 10. FOOTER */}
+      {/* 11. FOOTER */}
       <footer className="bg-slate-950 text-slate-400 py-12 border-t border-slate-800 text-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
           <div>
@@ -843,7 +1035,7 @@ export default function RentalTemplate({ tenant }: Props) {
         </div>
       </footer>
 
-      {/* 11. FLOATING WHATSAPP CTA */}
+      {/* 12. FLOATING WHATSAPP CTA */}
       <FloatingWhatsApp
         whatsappNumber={tenant.whatsappNumber}
         businessName={businessName}
