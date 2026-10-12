@@ -128,6 +128,14 @@ async function ensureTablesExist() {
     );
   `);
 
+  await prisma.$executeRawUnsafe(`
+    ALTER TABLE "CatalogItem" ADD COLUMN IF NOT EXISTS "orderIndex" INTEGER NOT NULL DEFAULT 0;
+  `);
+
+  await prisma.$executeRawUnsafe(`
+    ALTER TABLE "CatalogItem" ADD COLUMN IF NOT EXISTS "isFeatured" BOOLEAN NOT NULL DEFAULT false;
+  `);
+
   // 6. Table GalleryItem
   await prisma.$executeRawUnsafe(`
     CREATE TABLE IF NOT EXISTS "GalleryItem" (
@@ -138,6 +146,10 @@ async function ensureTablesExist() {
       "orderIndex" INTEGER NOT NULL DEFAULT 0,
       "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
+  `);
+
+  await prisma.$executeRawUnsafe(`
+    ALTER TABLE "GalleryItem" ADD COLUMN IF NOT EXISTS "orderIndex" INTEGER NOT NULL DEFAULT 0;
   `);
 
   // 7. Table Testimonial
