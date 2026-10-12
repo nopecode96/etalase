@@ -10,9 +10,9 @@ services:
       POSTGRES_PASSWORD: etalase_password
       POSTGRES_DB: etalase_db
     ports:
-      - "5433:5432"
+      - "127.0.0.1:5433:5432" # Hindari bentrok port 5432 host
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - etalase_postgres_data:/var/lib/postgresql/data
     networks:
       - etalase_net
 
@@ -35,21 +35,8 @@ services:
     networks:
       - etalase_net
 
-  nginx:
-    image: nginx:alpine
-    container_name: etalase_nginx
-    restart: always
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
-    depends_on:
-      - web
-    networks:
-      - etalase_net
-
 volumes:
-  postgres_data:
+  etalase_postgres_data:
 
 networks:
   etalase_net:
