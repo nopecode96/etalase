@@ -1,8 +1,8 @@
 #!/bin/sh
 set -e
 
-echo "Menyiapkan skema database & seed awal..."
+echo "Menyiapkan skema dan data awal database..."
 node ./prisma/seed.js || true
 
-echo "Memulai server Next.js etalase.online di port 3005..."
+echo "Menjalankan aplikasi Next.js di port 3005..."
 exec "$@"

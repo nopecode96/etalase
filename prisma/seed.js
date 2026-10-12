@@ -15,190 +15,167 @@ const prisma = new PrismaClient();
 const SAAS_PASSWORD_HASH = "$2b$10$PIBqqp.z1qeooSO07CfOYeJC0mrZZ49D4QlUIE8./tIiwv/dzYcS."; // admin123!
 const CLIENT_PASSWORD_HASH = "$2b$10$8WkHLaeBGeOJfmEV7VKRveg2OcPv7e5OKgF1Qd2L3NTO2mV5C.a36"; // client123!
 
-const DDL_STATEMENTS = `
-DO $$ BEGIN
-  CREATE TYPE "UserRole" AS ENUM ('SAAS_SUPER_ADMIN', 'SAAS_ADMIN', 'SAAS_MARKETING', 'SAAS_FINANCE', 'SAAS_TECHNICAL', 'CLIENT_SUPER_ADMIN', 'CLIENT_ADMIN');
-EXCEPTION
-  WHEN duplicate_object THEN null;
-END $$;
+async function ensureTablesExist() {
+  console.log("🌱 Menjalankan migrasi DDL mandiri ke PostgreSQL...");
 
-DO $$ BEGIN
-  CREATE TYPE "BusinessSector" AS ENUM ('AUTOMOTIVE', 'RENTAL', 'PROPERTY', 'RESTAURANT_CAFE', 'GENERAL_SERVICE');
-EXCEPTION
-  WHEN duplicate_object THEN null;
-END $$;
+  // 1. Enum Types
+  await prisma.$executeRawUnsafe(`
+    DO $$ BEGIN
+      CREATE TYPE "UserRole" AS ENUM (
+        'SAAS_SUPER_ADMIN', 'SAAS_ADMIN', 'SAAS_MARKETING', 
+        'SAAS_FINANCE', 'SAAS_TECHNICAL', 'CLIENT_SUPER_ADMIN', 'CLIENT_ADMIN'
+      );
+    EXCEPTION WHEN duplicate_object THEN null; END $$;
+  `);
 
-DO $$ BEGIN
-  CREATE TYPE "LeadStatus" AS ENUM ('NEW', 'CONTACTED', 'FOLLOW_UP', 'DEAL', 'LOST');
-EXCEPTION
-  WHEN duplicate_object THEN null;
-END $$;
+  await prisma.$executeRawUnsafe(`
+    DO $$ BEGIN
+      CREATE TYPE "BusinessSector" AS ENUM (
+        'AUTOMOTIVE', 'PROPERTY', 'RENTAL', 'RESTAURANT_CAFE', 'GENERAL_SERVICE'
+      );
+    EXCEPTION WHEN duplicate_object THEN null; END $$;
+  `);
 
-DO $$ BEGIN
-  CREATE TYPE "ModuleType" AS ENUM ('INSTALLMENT_SIMULATION', 'RENTAL_BOOKING', 'TABLE_RESERVATION', 'PROPERTY_INQUIRY', 'SERVICE_ORDER', 'GENERAL_CONTACT');
-EXCEPTION
-  WHEN duplicate_object THEN null;
-END $$;
+  await prisma.$executeRawUnsafe(`
+    DO $$ BEGIN
+      CREATE TYPE "LeadStatus" AS ENUM (
+        'NEW', 'CONTACTED', 'FOLLOW_UP', 'DEAL', 'LOST'
+      );
+    EXCEPTION WHEN duplicate_object THEN null; END $$;
+  `);
 
-CREATE TABLE IF NOT EXISTS "TenantCategory" (
-    "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "slug" TEXT NOT NULL,
-    "sector" "BusinessSector" NOT NULL,
-    "description" TEXT,
-    "icon" TEXT,
-    "orderIndex" INTEGER NOT NULL DEFAULT 0,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "TenantCategory_pkey" PRIMARY KEY ("id")
-);
-CREATE UNIQUE INDEX IF NOT EXISTS "TenantCategory_slug_key" ON "TenantCategory"("slug");
+  // 2. Table TenantCategory
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "TenantCategory" (
+      "id" TEXT PRIMARY KEY,
+      "name" TEXT NOT NULL,
+      "slug" TEXT UNIQUE NOT NULL,
+      "sector" "BusinessSector" NOT NULL,
+      "description" TEXT,
+      "icon" TEXT,
+      "orderIndex" INTEGER NOT NULL DEFAULT 0,
+      "isActive" BOOLEAN NOT NULL DEFAULT true,
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
 
-CREATE TABLE IF NOT EXISTS "Tenant" (
-    "id" TEXT NOT NULL,
-    "customDomain" TEXT NOT NULL,
-    "businessName" TEXT NOT NULL,
-    "categoryId" TEXT,
-    "sector" "BusinessSector" NOT NULL DEFAULT 'GENERAL_SERVICE',
-    "whatsappNumber" TEXT NOT NULL,
-    "contactEmail" TEXT,
-    "address" TEXT,
-    "googleMapsUrl" TEXT,
-    "seoTitle" TEXT,
-    "seoDescription" TEXT,
-    "seoKeywords" TEXT,
-    "geoCity" TEXT,
-    "geoRegion" TEXT,
-    "latitude" DOUBLE PRECISION,
-    "longitude" DOUBLE PRECISION,
-    "themeColor" TEXT NOT NULL DEFAULT '#2563eb',
-    "heroTitle" TEXT,
-    "heroSubtitle" TEXT,
-    "heroBannerUrl" TEXT,
-    "logoUrl" TEXT,
-    "featureFlags" JSONB NOT NULL DEFAULT '{}',
-    "isActive" BOOLEAN NOT NULL DEFAULT true,
-    "expiresAt" TIMESTAMP(3),
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "Tenant_pkey" PRIMARY KEY ("id")
-);
-CREATE UNIQUE INDEX IF NOT EXISTS "Tenant_customDomain_key" ON "Tenant"("customDomain");
+  // 3. Table Tenant
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "Tenant" (
+      "id" TEXT PRIMARY KEY,
+      "customDomain" TEXT UNIQUE NOT NULL,
+      "businessName" TEXT NOT NULL,
+      "categoryId" TEXT NOT NULL REFERENCES "TenantCategory"("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+      "sector" "BusinessSector" NOT NULL,
+      "isActive" BOOLEAN NOT NULL DEFAULT true,
+      "expiresAt" TIMESTAMP(3),
+      "whatsappNumber" TEXT NOT NULL,
+      "contactEmail" TEXT,
+      "address" TEXT,
+      "googleMapsUrl" TEXT,
+      "seoTitle" TEXT,
+      "seoDescription" TEXT,
+      "seoKeywords" TEXT,
+      "geoCity" TEXT,
+      "geoRegion" TEXT,
+      "latitude" DOUBLE PRECISION,
+      "longitude" DOUBLE PRECISION,
+      "themeColor" TEXT NOT NULL DEFAULT '#2563eb',
+      "logoUrl" TEXT,
+      "heroTitle" TEXT,
+      "heroSubtitle" TEXT,
+      "heroBannerUrl" TEXT,
+      "featureFlags" JSONB DEFAULT '{}'::jsonb,
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
 
-CREATE TABLE IF NOT EXISTS "User" (
-    "id" TEXT NOT NULL,
-    "email" TEXT NOT NULL,
-    "passwordHash" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "role" "UserRole" NOT NULL DEFAULT 'CLIENT_ADMIN',
-    "tenantId" TEXT,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
-);
-CREATE UNIQUE INDEX IF NOT EXISTS "User_email_key" ON "User"("email");
+  // 4. Table User
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "User" (
+      "id" TEXT PRIMARY KEY,
+      "email" TEXT UNIQUE NOT NULL,
+      "passwordHash" TEXT NOT NULL,
+      "name" TEXT NOT NULL,
+      "role" "UserRole" NOT NULL DEFAULT 'CLIENT_ADMIN',
+      "tenantId" TEXT REFERENCES "Tenant"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
 
-CREATE TABLE IF NOT EXISTS "CatalogItem" (
-    "id" TEXT NOT NULL,
-    "tenantId" TEXT NOT NULL,
-    "title" TEXT NOT NULL,
-    "slug" TEXT NOT NULL,
-    "category" TEXT,
-    "price" DOUBLE PRECISION,
-    "pricePrefix" TEXT,
-    "description" TEXT,
-    "imageUrl" TEXT,
-    "images" TEXT[] DEFAULT ARRAY[]::TEXT[],
-    "isFeatured" BOOLEAN NOT NULL DEFAULT false,
-    "specsJson" JSONB NOT NULL DEFAULT '{}',
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "CatalogItem_pkey" PRIMARY KEY ("id")
-);
-CREATE UNIQUE INDEX IF NOT EXISTS "CatalogItem_tenantId_slug_key" ON "CatalogItem"("tenantId", "slug");
+  // 5. Table CatalogItem
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "CatalogItem" (
+      "id" TEXT PRIMARY KEY,
+      "tenantId" TEXT NOT NULL REFERENCES "Tenant"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+      "title" TEXT NOT NULL,
+      "slug" TEXT NOT NULL,
+      "category" TEXT,
+      "price" DECIMAL(65,30),
+      "pricePrefix" TEXT,
+      "description" TEXT,
+      "imageUrl" TEXT NOT NULL,
+      "images" TEXT[] DEFAULT ARRAY[]::TEXT[],
+      "isFeatured" BOOLEAN NOT NULL DEFAULT false,
+      "orderIndex" INTEGER NOT NULL DEFAULT 0,
+      "specsJson" JSONB,
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      CONSTRAINT "CatalogItem_tenantId_slug_key" UNIQUE ("tenantId", "slug")
+    );
+  `);
 
-CREATE TABLE IF NOT EXISTS "GalleryItem" (
-    "id" TEXT NOT NULL,
-    "tenantId" TEXT NOT NULL,
-    "imageUrl" TEXT NOT NULL,
-    "caption" TEXT,
-    "orderIndex" INTEGER NOT NULL DEFAULT 0,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "GalleryItem_pkey" PRIMARY KEY ("id")
-);
+  // 6. Table GalleryItem
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "GalleryItem" (
+      "id" TEXT PRIMARY KEY,
+      "tenantId" TEXT NOT NULL REFERENCES "Tenant"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+      "imageUrl" TEXT NOT NULL,
+      "caption" TEXT,
+      "orderIndex" INTEGER NOT NULL DEFAULT 0,
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
 
-CREATE TABLE IF NOT EXISTS "Testimonial" (
-    "id" TEXT NOT NULL,
-    "tenantId" TEXT NOT NULL,
-    "customerName" TEXT NOT NULL,
-    "customerRole" TEXT,
-    "rating" INTEGER NOT NULL DEFAULT 5,
-    "reviewText" TEXT NOT NULL,
-    "avatarUrl" TEXT,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "Testimonial_pkey" PRIMARY KEY ("id")
-);
+  // 7. Table Testimonial
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "Testimonial" (
+      "id" TEXT PRIMARY KEY,
+      "tenantId" TEXT NOT NULL REFERENCES "Tenant"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+      "clientName" TEXT NOT NULL,
+      "clientRole" TEXT,
+      "comment" TEXT NOT NULL,
+      "rating" INTEGER NOT NULL DEFAULT 5,
+      "avatarUrl" TEXT,
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
 
-CREATE TABLE IF NOT EXISTS "Lead" (
-    "id" TEXT NOT NULL,
-    "tenantId" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "phone" TEXT NOT NULL,
-    "email" TEXT,
-    "moduleType" "ModuleType" NOT NULL,
-    "detailsJson" JSONB NOT NULL DEFAULT '{}',
-    "status" "LeadStatus" NOT NULL DEFAULT 'NEW',
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "Lead_pkey" PRIMARY KEY ("id")
-);
+  // 8. Table Lead
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "Lead" (
+      "id" TEXT PRIMARY KEY,
+      "tenantId" TEXT NOT NULL REFERENCES "Tenant"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+      "name" TEXT NOT NULL,
+      "phone" TEXT NOT NULL,
+      "moduleType" TEXT NOT NULL,
+      "sourceUrl" TEXT,
+      "detailsJson" JSONB,
+      "status" "LeadStatus" NOT NULL DEFAULT 'NEW',
+      "notes" TEXT,
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
 
-DO $$ BEGIN
-  ALTER TABLE "Tenant" ADD CONSTRAINT "Tenant_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "TenantCategory"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-EXCEPTION WHEN duplicate_object THEN null;
-END $$;
-
-DO $$ BEGIN
-  ALTER TABLE "User" ADD CONSTRAINT "User_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-EXCEPTION WHEN duplicate_object THEN null;
-END $$;
-
-DO $$ BEGIN
-  ALTER TABLE "CatalogItem" ADD CONSTRAINT "CatalogItem_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-EXCEPTION WHEN duplicate_object THEN null;
-END $$;
-
-DO $$ BEGIN
-  ALTER TABLE "GalleryItem" ADD CONSTRAINT "GalleryItem_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-EXCEPTION WHEN duplicate_object THEN null;
-END $$;
-
-DO $$ BEGIN
-  ALTER TABLE "Testimonial" ADD CONSTRAINT "Testimonial_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-EXCEPTION WHEN duplicate_object THEN null;
-END $$;
-
-DO $$ BEGIN
-  ALTER TABLE "Lead" ADD CONSTRAINT "Lead_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-EXCEPTION WHEN duplicate_object THEN null;
-END $$;
-`;
+  console.log("✅ Seluruh struktur tabel PostgreSQL berhasil dipastikan ada.");
+}
 
 async function main() {
-  console.log("🌱 Menyiapkan skema database...");
-  const statements = DDL_STATEMENTS
-    .split(";\n")
-    .map((s) => s.trim())
-    .filter((s) => s.length > 0);
-
-  for (const stmt of statements) {
-    try {
-      await prisma.$executeRawUnsafe(stmt);
-    } catch (_) {
-      // Abaikan jika statement sudah ada
-    }
-  }
-  console.log("✅ Skema tabel & enum database terverifikasi.");
+  await ensureTablesExist();
 
   console.log("🌱 Memulai seeding database dengan Granular RBAC (Zero External Dependencies)...");
 
@@ -274,6 +251,7 @@ async function main() {
       where: { slug: "sales-mobil" },
       update: {},
       create: {
+        id: "cat_sales_mobil",
         name: "Sales Mobil Baru",
         slug: "sales-mobil",
         sector: "AUTOMOTIVE",
@@ -286,6 +264,7 @@ async function main() {
       where: { slug: "sales-properti" },
       update: {},
       create: {
+        id: "cat_sales_properti",
         name: "Sales Properti",
         slug: "sales-properti",
         sector: "PROPERTY",
@@ -298,6 +277,7 @@ async function main() {
       where: { slug: "rental-kendaraan" },
       update: {},
       create: {
+        id: "cat_rental_kendaraan",
         name: "Rental Kendaraan",
         slug: "rental-kendaraan",
         sector: "RENTAL",
@@ -310,6 +290,7 @@ async function main() {
       where: { slug: "kafe-restoran" },
       update: {},
       create: {
+        id: "cat_kafe_restoran",
         name: "Kafe & Restoran",
         slug: "kafe-restoran",
         sector: "RESTAURANT_CAFE",
