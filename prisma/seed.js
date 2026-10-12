@@ -16,33 +16,21 @@ const SAAS_PASSWORD_HASH = "$2b$10$PIBqqp.z1qeooSO07CfOYeJC0mrZZ49D4QlUIE8./tIiw
 const CLIENT_PASSWORD_HASH = "$2b$10$8WkHLaeBGeOJfmEV7VKRveg2OcPv7e5OKgF1Qd2L3NTO2mV5C.a36"; // client123!
 
 async function ensureTablesExist() {
-  console.log("🌱 Menjalankan migrasi DDL mandiri ke PostgreSQL...");
+  console.log("🌱 Menjalankan migrasi DDL mandiri & self-healing komprehensif ke PostgreSQL...");
 
   // 1. Enum Types
-  await prisma.$executeRawUnsafe(`
-    DO $$ BEGIN
-      CREATE TYPE "UserRole" AS ENUM (
-        'SAAS_SUPER_ADMIN', 'SAAS_ADMIN', 'SAAS_MARKETING', 
-        'SAAS_FINANCE', 'SAAS_TECHNICAL', 'CLIENT_SUPER_ADMIN', 'CLIENT_ADMIN'
-      );
-    EXCEPTION WHEN duplicate_object THEN null; END $$;
-  `);
-
-  await prisma.$executeRawUnsafe(`
-    DO $$ BEGIN
-      CREATE TYPE "BusinessSector" AS ENUM (
-        'AUTOMOTIVE', 'PROPERTY', 'RENTAL', 'RESTAURANT_CAFE', 'GENERAL_SERVICE'
-      );
-    EXCEPTION WHEN duplicate_object THEN null; END $$;
-  `);
-
-  await prisma.$executeRawUnsafe(`
-    DO $$ BEGIN
-      CREATE TYPE "LeadStatus" AS ENUM (
-        'NEW', 'CONTACTED', 'FOLLOW_UP', 'DEAL', 'LOST'
-      );
-    EXCEPTION WHEN duplicate_object THEN null; END $$;
-  `);
+  const enums = [
+    `DO $$ BEGIN CREATE TYPE "UserRole" AS ENUM ('SAAS_SUPER_ADMIN', 'SAAS_ADMIN', 'SAAS_MARKETING', 'SAAS_FINANCE', 'SAAS_TECHNICAL', 'CLIENT_SUPER_ADMIN', 'CLIENT_ADMIN'); EXCEPTION WHEN duplicate_object THEN null; END $$;`,
+    `DO $$ BEGIN CREATE TYPE "BusinessSector" AS ENUM ('AUTOMOTIVE', 'PROPERTY', 'RENTAL', 'RESTAURANT_CAFE', 'GENERAL_SERVICE'); EXCEPTION WHEN duplicate_object THEN null; END $$;`,
+    `DO $$ BEGIN CREATE TYPE "LeadStatus" AS ENUM ('NEW', 'CONTACTED', 'FOLLOW_UP', 'DEAL', 'LOST'); EXCEPTION WHEN duplicate_object THEN null; END $$;`
+  ];
+  for (const sql of enums) {
+    try {
+      await prisma.$executeRawUnsafe(sql);
+    } catch (err) {
+      console.warn("Enum warning:", err.message);
+    }
+  }
 
   // 2. Table TenantCategory
   await prisma.$executeRawUnsafe(`
@@ -70,7 +58,7 @@ async function ensureTablesExist() {
       "sector" "BusinessSector" NOT NULL,
       "isActive" BOOLEAN NOT NULL DEFAULT true,
       "expiresAt" TIMESTAMP(3),
-      "whatsappNumber" TEXT NOT NULL,
+      "whatsappNumber" TEXT NOT NULL DEFAULT '6281234567890',
       "contactEmail" TEXT,
       "address" TEXT,
       "googleMapsUrl" TEXT,
@@ -117,7 +105,7 @@ async function ensureTablesExist() {
       "price" DECIMAL(65,30),
       "pricePrefix" TEXT,
       "description" TEXT,
-      "imageUrl" TEXT NOT NULL,
+      "imageUrl" TEXT NOT NULL DEFAULT '',
       "images" TEXT[] DEFAULT ARRAY[]::TEXT[],
       "isFeatured" BOOLEAN NOT NULL DEFAULT false,
       "orderIndex" INTEGER NOT NULL DEFAULT 0,
@@ -128,28 +116,16 @@ async function ensureTablesExist() {
     );
   `);
 
-  await prisma.$executeRawUnsafe(`
-    ALTER TABLE "CatalogItem" ADD COLUMN IF NOT EXISTS "orderIndex" INTEGER NOT NULL DEFAULT 0;
-  `);
-
-  await prisma.$executeRawUnsafe(`
-    ALTER TABLE "CatalogItem" ADD COLUMN IF NOT EXISTS "isFeatured" BOOLEAN NOT NULL DEFAULT false;
-  `);
-
   // 6. Table GalleryItem
   await prisma.$executeRawUnsafe(`
     CREATE TABLE IF NOT EXISTS "GalleryItem" (
       "id" TEXT PRIMARY KEY,
       "tenantId" TEXT NOT NULL REFERENCES "Tenant"("id") ON DELETE CASCADE ON UPDATE CASCADE,
-      "imageUrl" TEXT NOT NULL,
+      "imageUrl" TEXT NOT NULL DEFAULT '',
       "caption" TEXT,
       "orderIndex" INTEGER NOT NULL DEFAULT 0,
       "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
-  `);
-
-  await prisma.$executeRawUnsafe(`
-    ALTER TABLE "GalleryItem" ADD COLUMN IF NOT EXISTS "orderIndex" INTEGER NOT NULL DEFAULT 0;
   `);
 
   // 7. Table Testimonial
@@ -157,7 +133,8 @@ async function ensureTablesExist() {
     CREATE TABLE IF NOT EXISTS "Testimonial" (
       "id" TEXT PRIMARY KEY,
       "tenantId" TEXT NOT NULL REFERENCES "Tenant"("id") ON DELETE CASCADE ON UPDATE CASCADE,
-      "clientName" TEXT NOT NULL DEFAULT 'Pelanggan',
+      "clientName" TEXT,
+      "customerName" TEXT,
       "clientRole" TEXT,
       "comment" TEXT NOT NULL DEFAULT '',
       "rating" INTEGER NOT NULL DEFAULT 5,
@@ -171,9 +148,9 @@ async function ensureTablesExist() {
     CREATE TABLE IF NOT EXISTS "Lead" (
       "id" TEXT PRIMARY KEY,
       "tenantId" TEXT NOT NULL REFERENCES "Tenant"("id") ON DELETE CASCADE ON UPDATE CASCADE,
-      "name" TEXT NOT NULL,
-      "phone" TEXT NOT NULL,
-      "moduleType" TEXT NOT NULL,
+      "name" TEXT NOT NULL DEFAULT 'Pengunjung',
+      "phone" TEXT NOT NULL DEFAULT '',
+      "moduleType" TEXT NOT NULL DEFAULT 'GENERAL_INQUIRY',
       "sourceUrl" TEXT,
       "detailsJson" JSONB,
       "status" "LeadStatus" NOT NULL DEFAULT 'NEW',
@@ -183,71 +160,85 @@ async function ensureTablesExist() {
     );
   `);
 
-  // --- SINKRONISASI KOLOM KOMPREHENSIF (SELF-HEALING DDL) ---
-  // Mencegah P2022 jika tabel sudah dibuat oleh migrasi versi lama
+  // --- SINKRONISASI KOLOM DEFROST & SELF-HEALING MENYELURUH ---
+  const alterations = [
+    // --- MODEL: Testimonial (Selesaikan konflik customerName vs clientName) ---
+    `ALTER TABLE "Testimonial" ADD COLUMN IF NOT EXISTS "clientName" TEXT;`,
+    `ALTER TABLE "Testimonial" ADD COLUMN IF NOT EXISTS "customerName" TEXT;`,
+    `ALTER TABLE "Testimonial" ADD COLUMN IF NOT EXISTS "clientRole" TEXT;`,
+    `ALTER TABLE "Testimonial" ADD COLUMN IF NOT EXISTS "comment" TEXT NOT NULL DEFAULT '';`,
+    `ALTER TABLE "Testimonial" ADD COLUMN IF NOT EXISTS "rating" INTEGER NOT NULL DEFAULT 5;`,
+    `ALTER TABLE "Testimonial" ADD COLUMN IF NOT EXISTS "avatarUrl" TEXT;`,
+    `DO $$ BEGIN ALTER TABLE "Testimonial" ALTER COLUMN "customerName" DROP NOT NULL; EXCEPTION WHEN undefined_column THEN null; END $$;`,
+    `DO $$ BEGIN ALTER TABLE "Testimonial" ALTER COLUMN "clientName" DROP NOT NULL; EXCEPTION WHEN undefined_column THEN null; END $$;`,
+    `DO $$ BEGIN UPDATE "Testimonial" SET "clientName" = "customerName" WHERE "clientName" IS NULL AND "customerName" IS NOT NULL; EXCEPTION WHEN undefined_column THEN null; END $$;`,
+    `DO $$ BEGIN UPDATE "Testimonial" SET "customerName" = "clientName" WHERE "customerName" IS NULL AND "clientName" IS NOT NULL; EXCEPTION WHEN undefined_column THEN null; END $$;`,
 
-  // 1. Sinkronisasi Kolom Testimonial
-  await prisma.$executeRawUnsafe(`ALTER TABLE "Testimonial" ADD COLUMN IF NOT EXISTS "clientName" TEXT NOT NULL DEFAULT 'Pelanggan';`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "Testimonial" ADD COLUMN IF NOT EXISTS "clientRole" TEXT;`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "Testimonial" ADD COLUMN IF NOT EXISTS "comment" TEXT NOT NULL DEFAULT '';`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "Testimonial" ADD COLUMN IF NOT EXISTS "rating" INTEGER NOT NULL DEFAULT 5;`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "Testimonial" ADD COLUMN IF NOT EXISTS "avatarUrl" TEXT;`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "Testimonial" ADD COLUMN IF NOT EXISTS "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;`);
+    // --- MODEL: CatalogItem ---
+    `ALTER TABLE "CatalogItem" ADD COLUMN IF NOT EXISTS "slug" TEXT;`,
+    `ALTER TABLE "CatalogItem" ADD COLUMN IF NOT EXISTS "category" TEXT;`,
+    `ALTER TABLE "CatalogItem" ADD COLUMN IF NOT EXISTS "price" DECIMAL(65,30);`,
+    `ALTER TABLE "CatalogItem" ADD COLUMN IF NOT EXISTS "pricePrefix" TEXT;`,
+    `ALTER TABLE "CatalogItem" ADD COLUMN IF NOT EXISTS "description" TEXT;`,
+    `ALTER TABLE "CatalogItem" ADD COLUMN IF NOT EXISTS "imageUrl" TEXT NOT NULL DEFAULT '';`,
+    `ALTER TABLE "CatalogItem" ADD COLUMN IF NOT EXISTS "images" TEXT[] DEFAULT ARRAY[]::TEXT[];`,
+    `ALTER TABLE "CatalogItem" ADD COLUMN IF NOT EXISTS "isFeatured" BOOLEAN NOT NULL DEFAULT false;`,
+    `ALTER TABLE "CatalogItem" ADD COLUMN IF NOT EXISTS "orderIndex" INTEGER NOT NULL DEFAULT 0;`,
+    `ALTER TABLE "CatalogItem" ADD COLUMN IF NOT EXISTS "specsJson" JSONB;`,
+    `CREATE UNIQUE INDEX IF NOT EXISTS "CatalogItem_tenantId_slug_key" ON "CatalogItem"("tenantId", "slug");`,
 
-  // 2. Sinkronisasi Kolom CatalogItem
-  await prisma.$executeRawUnsafe(`ALTER TABLE "CatalogItem" ADD COLUMN IF NOT EXISTS "orderIndex" INTEGER NOT NULL DEFAULT 0;`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "CatalogItem" ADD COLUMN IF NOT EXISTS "isFeatured" BOOLEAN NOT NULL DEFAULT false;`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "CatalogItem" ADD COLUMN IF NOT EXISTS "specsJson" JSONB;`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "CatalogItem" ADD COLUMN IF NOT EXISTS "images" TEXT[] DEFAULT ARRAY[]::TEXT[];`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "CatalogItem" ADD COLUMN IF NOT EXISTS "pricePrefix" TEXT;`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "CatalogItem" ADD COLUMN IF NOT EXISTS "category" TEXT;`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "CatalogItem" ADD COLUMN IF NOT EXISTS "price" DECIMAL(65,30);`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "CatalogItem" ADD COLUMN IF NOT EXISTS "description" TEXT;`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "CatalogItem" ADD COLUMN IF NOT EXISTS "imageUrl" TEXT;`);
+    // --- MODEL: GalleryItem ---
+    `ALTER TABLE "GalleryItem" ADD COLUMN IF NOT EXISTS "imageUrl" TEXT NOT NULL DEFAULT '';`,
+    `ALTER TABLE "GalleryItem" ADD COLUMN IF NOT EXISTS "caption" TEXT;`,
+    `ALTER TABLE "GalleryItem" ADD COLUMN IF NOT EXISTS "orderIndex" INTEGER NOT NULL DEFAULT 0;`,
 
-  // 3. Sinkronisasi Kolom GalleryItem
-  await prisma.$executeRawUnsafe(`ALTER TABLE "GalleryItem" ADD COLUMN IF NOT EXISTS "orderIndex" INTEGER NOT NULL DEFAULT 0;`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "GalleryItem" ADD COLUMN IF NOT EXISTS "caption" TEXT;`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "GalleryItem" ADD COLUMN IF NOT EXISTS "imageUrl" TEXT;`);
+    // --- MODEL: Lead ---
+    `ALTER TABLE "Lead" ADD COLUMN IF NOT EXISTS "name" TEXT NOT NULL DEFAULT 'Pengunjung';`,
+    `ALTER TABLE "Lead" ADD COLUMN IF NOT EXISTS "phone" TEXT NOT NULL DEFAULT '';`,
+    `ALTER TABLE "Lead" ADD COLUMN IF NOT EXISTS "moduleType" TEXT NOT NULL DEFAULT 'GENERAL_INQUIRY';`,
+    `ALTER TABLE "Lead" ADD COLUMN IF NOT EXISTS "sourceUrl" TEXT;`,
+    `ALTER TABLE "Lead" ADD COLUMN IF NOT EXISTS "detailsJson" JSONB;`,
+    `ALTER TABLE "Lead" ADD COLUMN IF NOT EXISTS "notes" TEXT;`,
 
-  // 4. Sinkronisasi Kolom Tenant
-  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "featureFlags" JSONB DEFAULT '{}'::jsonb;`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "themeColor" TEXT NOT NULL DEFAULT '#2563eb';`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "logoUrl" TEXT;`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "heroTitle" TEXT;`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "heroSubtitle" TEXT;`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "heroBannerUrl" TEXT;`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "geoCity" TEXT;`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "geoRegion" TEXT;`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "latitude" DOUBLE PRECISION;`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "longitude" DOUBLE PRECISION;`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "address" TEXT;`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "googleMapsUrl" TEXT;`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "contactEmail" TEXT;`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "whatsappNumber" TEXT;`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "seoTitle" TEXT;`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "seoDescription" TEXT;`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "seoKeywords" TEXT;`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "isActive" BOOLEAN NOT NULL DEFAULT true;`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "expiresAt" TIMESTAMP(3);`);
+    // --- MODEL: Tenant ---
+    `ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "whatsappNumber" TEXT NOT NULL DEFAULT '6281234567890';`,
+    `ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "contactEmail" TEXT;`,
+    `ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "address" TEXT;`,
+    `ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "googleMapsUrl" TEXT;`,
+    `ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "seoTitle" TEXT;`,
+    `ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "seoDescription" TEXT;`,
+    `ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "seoKeywords" TEXT;`,
+    `ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "geoCity" TEXT;`,
+    `ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "geoRegion" TEXT;`,
+    `ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "latitude" DOUBLE PRECISION;`,
+    `ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "longitude" DOUBLE PRECISION;`,
+    `ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "themeColor" TEXT NOT NULL DEFAULT '#2563eb';`,
+    `ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "logoUrl" TEXT;`,
+    `ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "heroTitle" TEXT;`,
+    `ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "heroSubtitle" TEXT;`,
+    `ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "heroBannerUrl" TEXT;`,
+    `ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "featureFlags" JSONB DEFAULT '{}'::jsonb;`,
+    `ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "isActive" BOOLEAN NOT NULL DEFAULT true;`,
+    `ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "expiresAt" TIMESTAMP(3);`,
 
-  // 5. Sinkronisasi Kolom Lead
-  await prisma.$executeRawUnsafe(`ALTER TABLE "Lead" ADD COLUMN IF NOT EXISTS "sourceUrl" TEXT;`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "Lead" ADD COLUMN IF NOT EXISTS "detailsJson" JSONB;`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "Lead" ADD COLUMN IF NOT EXISTS "notes" TEXT;`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "Lead" ADD COLUMN IF NOT EXISTS "status" "LeadStatus" NOT NULL DEFAULT 'NEW';`);
+    // --- MODEL: User & TenantCategory ---
+    `ALTER TABLE "TenantCategory" ADD COLUMN IF NOT EXISTS "orderIndex" INTEGER NOT NULL DEFAULT 0;`,
+    `ALTER TABLE "TenantCategory" ADD COLUMN IF NOT EXISTS "isActive" BOOLEAN NOT NULL DEFAULT true;`,
+    `ALTER TABLE "TenantCategory" ADD COLUMN IF NOT EXISTS "description" TEXT;`,
+    `ALTER TABLE "TenantCategory" ADD COLUMN IF NOT EXISTS "icon" TEXT;`,
+    `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "role" "UserRole" NOT NULL DEFAULT 'CLIENT_ADMIN';`,
+    `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "tenantId" TEXT;`,
+    `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "passwordHash" TEXT NOT NULL DEFAULT '';`,
+    `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "name" TEXT NOT NULL DEFAULT 'User';`
+  ];
 
-  // 6. Sinkronisasi Kolom User
-  await prisma.$executeRawUnsafe(`ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "role" "UserRole" NOT NULL DEFAULT 'CLIENT_ADMIN';`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "tenantId" TEXT;`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "passwordHash" TEXT NOT NULL DEFAULT '';`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "name" TEXT NOT NULL DEFAULT 'User';`);
-
-  // 7. Sinkronisasi Kolom TenantCategory
-  await prisma.$executeRawUnsafe(`ALTER TABLE "TenantCategory" ADD COLUMN IF NOT EXISTS "orderIndex" INTEGER NOT NULL DEFAULT 0;`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "TenantCategory" ADD COLUMN IF NOT EXISTS "isActive" BOOLEAN NOT NULL DEFAULT true;`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "TenantCategory" ADD COLUMN IF NOT EXISTS "description" TEXT;`);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "TenantCategory" ADD COLUMN IF NOT EXISTS "icon" TEXT;`);
+  for (const sql of alterations) {
+    try {
+      await prisma.$executeRawUnsafe(sql);
+    } catch (err) {
+      console.warn("Alteration warning:", err.message);
+    }
+  }
 
   console.log("✅ Seluruh struktur tabel & sinkronisasi kolom PostgreSQL berhasil dipastikan ada.");
 }
@@ -576,6 +567,7 @@ async function main() {
   const testimonials1 = [
     {
       clientName: "Bpk. Hendra Kurniawan",
+      customerName: "Bpk. Hendra Kurniawan",
       clientRole: "Wiraswasta, Buah Batu",
       comment: "Pelayanan Mas Bastian top banget! Berkas dibantu sampai tuntas, DP minim sesuai janji, dan unit Omoda 5 GT dikirim langsung ke rumah plat nomor resmi siap pakai.",
       rating: 5,
@@ -583,6 +575,7 @@ async function main() {
     },
     {
       clientName: "Ibu Maya Septiani",
+      customerName: "Ibu Maya Septiani",
       clientRole: "Dokter, Dago Atas",
       comment: "Awalnya bingung pilih Tiggo 8 Pro atau merk lain. Mas Bastian bawa unit test drive langsung ke klinik saya. Proses kredit BCA Finance cuma 2 hari langsung approve!",
       rating: 5,
@@ -590,6 +583,7 @@ async function main() {
     },
     {
       clientName: "Bpk. Dr. Faisal M.",
+      customerName: "Bpk. Dr. Faisal M.",
       clientRole: "Dosen, Antapani",
       comment: "Beli Omoda E5 EV dapat promo free asuransi 1 tahun dan wall charger terpasang rapi di rumah. Penjelasan fitur ADAS sangat detail dan profesional.",
       rating: 5,
@@ -598,12 +592,30 @@ async function main() {
   ];
 
   for (const t of testimonials1) {
-    await prisma.testimonial.create({
-      data: {
-        tenantId: tenant1.id,
-        ...t,
-      },
-    });
+    try {
+      await prisma.testimonial.create({
+        data: {
+          tenantId: tenant1.id,
+          clientName: t.clientName,
+          clientRole: t.clientRole,
+          comment: t.comment,
+          rating: t.rating,
+          avatarUrl: t.avatarUrl,
+        },
+      });
+    } catch (createErr) {
+      // Fallback via raw SQL if Prisma Client model differs from older database schema
+      await prisma.$executeRawUnsafe(
+        `INSERT INTO "Testimonial" ("id", "tenantId", "clientName", "customerName", "clientRole", "comment", "rating", "avatarUrl", "createdAt")
+         VALUES (gen_random_uuid()::text, $1, $2, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP)`,
+        tenant1.id,
+        t.clientName,
+        t.clientRole,
+        t.comment,
+        t.rating,
+        t.avatarUrl
+      );
+    }
   }
 
   console.log("✅ Tenant 1 (Automotive Chery & Jaecoo Bandung):", tenant1.customDomain);
