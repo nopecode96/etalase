@@ -1,4 +1,9 @@
-const { PrismaClient } = require("@prisma/client");
+let PrismaClient;
+try {
+  PrismaClient = require("../src/generated/prisma").PrismaClient;
+} catch {
+  PrismaClient = require("@prisma/client").PrismaClient;
+}
 const bcrypt = require("bcryptjs");
 
 const prisma = new PrismaClient();
