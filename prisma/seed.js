@@ -157,9 +157,9 @@ async function ensureTablesExist() {
     CREATE TABLE IF NOT EXISTS "Testimonial" (
       "id" TEXT PRIMARY KEY,
       "tenantId" TEXT NOT NULL REFERENCES "Tenant"("id") ON DELETE CASCADE ON UPDATE CASCADE,
-      "clientName" TEXT NOT NULL,
+      "clientName" TEXT NOT NULL DEFAULT 'Pelanggan',
       "clientRole" TEXT,
-      "comment" TEXT NOT NULL,
+      "comment" TEXT NOT NULL DEFAULT '',
       "rating" INTEGER NOT NULL DEFAULT 5,
       "avatarUrl" TEXT,
       "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -183,7 +183,73 @@ async function ensureTablesExist() {
     );
   `);
 
-  console.log("✅ Seluruh struktur tabel PostgreSQL berhasil dipastikan ada.");
+  // --- SINKRONISASI KOLOM KOMPREHENSIF (SELF-HEALING DDL) ---
+  // Mencegah P2022 jika tabel sudah dibuat oleh migrasi versi lama
+
+  // 1. Sinkronisasi Kolom Testimonial
+  await prisma.$executeRawUnsafe(`ALTER TABLE "Testimonial" ADD COLUMN IF NOT EXISTS "clientName" TEXT NOT NULL DEFAULT 'Pelanggan';`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "Testimonial" ADD COLUMN IF NOT EXISTS "clientRole" TEXT;`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "Testimonial" ADD COLUMN IF NOT EXISTS "comment" TEXT NOT NULL DEFAULT '';`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "Testimonial" ADD COLUMN IF NOT EXISTS "rating" INTEGER NOT NULL DEFAULT 5;`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "Testimonial" ADD COLUMN IF NOT EXISTS "avatarUrl" TEXT;`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "Testimonial" ADD COLUMN IF NOT EXISTS "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;`);
+
+  // 2. Sinkronisasi Kolom CatalogItem
+  await prisma.$executeRawUnsafe(`ALTER TABLE "CatalogItem" ADD COLUMN IF NOT EXISTS "orderIndex" INTEGER NOT NULL DEFAULT 0;`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "CatalogItem" ADD COLUMN IF NOT EXISTS "isFeatured" BOOLEAN NOT NULL DEFAULT false;`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "CatalogItem" ADD COLUMN IF NOT EXISTS "specsJson" JSONB;`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "CatalogItem" ADD COLUMN IF NOT EXISTS "images" TEXT[] DEFAULT ARRAY[]::TEXT[];`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "CatalogItem" ADD COLUMN IF NOT EXISTS "pricePrefix" TEXT;`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "CatalogItem" ADD COLUMN IF NOT EXISTS "category" TEXT;`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "CatalogItem" ADD COLUMN IF NOT EXISTS "price" DECIMAL(65,30);`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "CatalogItem" ADD COLUMN IF NOT EXISTS "description" TEXT;`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "CatalogItem" ADD COLUMN IF NOT EXISTS "imageUrl" TEXT;`);
+
+  // 3. Sinkronisasi Kolom GalleryItem
+  await prisma.$executeRawUnsafe(`ALTER TABLE "GalleryItem" ADD COLUMN IF NOT EXISTS "orderIndex" INTEGER NOT NULL DEFAULT 0;`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "GalleryItem" ADD COLUMN IF NOT EXISTS "caption" TEXT;`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "GalleryItem" ADD COLUMN IF NOT EXISTS "imageUrl" TEXT;`);
+
+  // 4. Sinkronisasi Kolom Tenant
+  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "featureFlags" JSONB DEFAULT '{}'::jsonb;`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "themeColor" TEXT NOT NULL DEFAULT '#2563eb';`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "logoUrl" TEXT;`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "heroTitle" TEXT;`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "heroSubtitle" TEXT;`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "heroBannerUrl" TEXT;`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "geoCity" TEXT;`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "geoRegion" TEXT;`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "latitude" DOUBLE PRECISION;`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "longitude" DOUBLE PRECISION;`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "address" TEXT;`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "googleMapsUrl" TEXT;`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "contactEmail" TEXT;`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "whatsappNumber" TEXT;`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "seoTitle" TEXT;`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "seoDescription" TEXT;`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "seoKeywords" TEXT;`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "isActive" BOOLEAN NOT NULL DEFAULT true;`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "Tenant" ADD COLUMN IF NOT EXISTS "expiresAt" TIMESTAMP(3);`);
+
+  // 5. Sinkronisasi Kolom Lead
+  await prisma.$executeRawUnsafe(`ALTER TABLE "Lead" ADD COLUMN IF NOT EXISTS "sourceUrl" TEXT;`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "Lead" ADD COLUMN IF NOT EXISTS "detailsJson" JSONB;`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "Lead" ADD COLUMN IF NOT EXISTS "notes" TEXT;`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "Lead" ADD COLUMN IF NOT EXISTS "status" "LeadStatus" NOT NULL DEFAULT 'NEW';`);
+
+  // 6. Sinkronisasi Kolom User
+  await prisma.$executeRawUnsafe(`ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "role" "UserRole" NOT NULL DEFAULT 'CLIENT_ADMIN';`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "tenantId" TEXT;`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "passwordHash" TEXT NOT NULL DEFAULT '';`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "name" TEXT NOT NULL DEFAULT 'User';`);
+
+  // 7. Sinkronisasi Kolom TenantCategory
+  await prisma.$executeRawUnsafe(`ALTER TABLE "TenantCategory" ADD COLUMN IF NOT EXISTS "orderIndex" INTEGER NOT NULL DEFAULT 0;`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "TenantCategory" ADD COLUMN IF NOT EXISTS "isActive" BOOLEAN NOT NULL DEFAULT true;`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "TenantCategory" ADD COLUMN IF NOT EXISTS "description" TEXT;`);
+  await prisma.$executeRawUnsafe(`ALTER TABLE "TenantCategory" ADD COLUMN IF NOT EXISTS "icon" TEXT;`);
+
+  console.log("✅ Seluruh struktur tabel & sinkronisasi kolom PostgreSQL berhasil dipastikan ada.");
 }
 
 async function main() {
