@@ -1,4 +1,8 @@
-import "dotenv/config";
+try {
+  require("dotenv/config");
+} catch {
+  // Abaikan jika dotenv tidak tersedia (misal di production container)
+}
 import { defineConfig, env } from "prisma/config";
 
 export default defineConfig({
