@@ -23,7 +23,7 @@ export default function CategoryShowcase() {
         "Spesifikasi lengkap & brosur digital per tipe kendaraan",
         "Tombol cepat tanya stok & booking test drive langsung ke WhatsApp",
       ],
-      demoUrl: "http://bastian-sales.com:3005",
+      demoUrl: "https://etalase.online/bastian-sales",
       demoDomain: "bastian-sales.com",
       demoButtonLabel: "Buka Contoh Website Otomotif",
       image: "/showcase/automotive-web.png",
@@ -44,7 +44,7 @@ export default function CategoryShowcase() {
         "Informasi syarat sewa yang jelas & transparan",
         "Formulir reservasi tanggal & armada siap kirim ke WhatsApp",
       ],
-      demoUrl: "http://bastian-rental.com:3005",
+      demoUrl: "https://etalase.online/bastian-rental",
       demoDomain: "bastian-rental.com",
       demoButtonLabel: "Buka Contoh Website Rental",
       image: "/showcase/rental-web.png",
@@ -65,7 +65,7 @@ export default function CategoryShowcase() {
         "Formulir simulasi cicilan KPR & estimasi DP",
         "Form download e-brosur berhadiah kontak calon pembeli",
       ],
-      demoUrl: "http://propertibandung.com:3005",
+      demoUrl: "https://etalase.online/properti-bandung",
       demoDomain: "propertibandung.com",
       demoButtonLabel: "Buka Contoh Website Properti",
       image: "/showcase/property-web.png",
@@ -86,7 +86,7 @@ export default function CategoryShowcase() {
         "Integrasi peta lokasi Google Maps & jam buka operasional",
         "Bisa dipasang sebagai QR Code meja tanpa biaya tambahan",
       ],
-      demoUrl: "http://kulinerkita.com:3005",
+      demoUrl: "https://etalase.online/kuliner-kita",
       demoDomain: "kulinerkita.com",
       demoButtonLabel: "Buka Contoh Website Kafe & Resto",
       image: "/showcase/restaurant-web.png",
@@ -107,7 +107,7 @@ export default function CategoryShowcase() {
         "Review & testimoni kepuasan pelanggan terdahulu",
         "Tombol darurat/konsultasi cepat via WhatsApp 24 Jam",
       ],
-      demoUrl: "http://jasaprofesional.id:3005",
+      demoUrl: "https://etalase.online/jasaprofesional",
       demoDomain: "jasaprofesional.id",
       demoButtonLabel: "Buka Contoh Website Jasa Lokal",
       image: "/showcase/service-web.png",
@@ -220,13 +220,13 @@ export default function CategoryShowcase() {
                 </div>
 
                 {/* Preview Image */}
-                <div className="aspect-[4/3] overflow-hidden relative">
+                <div className="aspect-[16/10] overflow-hidden relative bg-slate-900">
                   <img
                     src={current.image}
                     alt={current.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent flex items-end p-6">
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent flex items-end p-5">
                     <span className="text-white text-xs font-semibold bg-black/40 backdrop-blur-sm px-3 py-1 rounded-full border border-white/20">
                       Tampilan Responsif di HP &amp; Komputer
                     </span>
