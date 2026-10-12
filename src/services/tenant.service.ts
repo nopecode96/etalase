@@ -4,7 +4,7 @@ import type { Tenant } from "@/generated/prisma";
 const PREVIEW_SLUG_MAP: Record<string, string> = {
   "bastian-sales": "bastian-sales.com",
   "bastian-rental": "bastian-rental.com",
-  "properti-bandung": "propertibandung.com",
+  "properti-bandung": "properti-bandung.com",
   "kuliner-kita": "kulinerkita.com",
   "jasaprofesional": "jasaprofesional.id",
 };

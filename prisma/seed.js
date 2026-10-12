@@ -1135,6 +1135,323 @@ async function main() {
 
   console.log("✅ Tenant 2 (Rental):", tenant2.customDomain);
 
+  // 5. DUMMY TENANT 3: properti-bandung.com (Grand Ciganitri Regency - Property)
+  const tenant3 = await prisma.tenant.upsert({
+    where: { customDomain: "properti-bandung.com" },
+    update: {
+      businessName: "Grand Ciganitri Regency - Bandung",
+      heroTitle: "Hunian Modern Tropis Premium di Bandung Selatan",
+      heroSubtitle: "Lokasi strategis 10 menit dari Tol Buah Batu & Telkom University. Dapatkan promo DP 0%, Free Biaya KPR, dan Sertifikat SHM!",
+      heroBannerUrl: "/assets/templates/property/hero-property.webp",
+      logoUrl: "/assets/templates/property/agent-profile.webp",
+      themeColor: "#b45309", // Warm Amber / Bronze Luxury
+      geoCity: "Bandung",
+      geoRegion: "ID-JB",
+      latitude: -6.9744,
+      longitude: 107.6322,
+      address: "Jl. Terusan Buah Batu No. 88, Bojongsoang, Bandung, Jawa Barat",
+      googleMapsUrl: "https://maps.google.com/?q=Bojongsoang+Bandung",
+      whatsappNumber: "6281312345678",
+      contactEmail: "marketing@properti-bandung.com",
+      seoTitle: "Grand Ciganitri Regency Bandung | Rumah Modern Tropis Dekat Tol Buah Batu",
+      seoDescription: "Cluster perumahan modern tropis di Bandung Selatan. Promo DP 0%, bebas biaya KPR, SHM pecah, 10 menit Tol Buah Batu & Telkom University. Hubungi Riana Anggraini!",
+      seoKeywords: "rumah dijual bandung, cluster buah batu, rumah dekat telkom university, rumah bojongsoang bandung, perumahan murah bandung selatan, kpr rumah bandung",
+      featureFlags: {
+        taglineBadge: "Exclusive Cluster & Smart Living • Hanya Tersedia 24 Unit",
+        developerName: "PT Graha Mahakarya Propertindo",
+        agentProfile: {
+          name: "Riana Anggraini, S.Ars",
+          role: "In-House Property Specialist",
+          greeting: "Halo! Saya Riana, siap membantu konsultasi pemilihan kavling, perhitungan KPR bank syariah/konvensional, hingga jadwal survei lokasi."
+        },
+        heroHighlights: [
+          { label: "Promo DP", value: "0% / Bebas Uang Muka" },
+          { label: "Sertifikat", value: "SHM Sudah Pecah per Kavling" },
+          { label: "Akses Tol", value: "10 Menit Gerbang Buah Batu" }
+        ],
+        commitments: [
+          "Jaminan Bangunan Bergaransi 1 Tahun",
+          "Free Kanopi, Smart Door Lock & Toren Air",
+          "Dibantu Proses Akad KPR sampai Lolos 100%",
+          "Legalitas Clean & Clear (IMB/PBG Lengkap)"
+        ],
+        facilityBadges: [
+          "One Gate System & CCTV 24 Jam",
+          "Clubhouse & Kolam Renang",
+          "Jaringan Listrik & Fiber Optic Bawah Tanah",
+          "Taman Hijau & Playground Ramah Anak"
+        ]
+      },
+      isActive: true,
+      expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+    },
+    create: {
+      customDomain: "properti-bandung.com",
+      businessName: "Grand Ciganitri Regency - Bandung",
+      categoryId: catProperti.id,
+      sector: "PROPERTY",
+      whatsappNumber: "6281312345678",
+      contactEmail: "marketing@properti-bandung.com",
+      address: "Jl. Terusan Buah Batu No. 88, Bojongsoang, Bandung, Jawa Barat",
+      googleMapsUrl: "https://maps.google.com/?q=Bojongsoang+Bandung",
+      seoTitle: "Grand Ciganitri Regency Bandung | Rumah Modern Tropis Dekat Tol Buah Batu",
+      seoDescription: "Cluster perumahan modern tropis di Bandung Selatan. Promo DP 0%, bebas biaya KPR, SHM pecah, 10 menit Tol Buah Batu & Telkom University. Hubungi Riana Anggraini!",
+      seoKeywords: "rumah dijual bandung, cluster buah batu, rumah dekat telkom university, rumah bojongsoang bandung, perumahan murah bandung selatan, kpr rumah bandung",
+      geoCity: "Bandung",
+      geoRegion: "ID-JB",
+      latitude: -6.9744,
+      longitude: 107.6322,
+      themeColor: "#b45309",
+      heroTitle: "Hunian Modern Tropis Premium di Bandung Selatan",
+      heroSubtitle: "Lokasi strategis 10 menit dari Tol Buah Batu & Telkom University. Dapatkan promo DP 0%, Free Biaya KPR, dan Sertifikat SHM!",
+      heroBannerUrl: "/assets/templates/property/hero-property.webp",
+      logoUrl: "/assets/templates/property/agent-profile.webp",
+      featureFlags: {
+        taglineBadge: "Exclusive Cluster & Smart Living • Hanya Tersedia 24 Unit",
+        developerName: "PT Graha Mahakarya Propertindo",
+        agentProfile: {
+          name: "Riana Anggraini, S.Ars",
+          role: "In-House Property Specialist",
+          greeting: "Halo! Saya Riana, siap membantu konsultasi pemilihan kavling, perhitungan KPR bank syariah/konvensional, hingga jadwal survei lokasi."
+        },
+        heroHighlights: [
+          { label: "Promo DP", value: "0% / Bebas Uang Muka" },
+          { label: "Sertifikat", value: "SHM Sudah Pecah per Kavling" },
+          { label: "Akses Tol", value: "10 Menit Gerbang Buah Batu" }
+        ],
+        commitments: [
+          "Jaminan Bangunan Bergaransi 1 Tahun",
+          "Free Kanopi, Smart Door Lock & Toren Air",
+          "Dibantu Proses Akad KPR sampai Lolos 100%",
+          "Legalitas Clean & Clear (IMB/PBG Lengkap)"
+        ],
+        facilityBadges: [
+          "One Gate System & CCTV 24 Jam",
+          "Clubhouse & Kolam Renang",
+          "Jaringan Listrik & Fiber Optic Bawah Tanah",
+          "Taman Hijau & Playground Ramah Anak"
+        ]
+      },
+      isActive: true,
+      expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+    },
+  });
+
+  await prisma.user.upsert({
+    where: { email: "owner@properti-bandung.com" },
+    update: { role: "CLIENT_SUPER_ADMIN", tenantId: tenant3.id },
+    create: {
+      email: "owner@properti-bandung.com",
+      passwordHash: clientPasswordHash,
+      name: "Riana Anggraini, S.Ars (Property Specialist)",
+      role: "CLIENT_SUPER_ADMIN",
+      tenantId: tenant3.id,
+    },
+  });
+
+  // Katalog Unit Properti
+  const catalogItems3 = [
+    {
+      title: "Rumah Tipe 60/84 - 2 Lantai Minimalis",
+      slug: "tipe-60-84",
+      category: "Rumah 2 Lantai",
+      price: 650000000,
+      pricePrefix: "Harga mulai",
+      description: "Hunian modern tropis 2 lantai berkonsep open-space dengan pencahayaan alami maksimal, cross ventilation, dan smart home system.",
+      imageUrl: "/assets/templates/property/tipe-60.webp",
+      images: ["/assets/templates/property/tipe-60.webp"],
+      isFeatured: true,
+      orderIndex: 0,
+      specsJson: {
+        landArea: "84 m²",
+        buildingArea: "60 m²",
+        bedrooms: 3,
+        bathrooms: 2,
+        floors: 2,
+        carport: "1 Mobil",
+        electricity: "2200 VA",
+        water: "Jetpump Submersible",
+        monthlyInstallment: "Mulai Rp 3,8 Jt/bln",
+        floorplanUrl: "/assets/templates/property/siteplan.webp"
+      },
+    },
+    {
+      title: "Rumah Tipe 90/120 - Scandinavian Modern",
+      slug: "tipe-90-120",
+      category: "Rumah Keluarga Favorit",
+      price: 950000000,
+      pricePrefix: "Harga mulai",
+      description: "Fasad elegan bergaya Scandinavian dengan ruang keluarga ekstra luas, taman belakang asri, dan master bedroom ber-balkon privat.",
+      imageUrl: "/assets/templates/property/tipe-90.webp",
+      images: ["/assets/templates/property/tipe-90.webp"],
+      isFeatured: true,
+      orderIndex: 1,
+      specsJson: {
+        landArea: "120 m²",
+        buildingArea: "90 m²",
+        bedrooms: 4,
+        bathrooms: 3,
+        floors: 2,
+        carport: "2 Mobil",
+        electricity: "2200 VA",
+        water: "Jetpump Submersible",
+        monthlyInstallment: "Mulai Rp 5,6 Jt/bln",
+        floorplanUrl: "/assets/templates/property/siteplan.webp"
+      },
+    },
+    {
+      title: "Rumah Tipe 120/150 - Luxury Family Residence",
+      slug: "tipe-120-150",
+      category: "Exclusive Hook / Boulevard",
+      price: 1450000000,
+      pricePrefix: "Harga mulai",
+      description: "Hunian mewah prestisius di jalan utama cluster. Dilengkapi ruang kerja mezzanine, sanitair premium Toto, dan garasi luas.",
+      imageUrl: "/assets/templates/property/tipe-120.webp",
+      images: ["/assets/templates/property/tipe-120.webp"],
+      isFeatured: true,
+      orderIndex: 2,
+      specsJson: {
+        landArea: "150 m²",
+        buildingArea: "120 m²",
+        bedrooms: 4,
+        bathrooms: 4,
+        floors: 2,
+        carport: "2 Mobil + Canopy",
+        electricity: "3500 VA",
+        water: "Jetpump Submersible",
+        monthlyInstallment: "Mulai Rp 8,5 Jt/bln",
+        floorplanUrl: "/assets/templates/property/siteplan.webp"
+      },
+    },
+    {
+      title: "Ruko Komersial 3 Lantai Prime Area",
+      slug: "ruko-komersial-3-lantai",
+      category: "Komersial & Investasi",
+      price: 1850000000,
+      pricePrefix: "Harga mulai",
+      description: "Unit ruko komersial berhadapan langsung dengan jalan raya utama Bojongsoang. Sangat cocok untuk kafe, kantor, klinik, atau minimarket.",
+      imageUrl: "/assets/templates/property/ruko-commercial.webp",
+      images: ["/assets/templates/property/ruko-commercial.webp"],
+      isFeatured: false,
+      orderIndex: 3,
+      specsJson: {
+        landArea: "100 m²",
+        buildingArea: "180 m²",
+        bedrooms: 2,
+        bathrooms: 3,
+        floors: 3,
+        carport: "Parkir Luas 4 Mobil",
+        electricity: "4400 VA",
+        water: "Jetpump Submersible",
+        monthlyInstallment: "Mulai Rp 11 Jt/bln",
+        floorplanUrl: "/assets/templates/property/siteplan.webp"
+      },
+    },
+  ];
+
+  for (const item of catalogItems3) {
+    await prisma.catalogItem.upsert({
+      where: { tenantId_slug: { tenantId: tenant3.id, slug: item.slug } },
+      update: { ...item },
+      create: { tenantId: tenant3.id, ...item },
+    });
+  }
+
+  // Galeri Serah Terima Unit Properti
+  const propertyGalleries = [
+    { id: "prop-gal-1", imageUrl: "/assets/templates/property/handover-prop-1.webp", caption: "Akad KPR & Serah Terima Kunci Unit Tipe 90 kepada Bpk. Irfan di Galeri Pemasaran", orderIndex: 0 },
+    { id: "prop-gal-2", imageUrl: "/assets/templates/property/handover-prop-2.webp", caption: "Kunjungan survei lokasi kavling & konsultasi layout bersama Ibu Dian & Keluarga", orderIndex: 1 },
+    { id: "prop-gal-3", imageUrl: "/assets/templates/property/handover-prop-3.webp", caption: "Penyerahan Sertifikat SHM & Kunci Rumah Tipe 60 ke Pasangan Muda Bpk. Aditya", orderIndex: 2 },
+    { id: "prop-gal-4", imageUrl: "/assets/templates/property/handover-prop-4.webp", caption: "Progress pembangunan fisik cluster tahap 2 terpantau rapi dan on-schedule", orderIndex: 3 },
+  ];
+
+  for (const gal of propertyGalleries) {
+    await prisma.galleryItem.upsert({
+      where: { id: gal.id },
+      update: {
+        imageUrl: gal.imageUrl,
+        caption: gal.caption,
+        orderIndex: gal.orderIndex,
+      },
+      create: {
+        id: gal.id,
+        tenantId: tenant3.id,
+        imageUrl: gal.imageUrl,
+        caption: gal.caption,
+        orderIndex: gal.orderIndex,
+      },
+    });
+  }
+
+  // Testimoni Konsumen Properti
+  const propertyTestimonials = [
+    {
+      id: "prop-testi-1",
+      tenantId: tenant3.id,
+      clientName: "Bpk. Irfan Maulana",
+      customerName: "Bpk. Irfan Maulana",
+      clientRole: "Pembeli Tipe 90/120 - Karyawan BUMN",
+      comment: "Alhamdulillah dibantu Mbak Riana dari awal pilih kavling sampai akad kredit BSI lolos tanpa kendala. Kualitas bangunan kokoh, udara sejuk, dan dekat banget ke tol Buah Batu.",
+      rating: 5,
+      avatarUrl: "/assets/templates/property/handover-prop-1.webp",
+    },
+    {
+      id: "prop-testi-2",
+      tenantId: tenant3.id,
+      clientName: "Ibu Dian Anggraeni",
+      customerName: "Ibu Dian Anggraeni",
+      clientRole: "Pembeli Tipe 60/84 - Dosen Telkom University",
+      comment: "Lokasi perumahan sangat strategis, cuma 7 menit ke kampus Telkom. Lingkungan aman one gate system, anak-anak nyaman main di playground cluster.",
+      rating: 5,
+      avatarUrl: "/assets/templates/property/handover-prop-2.webp",
+    },
+    {
+      id: "prop-testi-3",
+      tenantId: tenant3.id,
+      clientName: "Bpk. Aditya Pratama & Istri",
+      customerName: "Bpk. Aditya Pratama & Istri",
+      clientRole: "Pembeli Tipe 120/150 - Entrepreneur",
+      comment: "Desain fasad rumahnya mewah dan tidak pasaran. Sertifikat SHM sudah split langsung balik nama waktu serah terima. Investasi yang sangat memuaskan di Bandung!",
+      rating: 5,
+      avatarUrl: "/assets/templates/property/handover-prop-3.webp",
+    },
+  ];
+
+  for (const item of propertyTestimonials) {
+    try {
+      await prisma.testimonial.upsert({
+        where: { id: item.id },
+        update: {
+          clientName: item.clientName,
+          clientRole: item.clientRole,
+          comment: item.comment,
+          rating: item.rating,
+          avatarUrl: item.avatarUrl,
+        },
+        create: {
+          id: item.id,
+          tenantId: item.tenantId,
+          clientName: item.clientName,
+          clientRole: item.clientRole,
+          comment: item.comment,
+          rating: item.rating,
+          avatarUrl: item.avatarUrl,
+        },
+      });
+    } catch {
+      await prisma.$executeRawUnsafe(`
+        INSERT INTO "Testimonial" ("id", "tenantId", "clientName", "customerName", "clientRole", "comment", "rating", "avatarUrl", "createdAt")
+        VALUES ($1, $2, $3, $3, $4, $5, $6, $7, NOW())
+        ON CONFLICT ("id") DO UPDATE 
+        SET "clientName" = EXCLUDED."clientName",
+            "comment" = EXCLUDED."comment",
+            "rating" = EXCLUDED."rating";
+      `, item.id, item.tenantId, item.clientName, item.clientRole, item.comment, item.rating, item.avatarUrl);
+    }
+  }
+
+  console.log("✅ Tenant 3 (Property):", tenant3.customDomain);
+
   console.log("\n🎉 Seeding selesai dengan Granular RBAC!");
   console.log("📋 Kredensial Login:");
   console.log("   - Super Admin: superadmin@etalase.online / admin123!");
@@ -1145,6 +1462,7 @@ async function main() {
   console.log("   - Owner Mobil: owner@bastian-sales.com / client123!");
   console.log("   - Staf Mobil : staff@bastian-sales.com / client123!");
   console.log("   - Owner Sewa : owner@bastian-rental.com / client123!");
+  console.log("   - Owner Rumah: owner@properti-bandung.com / client123!");
 }
 
 main()

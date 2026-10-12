@@ -11,6 +11,9 @@ const MODULE_TYPES = [
   "TABLE_RESERVATION",
   "RENTAL_BOOKING",
   "GENERAL_INQUIRY",
+  "PROPERTY_INQUIRY",
+  "KPR_SIMULATION",
+  "SITE_VISIT_BOOKING",
 ] as const;
 
 type ModuleType = (typeof MODULE_TYPES)[number];

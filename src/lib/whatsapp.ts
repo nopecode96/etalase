@@ -8,7 +8,10 @@ export function buildWhatsAppMessage(params: {
     | "INSTALLMENT_SIMULATION"
     | "TABLE_RESERVATION"
     | "RENTAL_BOOKING"
-    | "GENERAL_INQUIRY";
+    | "GENERAL_INQUIRY"
+    | "PROPERTY_INQUIRY"
+    | "KPR_SIMULATION"
+    | "SITE_VISIT_BOOKING";
   name: string;
   phone: string;
   details: Record<string, string | number | undefined>;
@@ -16,12 +19,37 @@ export function buildWhatsAppMessage(params: {
 }): string {
   const { moduleType, name, phone, details, businessName } = params;
 
-  const header = `Halo *${businessName}* 👋\n\nSaya ingin menghubungi Anda.`;
+  const header = `Halo *${businessName}* 👋\n\nSaya ingin berkonsultasi mengenai properti.`;
   const senderInfo = `\n\n*Nama:* ${name}\n*No. HP:* ${phone}`;
 
   let body = "";
 
   switch (moduleType) {
+    case "KPR_SIMULATION": {
+      body = `\n\n🏡 *SIMULASI KPR PROPERTI*`;
+      if (details.unit) body += `\n• Tipe Unit: ${details.unit}`;
+      if (details.harga) body += `\n• Harga Properti: ${details.harga}`;
+      if (details.dp) body += `\n• Uang Muka (DP): ${details.dp}`;
+      if (details.bunga) body += `\n• Suku Bunga: ${details.bunga}`;
+      if (details.tenor) body += `\n• Tenor: ${details.tenor} Tahun`;
+      if (details.angsuran) body += `\n• Est. Angsuran KPR: ${details.angsuran}/bulan`;
+      break;
+    }
+    case "SITE_VISIT_BOOKING": {
+      body = `\n\n📅 *JADWAL SURVEI LOKASI PERUMAHAN*`;
+      if (details.unit) body += `\n• Minat Tipe: ${details.unit}`;
+      if (details.visitDate) body += `\n• Tanggal Kunjungan: ${details.visitDate}`;
+      if (details.visitTime) body += `\n• Jam Kunjungan: ${details.visitTime}`;
+      if (details.notes) body += `\n• Catatan: ${details.notes}`;
+      break;
+    }
+    case "PROPERTY_INQUIRY": {
+      body = `\n\n🏠 *KONSULTASI & BROSUR PROPERTI*`;
+      if (details.unit) body += `\n• Tipe Unit: ${details.unit}`;
+      if (details.subject) body += `\n• Perihal: ${details.subject}`;
+      if (details.notes) body += `\n• Pesan: ${details.notes}`;
+      break;
+    }
     case "INSTALLMENT_SIMULATION": {
       body = `\n\n📋 *SIMULASI KREDIT*`;
       if (details.unit) body += `\n• Unit: ${details.unit}`;
@@ -77,7 +105,10 @@ export function createLeadWhatsAppUrl(params: {
     | "INSTALLMENT_SIMULATION"
     | "TABLE_RESERVATION"
     | "RENTAL_BOOKING"
-    | "GENERAL_INQUIRY";
+    | "GENERAL_INQUIRY"
+    | "PROPERTY_INQUIRY"
+    | "KPR_SIMULATION"
+    | "SITE_VISIT_BOOKING";
   name: string;
   phone: string;
   details: Record<string, string | number | undefined>;
