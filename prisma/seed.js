@@ -2,17 +2,24 @@ let PrismaClient;
 try {
   PrismaClient = require("../src/generated/prisma").PrismaClient;
 } catch {
-  PrismaClient = require("@prisma/client").PrismaClient;
+  try {
+    PrismaClient = require("./src/generated/prisma").PrismaClient;
+  } catch {
+    PrismaClient = require("@prisma/client").PrismaClient;
+  }
 }
-const bcrypt = require("bcryptjs");
 
 const prisma = new PrismaClient();
 
-async function main() {
-  console.log("🌱 Memulai seeding database dengan Granular RBAC...");
+// Pre-computed Bcrypt Hashes (10 rounds) to avoid external runtime dependencies in production runner
+const SAAS_PASSWORD_HASH = "$2b$10$PIBqqp.z1qeooSO07CfOYeJC0mrZZ49D4QlUIE8./tIiwv/dzYcS."; // admin123!
+const CLIENT_PASSWORD_HASH = "$2b$10$8WkHLaeBGeOJfmEV7VKRveg2OcPv7e5OKgF1Qd2L3NTO2mV5C.a36"; // client123!
 
-  const saasPasswordHash = await bcrypt.hash("admin123!", 12);
-  const clientPasswordHash = await bcrypt.hash("client123!", 12);
+async function main() {
+  console.log("🌱 Memulai seeding database dengan Granular RBAC (Zero External Dependencies)...");
+
+  const saasPasswordHash = SAAS_PASSWORD_HASH;
+  const clientPasswordHash = CLIENT_PASSWORD_HASH;
 
   // 1. SAAS PLATFORM ROLES
   const superAdmin = await prisma.user.upsert({
