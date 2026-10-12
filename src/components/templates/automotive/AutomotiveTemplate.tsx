@@ -107,9 +107,42 @@ export default function AutomotiveTemplate({ tenant }: Props) {
     }
   };
 
-  const salesName = "Bastian";
+  // FeatureFlags & Metadata parsing
+  const flags = (tenant.featureFlags as Record<string, any>) || {};
+  const salesProfile = flags.salesProfile || {};
+  const salesName = salesProfile.name || "Bastian Pratama";
+  const salesRole = salesProfile.role || "Senior Sales Consultant Chery & Jaecoo Bandung";
+  const salesGreeting = salesProfile.greeting || `Halo, Saya ${salesName} siap membantu Anda mendapatkan promo mobil Chery & Jaecoo terbaik, test drive gratis ke rumah, dan approval leasing 100%!`;
+  const salesBio = salesProfile.bio || "Dengan pengalaman melayani ratusan pengiriman mobil di area Bandung, Cimahi, dan Jawa Barat, saya berkomitmen memberikan pelayanan transparan tanpa biaya tersembunyi. Dari proses pemilihan tipe, kalkulasi kredit, hingga mobil tiba di garasi Anda dengan plat nomor resmi.";
+  const salesPhotoUrl = tenant.logoUrl || "/assets/templates/automotive/sales-profile.webp";
+
+  const heroTitle = tenant.heroTitle || "Beli Mobil Baru Chery & Jaecoo di Bandung Lebih Mudah & Cepat";
+  const heroSubtitle = tenant.heroSubtitle || "Dapatkan penawaran promo harga OTR Bandung, DP teringan mulai 25 Jutaan, bunga 0%, dan garansi mesin 10 Tahun / 1.000.000 KM.";
+  const heroBannerUrl = tenant.heroBannerUrl || "/assets/templates/automotive/chery-omoda-5.webp";
+
+  const heroBadges: Array<{ label: string; icon?: string; sublabel?: string }> = flags.heroBadges || [
+    { label: "Unit Ready Stock Bandung • Plat D", icon: "Car", sublabel: "Ketersediaan Unit" },
+    { label: "Garansi Mesin 10 Thn / 1.000.000 KM", icon: "ShieldCheck", sublabel: "Garansi Resmi Terpanjang" },
+  ];
+
+  const commitments: string[] = flags.commitments || [
+    "Unit Ready Stock Semua Tipe",
+    "Dibantu Sampai Approval Leasing 100%",
+    "Layanan Test Drive Langsung ke Rumah",
+    "Terima Tukar Tambah (Trade-in) Segala Merk",
+  ];
+
+  const leasingPartners: Array<{ name: string; logo?: string }> = flags.leasingPartners || [
+    { name: "BCA Finance" },
+    { name: "Maybank Finance" },
+    { name: "Mandiri Tunas Finance" },
+    { name: "Adira Finance" },
+    { name: "Mandiri Utama Finance (MUF)" },
+  ];
+
   const dealerAddress = tenant.address || "Jl. Soekarno Hatta No. 500, Bandung, Jawa Barat";
   const geoCity = tenant.geoCity || "Bandung";
+  const themeColor = tenant.themeColor || "#dc2626";
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans selection:bg-red-500 selection:text-white pb-20">
@@ -142,8 +175,8 @@ export default function AutomotiveTemplate({ tenant }: Props) {
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden border-2 border-red-600 shadow-sm bg-red-50 flex-shrink-0">
               <img
-                src="/assets/templates/automotive/sales-profile.webp"
-                alt="Bastian Sales Chery Bandung"
+                src={salesPhotoUrl}
+                alt={`${salesName} Sales Chery Bandung`}
                 className="w-full h-full object-cover object-top"
               />
             </div>
@@ -154,8 +187,8 @@ export default function AutomotiveTemplate({ tenant }: Props) {
                 </span>
                 <BadgeCheck size={16} className="text-blue-600 inline" />
               </div>
-              <p className="text-[11px] sm:text-xs text-slate-500 font-medium">
-                Senior Sales Consultant Chery &amp; Jaecoo
+              <p className="text-[11px] sm:text-xs text-slate-500 font-medium truncate max-w-[200px] sm:max-w-none">
+                {salesRole}
               </p>
             </div>
           </div>
@@ -169,7 +202,7 @@ export default function AutomotiveTemplate({ tenant }: Props) {
               Simulasi Kredit
             </a>
             <a href="#profil" className="hover:text-red-600 transition-colors">
-              Tentang Bastian
+              Tentang {salesName.split(" ")[0]}
             </a>
             <a href="#serah-terima" className="hover:text-red-600 transition-colors">
               Bukti Pengiriman
@@ -183,7 +216,7 @@ export default function AutomotiveTemplate({ tenant }: Props) {
           <div className="flex items-center gap-2">
             <a
               href={`https://wa.me/${tenant.whatsappNumber}?text=${encodeURIComponent(
-                `Halo ${salesName}, saya ingin konsultasi promo mobil Chery & Jaecoo di Bandung.`
+                `Halo ${salesName}, saya ingin konsultasi promo mobil Chery & Jaecoo di ${geoCity}.`
               )}`}
               target="_blank"
               rel="noopener noreferrer"
@@ -208,19 +241,19 @@ export default function AutomotiveTemplate({ tenant }: Props) {
             <div className="lg:col-span-7 text-left">
               <div className="inline-flex items-center gap-2 bg-red-600/90 text-white text-xs sm:text-sm font-bold px-3.5 py-1.5 rounded-full mb-6 backdrop-blur-sm border border-red-400/30">
                 <Sparkles size={15} />
-                <span>Pesta Promo Spesial Bulan Ini • Khusus Plat D / Bandung</span>
+                <span>Pesta Promo Spesial Bulan Ini • Khusus {geoCity} &amp; Sekitarnya</span>
               </div>
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight sm:leading-none text-white mb-6">
-                Beli Mobil Baru <span className="text-red-500">Chery &amp; Jaecoo</span> di Bandung Lebih Mudah &amp; Cepat
+                {heroTitle}
               </h1>
               <p className="text-base sm:text-lg text-slate-300 leading-relaxed mb-8 max-w-2xl">
-                Dapatkan DP teringan mulai <strong>25 Jutaan</strong>, Bunga <strong>0%</strong>, Test Drive langsung ke rumah/kantor Anda, serta garansi mesin hingga <strong>10 Tahun / 1.000.000 KM</strong>.
+                {heroSubtitle}
               </p>
 
               <div className="flex flex-wrap items-center gap-3 sm:gap-4 mb-10">
                 <a
                   href={`https://wa.me/${tenant.whatsappNumber}?text=${encodeURIComponent(
-                    `Halo ${salesName}, saya ingin konsultasi promo dan simulasi kredit mobil Chery & Jaecoo di Bandung.`
+                    `Halo ${salesName}, saya ingin konsultasi promo dan simulasi kredit mobil Chery & Jaecoo di ${geoCity}.`
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -238,24 +271,14 @@ export default function AutomotiveTemplate({ tenant }: Props) {
                 </a>
               </div>
 
-              {/* 4 Poin Komitmen */}
+              {/* 4 Poin Komitmen (Dinamis dari featureFlags) */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 border-t border-white/10 text-xs sm:text-sm text-slate-300">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 size={16} className="text-emerald-400 flex-shrink-0" />
-                  <span>Unit Ready Stock</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 size={16} className="text-emerald-400 flex-shrink-0" />
-                  <span>Dibantu Approve</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 size={16} className="text-emerald-400 flex-shrink-0" />
-                  <span>Test Drive ke Rumah</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 size={16} className="text-emerald-400 flex-shrink-0" />
-                  <span>Trade-in Segala Merk</span>
-                </div>
+                {commitments.slice(0, 4).map((commitment, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <CheckCircle2 size={16} className="text-emerald-400 flex-shrink-0" />
+                    <span>{commitment}</span>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -266,40 +289,52 @@ export default function AutomotiveTemplate({ tenant }: Props) {
 
               <div className="relative z-10 w-full flex flex-col items-center">
                 {/* Floating Badge 1 (Atas Kanan) */}
-                <div className="self-end mr-2 sm:mr-6 mb-2 bg-slate-900/90 backdrop-blur-md border border-white/15 px-3.5 py-2 rounded-2xl shadow-2xl flex items-center gap-2.5 transform hover:-translate-y-1 transition-transform">
-                  <div className="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0">
-                    <Car size={16} />
+                {heroBadges[0] && (
+                  <div className="self-end mr-2 sm:mr-6 mb-2 bg-slate-900/90 backdrop-blur-md border border-white/15 px-3.5 py-2 rounded-2xl shadow-2xl flex items-center gap-2.5 transform hover:-translate-y-1 transition-transform">
+                    <div className="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0">
+                      <Car size={16} />
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">
+                        {heroBadges[0].sublabel || "Ketersediaan Unit"}
+                      </p>
+                      <p className="text-xs sm:text-sm font-extrabold text-white">
+                        {heroBadges[0].label}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Ketersediaan Unit</p>
-                    <p className="text-xs sm:text-sm font-extrabold text-white">Unit Ready Stock Bandung • Plat D</p>
-                  </div>
-                </div>
+                )}
 
-                {/* Foto Mobil Utama */}
+                {/* Foto Mobil Utama (Dinamis dari tenant.heroBannerUrl) */}
                 <div className="relative group w-full my-2">
                   <img
-                    src="/assets/templates/automotive/chery-omoda-5.webp"
-                    alt="Chery Omoda 5 GT Bandung"
+                    src={heroBannerUrl}
+                    alt={`${tenant.businessName} Unggulan`}
                     className="w-full max-w-lg mx-auto object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500"
                   />
                   <div className="text-center mt-1">
                     <span className="inline-block text-[11px] font-semibold text-slate-400 bg-white/5 border border-white/10 px-3 py-1 rounded-full backdrop-blur-sm">
-                      Chery Omoda 5 GT AWD • Best Compact Luxury SUV
+                      {selectedCar?.title || "Chery Omoda 5 GT"} • Best Compact Luxury SUV
                     </span>
                   </div>
                 </div>
 
                 {/* Floating Badge 2 (Bawah Kiri) */}
-                <div className="self-start ml-2 sm:ml-4 -mt-3 bg-slate-900/90 backdrop-blur-md border border-white/15 px-3.5 py-2 rounded-2xl shadow-2xl flex items-center gap-2.5 transform hover:-translate-y-1 transition-transform">
-                  <div className="w-8 h-8 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center flex-shrink-0">
-                    <ShieldCheck size={16} />
+                {heroBadges[1] && (
+                  <div className="self-start ml-2 sm:ml-4 -mt-3 bg-slate-900/90 backdrop-blur-md border border-white/15 px-3.5 py-2 rounded-2xl shadow-2xl flex items-center gap-2.5 transform hover:-translate-y-1 transition-transform">
+                    <div className="w-8 h-8 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center flex-shrink-0">
+                      <ShieldCheck size={16} />
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">
+                        {heroBadges[1].sublabel || "Garansi Resmi"}
+                      </p>
+                      <p className="text-xs sm:text-sm font-extrabold text-white">
+                        {heroBadges[1].label}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Garansi Resmi Terpanjang</p>
-                    <p className="text-xs sm:text-sm font-extrabold text-white">Garansi Mesin 10 Thn / 1.000.000 KM</p>
-                  </div>
-                </div>
+                )}
               </div>
             </div>
           </div>
@@ -316,8 +351,8 @@ export default function AutomotiveTemplate({ tenant }: Props) {
                 <div className="relative group">
                   <div className="w-48 h-60 sm:w-60 sm:h-72 rounded-2xl overflow-hidden border-4 border-red-500 shadow-2xl bg-slate-800">
                     <img
-                      src="/assets/templates/automotive/sales-profile.webp"
-                      alt="Bastian Pratama Chery Bandung"
+                      src={salesPhotoUrl}
+                      alt={salesName}
                       className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
                     />
                   </div>
@@ -333,13 +368,13 @@ export default function AutomotiveTemplate({ tenant }: Props) {
                   Konsultan Penjualan Terpercaya
                 </span>
                 <h2 className="text-2xl sm:text-3xl font-extrabold text-white mt-3 mb-2">
-                  Halo, Saya {salesName} Pratama
+                  Halo, Saya {salesName}
                 </h2>
                 <p className="text-red-300 text-sm font-semibold mb-4">
-                  Senior Sales Consultant Dealer Resmi Chery &amp; Jaecoo Bandung
+                  {salesRole}
                 </p>
                 <p className="text-slate-300 text-sm sm:text-base leading-relaxed mb-6">
-                  Dengan pengalaman melayani ratusan pengiriman mobil di area Bandung, Cimahi, dan Jawa Barat, saya berkomitmen memberikan pelayanan transparan tanpa biaya tersembunyi. Dari proses pemilihan tipe, kalkulasi kredit, hingga mobil tiba di garasi Anda dengan plat nomor resmi.
+                  {salesBio}
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-slate-700/60">
@@ -636,7 +671,7 @@ export default function AutomotiveTemplate({ tenant }: Props) {
         </div>
       </section>
 
-      {/* 7. GALERI SERAH TERIMA UNIT (SOCIAL PROOF) */}
+      {/* 7. GALERI SERAH TERIMA UNIT (Dinamis dari GalleryItem) */}
       <section id="serah-terima" className="py-16 sm:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-14">
@@ -652,28 +687,48 @@ export default function AutomotiveTemplate({ tenant }: Props) {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
-            {[1, 2, 3, 4, 5, 6].map((idx) => (
-              <div
-                key={idx}
-                className="group relative rounded-2xl overflow-hidden aspect-[4/5] bg-slate-100 border border-slate-200 shadow-sm"
-              >
-                <img
-                  src={`/assets/templates/automotive/delivery-${idx}.webp`}
-                  alt={`Serah terima mobil Chery ${idx}`}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end p-3 opacity-90 group-hover:opacity-100 transition-opacity">
-                  <span className="text-white text-[11px] font-bold leading-tight">
-                    Serah Terima Unit #{idx} Bandung
-                  </span>
+            {tenant.galleries.length > 0 ? (
+              tenant.galleries.map((item, idx) => (
+                <div
+                  key={item.id}
+                  className="group relative rounded-2xl overflow-hidden aspect-[4/5] bg-slate-100 border border-slate-200 shadow-sm"
+                >
+                  <img
+                    src={item.imageUrl}
+                    alt={item.caption || `Serah terima mobil Chery ${idx + 1}`}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end p-3 opacity-90 group-hover:opacity-100 transition-opacity">
+                    <span className="text-white text-[11px] font-bold leading-tight">
+                      {item.caption || `Serah Terima Unit #${idx + 1} Bandung`}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              [1, 2, 3, 4, 5, 6].map((idx) => (
+                <div
+                  key={idx}
+                  className="group relative rounded-2xl overflow-hidden aspect-[4/5] bg-slate-100 border border-slate-200 shadow-sm"
+                >
+                  <img
+                    src={`/assets/templates/automotive/delivery-${idx}.webp`}
+                    alt={`Serah terima mobil Chery ${idx}`}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end p-3 opacity-90 group-hover:opacity-100 transition-opacity">
+                    <span className="text-white text-[11px] font-bold leading-tight">
+                      Serah Terima Unit #{idx} Bandung
+                    </span>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </section>
 
-      {/* 8. TESTIMONIAL KONSUMEN */}
+      {/* 8. TESTIMONIAL KONSUMEN (Dinamis dari Testimonial) */}
       {tenant.testimonials.length > 0 && (
         <section className="py-16 bg-slate-50 border-t border-slate-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -703,9 +758,17 @@ export default function AutomotiveTemplate({ tenant }: Props) {
                     </p>
                   </div>
                   <div className="pt-4 border-t border-slate-100 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-red-100 text-red-600 font-bold flex items-center justify-center text-sm">
-                      {t.clientName.charAt(0)}
-                    </div>
+                    {t.avatarUrl ? (
+                      <img
+                        src={t.avatarUrl}
+                        alt={t.clientName}
+                        className="w-10 h-10 rounded-full object-cover border border-slate-200"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-red-100 text-red-600 font-bold flex items-center justify-center text-sm">
+                        {t.clientName.charAt(0)}
+                      </div>
+                    )}
                     <div>
                       <h4 className="text-xs font-extrabold text-slate-900">{t.clientName}</h4>
                       <p className="text-[11px] text-slate-500">{t.clientRole}</p>
@@ -718,18 +781,18 @@ export default function AutomotiveTemplate({ tenant }: Props) {
         </section>
       )}
 
-      {/* 9. REKANAN LEASING & PEMBIAYAAN */}
+      {/* 9. REKANAN LEASING & PEMBIAYAAN (Dinamis dari featureFlags.leasingPartners) */}
       <section className="py-12 bg-white border-y border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center">
           <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-6">
             Bekerjasama dengan Mitra Lembaga Pembiayaan Resmi &amp; Terpercaya
           </p>
           <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-12 opacity-80 font-black text-slate-600 text-base sm:text-lg">
-            <span className="hover:text-blue-600 transition-colors">BCA Finance</span>
-            <span className="hover:text-yellow-600 transition-colors">Maybank Finance</span>
-            <span className="hover:text-yellow-500 transition-colors">Mandiri Tunas Finance</span>
-            <span className="hover:text-orange-600 transition-colors">Adira Finance</span>
-            <span className="hover:text-blue-800 transition-colors">Mandiri Utama Finance (MUF)</span>
+            {leasingPartners.map((partner, idx) => (
+              <span key={idx} className="hover:text-red-600 transition-colors">
+                {partner.name}
+              </span>
+            ))}
           </div>
         </div>
       </section>

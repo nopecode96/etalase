@@ -414,12 +414,39 @@ async function main() {
       geoRegion: "ID-JB",
       latitude: -6.9458,
       longitude: 107.6385,
-      themeColor: "#b91c1c", // Chery / Luxury Red
-      heroTitle: "Promo Spesial Mobil Baru Bandung - DP Ringan, Bunga 0%, & Proses Tercepat!",
-      heroSubtitle: "Dealer Resmi Chery & Jaecoo Wilayah Bandung & Jawa Barat. Unit Ready Stock, Test Drive ke Rumah Anda & Tukar Tambah Semua Merk.",
+      themeColor: "#dc2626", // Merah khas Chery
+      heroTitle: "Beli Mobil Baru Chery & Jaecoo di Bandung Lebih Mudah & Cepat",
+      heroSubtitle: "Dapatkan penawaran promo harga OTR Bandung, DP teringan mulai 25 Jutaan, bunga 0%, dan garansi mesin 10 Tahun / 1.000.000 KM.",
       heroBannerUrl: "/assets/templates/automotive/chery-omoda-5.webp",
       logoUrl: "/assets/templates/automotive/sales-profile.webp",
-      featureFlags: { showInstallmentSimulator: true, showGallery: true },
+      featureFlags: {
+        showInstallmentSimulator: true,
+        showGallery: true,
+        salesProfile: {
+          name: "Bastian Pratama",
+          role: "Senior Sales Consultant Chery & Jaecoo Bandung",
+          experience: "10+ Tahun Melayani Penjualan Mobil di Bandung & Jawa Barat",
+          greeting: "Halo, Saya Bastian Pratama siap membantu Anda mendapatkan promo mobil Chery & Jaecoo terbaik, test drive gratis ke rumah, dan approval leasing 100%!",
+          bio: "Dengan pengalaman melayani ratusan pengiriman mobil di area Bandung, Cimahi, dan Jawa Barat, saya berkomitmen memberikan pelayanan transparan tanpa biaya tersembunyi. Dari proses pemilihan tipe, kalkulasi kredit, hingga mobil tiba di garasi Anda dengan plat nomor resmi."
+        },
+        heroBadges: [
+          { label: "Unit Ready Stock Bandung • Plat D", icon: "Car", sublabel: "Ketersediaan Unit" },
+          { label: "Garansi Mesin 10 Thn / 1.000.000 KM", icon: "ShieldCheck", sublabel: "Garansi Resmi Terpanjang" }
+        ],
+        commitments: [
+          "Unit Ready Stock Semua Tipe",
+          "Dibantu Sampai Approval Leasing 100%",
+          "Layanan Test Drive Langsung ke Rumah",
+          "Terima Tukar Tambah (Trade-in) Segala Merk"
+        ],
+        leasingPartners: [
+          { name: "BCA Finance", logo: "/assets/templates/automotive/leasing/bca.svg" },
+          { name: "Maybank Finance", logo: "/assets/templates/automotive/leasing/maybank.svg" },
+          { name: "Mandiri Tunas Finance", logo: "/assets/templates/automotive/leasing/mtf.svg" },
+          { name: "Adira Finance", logo: "/assets/templates/automotive/leasing/adira.svg" },
+          { name: "MUF", logo: "/assets/templates/automotive/leasing/muf.svg" }
+        ]
+      },
       isActive: true,
       expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
     },
@@ -439,12 +466,39 @@ async function main() {
       geoRegion: "ID-JB",
       latitude: -6.9458,
       longitude: 107.6385,
-      themeColor: "#b91c1c",
-      heroTitle: "Promo Spesial Mobil Baru Bandung - DP Ringan, Bunga 0%, & Proses Tercepat!",
-      heroSubtitle: "Dealer Resmi Chery & Jaecoo Wilayah Bandung & Jawa Barat. Unit Ready Stock, Test Drive ke Rumah Anda & Tukar Tambah Semua Merk.",
+      themeColor: "#dc2626",
+      heroTitle: "Beli Mobil Baru Chery & Jaecoo di Bandung Lebih Mudah & Cepat",
+      heroSubtitle: "Dapatkan penawaran promo harga OTR Bandung, DP teringan mulai 25 Jutaan, bunga 0%, dan garansi mesin 10 Tahun / 1.000.000 KM.",
       heroBannerUrl: "/assets/templates/automotive/chery-omoda-5.webp",
       logoUrl: "/assets/templates/automotive/sales-profile.webp",
-      featureFlags: { showInstallmentSimulator: true, showGallery: true },
+      featureFlags: {
+        showInstallmentSimulator: true,
+        showGallery: true,
+        salesProfile: {
+          name: "Bastian Pratama",
+          role: "Senior Sales Consultant Chery & Jaecoo Bandung",
+          experience: "10+ Tahun Melayani Penjualan Mobil di Bandung & Jawa Barat",
+          greeting: "Halo, Saya Bastian Pratama siap membantu Anda mendapatkan promo mobil Chery & Jaecoo terbaik, test drive gratis ke rumah, dan approval leasing 100%!",
+          bio: "Dengan pengalaman melayani ratusan pengiriman mobil di area Bandung, Cimahi, dan Jawa Barat, saya berkomitmen memberikan pelayanan transparan tanpa biaya tersembunyi. Dari proses pemilihan tipe, kalkulasi kredit, hingga mobil tiba di garasi Anda dengan plat nomor resmi."
+        },
+        heroBadges: [
+          { label: "Unit Ready Stock Bandung • Plat D", icon: "Car", sublabel: "Ketersediaan Unit" },
+          { label: "Garansi Mesin 10 Thn / 1.000.000 KM", icon: "ShieldCheck", sublabel: "Garansi Resmi Terpanjang" }
+        ],
+        commitments: [
+          "Unit Ready Stock Semua Tipe",
+          "Dibantu Sampai Approval Leasing 100%",
+          "Layanan Test Drive Langsung ke Rumah",
+          "Terima Tukar Tambah (Trade-in) Segala Merk"
+        ],
+        leasingPartners: [
+          { name: "BCA Finance", logo: "/assets/templates/automotive/leasing/bca.svg" },
+          { name: "Maybank Finance", logo: "/assets/templates/automotive/leasing/maybank.svg" },
+          { name: "Mandiri Tunas Finance", logo: "/assets/templates/automotive/leasing/mtf.svg" },
+          { name: "Adira Finance", logo: "/assets/templates/automotive/leasing/adira.svg" },
+          { name: "MUF", logo: "/assets/templates/automotive/leasing/muf.svg" }
+        ]
+      },
       isActive: true,
       expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
     },
