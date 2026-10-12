@@ -315,30 +315,51 @@ async function main() {
 
   const [catMobil, catProperti, catRental, catKafe] = categories;
 
-  // 3. DUMMY TENANT 1: bastian-sales.com
+  // 3. DUMMY TENANT 1: bastian-sales.com (Chery & Jaecoo Bandung)
   const tenant1 = await prisma.tenant.upsert({
     where: { customDomain: "bastian-sales.com" },
-    update: {},
+    update: {
+      businessName: "Bastian - Sales Resmi Chery & Jaecoo Bandung",
+      address: "Dealer Resmi Chery Bandung, Jl. Soekarno Hatta No. 500, Bandung",
+      whatsappNumber: "6281234567890",
+      contactEmail: "bastian@bastian-sales.com",
+      seoTitle: "Promo Mobil Chery & Jaecoo Bandung | DP Ringan & Bunga 0% - Bastian",
+      seoDescription: "Dealer resmi Chery & Jaecoo Bandung. Dapatkan promo DP mulai 25 Juta, diskon spesial, test drive ke rumah, dan approval leasing 100%. Hubungi Bastian!",
+      seoKeywords: "chery bandung, jaecoo bandung, promo omoda 5 bandung, kredit chery bandung, sales chery bandung",
+      geoCity: "Bandung",
+      geoRegion: "ID-JB",
+      latitude: -6.9458,
+      longitude: 107.6385,
+      themeColor: "#b91c1c", // Chery / Luxury Red
+      heroTitle: "Promo Spesial Mobil Baru Bandung - DP Ringan, Bunga 0%, & Proses Tercepat!",
+      heroSubtitle: "Dealer Resmi Chery & Jaecoo Wilayah Bandung & Jawa Barat. Unit Ready Stock, Test Drive ke Rumah Anda & Tukar Tambah Semua Merk.",
+      heroBannerUrl: "/assets/templates/automotive/chery-omoda-5.webp",
+      logoUrl: "/assets/templates/automotive/sales-profile.webp",
+      featureFlags: { showInstallmentSimulator: true, showGallery: true },
+      isActive: true,
+      expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+    },
     create: {
       customDomain: "bastian-sales.com",
-      businessName: "Bastian Sales Mobil Bandung",
+      businessName: "Bastian - Sales Resmi Chery & Jaecoo Bandung",
       categoryId: catMobil.id,
       sector: "AUTOMOTIVE",
       whatsappNumber: "6281234567890",
       contactEmail: "bastian@bastian-sales.com",
-      address: "Jl. Asia Afrika No. 88, Bandung, Jawa Barat",
-      googleMapsUrl: "https://maps.google.com/?q=Bandung",
-      seoTitle: "Bastian Sales Mobil Bandung | Toyota, Honda, Mitsubishi",
-      seoDescription: "Sales mobil terpercaya di Bandung. Proses kredit mudah, DP ringan. Hubungi Bastian sekarang!",
-      seoKeywords: "sales mobil bandung, kredit mobil bandung, toyota bandung, honda bandung",
+      address: "Dealer Resmi Chery Bandung, Jl. Soekarno Hatta No. 500, Bandung",
+      googleMapsUrl: "https://maps.google.com/?q=Dealer+Chery+Bandung",
+      seoTitle: "Promo Mobil Chery & Jaecoo Bandung | DP Ringan & Bunga 0% - Bastian",
+      seoDescription: "Dealer resmi Chery & Jaecoo Bandung. Dapatkan promo DP mulai 25 Juta, diskon spesial, test drive ke rumah, dan approval leasing 100%. Hubungi Bastian!",
+      seoKeywords: "chery bandung, jaecoo bandung, promo omoda 5 bandung, kredit chery bandung, sales chery bandung",
       geoCity: "Bandung",
       geoRegion: "ID-JB",
-      latitude: -6.9175,
-      longitude: 107.6191,
-      themeColor: "#2563eb",
-      heroTitle: "Sales Mobil Terpercaya di Bandung",
-      heroSubtitle: "Proses Kredit Mudah, DP Ringan, Cicilan Terjangkau. 20+ Tahun Pengalaman.",
-      heroBannerUrl: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1200",
+      latitude: -6.9458,
+      longitude: 107.6385,
+      themeColor: "#b91c1c",
+      heroTitle: "Promo Spesial Mobil Baru Bandung - DP Ringan, Bunga 0%, & Proses Tercepat!",
+      heroSubtitle: "Dealer Resmi Chery & Jaecoo Wilayah Bandung & Jawa Barat. Unit Ready Stock, Test Drive ke Rumah Anda & Tukar Tambah Semua Merk.",
+      heroBannerUrl: "/assets/templates/automotive/chery-omoda-5.webp",
+      logoUrl: "/assets/templates/automotive/sales-profile.webp",
       featureFlags: { showInstallmentSimulator: true, showGallery: true },
       isActive: true,
       expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
@@ -352,7 +373,7 @@ async function main() {
     create: {
       email: "owner@bastian-sales.com",
       passwordHash: clientPasswordHash,
-      name: "Bastian Pratama (Owner)",
+      name: "Bastian Pratama (Senior Sales Consultant)",
       role: "CLIENT_SUPER_ADMIN",
       tenantId: tenant1.id,
     },
@@ -370,64 +391,156 @@ async function main() {
     },
   });
 
-  // Katalog Tenant 1
+  // Katalog Tenant 1: Mobil Chery & Jaecoo
   const catalogItems1 = [
     {
-      title: "Toyota Avanza 1.5 G CVT 2024",
-      slug: "toyota-avanza-1-5-g-cvt-2024",
-      category: "MPV",
-      price: 245000000,
-      pricePrefix: "Mulai dari",
-      description: "Kendaraan keluarga terpopuler dengan transmisi otomatis CVT. Hemat BBM, lega, dan nyaman.",
-      imageUrl: "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=600",
-      images: ["https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=600"],
+      title: "Chery Omoda 5 GT AWD",
+      slug: "chery-omoda-5-gt-awd",
+      category: "Futuristic Crossover SUV",
+      price: 448800000,
+      pricePrefix: "OTR Bandung Mulai",
+      description: "Crossover futuristik dengan mesin 1.6 TGDI bertenaga buas, sistem All Wheel Drive (AWD), dan ADAS Level 2.5 terlengkap di kelasnya.",
+      imageUrl: "/assets/templates/automotive/chery-omoda-5.webp",
+      images: ["/assets/templates/automotive/chery-omoda-5.webp"],
       isFeatured: true,
-      specsJson: { Mesin: "1.5L Dual VVT-i", Transmisi: "CVT", BBM: "Bensin", Kapasitas: "7 Penumpang" },
+      orderIndex: 0,
+      specsJson: {
+        otrPrice: "Rp 448.800.000",
+        dpPromo: "DP Mulai 35 Juta",
+        angsuranPromo: "Angsuran 6.2 Jt/bln",
+        transmission: "7-Speed Dual Clutch (DCT)",
+        fuelType: "Bensin Turbo",
+        engine: "1.6L TGDI Turbocharged (197 HP)",
+        warranty: "Garansi Mesin 10 Thn / 1.000.000 KM",
+      },
     },
     {
-      title: "Honda HR-V 1.5 SE CVT 2024",
-      slug: "honda-hrv-1-5-se-cvt-2024",
-      category: "SUV",
-      price: 355000000,
-      pricePrefix: "OTR Bandung",
-      description: "SUV stylish dengan teknologi Honda SENSING terbaru.",
-      imageUrl: "https://images.unsplash.com/photo-1555652736-e92021d28a10?w=600",
-      images: [],
+      title: "Chery Omoda E5 Pure Electric (EV)",
+      slug: "chery-omoda-e5-ev",
+      category: "100% Electric SUV",
+      price: 498800000,
+      pricePrefix: "OTR Bandung Mulai",
+      description: "SUV listrik murni masa depan dengan jarak tempuh hingga 430 KM (WLTP), fitur fast charging, dan gratis wall charger di rumah.",
+      imageUrl: "/assets/templates/automotive/omoda-e5-ev.webp",
+      images: ["/assets/templates/automotive/omoda-e5-ev.webp"],
       isFeatured: true,
-      specsJson: { Mesin: "1.5L DOHC VTEC Turbo", Transmisi: "CVT", BBM: "Bensin", Kapasitas: "5 Penumpang" },
+      orderIndex: 1,
+      specsJson: {
+        otrPrice: "Rp 498.800.000",
+        dpPromo: "DP Mulai 40 Juta / Bunga 0%",
+        angsuranPromo: "Angsuran 6.9 Jt/bln",
+        transmission: "Single Speed EV",
+        fuelType: "Baterai Listrik LFP (61 kWh)",
+        engine: "Motor Listrik 204 HP (Jarak 430 KM)",
+        warranty: "Garansi Baterai Seumur Hidup (Lifetime)",
+      },
+    },
+    {
+      title: "Chery Tiggo 8 Pro Max Luxury",
+      slug: "chery-tiggo-8-pro-max",
+      category: "7-Seater Premium Luxury SUV",
+      price: 528500000,
+      pricePrefix: "OTR Bandung Mulai",
+      description: "SUV keluarga 7-penumpang dengan kabin mewah kelas atas, panoramic sunroof besar, Sony 8-speaker audio, dan tenaga 250 HP.",
+      imageUrl: "/assets/templates/automotive/chery-tiggo-8-pro.webp",
+      images: ["/assets/templates/automotive/chery-tiggo-8-pro.webp"],
+      isFeatured: true,
+      orderIndex: 2,
+      specsJson: {
+        otrPrice: "Rp 528.500.000",
+        dpPromo: "DP Mulai 45 Juta",
+        angsuranPromo: "Angsuran 7.5 Jt/bln",
+        transmission: "7-Speed Wet DCT",
+        fuelType: "Bensin Turbo",
+        engine: "2.0L TGDI Turbocharged (250 HP)",
+        warranty: "Garansi Mesin 10 Thn / 1.000.000 KM",
+      },
+    },
+    {
+      title: "Jaecoo 7 Urban Off-Road SUV",
+      slug: "jaecoo-7-urban-off-road",
+      category: "Premium Classic Off-Roader",
+      price: 435000000,
+      pricePrefix: "OTR Bandung Mulai",
+      description: "Desain gagah boxy khas petualang dengan ARDIS (All road drive intelligent system) 7 mode berkendara dan water wading depth 600mm.",
+      imageUrl: "/assets/templates/automotive/jaecoo-7.webp",
+      images: ["/assets/templates/automotive/jaecoo-7.webp"],
+      isFeatured: true,
+      orderIndex: 3,
+      specsJson: {
+        otrPrice: "Rp 435.000.000",
+        dpPromo: "DP Mulai 30 Juta",
+        angsuranPromo: "Angsuran 5.8 Jt/bln",
+        transmission: "Automatic 7-Speed",
+        fuelType: "Bensin Turbo",
+        engine: "1.6L TGDI 4-Cylinder",
+        warranty: "Garansi Mesin 10 Thn / 1.000.000 KM",
+      },
     },
   ];
 
   for (const item of catalogItems1) {
     await prisma.catalogItem.upsert({
       where: { tenantId_slug: { tenantId: tenant1.id, slug: item.slug } },
-      update: {},
+      update: { ...item },
       create: { tenantId: tenant1.id, ...item },
     });
   }
 
-  await prisma.galleryItem.createMany({
-    data: [
-      { tenantId: tenant1.id, imageUrl: "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=400", caption: "Serah terima unit Avanza ke Bpk Hendra", orderIndex: 0 },
-    ],
-    skipDuplicates: true,
-  });
+  // Galeri Serah Terima Unit Bastian di Bandung
+  const deliveryItems = [
+    { imageUrl: "/assets/templates/automotive/delivery-1.webp", caption: "Serah terima Chery Omoda 5 GT ke Bpk. Hendra - Buah Batu Bandung", orderIndex: 0 },
+    { imageUrl: "/assets/templates/automotive/delivery-2.webp", caption: "Pengiriman Chery Tiggo 8 Pro ke Ibu Maya - Dago Atas Bandung", orderIndex: 1 },
+    { imageUrl: "/assets/templates/automotive/delivery-3.webp", caption: "Delivery Omoda E5 Electric Car ke Bpk. Dr. Faisal - Antapani Bandung", orderIndex: 2 },
+    { imageUrl: "/assets/templates/automotive/delivery-4.webp", caption: "Penyerahan Unit Jaecoo 7 ke Bpk. Rian - Setiabudi Bandung", orderIndex: 3 },
+    { imageUrl: "/assets/templates/automotive/delivery-5.webp", caption: "Serah terima Omoda 5 Z ke Bpk. Agus - Kopo Bandung", orderIndex: 4 },
+    { imageUrl: "/assets/templates/automotive/delivery-6.webp", caption: "Customer puas Chery Omoda 5 ke Bpk. Dani - Cimahi", orderIndex: 5 },
+  ];
 
-  await prisma.lead.createMany({
-    data: [
-      {
+  for (const delivery of deliveryItems) {
+    await prisma.galleryItem.create({
+      data: {
         tenantId: tenant1.id,
-        name: "Ahmad Fauzi",
-        phone: "08123456789",
-        moduleType: "INSTALLMENT_SIMULATION",
-        detailsJson: { unit: "Toyota Avanza 1.5 G CVT", dp: "Rp 50.000.000", tenor: "48", cicilan: "Rp 5.200.000" },
-        status: "CONTACTED",
+        ...delivery,
       },
-    ],
-    skipDuplicates: true,
-  });
+    });
+  }
 
-  console.log("✅ Tenant 1 (Automotive):", tenant1.customDomain);
+  // Testimoni Konsumen
+  const testimonials1 = [
+    {
+      clientName: "Bpk. Hendra Kurniawan",
+      clientRole: "Wiraswasta, Buah Batu",
+      comment: "Pelayanan Mas Bastian top banget! Berkas dibantu sampai tuntas, DP minim sesuai janji, dan unit Omoda 5 GT dikirim langsung ke rumah plat nomor resmi siap pakai.",
+      rating: 5,
+      avatarUrl: "/assets/templates/automotive/delivery-1.webp",
+    },
+    {
+      clientName: "Ibu Maya Septiani",
+      clientRole: "Dokter, Dago Atas",
+      comment: "Awalnya bingung pilih Tiggo 8 Pro atau merk lain. Mas Bastian bawa unit test drive langsung ke klinik saya. Proses kredit BCA Finance cuma 2 hari langsung approve!",
+      rating: 5,
+      avatarUrl: "/assets/templates/automotive/delivery-2.webp",
+    },
+    {
+      clientName: "Bpk. Dr. Faisal M.",
+      clientRole: "Dosen, Antapani",
+      comment: "Beli Omoda E5 EV dapat promo free asuransi 1 tahun dan wall charger terpasang rapi di rumah. Penjelasan fitur ADAS sangat detail dan profesional.",
+      rating: 5,
+      avatarUrl: "/assets/templates/automotive/delivery-3.webp",
+    },
+  ];
+
+  for (const t of testimonials1) {
+    await prisma.testimonial.create({
+      data: {
+        tenantId: tenant1.id,
+        ...t,
+      },
+    });
+  }
+
+  console.log("✅ Tenant 1 (Automotive Chery & Jaecoo Bandung):", tenant1.customDomain);
 
   // 4. DUMMY TENANT 2: bastian-rental.com
   const tenant2 = await prisma.tenant.upsert({

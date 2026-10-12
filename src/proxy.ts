@@ -36,8 +36,22 @@ export function proxy(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // Jika domain SaaS utama, layani rute (saas) dan (dashboard)
+  // Jika domain SaaS utama, cek apakah mengakses subpath preview tenant
   if (isMainSaas) {
+    const previewSlugs = [
+      "bastian-sales",
+      "bastian-rental",
+      "properti-bandung",
+      "kuliner-kita",
+      "jasaprofesional",
+    ];
+
+    const firstSegment = url.pathname.split("/")[1];
+    if (previewSlugs.includes(firstSegment)) {
+      // Rewrite request ke handler rute dinamis tenant: /[domain]
+      return NextResponse.rewrite(new URL(`/${firstSegment}`, req.url));
+    }
+
     return NextResponse.next();
   }
 

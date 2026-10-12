@@ -1,19 +1,30 @@
 import { prisma } from "@/lib/prisma";
 import type { Tenant } from "@/generated/prisma";
 
+const PREVIEW_SLUG_MAP: Record<string, string> = {
+  "bastian-sales": "bastian-sales.com",
+  "bastian-rental": "bastian-rental.com",
+  "properti-bandung": "propertibandung.com",
+  "kuliner-kita": "kulinerkita.com",
+  "jasaprofesional": "jasaprofesional.id",
+};
+
 /**
- * Resolves tenant data berdasarkan custom domain (host header).
+ * Resolves tenant data berdasarkan custom domain atau slug preview.
  * Di-cache dengan React cache() agar request dalam satu render tree hanya query sekali.
  */
 export async function getTenantByDomain(
   domain: string
 ): Promise<Tenant | null> {
-  // Normalisasi: hilangkan port jika ada (misal: localhost:3000)
-  const cleanDomain = domain.split(":")[0];
+  const cleanDomain = domain.split(":")[0].toLowerCase();
+  const targetDomain = PREVIEW_SLUG_MAP[cleanDomain] || cleanDomain;
 
-  return prisma.tenant.findUnique({
+  return prisma.tenant.findFirst({
     where: {
-      customDomain: cleanDomain,
+      OR: [
+        { customDomain: targetDomain },
+        { customDomain: cleanDomain },
+      ],
       isActive: true,
     },
     include: {
@@ -26,11 +37,15 @@ export async function getTenantByDomain(
  * Resolves tenant dengan semua relasi untuk halaman penuh.
  */
 export async function getTenantFullByDomain(domain: string) {
-  const cleanDomain = domain.split(":")[0];
+  const cleanDomain = domain.split(":")[0].toLowerCase();
+  const targetDomain = PREVIEW_SLUG_MAP[cleanDomain] || cleanDomain;
 
-  return prisma.tenant.findUnique({
+  return prisma.tenant.findFirst({
     where: {
-      customDomain: cleanDomain,
+      OR: [
+        { customDomain: targetDomain },
+        { customDomain: cleanDomain },
+      ],
       isActive: true,
     },
     include: {
