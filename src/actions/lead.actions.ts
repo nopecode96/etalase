@@ -9,6 +9,7 @@ import type { LeadStatus } from "@/generated/prisma";
 const MODULE_TYPES = [
   "INSTALLMENT_SIMULATION",
   "TABLE_RESERVATION",
+  "RESTAURANT_RESERVATION",
   "RENTAL_BOOKING",
   "GENERAL_INQUIRY",
   "PROPERTY_INQUIRY",

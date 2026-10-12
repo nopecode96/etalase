@@ -5,7 +5,7 @@ const PREVIEW_SLUG_MAP: Record<string, string> = {
   "bastian-sales": "bastian-sales.com",
   "bastian-rental": "bastian-rental.com",
   "properti-bandung": "properti-bandung.com",
-  "kuliner-kita": "kulinerkita.com",
+  "kuliner-kita": "kuliner-kita.com",
   "jasaprofesional": "jasaprofesional.id",
 };
 

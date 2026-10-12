@@ -7,6 +7,7 @@ export function buildWhatsAppMessage(params: {
   moduleType:
     | "INSTALLMENT_SIMULATION"
     | "TABLE_RESERVATION"
+    | "RESTAURANT_RESERVATION"
     | "RENTAL_BOOKING"
     | "GENERAL_INQUIRY"
     | "PROPERTY_INQUIRY"
@@ -19,7 +20,7 @@ export function buildWhatsAppMessage(params: {
 }): string {
   const { moduleType, name, phone, details, businessName } = params;
 
-  const header = `Halo *${businessName}* 👋\n\nSaya ingin berkonsultasi mengenai properti.`;
+  const header = `Halo *${businessName}* 👋\n\nSaya ingin berkonsultasi / melakukan pemesanan.`;
   const senderInfo = `\n\n*Nama:* ${name}\n*No. HP:* ${phone}`;
 
   let body = "";
@@ -58,11 +59,14 @@ export function buildWhatsAppMessage(params: {
       if (details.cicilan) body += `\n• Est. Cicilan: ${details.cicilan}/bulan`;
       break;
     }
+    case "RESTAURANT_RESERVATION":
     case "TABLE_RESERVATION": {
-      body = `\n\n🍽️ *RESERVASI MEJA*`;
+      body = `\n\n🍽️ *RESERVASI MEJA & DINING*`;
+      if (details.guests) body += `\n• Jumlah Tamu: ${details.guests}`;
+      if (details.persons) body += `\n• Jumlah Tamu: ${details.persons} orang`;
+      if (details.area) body += `\n• Pilihan Area: ${details.area}`;
       if (details.date) body += `\n• Tanggal: ${details.date}`;
       if (details.time) body += `\n• Jam: ${details.time}`;
-      if (details.persons) body += `\n• Jumlah Tamu: ${details.persons} orang`;
       if (details.notes) body += `\n• Catatan: ${details.notes}`;
       break;
     }
@@ -104,6 +108,7 @@ export function createLeadWhatsAppUrl(params: {
   moduleType:
     | "INSTALLMENT_SIMULATION"
     | "TABLE_RESERVATION"
+    | "RESTAURANT_RESERVATION"
     | "RENTAL_BOOKING"
     | "GENERAL_INQUIRY"
     | "PROPERTY_INQUIRY"

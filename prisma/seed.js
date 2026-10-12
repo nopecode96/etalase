@@ -1452,6 +1452,355 @@ async function main() {
 
   console.log("✅ Tenant 3 (Property):", tenant3.customDomain);
 
+  // 6. DUMMY TENANT 4: kuliner-kita.com (Kopi & Dapur Kuliner Kita - Bandung)
+  const tenant4 = await prisma.tenant.upsert({
+    where: { customDomain: "kuliner-kita.com" },
+    update: {
+      businessName: "Kopi & Dapur Kuliner Kita - Bandung",
+      heroTitle: "Cita Rasa Autentik & Suasana Hangat di Jantung Kota Bandung",
+      heroSubtitle: "Perpaduan kopi artisan pilihan, sajian hidangan nusantara modern, dan area outdoor asri untuk momen santai bersama teman dan keluarga.",
+      heroBannerUrl: "/assets/templates/restaurant/hero-cafe.webp",
+      logoUrl: "/assets/templates/restaurant/logo-resto.webp",
+      themeColor: "#ea580c", // Terracotta Warm Orange
+      geoCity: "Bandung",
+      geoRegion: "ID-JB",
+      latitude: -6.9083,
+      longitude: 107.6234,
+      address: "Jl. Riau (LLRE Martadinata) No. 145, Cihapit, Bandung, Jawa Barat",
+      googleMapsUrl: "https://maps.google.com/?q=Jl.+LLRE+Martadinata+No.145+Bandung",
+      whatsappNumber: "6281223344556",
+      contactEmail: "reservasi@kuliner-kita.com",
+      seoTitle: "Kopi & Dapur Kuliner Kita Bandung | Kafe & Resto Nuansa Hangat Jl. Riau",
+      seoDescription: "Kafe & resto estetik di Jl. Riau Bandung. Kopi artisan single origin, steak premium, hidangan nusantara modern, dan area outdoor asri. Reservasi meja sekarang!",
+      seoKeywords: "kafe bandung, resto jl riau bandung, tempat nongkrong bandung, kopi enak bandung, kuliner bandung, reservasi kafe bandung",
+      featureFlags: {
+        taglineBadge: "Artisanal Coffee & Modern Comfort Dining • Bandung",
+        operatingHours: "Setiap Hari: 08.00 - 23.00 WIB",
+        statusBadge: "Buka Sekarang • Area Parkir Luas",
+        chefProfile: {
+          name: "Chef Arga Wicaksana",
+          role: "Executive Culinary Director",
+          bio: "Menghadirkan hidangan berkualitas tinggi dengan bahan lokal segar dan sentuhan gastronomi modern."
+        },
+        highlights: [
+          { label: "Biji Kopi", value: "100% Single Origin Arabica Jawa Barat" },
+          { label: "Bahan Masakan", value: "Bahan Segar Alami Tanpa Pengawet" },
+          { label: "Kapasitas", value: "Tersedia 150 Seat & Private VIP Room" }
+        ],
+        commitments: [
+          "Tempat Higienis, Nyaman & Ramah Keluarga",
+          "Wi-Fi Kecepatan Tinggi & Tersedia Stop Kontak di Setiap Meja",
+          "Musholla Bersih, Area Parkir Luas & Ramah Kursi Roda",
+          "Tersedia Opsi Vegetarian & Makanan Ramah Anak"
+        ],
+        seatingAreas: [
+          "Indoor AC Bebas Asap Rokok",
+          "Outdoor Garden Sejuk & Asri",
+          "Meja Bar Barista",
+          "Private VIP Room (Meeting/Arisan)"
+        ]
+      },
+      isActive: true,
+      expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+    },
+    create: {
+      customDomain: "kuliner-kita.com",
+      businessName: "Kopi & Dapur Kuliner Kita - Bandung",
+      categoryId: catKafe.id,
+      sector: "RESTAURANT_CAFE",
+      whatsappNumber: "6281223344556",
+      contactEmail: "reservasi@kuliner-kita.com",
+      address: "Jl. Riau (LLRE Martadinata) No. 145, Cihapit, Bandung, Jawa Barat",
+      googleMapsUrl: "https://maps.google.com/?q=Jl.+LLRE+Martadinata+No.145+Bandung",
+      seoTitle: "Kopi & Dapur Kuliner Kita Bandung | Kafe & Resto Nuansa Hangat Jl. Riau",
+      seoDescription: "Kafe & resto estetik di Jl. Riau Bandung. Kopi artisan single origin, steak premium, hidangan nusantara modern, dan area outdoor asri. Reservasi meja sekarang!",
+      seoKeywords: "kafe bandung, resto jl riau bandung, tempat nongkrong bandung, kopi enak bandung, kuliner bandung, reservasi kafe bandung",
+      geoCity: "Bandung",
+      geoRegion: "ID-JB",
+      latitude: -6.9083,
+      longitude: 107.6234,
+      themeColor: "#ea580c",
+      heroTitle: "Cita Rasa Autentik & Suasana Hangat di Jantung Kota Bandung",
+      heroSubtitle: "Perpaduan kopi artisan pilihan, sajian hidangan nusantara modern, dan area outdoor asri untuk momen santai bersama teman dan keluarga.",
+      heroBannerUrl: "/assets/templates/restaurant/hero-cafe.webp",
+      logoUrl: "/assets/templates/restaurant/logo-resto.webp",
+      featureFlags: {
+        taglineBadge: "Artisanal Coffee & Modern Comfort Dining • Bandung",
+        operatingHours: "Setiap Hari: 08.00 - 23.00 WIB",
+        statusBadge: "Buka Sekarang • Area Parkir Luas",
+        chefProfile: {
+          name: "Chef Arga Wicaksana",
+          role: "Executive Culinary Director",
+          bio: "Menghadirkan hidangan berkualitas tinggi dengan bahan lokal segar dan sentuhan gastronomi modern."
+        },
+        highlights: [
+          { label: "Biji Kopi", value: "100% Single Origin Arabica Jawa Barat" },
+          { label: "Bahan Masakan", value: "Bahan Segar Alami Tanpa Pengawet" },
+          { label: "Kapasitas", value: "Tersedia 150 Seat & Private VIP Room" }
+        ],
+        commitments: [
+          "Tempat Higienis, Nyaman & Ramah Keluarga",
+          "Wi-Fi Kecepatan Tinggi & Tersedia Stop Kontak di Setiap Meja",
+          "Musholla Bersih, Area Parkir Luas & Ramah Kursi Roda",
+          "Tersedia Opsi Vegetarian & Makanan Ramah Anak"
+        ],
+        seatingAreas: [
+          "Indoor AC Bebas Asap Rokok",
+          "Outdoor Garden Sejuk & Asri",
+          "Meja Bar Barista",
+          "Private VIP Room (Meeting/Arisan)"
+        ]
+      },
+      isActive: true,
+      expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+    },
+  });
+
+  await prisma.user.upsert({
+    where: { email: "owner@kuliner-kita.com" },
+    update: { role: "CLIENT_SUPER_ADMIN", tenantId: tenant4.id },
+    create: {
+      email: "owner@kuliner-kita.com",
+      passwordHash: clientPasswordHash,
+      name: "Arga Wicaksana (Owner & Executive Chef)",
+      role: "CLIENT_SUPER_ADMIN",
+      tenantId: tenant4.id,
+    },
+  });
+
+  // Katalog Menu Makanan & Minuman
+  const catalogItems4 = [
+    {
+      title: "Wagyu Ribeye Steak with Truffle Herb Butter",
+      slug: "wagyu-ribeye-steak",
+      category: "Main Course",
+      price: 185000,
+      pricePrefix: "Rp",
+      description: "Daging wagyu meltique pilihan dengan tingkat kematangan sempurna, disajikan dengan creamy mashed potato, sayuran panggang, dan lelehan truffle butter.",
+      imageUrl: "/assets/templates/restaurant/menu-signature-steak.webp",
+      images: ["/assets/templates/restaurant/menu-signature-steak.webp"],
+      isFeatured: true,
+      orderIndex: 0,
+      specsJson: {
+        category: "Main Course",
+        isRecommended: true,
+        spicyLevel: 0,
+        calories: "620 kkal",
+        preparationTime: "20 Menit",
+        portion: "1 Orang (200gr)",
+        tags: ["Chef's Signature", "Best Seller"]
+      },
+    },
+    {
+      title: "Signature Gula Aren Latte & Manual Brew Arabica",
+      slug: "signature-artisan-coffee",
+      category: "Artisan Coffee",
+      price: 38000,
+      pricePrefix: "Rp",
+      description: "Double shot espresso biji kopi Arabica Priangan dengan racikan susu segar gurih dan sirup gula aren organik asli Jawa Barat.",
+      imageUrl: "/assets/templates/restaurant/menu-artisan-coffee.webp",
+      images: ["/assets/templates/restaurant/menu-artisan-coffee.webp"],
+      isFeatured: true,
+      orderIndex: 1,
+      specsJson: {
+        category: "Artisan Coffee",
+        isRecommended: true,
+        spicyLevel: 0,
+        calories: "180 kkal",
+        preparationTime: "7 Menit",
+        portion: "1 Cup (Double Shot)",
+        tags: ["Best Seller", "100% Arabica"]
+      },
+    },
+    {
+      title: "Creamy Truffle Mushroom Fettuccine",
+      slug: "creamy-truffle-fettuccine",
+      category: "Main Course",
+      price: 78000,
+      pricePrefix: "Rp",
+      description: "Pasta fettuccine al dente berbalur saus krim truffle harum, tumisan jamur portobello segar, dan taburan keju parmesan impor.",
+      imageUrl: "/assets/templates/restaurant/menu-pasta-truffle.webp",
+      images: ["/assets/templates/restaurant/menu-pasta-truffle.webp"],
+      isFeatured: true,
+      orderIndex: 2,
+      specsJson: {
+        category: "Main Course",
+        isRecommended: true,
+        spicyLevel: 0,
+        calories: "510 kkal",
+        preparationTime: "15 Menit",
+        portion: "1-2 Orang",
+        tags: ["Chef's Signature", "Vegetarian Friendly"]
+      },
+    },
+    {
+      title: "Artisanal Almond Butter Croissant",
+      slug: "artisan-almond-croissant",
+      category: "Pastry & Bakery",
+      price: 35000,
+      pricePrefix: "Rp",
+      description: "Pastry croissant berlapis renyah dengan isian almond cream lembut dan taburan almond slice panggang wangi. Dipanggang fresh setiap pagi.",
+      imageUrl: "/assets/templates/restaurant/menu-artisan-croissant.webp",
+      images: ["/assets/templates/restaurant/menu-artisan-croissant.webp"],
+      isFeatured: false,
+      orderIndex: 3,
+      specsJson: {
+        category: "Pastry & Bakery",
+        isRecommended: false,
+        spicyLevel: 0,
+        calories: "320 kkal",
+        preparationTime: "5 Menit",
+        portion: "1 Pcs",
+        tags: ["Freshly Baked Daily"]
+      },
+    },
+    {
+      title: "Wild Berry Sparkling Basil Mocktail",
+      slug: "wild-berry-sparkling-mocktail",
+      category: "Refreshing Drinks",
+      price: 42000,
+      pricePrefix: "Rp",
+      description: "Kombinasi puree buah berry liar, perasan lemon segar, daun basil aromatik, dan soda dingin yang membangkitkan kesegaran dahaga.",
+      imageUrl: "/assets/templates/restaurant/menu-mocktail-berry.webp",
+      images: ["/assets/templates/restaurant/menu-mocktail-berry.webp"],
+      isFeatured: true,
+      orderIndex: 4,
+      specsJson: {
+        category: "Refreshing Drinks",
+        isRecommended: true,
+        spicyLevel: 0,
+        calories: "120 kkal",
+        preparationTime: "5 Menit",
+        portion: "1 Glass (350ml)",
+        tags: ["House Favorite", "Refreshing"]
+      },
+    },
+    {
+      title: "Dendeng Batokok Sambal Ijo Rice Bowl",
+      slug: "dendeng-batokok-rice-bowl",
+      category: "Main Course",
+      price: 65000,
+      pricePrefix: "Rp",
+      description: "Daging sapi tipis gurih dengan sambal ijo khas Minang segar, disajikan di atas nasi putih pulen hangat, telur mata sapi, dan kerupuk kulit.",
+      imageUrl: "/assets/templates/restaurant/menu-rice-bowl.webp",
+      images: ["/assets/templates/restaurant/menu-rice-bowl.webp"],
+      isFeatured: true,
+      orderIndex: 5,
+      specsJson: {
+        category: "Main Course",
+        isRecommended: true,
+        spicyLevel: 2,
+        calories: "580 kkal",
+        preparationTime: "15 Menit",
+        portion: "1 Porsi Kenyang",
+        tags: ["Nusantara Favorite", "Spicy"]
+      },
+    },
+  ];
+
+  for (const item of catalogItems4) {
+    await prisma.catalogItem.upsert({
+      where: { tenantId_slug: { tenantId: tenant4.id, slug: item.slug } },
+      update: { ...item },
+      create: { tenantId: tenant4.id, ...item },
+    });
+  }
+
+  // Galeri Suasana Resto & Kafe
+  const restoGalleries = [
+    { id: "resto-gal-1", imageUrl: "/assets/templates/restaurant/ambience-1.webp", caption: "Suasana hangat indoor dining area dengan pencahayaan temaram yang nyaman", orderIndex: 0 },
+    { id: "resto-gal-2", imageUrl: "/assets/templates/restaurant/ambience-2.webp", caption: "Area outdoor garden asri, favorit untuk ngopi sore dan menikmati angin sejuk Bandung", orderIndex: 1 },
+    { id: "resto-gal-3", imageUrl: "/assets/templates/restaurant/ambience-3.webp", caption: "Open bar barista & live coffee brewing pengalaman interaktif aroma kopi segar", orderIndex: 2 },
+    { id: "resto-gal-4", imageUrl: "/assets/templates/restaurant/ambience-4.webp", caption: "Momen hangat kumpul keluarga, arisan dan perayaan ulang tahun di VIP dining", orderIndex: 3 },
+  ];
+
+  for (const gal of restoGalleries) {
+    await prisma.galleryItem.upsert({
+      where: { id: gal.id },
+      update: {
+        imageUrl: gal.imageUrl,
+        caption: gal.caption,
+        orderIndex: gal.orderIndex,
+      },
+      create: {
+        id: gal.id,
+        tenantId: tenant4.id,
+        imageUrl: gal.imageUrl,
+        caption: gal.caption,
+        orderIndex: gal.orderIndex,
+      },
+    });
+  }
+
+  // Testimoni Pelanggan & Foodies
+  const restoTestimonials = [
+    {
+      id: "resto-testi-1",
+      tenantId: tenant4.id,
+      clientName: "Bpk. Kevin Sanjaya",
+      customerName: "Bpk. Kevin Sanjaya",
+      clientRole: "Food Blogger Bandung",
+      comment: "Steak wagyu-nya luar biasa empuk dan saus truffle butter-nya sangat kaya rasa! Tempatnya asri di Jl. Riau, pas banget buat dinner romantis atau santai bareng teman.",
+      rating: 5,
+      avatarUrl: "/assets/templates/restaurant/ambience-1.webp",
+    },
+    {
+      id: "resto-testi-2",
+      tenantId: tenant4.id,
+      clientName: "Ibu Nadia Tamara",
+      customerName: "Ibu Nadia Tamara",
+      clientRole: "Penyelenggara Event Komunitas",
+      comment: "Reservasi VIP room untuk private gathering 20 orang dilayani dengan sangat sigap. Wi-Fi cepat, pelayanan ramah, dan kopi gula arennya nagih banget.",
+      rating: 5,
+      avatarUrl: "/assets/templates/restaurant/ambience-2.webp",
+    },
+    {
+      id: "resto-testi-3",
+      tenantId: tenant4.id,
+      clientName: "Dimas & Sarah",
+      customerName: "Dimas & Sarah",
+      clientRole: "Pengunjung Setia Weekend",
+      comment: "Kafe favorit kalau lagi ke Bandung. Suasana outdoor tamannya adem, croissant freshly baked setiap pagi, dan parkirannya lega. Sangat recommended!",
+      rating: 5,
+      avatarUrl: "/assets/templates/restaurant/ambience-3.webp",
+    },
+  ];
+
+  for (const item of restoTestimonials) {
+    try {
+      await prisma.testimonial.upsert({
+        where: { id: item.id },
+        update: {
+          clientName: item.clientName,
+          clientRole: item.clientRole,
+          comment: item.comment,
+          rating: item.rating,
+          avatarUrl: item.avatarUrl,
+        },
+        create: {
+          id: item.id,
+          tenantId: item.tenantId,
+          clientName: item.clientName,
+          clientRole: item.clientRole,
+          comment: item.comment,
+          rating: item.rating,
+          avatarUrl: item.avatarUrl,
+        },
+      });
+    } catch {
+      await prisma.$executeRawUnsafe(`
+        INSERT INTO "Testimonial" ("id", "tenantId", "clientName", "customerName", "clientRole", "comment", "rating", "avatarUrl", "createdAt")
+        VALUES ($1, $2, $3, $3, $4, $5, $6, $7, NOW())
+        ON CONFLICT ("id") DO UPDATE 
+        SET "clientName" = EXCLUDED."clientName",
+            "comment" = EXCLUDED."comment",
+            "rating" = EXCLUDED."rating";
+      `, item.id, item.tenantId, item.clientName, item.clientRole, item.comment, item.rating, item.avatarUrl);
+    }
+  }
+
+  console.log("✅ Tenant 4 (Cafe & Resto):", tenant4.customDomain);
+
   console.log("\n🎉 Seeding selesai dengan Granular RBAC!");
   console.log("📋 Kredensial Login:");
   console.log("   - Super Admin: superadmin@etalase.online / admin123!");
@@ -1463,6 +1812,7 @@ async function main() {
   console.log("   - Staf Mobil : staff@bastian-sales.com / client123!");
   console.log("   - Owner Sewa : owner@bastian-rental.com / client123!");
   console.log("   - Owner Rumah: owner@properti-bandung.com / client123!");
+  console.log("   - Owner Resto: owner@kuliner-kita.com / client123!");
 }
 
 main()
