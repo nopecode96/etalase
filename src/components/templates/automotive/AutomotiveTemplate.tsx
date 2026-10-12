@@ -197,63 +197,109 @@ export default function AutomotiveTemplate({ tenant }: Props) {
       </header>
 
       {/* 3. HERO BANNER SECTION */}
-      <section className="relative overflow-hidden bg-slate-950 text-white py-16 sm:py-24 lg:py-28">
-        <div className="absolute inset-0 opacity-40 mix-blend-overlay">
-          <img
-            src="/assets/templates/automotive/chery-omoda-5.webp"
-            alt="Chery Omoda 5 Bandung"
-            className="w-full h-full object-cover object-center"
-          />
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent" />
+      <section className="relative overflow-hidden bg-slate-950 text-white py-14 sm:py-20 lg:py-24">
+        {/* Subtle background glow */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-red-600/10 blur-[140px] pointer-events-none rounded-full" />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-950/95 to-slate-950" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 bg-red-600/90 text-white text-xs sm:text-sm font-bold px-3.5 py-1.5 rounded-full mb-6 backdrop-blur-sm border border-red-400/30">
-              <Sparkles size={15} />
-              <span>Pesta Promo Spesial Bulan Ini • Khusus Plat D / Bandung</span>
-            </div>
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight sm:leading-none text-white mb-6">
-              Beli Mobil Baru <span className="text-red-500">Chery &amp; Jaecoo</span> di Bandung Lebih Mudah &amp; Cepat
-            </h1>
-            <p className="text-base sm:text-xl text-slate-300 leading-relaxed mb-8">
-              Dapatkan DP teringan mulai <strong>25 Jutaan</strong>, Bunga <strong>0%</strong>, Test Drive langsung ke rumah/kantor Anda, serta garansi mesin hingga <strong>10 Tahun / 1.000.000 KM</strong>.
-            </p>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
+            {/* Kolom Kiri: Headline & CTA (lg:col-span-7) */}
+            <div className="lg:col-span-7 text-left">
+              <div className="inline-flex items-center gap-2 bg-red-600/90 text-white text-xs sm:text-sm font-bold px-3.5 py-1.5 rounded-full mb-6 backdrop-blur-sm border border-red-400/30">
+                <Sparkles size={15} />
+                <span>Pesta Promo Spesial Bulan Ini • Khusus Plat D / Bandung</span>
+              </div>
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight sm:leading-none text-white mb-6">
+                Beli Mobil Baru <span className="text-red-500">Chery &amp; Jaecoo</span> di Bandung Lebih Mudah &amp; Cepat
+              </h1>
+              <p className="text-base sm:text-lg text-slate-300 leading-relaxed mb-8 max-w-2xl">
+                Dapatkan DP teringan mulai <strong>25 Jutaan</strong>, Bunga <strong>0%</strong>, Test Drive langsung ke rumah/kantor Anda, serta garansi mesin hingga <strong>10 Tahun / 1.000.000 KM</strong>.
+              </p>
 
-            <div className="flex flex-wrap items-center gap-3 sm:gap-4 mb-10">
-              <a
-                href="#simulasi"
-                className="inline-flex items-center justify-center gap-2.5 bg-red-600 hover:bg-red-700 text-white font-extrabold px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl text-sm sm:text-base shadow-xl shadow-red-600/30 transition-all hover:scale-[1.02]"
-              >
-                <Calculator size={18} />
-                <span>Simulasi Kredit DP &amp; Cicilan</span>
-              </a>
-              <a
-                href="#katalog"
-                className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-bold px-6 py-3.5 sm:py-4 rounded-xl text-sm sm:text-base backdrop-blur-md border border-white/20 transition-all"
-              >
-                <span>Lihat Tipe Mobil</span>
-                <ChevronRight size={18} />
-              </a>
+              <div className="flex flex-wrap items-center gap-3 sm:gap-4 mb-10">
+                <a
+                  href={`https://wa.me/${tenant.whatsappNumber}?text=${encodeURIComponent(
+                    `Halo ${salesName}, saya ingin konsultasi promo dan simulasi kredit mobil Chery & Jaecoo di Bandung.`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl text-sm sm:text-base shadow-xl shadow-emerald-600/30 transition-all hover:scale-[1.02]"
+                >
+                  <MessageCircle size={18} />
+                  <span>Konsultasi Promo via WA</span>
+                </a>
+                <a
+                  href="#katalog"
+                  className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-bold px-6 py-3.5 sm:py-4 rounded-xl text-sm sm:text-base backdrop-blur-md border border-white/20 transition-all"
+                >
+                  <span>Lihat Pilihan Unit</span>
+                  <ChevronRight size={18} />
+                </a>
+              </div>
+
+              {/* 4 Poin Komitmen */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 border-t border-white/10 text-xs sm:text-sm text-slate-300">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 size={16} className="text-emerald-400 flex-shrink-0" />
+                  <span>Unit Ready Stock</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 size={16} className="text-emerald-400 flex-shrink-0" />
+                  <span>Dibantu Approve</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 size={16} className="text-emerald-400 flex-shrink-0" />
+                  <span>Test Drive ke Rumah</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 size={16} className="text-emerald-400 flex-shrink-0" />
+                  <span>Trade-in Segala Merk</span>
+                </div>
+              </div>
             </div>
 
-            {/* Quick Badges */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 border-t border-white/10 text-xs sm:text-sm text-slate-300">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 size={16} className="text-emerald-400 flex-shrink-0" />
-                <span>Unit Ready Stock</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 size={16} className="text-emerald-400 flex-shrink-0" />
-                <span>Dibantu Sampai Approve</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 size={16} className="text-emerald-400 flex-shrink-0" />
-                <span>Test Drive ke Rumah</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 size={16} className="text-emerald-400 flex-shrink-0" />
-                <span>Trade-in Segala Merk</span>
+            {/* Kolom Kanan: Foto Mobil Unggulan & Floating Badges (lg:col-span-5) */}
+            <div className="lg:col-span-5 relative flex items-center justify-center">
+              {/* Radial glow di belakang mobil */}
+              <div className="absolute w-72 h-72 sm:w-96 sm:h-96 bg-gradient-to-tr from-red-600/25 to-blue-600/20 blur-3xl rounded-full pointer-events-none -z-0" />
+
+              <div className="relative z-10 w-full flex flex-col items-center">
+                {/* Floating Badge 1 (Atas Kanan) */}
+                <div className="self-end mr-2 sm:mr-6 mb-2 bg-slate-900/90 backdrop-blur-md border border-white/15 px-3.5 py-2 rounded-2xl shadow-2xl flex items-center gap-2.5 transform hover:-translate-y-1 transition-transform">
+                  <div className="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0">
+                    <Car size={16} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Ketersediaan Unit</p>
+                    <p className="text-xs sm:text-sm font-extrabold text-white">Unit Ready Stock Bandung • Plat D</p>
+                  </div>
+                </div>
+
+                {/* Foto Mobil Utama */}
+                <div className="relative group w-full my-2">
+                  <img
+                    src="/assets/templates/automotive/chery-omoda-5.webp"
+                    alt="Chery Omoda 5 GT Bandung"
+                    className="w-full max-w-lg mx-auto object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="text-center mt-1">
+                    <span className="inline-block text-[11px] font-semibold text-slate-400 bg-white/5 border border-white/10 px-3 py-1 rounded-full backdrop-blur-sm">
+                      Chery Omoda 5 GT AWD • Best Compact Luxury SUV
+                    </span>
+                  </div>
+                </div>
+
+                {/* Floating Badge 2 (Bawah Kiri) */}
+                <div className="self-start ml-2 sm:ml-4 -mt-3 bg-slate-900/90 backdrop-blur-md border border-white/15 px-3.5 py-2 rounded-2xl shadow-2xl flex items-center gap-2.5 transform hover:-translate-y-1 transition-transform">
+                  <div className="w-8 h-8 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center flex-shrink-0">
+                    <ShieldCheck size={16} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Garansi Resmi Terpanjang</p>
+                    <p className="text-xs sm:text-sm font-extrabold text-white">Garansi Mesin 10 Thn / 1.000.000 KM</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
