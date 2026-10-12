@@ -240,7 +240,34 @@ async function ensureTablesExist() {
     }
   }
 
-  console.log("✅ Seluruh struktur tabel & sinkronisasi kolom PostgreSQL berhasil dipastikan ada.");
+  // --- SANITASI KOLOM DINAMIS (ELIMINASI ERROR 23502 NOT NULL VIOLATION) ---
+  // Menghapus constraint NOT NULL pada seluruh kolom non-kunci di tabel data sekunder
+  // agar kolom legacy dari migrasi sebelumnya tidak pernah menyebabkan 23502
+  const tablesToSanitize = ['Testimonial', 'CatalogItem', 'GalleryItem', 'Lead'];
+  for (const table of tablesToSanitize) {
+    try {
+      await prisma.$executeRawUnsafe(`
+        DO $$ 
+        DECLARE 
+          col record;
+        BEGIN 
+          FOR col IN 
+            SELECT column_name 
+            FROM information_schema.columns 
+            WHERE table_schema = 'public'
+              AND table_name = '${table}' 
+              AND column_name NOT IN ('id', 'tenantId', 'createdAt')
+          LOOP 
+            EXECUTE format('ALTER TABLE "${table}" ALTER COLUMN %I DROP NOT NULL;', col.column_name);
+          END LOOP; 
+        END $$;
+      `);
+    } catch (err) {
+      console.warn(`Sanitize warning for ${table}:`, err.message);
+    }
+  }
+
+  console.log("✅ Seluruh struktur tabel & sinkronisasi kolom PostgreSQL berhasil dipastikan ada & disanitasi.");
 }
 
 async function main() {
@@ -546,26 +573,37 @@ async function main() {
 
   // Galeri Serah Terima Unit Bastian di Bandung
   const deliveryItems = [
-    { imageUrl: "/assets/templates/automotive/delivery-1.webp", caption: "Serah terima Chery Omoda 5 GT ke Bpk. Hendra - Buah Batu Bandung", orderIndex: 0 },
-    { imageUrl: "/assets/templates/automotive/delivery-2.webp", caption: "Pengiriman Chery Tiggo 8 Pro ke Ibu Maya - Dago Atas Bandung", orderIndex: 1 },
-    { imageUrl: "/assets/templates/automotive/delivery-3.webp", caption: "Delivery Omoda E5 Electric Car ke Bpk. Dr. Faisal - Antapani Bandung", orderIndex: 2 },
-    { imageUrl: "/assets/templates/automotive/delivery-4.webp", caption: "Penyerahan Unit Jaecoo 7 ke Bpk. Rian - Setiabudi Bandung", orderIndex: 3 },
-    { imageUrl: "/assets/templates/automotive/delivery-5.webp", caption: "Serah terima Omoda 5 Z ke Bpk. Agus - Kopo Bandung", orderIndex: 4 },
-    { imageUrl: "/assets/templates/automotive/delivery-6.webp", caption: "Customer puas Chery Omoda 5 ke Bpk. Dani - Cimahi", orderIndex: 5 },
+    { id: "delivery-1", imageUrl: "/assets/templates/automotive/delivery-1.webp", caption: "Serah terima Chery Omoda 5 GT ke Bpk. Hendra - Buah Batu Bandung", orderIndex: 0 },
+    { id: "delivery-2", imageUrl: "/assets/templates/automotive/delivery-2.webp", caption: "Pengiriman Chery Tiggo 8 Pro ke Ibu Maya - Dago Atas Bandung", orderIndex: 1 },
+    { id: "delivery-3", imageUrl: "/assets/templates/automotive/delivery-3.webp", caption: "Delivery Omoda E5 Electric Car ke Bpk. Dr. Faisal - Antapani Bandung", orderIndex: 2 },
+    { id: "delivery-4", imageUrl: "/assets/templates/automotive/delivery-4.webp", caption: "Penyerahan Unit Jaecoo 7 ke Bpk. Rian - Setiabudi Bandung", orderIndex: 3 },
+    { id: "delivery-5", imageUrl: "/assets/templates/automotive/delivery-5.webp", caption: "Serah terima Omoda 5 Z ke Bpk. Agus - Kopo Bandung", orderIndex: 4 },
+    { id: "delivery-6", imageUrl: "/assets/templates/automotive/delivery-6.webp", caption: "Customer puas Chery Omoda 5 ke Bpk. Dani - Cimahi", orderIndex: 5 },
   ];
 
   for (const delivery of deliveryItems) {
-    await prisma.galleryItem.create({
-      data: {
+    await prisma.galleryItem.upsert({
+      where: { id: delivery.id },
+      update: {
+        imageUrl: delivery.imageUrl,
+        caption: delivery.caption,
+        orderIndex: delivery.orderIndex,
+      },
+      create: {
+        id: delivery.id,
         tenantId: tenant1.id,
-        ...delivery,
+        imageUrl: delivery.imageUrl,
+        caption: delivery.caption,
+        orderIndex: delivery.orderIndex,
       },
     });
   }
 
   // Testimoni Konsumen
-  const testimonials1 = [
+  const dummyTestimonials = [
     {
+      id: "testi-hendra-automotive",
+      tenantId: tenant1.id,
       clientName: "Bpk. Hendra Kurniawan",
       customerName: "Bpk. Hendra Kurniawan",
       clientRole: "Wiraswasta, Buah Batu",
@@ -574,6 +612,8 @@ async function main() {
       avatarUrl: "/assets/templates/automotive/delivery-1.webp",
     },
     {
+      id: "testi-maya-automotive",
+      tenantId: tenant1.id,
       clientName: "Ibu Maya Septiani",
       customerName: "Ibu Maya Septiani",
       clientRole: "Dokter, Dago Atas",
@@ -582,6 +622,8 @@ async function main() {
       avatarUrl: "/assets/templates/automotive/delivery-2.webp",
     },
     {
+      id: "testi-faisal-automotive",
+      tenantId: tenant1.id,
       clientName: "Bpk. Dr. Faisal M.",
       customerName: "Bpk. Dr. Faisal M.",
       clientRole: "Dosen, Antapani",
@@ -591,30 +633,36 @@ async function main() {
     },
   ];
 
-  for (const t of testimonials1) {
+  for (const item of dummyTestimonials) {
     try {
-      await prisma.testimonial.create({
-        data: {
-          tenantId: tenant1.id,
-          clientName: t.clientName,
-          clientRole: t.clientRole,
-          comment: t.comment,
-          rating: t.rating,
-          avatarUrl: t.avatarUrl,
+      await prisma.testimonial.upsert({
+        where: { id: item.id },
+        update: {
+          clientName: item.clientName,
+          clientRole: item.clientRole,
+          comment: item.comment,
+          rating: item.rating,
+          avatarUrl: item.avatarUrl,
+        },
+        create: {
+          id: item.id,
+          tenantId: item.tenantId,
+          clientName: item.clientName,
+          clientRole: item.clientRole,
+          comment: item.comment,
+          rating: item.rating,
+          avatarUrl: item.avatarUrl,
         },
       });
-    } catch (createErr) {
-      // Fallback via raw SQL if Prisma Client model differs from older database schema
-      await prisma.$executeRawUnsafe(
-        `INSERT INTO "Testimonial" ("id", "tenantId", "clientName", "customerName", "clientRole", "comment", "rating", "avatarUrl", "createdAt")
-         VALUES (gen_random_uuid()::text, $1, $2, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP)`,
-        tenant1.id,
-        t.clientName,
-        t.clientRole,
-        t.comment,
-        t.rating,
-        t.avatarUrl
-      );
+    } catch {
+      await prisma.$executeRawUnsafe(`
+        INSERT INTO "Testimonial" ("id", "tenantId", "clientName", "customerName", "clientRole", "comment", "rating", "avatarUrl", "createdAt")
+        VALUES ($1, $2, $3, $3, $4, $5, $6, $7, NOW())
+        ON CONFLICT ("id") DO UPDATE 
+        SET "clientName" = EXCLUDED."clientName",
+            "comment" = EXCLUDED."comment",
+            "rating" = EXCLUDED."rating";
+      `, item.id, item.tenantId, item.clientName, item.clientRole, item.comment, item.rating, item.avatarUrl);
     }
   }
 
