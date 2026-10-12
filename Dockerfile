@@ -13,10 +13,12 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Generate Prisma Client & Eksekusi Build
-RUN npx prisma generate
+# Sediakan dummy DATABASE_URL untuk keperluan prerendering build Next.js
+ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy?schema=public"
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
+
+RUN npx prisma generate
 RUN npm run build
 
 # Stage 3: Runner (Image Akhir Produksi)
