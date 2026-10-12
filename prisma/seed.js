@@ -722,32 +722,165 @@ async function main() {
 
   console.log("✅ Tenant 1 (Automotive Chery & Jaecoo Bandung):", tenant1.customDomain);
 
-  // 4. DUMMY TENANT 2: bastian-rental.com
+  // 4. DUMMY TENANT 2: bastian-rental.com (Rental Mobil Bandung)
   const tenant2 = await prisma.tenant.upsert({
     where: { customDomain: "bastian-rental.com" },
-    update: {},
-    create: {
-      customDomain: "bastian-rental.com",
-      businessName: "Bastian Rental Bandung",
-      categoryId: catRental.id,
-      sector: "RENTAL",
-      whatsappNumber: "6289876543210",
-      contactEmail: "rental@bastian-rental.com",
-      address: "Jl. Raya Lembang No. 45, Bandung, Jawa Barat",
-      seoTitle: "Bastian Rental Mobil Bandung | Harga Terjangkau, Armada Lengkap",
-      seoDescription: "Sewa mobil di Bandung dengan harga terjangkau. Tersedia rental harian dan bulanan. Hubungi kami sekarang!",
-      seoKeywords: "rental mobil bandung, sewa mobil bandung, rental harian bandung",
+    update: {
+      businessName: "Bastian Rental Mobil Bandung",
+      heroTitle: "Sewa Mobil Bandung Lepas Kunci & Plus Driver Murah Terpercaya",
+      heroSubtitle: "Armada keluaran terbaru, bersih terawat, dan siap antar-jemput ke Stasiun/Bandara/Hotel. Proses mudah tanpa survey berbelit!",
+      heroBannerUrl: "/assets/templates/rental/hero-rental.webp",
+      logoUrl: "/assets/templates/rental/logo-rental.webp",
+      themeColor: "#059669", // Emerald Green khas rental terpercaya
       geoCity: "Bandung",
       geoRegion: "ID-JB",
-      latitude: -6.8215,
-      longitude: 107.6098,
-      themeColor: "#7c3aed",
-      heroTitle: "Rental Mobil Bandung Terpercaya",
-      heroSubtitle: "Armada lengkap, harga transparan, siap antar jemput. Booking mudah via WhatsApp!",
-      heroBannerUrl: "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=1200",
-      featureFlags: { showRentalCalendar: true },
+      latitude: -6.8905,
+      longitude: 107.5996,
+      address: "Jl. Pasteur No. 120, Sukajadi, Kota Bandung, Jawa Barat",
+      googleMapsUrl: "https://maps.google.com/?q=Jl.+Pasteur+No.120+Bandung",
+      whatsappNumber: "6281298765432",
+      contactEmail: "rental@bastian-rental.com",
+      seoTitle: "Sewa Mobil Bandung Lepas Kunci & Driver Murah | Bastian Rental",
+      seoDescription: "Rental mobil Bandung lepas kunci & driver murah. Tersedia Innova Zenix, Avanza, Xpander, Fortuner, Hiace. Antar jemput Stasiun/Hotel 24 jam!",
+      seoKeywords: "rental mobil bandung, sewa mobil bandung, rental mobil lepas kunci bandung, sewa mobil dengan sopir bandung, rental innova zenix bandung, rental hiace bandung",
+      featureFlags: {
+        taglineBadge: "Solusi Transportasi & Wisata Bandung • Unit 2023-2025",
+        heroBadges: [
+          { label: "Bisa Lepas Kunci Tanpa Survey", icon: "Key", sublabel: "Kemudahan Sewa" },
+          { label: "Gratis Antar Jemput Stasiun / Hotel", icon: "MapPin", sublabel: "Layanan Antar Unit" }
+        ],
+        commitments: [
+          "Armada Bersih, Wangi & Rutin Servis Resmi",
+          "Pilihan Durasi: 12 Jam, 24 Jam, & Mingguan",
+          "Driver Ramah, Berpengalaman & Menguasai Rute Wisata",
+          "Asuransi All-Risk & Jaminan Mobil Pengganti"
+        ],
+        rentalTerms: [
+          {
+            title: "Syarat Lepas Kunci (Wisatawan / Luar Kota)",
+            items: [
+              "Foto KTP Asli & SIM A Aktif",
+              "Tiket Kereta Api (Whoosh/KAI) atau Tiket Pesawat PP",
+              "Bukti Reservasi Hotel / Penginapan di Bandung",
+              "Akun Media Sosial Aktif (Instagram / LinkedIn)"
+            ]
+          },
+          {
+            title: "Syarat Lepas Kunci (Warga Domisili Bandung)",
+            items: [
+              "e-KTP Asli Bandung & SIM A Aktif",
+              "Kartu Keluarga (KK) / ID Card Karyawan Asli",
+              "Motor + STNK atas nama pribadi sebagai deposit jaminan",
+              "Bersedia disurvei lokasi tempat tinggal jika diperlukan"
+            ]
+          },
+          {
+            title: "Ketentuan Paket Dengan Driver",
+            items: [
+              "Cukup DP Reservasi Jadwal (Tanpa deposit jaminan unit)",
+              "Driver profesional, ramah, dan bebas asap rokok di dalam kabin",
+              "Tarif belum termasuk BBM, Tol, Parkir, & Uang Makan Driver Rp 50.000/hari",
+              "Tersedia opsi Paket All-In (Mobil + Driver + BBM + Tol)"
+            ]
+          }
+        ],
+        facilities: [
+          {
+            title: "Antar Jemput Tepat Waktu",
+            desc: "Armada kami antarkan langsung ke Stasiun KCIC Whoosh Tegalluar/Padalarang, Stasiun Bandung, atau hotel Anda tepat waktu."
+          },
+          {
+            title: "Unit Selalu Prima & Higienis",
+            desc: "Seluruh armada dicuci bersih, wangi, dan dicek oli serta sistem rem secara berkala sebelum diserahterimakan kepada penyewa."
+          },
+          {
+            title: "Layanan Bantuan Darurat 24 Jam",
+            desc: "Tim teknis darurat siaga 24 jam di seluruh area Bandung Raya dengan jaminan unit pengganti bila terjadi kendala mesin."
+          }
+        ]
+      },
       isActive: true,
-      expiresAt: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000),
+      expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+    },
+    create: {
+      customDomain: "bastian-rental.com",
+      businessName: "Bastian Rental Mobil Bandung",
+      categoryId: catRental.id,
+      sector: "RENTAL",
+      whatsappNumber: "6281298765432",
+      contactEmail: "rental@bastian-rental.com",
+      address: "Jl. Pasteur No. 120, Sukajadi, Kota Bandung, Jawa Barat",
+      googleMapsUrl: "https://maps.google.com/?q=Jl.+Pasteur+No.120+Bandung",
+      seoTitle: "Sewa Mobil Bandung Lepas Kunci & Driver Murah | Bastian Rental",
+      seoDescription: "Rental mobil Bandung lepas kunci & driver murah. Tersedia Innova Zenix, Avanza, Xpander, Fortuner, Hiace. Antar jemput Stasiun/Hotel 24 jam!",
+      seoKeywords: "rental mobil bandung, sewa mobil bandung, rental mobil lepas kunci bandung, sewa mobil dengan sopir bandung, rental innova zenix bandung, rental hiace bandung",
+      geoCity: "Bandung",
+      geoRegion: "ID-JB",
+      latitude: -6.8905,
+      longitude: 107.5996,
+      themeColor: "#059669",
+      heroTitle: "Sewa Mobil Bandung Lepas Kunci & Plus Driver Murah Terpercaya",
+      heroSubtitle: "Armada keluaran terbaru, bersih terawat, dan siap antar-jemput ke Stasiun/Bandara/Hotel. Proses mudah tanpa survey berbelit!",
+      heroBannerUrl: "/assets/templates/rental/hero-rental.webp",
+      logoUrl: "/assets/templates/rental/logo-rental.webp",
+      featureFlags: {
+        taglineBadge: "Solusi Transportasi & Wisata Bandung • Unit 2023-2025",
+        heroBadges: [
+          { label: "Bisa Lepas Kunci Tanpa Survey", icon: "Key", sublabel: "Kemudahan Sewa" },
+          { label: "Gratis Antar Jemput Stasiun / Hotel", icon: "MapPin", sublabel: "Layanan Antar Unit" }
+        ],
+        commitments: [
+          "Armada Bersih, Wangi & Rutin Servis Resmi",
+          "Pilihan Durasi: 12 Jam, 24 Jam, & Mingguan",
+          "Driver Ramah, Berpengalaman & Menguasai Rute Wisata",
+          "Asuransi All-Risk & Jaminan Mobil Pengganti"
+        ],
+        rentalTerms: [
+          {
+            title: "Syarat Lepas Kunci (Wisatawan / Luar Kota)",
+            items: [
+              "Foto KTP Asli & SIM A Aktif",
+              "Tiket Kereta Api (Whoosh/KAI) atau Tiket Pesawat PP",
+              "Bukti Reservasi Hotel / Penginapan di Bandung",
+              "Akun Media Sosial Aktif (Instagram / LinkedIn)"
+            ]
+          },
+          {
+            title: "Syarat Lepas Kunci (Warga Domisili Bandung)",
+            items: [
+              "e-KTP Asli Bandung & SIM A Aktif",
+              "Kartu Keluarga (KK) / ID Card Karyawan Asli",
+              "Motor + STNK atas nama pribadi sebagai deposit jaminan",
+              "Bersedia disurvei lokasi tempat tinggal jika diperlukan"
+            ]
+          },
+          {
+            title: "Ketentuan Paket Dengan Driver",
+            items: [
+              "Cukup DP Reservasi Jadwal (Tanpa deposit jaminan unit)",
+              "Driver profesional, ramah, dan bebas asap rokok di dalam kabin",
+              "Tarif belum termasuk BBM, Tol, Parkir, & Uang Makan Driver Rp 50.000/hari",
+              "Tersedia opsi Paket All-In (Mobil + Driver + BBM + Tol)"
+            ]
+          }
+        ],
+        facilities: [
+          {
+            title: "Antar Jemput Tepat Waktu",
+            desc: "Armada kami antarkan langsung ke Stasiun KCIC Whoosh Tegalluar/Padalarang, Stasiun Bandung, atau hotel Anda tepat waktu."
+          },
+          {
+            title: "Unit Selalu Prima & Higienis",
+            desc: "Seluruh armada dicuci bersih, wangi, dan dicek oli serta sistem rem secara berkala sebelum diserahterimakan kepada penyewa."
+          },
+          {
+            title: "Layanan Bantuan Darurat 24 Jam",
+            desc: "Tim teknis darurat siaga 24 jam di seluruh area Bandung Raya dengan jaminan unit pengganti bila terjadi kendala mesin."
+          }
+        ]
+      },
+      isActive: true,
+      expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
     },
   });
 
@@ -763,27 +896,241 @@ async function main() {
     },
   });
 
+  // 6 Unit Armada Rental Bandung Pilihan
   const catalogItems2 = [
     {
-      title: "Toyota Fortuner VRZ",
-      slug: "toyota-fortuner-vrz",
-      category: "SUV",
-      price: 800000,
-      pricePrefix: "Tarif Harian",
-      description: "SUV premium untuk perjalanan nyaman dan prestisius.",
-      imageUrl: "https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=600",
-      images: [],
+      title: "Toyota All New Avanza 2024",
+      slug: "toyota-all-new-avanza",
+      category: "MPV Keluarga Terlaris",
+      price: 450000,
+      pricePrefix: "Mulai dari",
+      description: "Pilihan utama perjalanan hemat bersama keluarga di Bandung. Kabin lega, suspensi empuk, dan irit bahan bakar.",
+      imageUrl: "/assets/templates/rental/avanza-2024.webp",
+      images: ["/assets/templates/rental/avanza-2024.webp"],
       isFeatured: true,
-      specsJson: { Kapasitas: "7 Penumpang", Transmisi: "AT", BBM: "Solar" },
+      orderIndex: 0,
+      specsJson: {
+        seats: "7 Kursi",
+        transmission: "Matic & Manual",
+        fuelType: "Bensin (Irit)",
+        year: "2023 - 2024",
+        price12h: "Rp 350.000",
+        price24h: "Rp 450.000",
+        priceWithDriver: "Rp 600.000",
+        features: ["AC Double Blower", "Head Unit Touchscreen", "Sensor Parkir", "Kamera Mundur"]
+      },
+    },
+    {
+      title: "Toyota Kijang Innova Zenix",
+      slug: "toyota-innova-zenix",
+      category: "Premium Luxury MPV",
+      price: 750000,
+      pricePrefix: "Mulai dari",
+      description: "Kenyamanan eksekutif kelas atas dengan platform TNGA terbaru. Sangat nyaman untuk perjalanan bisnis, VIP, dan liburan mewah di Bandung.",
+      imageUrl: "/assets/templates/rental/innova-zenix.webp",
+      images: ["/assets/templates/rental/innova-zenix.webp"],
+      isFeatured: true,
+      orderIndex: 1,
+      specsJson: {
+        seats: "7 Kursi (Captain Seat)",
+        transmission: "CVT Automatic",
+        fuelType: "Bensin 2.0L",
+        year: "2024",
+        price12h: "Rp 650.000",
+        price24h: "Rp 750.000",
+        priceWithDriver: "Rp 950.000",
+        features: ["Panoramic Sunroof", "Captain Seat", "Wireless Charger", "Layar Hiburan 10 Inci"]
+      },
+    },
+    {
+      title: "Mitsubishi Xpander Ultimate",
+      slug: "mitsubishi-xpander-ultimate",
+      category: "Comfort MPV",
+      price: 500000,
+      pricePrefix: "Mulai dari",
+      description: "Desain stylish dan kabin kedap suara terbaik di kelasnya. Suspensi mantap untuk rute Lembang, Ciwidey, dan wisata pegunungan.",
+      imageUrl: "/assets/templates/rental/xpander.webp",
+      images: ["/assets/templates/rental/xpander.webp"],
+      isFeatured: true,
+      orderIndex: 2,
+      specsJson: {
+        seats: "7 Kursi",
+        transmission: "CVT Automatic",
+        fuelType: "Bensin",
+        year: "2023 - 2024",
+        price12h: "Rp 400.000",
+        price24h: "Rp 500.000",
+        priceWithDriver: "Rp 650.000",
+        features: ["Cruise Control", "Electric Parking Brake", "Ground Clearance Tinggi", "Kabin Super Kedap"]
+      },
+    },
+    {
+      title: "Toyota Fortuner 2.8 GR Sport",
+      slug: "toyota-fortuner-gr-sport",
+      category: "Gagah & Prestisius (SUV)",
+      price: 1100000,
+      pricePrefix: "Mulai dari",
+      description: "SUV tangguh bertenaga besar untuk perjalanan prestisius, pengawalan rombongan, atau menjelajahi kontur jalanan perbukitan Bandung.",
+      imageUrl: "/assets/templates/rental/fortuner-gr.webp",
+      images: ["/assets/templates/rental/fortuner-gr.webp"],
+      isFeatured: true,
+      orderIndex: 3,
+      specsJson: {
+        seats: "7 Kursi",
+        transmission: "6-Speed Automatic",
+        fuelType: "Diesel Turbo (Solar)",
+        year: "2023 - 2024",
+        price12h: "Rp 950.000",
+        price24h: "Rp 1.100.000",
+        priceWithDriver: "Rp 1.350.000",
+        features: ["Kamera 360", "Power Backdoor", "Jok Kulit Mewah", "Mesin 2.8L Powerful"]
+      },
+    },
+    {
+      title: "Toyota Hiace Premio Luxury",
+      slug: "toyota-hiace-premio",
+      category: "Rombongan & Wisata (14 Seat)",
+      price: 1350000,
+      pricePrefix: "Mulai dari",
+      description: "Microbus premium untuk rombongan wisata keluarga besar atau instansi kantor. Legroom luas, jok empuk, dan AC sejuk merata.",
+      imageUrl: "/assets/templates/rental/hiace-premio.webp",
+      images: ["/assets/templates/rental/hiace-premio.webp"],
+      isFeatured: true,
+      orderIndex: 4,
+      specsJson: {
+        seats: "14 Kursi",
+        transmission: "Manual 6-Speed",
+        fuelType: "Diesel Turbo",
+        year: "2023",
+        price12h: "Rp 1.150.000",
+        price24h: "Rp 1.350.000",
+        priceWithDriver: "Rp 1.350.000 (Inc Driver)",
+        features: ["Audio Karaoke", "Port USB Tiap Baris", "Reclining Seat", "Bagasi Rombongan Luas"]
+      },
+    },
+    {
+      title: "Honda Brio RS Urbanite",
+      slug: "honda-brio-rs",
+      category: "City Car Gesit & Lincah",
+      price: 350000,
+      pricePrefix: "Mulai dari",
+      description: "Pilihan terbaik untuk keliling Kota Bandung yang padat. Mudah bermanuver dan parkir di berbagai kafe dan spot kuliner hits.",
+      imageUrl: "/assets/templates/rental/brio-rs.webp",
+      images: ["/assets/templates/rental/brio-rs.webp"],
+      isFeatured: true,
+      orderIndex: 5,
+      specsJson: {
+        seats: "5 Kursi",
+        transmission: "CVT Automatic",
+        fuelType: "Bensin (Sangat Irit)",
+        year: "2023 - 2024",
+        price12h: "Rp 275.000",
+        price24h: "Rp 350.000",
+        priceWithDriver: "Rp 500.000",
+        features: ["Audio Bluetooth", "Lincah & Irit BBM", "AC Dingin", "Dual SRS Airbag"]
+      },
     },
   ];
 
   for (const item of catalogItems2) {
     await prisma.catalogItem.upsert({
       where: { tenantId_slug: { tenantId: tenant2.id, slug: item.slug } },
-      update: {},
+      update: { ...item },
       create: { tenantId: tenant2.id, ...item },
     });
+  }
+
+  // Galeri Serah Terima Pelanggan Rental
+  const rentalGalleries = [
+    { id: "rental-gal-1", imageUrl: "/assets/templates/rental/rental-client-1.webp", caption: "Serah terima Innova Zenix ke Ibu Ratna & Keluarga di Hotel Trans Luxury Bandung", orderIndex: 0 },
+    { id: "rental-gal-2", imageUrl: "/assets/templates/rental/rental-client-2.webp", caption: "Pengantaran unit All New Avanza ke Stasiun KCIC Whoosh Padalarang", orderIndex: 1 },
+    { id: "rental-gal-3", imageUrl: "/assets/templates/rental/rental-client-3.webp", caption: "Rombongan reuni wisata Lembang menggunakan Toyota Hiace Premio", orderIndex: 2 },
+    { id: "rental-gal-4", imageUrl: "/assets/templates/rental/rental-client-4.webp", caption: "Delivery Xpander lepas kunci ke penginapan Dago Pakar", orderIndex: 3 },
+  ];
+
+  for (const gal of rentalGalleries) {
+    await prisma.galleryItem.upsert({
+      where: { id: gal.id },
+      update: {
+        imageUrl: gal.imageUrl,
+        caption: gal.caption,
+        orderIndex: gal.orderIndex,
+      },
+      create: {
+        id: gal.id,
+        tenantId: tenant2.id,
+        imageUrl: gal.imageUrl,
+        caption: gal.caption,
+        orderIndex: gal.orderIndex,
+      },
+    });
+  }
+
+  // Testimonial Pelanggan Rental Mobil
+  const rentalTestimonials = [
+    {
+      id: "rental-testi-1",
+      tenantId: tenant2.id,
+      clientName: "Bpk. Dimas Prasetyo",
+      customerName: "Bpk. Dimas Prasetyo",
+      clientRole: "Wisatawan Asal Jakarta",
+      comment: "Layanan terbaik! Mobil Innova Zenix diantar tepat waktu saat kami tiba di Stasiun Whoosh Padalarang. Mobil bersih wangi seperti baru keluar dari showroom.",
+      rating: 5,
+      avatarUrl: "/assets/templates/rental/rental-client-1.webp",
+    },
+    {
+      id: "rental-testi-2",
+      tenantId: tenant2.id,
+      clientName: "Ibu Shinta & Rekan",
+      customerName: "Ibu Shinta & Rekan",
+      clientRole: "Corporate Event Organizer",
+      comment: "Sewa Hiace Premio plus driver untuk event kantor di Lembang 3 hari. Drivernya sangat sabar, hafal jalan tikus menghindari macet, dan tarif sangat terjangkau.",
+      rating: 5,
+      avatarUrl: "/assets/templates/rental/rental-client-2.webp",
+    },
+    {
+      id: "rental-testi-3",
+      tenantId: tenant2.id,
+      clientName: "Rian Ramadhan",
+      customerName: "Rian Ramadhan",
+      clientRole: "Penyewa Lepas Kunci (Brio RS)",
+      comment: "Proses lepas kunci sangat cepat tanpa dipersulit. Cukup kirim foto tiket kereta dan KTP langsung di-ACC. Brio-nya gesit banget keliling kulineran Bandung!",
+      rating: 5,
+      avatarUrl: "/assets/templates/rental/rental-client-3.webp",
+    },
+  ];
+
+  for (const item of rentalTestimonials) {
+    try {
+      await prisma.testimonial.upsert({
+        where: { id: item.id },
+        update: {
+          clientName: item.clientName,
+          clientRole: item.clientRole,
+          comment: item.comment,
+          rating: item.rating,
+          avatarUrl: item.avatarUrl,
+        },
+        create: {
+          id: item.id,
+          tenantId: item.tenantId,
+          clientName: item.clientName,
+          clientRole: item.clientRole,
+          comment: item.comment,
+          rating: item.rating,
+          avatarUrl: item.avatarUrl,
+        },
+      });
+    } catch {
+      await prisma.$executeRawUnsafe(`
+        INSERT INTO "Testimonial" ("id", "tenantId", "clientName", "customerName", "clientRole", "comment", "rating", "avatarUrl", "createdAt")
+        VALUES ($1, $2, $3, $3, $4, $5, $6, $7, NOW())
+        ON CONFLICT ("id") DO UPDATE 
+        SET "clientName" = EXCLUDED."clientName",
+            "comment" = EXCLUDED."comment",
+            "rating" = EXCLUDED."rating";
+      `, item.id, item.tenantId, item.clientName, item.clientRole, item.comment, item.rating, item.avatarUrl);
+    }
   }
 
   console.log("✅ Tenant 2 (Rental):", tenant2.customDomain);
