@@ -8,7 +8,7 @@ const SECTOR_SCHEMA_TYPE: Record<BusinessSector, string> = {
   PROPERTY: "RealEstateAgent",
   RENTAL: "AutoRental",
   RESTAURANT_CAFE: "Restaurant",
-  GENERAL_SERVICE: "LocalBusiness",
+  GENERAL_SERVICE: "DryCleaningOrLaundry",
 };
 
 /**

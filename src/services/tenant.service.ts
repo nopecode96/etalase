@@ -6,7 +6,7 @@ const PREVIEW_SLUG_MAP: Record<string, string> = {
   "bastian-rental": "bastian-rental.com",
   "properti-bandung": "properti-bandung.com",
   "kuliner-kita": "kuliner-kita.com",
-  "jasaprofesional": "jasaprofesional.id",
+  "jasaprofesional": "jasaprofesional.com",
 };
 
 /**

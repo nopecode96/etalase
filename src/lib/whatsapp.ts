@@ -12,7 +12,8 @@ export function buildWhatsAppMessage(params: {
     | "GENERAL_INQUIRY"
     | "PROPERTY_INQUIRY"
     | "KPR_SIMULATION"
-    | "SITE_VISIT_BOOKING";
+    | "SITE_VISIT_BOOKING"
+    | "LAUNDRY_PICKUP";
   name: string;
   phone: string;
   details: Record<string, string | number | undefined>;
@@ -78,6 +79,17 @@ export function buildWhatsAppMessage(params: {
       if (details.duration) body += `\n• Durasi: ${details.duration} hari`;
       break;
     }
+    case "LAUNDRY_PICKUP": {
+      body = `\n\n🧺 *PERMINTAAN PENJEMPUTAN LAUNDRY (PICKUP)*`;
+      if (details.service) body += `\n• Layanan: ${details.service}`;
+      if (details.weightOrPieces) body += `\n• Est. Cucian: ${details.weightOrPieces}`;
+      if (details.speedPackage) body += `\n• Paket Waktu: ${details.speedPackage}`;
+      if (details.pickupDate) body += `\n• Tanggal Pickup: ${details.pickupDate}`;
+      if (details.pickupTime) body += `\n• Jam Pickup: ${details.pickupTime}`;
+      if (details.address) body += `\n• Alamat Jemput: ${details.address}`;
+      if (details.notes) body += `\n• Catatan: ${details.notes}`;
+      break;
+    }
     case "GENERAL_INQUIRY":
     default: {
       body = `\n\n💬 *INQUIRY UMUM*`;
@@ -113,7 +125,8 @@ export function createLeadWhatsAppUrl(params: {
     | "GENERAL_INQUIRY"
     | "PROPERTY_INQUIRY"
     | "KPR_SIMULATION"
-    | "SITE_VISIT_BOOKING";
+    | "SITE_VISIT_BOOKING"
+    | "LAUNDRY_PICKUP";
   name: string;
   phone: string;
   details: Record<string, string | number | undefined>;

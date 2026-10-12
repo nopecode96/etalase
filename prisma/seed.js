@@ -395,9 +395,22 @@ async function main() {
         orderIndex: 3,
       },
     }),
+    prisma.tenantCategory.upsert({
+      where: { slug: "jasa-profesional" },
+      update: {},
+      create: {
+        id: "cat_jasa_profesional",
+        name: "Jasa & Layanan Lokal",
+        slug: "jasa-profesional",
+        sector: "GENERAL_SERVICE",
+        description: "Website jasa profesional & layanan bisnis lokal",
+        icon: "🧺",
+        orderIndex: 4,
+      },
+    }),
   ]);
 
-  const [catMobil, catProperti, catRental, catKafe] = categories;
+  const [catMobil, catProperti, catRental, catKafe, catJasa] = categories;
 
   // 3. DUMMY TENANT 1: bastian-sales.com (Chery & Jaecoo Bandung)
   const tenant1 = await prisma.tenant.upsert({
@@ -1801,6 +1814,327 @@ async function main() {
 
   console.log("✅ Tenant 4 (Cafe & Resto):", tenant4.customDomain);
 
+  // 7. DUMMY TENANT 5: jasaprofesional.com (Bastian Clean & Care - Premium Laundry Bandung)
+  const tenant5 = await prisma.tenant.upsert({
+    where: { customDomain: "jasaprofesional.com" },
+    update: {
+      businessName: "Bastian Clean & Care - Premium Laundry Bandung",
+      heroTitle: "Jasa Laundry Kiloan & Satuan Premium dengan Layanan Antar Jemput Gratis",
+      heroSubtitle: "Pakaian bersih higienis, wangi tahan lama, dan disetrika uap rapi. Standar 1 Mesin 1 Pelanggan tanpa risiko tertukar atau luntur!",
+      heroBannerUrl: "/assets/templates/laundry/hero-laundry.webp",
+      logoUrl: "/assets/templates/laundry/logo-laundry.webp",
+      themeColor: "#0284c7", // Sky Blue Fresh
+      geoCity: "Bandung",
+      geoRegion: "ID-JB",
+      latitude: -6.8856,
+      longitude: 107.6142,
+      address: "Jl. Dago (Ir. H. Djuanda) No. 92, Coblong, Kota Bandung, Jawa Barat",
+      googleMapsUrl: "https://maps.google.com/?q=Jl.+Ir.+H.+Djuanda+No.92+Bandung",
+      whatsappNumber: "6281234567899",
+      contactEmail: "care@jasaprofesional.com",
+      seoTitle: "Bastian Clean & Care Bandung | Jasa Laundry Kiloan & Satuan Antar Jemput",
+      seoDescription: "Jasa laundry kiloan & dry cleaning satuan premium di Dago Bandung. 1 mesin 1 pelanggan, setrika uap boiler, gratis antar jemput radius 5 KM. Pesan sekarang!",
+      seoKeywords: "laundry bandung, laundry kiloan dago, dry cleaning bandung, cuci sepatu bandung, laundry express bandung, antar jemput laundry bandung",
+      featureFlags: {
+        taglineBadge: "Layanan Antar Jemput Laundry Bandung • Gratis Ongkir Radius 5 KM",
+        operatingHours: "Setiap Hari: 07.30 - 20.00 WIB",
+        statusBadge: "Kurir Pickup Aktif Hari Ini: 07.30 - 20.00 WIB",
+        serviceHighlights: [
+          { label: "Higienis Terjamin", value: "1 Mesin Cuci Khusus 1 Pelanggan (Tidak Dicampur)" },
+          { label: "Setrika Uap", value: "Setrika Uap Boiler (Pakaian Tidak Mengkilap & Rapi)" },
+          { label: "Deterjen Khusus", value: "Deterjen Ramah Serat Kain & Parfum Grade Premium" }
+        ],
+        commitments: [
+          "Jaminan Garansi Cuci Ulang Jika Kurang Bersih / Harum",
+          "Timbangan Digital Akurat dan Transparan",
+          "Pemisahan Bahan Sensitif (Batik, Sutra, Wol)",
+          "Gratis Antar Jemput Wilayah Bandung Kota"
+        ],
+        processSteps: [
+          { step: "01", title: "Pesan & Jadwalkan Pickup", desc: "Isi form online atau chat WA, kurir kami jemput ke rumah, kos, atau kantor Anda." },
+          { step: "02", title: "Sortir & Timbang Digital", desc: "Pakaian dicek kondisi noda dan ditimbang transparan di hadapan Anda / via video." },
+          { step: "03", title: "Cuci Higienis & Uap Boiler", desc: "Dicuci tersendiri menggunakan mesin komersial dan disetrika uap profesional." },
+          { step: "04", title: "Packing Rapi & Diantar Balik", desc: "Dipacking plastik kedap wangi dan langsung diantar kembali tepat waktu." }
+        ]
+      },
+      isActive: true,
+      expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+    },
+    create: {
+      customDomain: "jasaprofesional.com",
+      businessName: "Bastian Clean & Care - Premium Laundry Bandung",
+      categoryId: catJasa.id,
+      sector: "GENERAL_SERVICE",
+      whatsappNumber: "6281234567899",
+      contactEmail: "care@jasaprofesional.com",
+      address: "Jl. Dago (Ir. H. Djuanda) No. 92, Coblong, Kota Bandung, Jawa Barat",
+      googleMapsUrl: "https://maps.google.com/?q=Jl.+Ir.+H.+Djuanda+No.92+Bandung",
+      seoTitle: "Bastian Clean & Care Bandung | Jasa Laundry Kiloan & Satuan Antar Jemput",
+      seoDescription: "Jasa laundry kiloan & dry cleaning satuan premium di Dago Bandung. 1 mesin 1 pelanggan, setrika uap boiler, gratis antar jemput radius 5 KM. Pesan sekarang!",
+      seoKeywords: "laundry bandung, laundry kiloan dago, dry cleaning bandung, cuci sepatu bandung, laundry express bandung, antar jemput laundry bandung",
+      geoCity: "Bandung",
+      geoRegion: "ID-JB",
+      latitude: -6.8856,
+      longitude: 107.6142,
+      themeColor: "#0284c7",
+      heroTitle: "Jasa Laundry Kiloan & Satuan Premium dengan Layanan Antar Jemput Gratis",
+      heroSubtitle: "Pakaian bersih higienis, wangi tahan lama, dan disetrika uap rapi. Standar 1 Mesin 1 Pelanggan tanpa risiko tertukar atau luntur!",
+      heroBannerUrl: "/assets/templates/laundry/hero-laundry.webp",
+      logoUrl: "/assets/templates/laundry/logo-laundry.webp",
+      featureFlags: {
+        taglineBadge: "Layanan Antar Jemput Laundry Bandung • Gratis Ongkir Radius 5 KM",
+        operatingHours: "Setiap Hari: 07.30 - 20.00 WIB",
+        statusBadge: "Kurir Pickup Aktif Hari Ini: 07.30 - 20.00 WIB",
+        serviceHighlights: [
+          { label: "Higienis Terjamin", value: "1 Mesin Cuci Khusus 1 Pelanggan (Tidak Dicampur)" },
+          { label: "Setrika Uap", value: "Setrika Uap Boiler (Pakaian Tidak Mengkilap & Rapi)" },
+          { label: "Deterjen Khusus", value: "Deterjen Ramah Serat Kain & Parfum Grade Premium" }
+        ],
+        commitments: [
+          "Jaminan Garansi Cuci Ulang Jika Kurang Bersih / Harum",
+          "Timbangan Digital Akurat dan Transparan",
+          "Pemisahan Bahan Sensitif (Batik, Sutra, Wol)",
+          "Gratis Antar Jemput Wilayah Bandung Kota"
+        ],
+        processSteps: [
+          { step: "01", title: "Pesan & Jadwalkan Pickup", desc: "Isi form online atau chat WA, kurir kami jemput ke rumah, kos, atau kantor Anda." },
+          { step: "02", title: "Sortir & Timbang Digital", desc: "Pakaian dicek kondisi noda dan ditimbang transparan di hadapan Anda / via video." },
+          { step: "03", title: "Cuci Higienis & Uap Boiler", desc: "Dicuci tersendiri menggunakan mesin komersial dan disetrika uap profesional." },
+          { step: "04", title: "Packing Rapi & Diantar Balik", desc: "Dipacking plastik kedap wangi dan langsung diantar kembali tepat waktu." }
+        ]
+      },
+      isActive: true,
+      expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+    },
+  });
+
+  await prisma.user.upsert({
+    where: { email: "owner@jasaprofesional.com" },
+    update: { role: "CLIENT_SUPER_ADMIN", tenantId: tenant5.id },
+    create: {
+      email: "owner@jasaprofesional.com",
+      passwordHash: clientPasswordHash,
+      name: "Bastian Pratama (Laundry Owner)",
+      role: "CLIENT_SUPER_ADMIN",
+      tenantId: tenant5.id,
+    },
+  });
+
+  // Katalog Layanan Laundry & Dry Cleaning
+  const catalogItems5 = [
+    {
+      title: "Cuci Komplit Kiloan Premium",
+      slug: "cuci-komplit-kiloan-premium",
+      category: "Kiloan Reguler",
+      price: 8000,
+      pricePrefix: "Mulai",
+      description: "Pakaian dicuci bersih, wangi, dan disetrika uap rapi. Standar 1 mesin 1 nota pelanggan tanpa risiko tertukar.",
+      imageUrl: "/assets/templates/laundry/service-kiloan.webp",
+      images: ["/assets/templates/laundry/service-kiloan.webp"],
+      isFeatured: true,
+      orderIndex: 0,
+      specsJson: {
+        duration: "2 Hari Kerja",
+        unitType: "Per Kg (Min. 3 Kg)",
+        includes: ["Cuci Bersih 1 Mesin 1 Nota", "Deterjen Antibakteri", "Setrika Uap Boiler", "Packing Plastik Rapi"],
+        isExpressAvailable: true
+      },
+    },
+    {
+      title: "Cuci Kering Setrika Kilat 6 Jam Express",
+      slug: "cuci-express-kilat-6-jam",
+      category: "Kiloan Express",
+      price: 15000,
+      pricePrefix: "Mulai",
+      description: "Layanan cuci kilat selesai dalam 6 jam. Sangat cocok untuk kebutuhan mendesak, seragam kerja, atau pakaian bepergian.",
+      imageUrl: "/assets/templates/laundry/service-express.webp",
+      images: ["/assets/templates/laundry/service-express.webp"],
+      isFeatured: true,
+      orderIndex: 1,
+      specsJson: {
+        duration: "6 Jam Siap Pakai",
+        unitType: "Per Kg",
+        includes: ["Prioritas Mesin Mandiri", "Deterjen Grade A", "Setrika Uap Cepat", "Kurir Antar Langsung"],
+        isExpressAvailable: true
+      },
+    },
+    {
+      title: "Cuci Satuan Jas, Blazer & Gaun Pesta",
+      slug: "cuci-satuan-jas-blazer-gaun",
+      category: "Satuan Eksklusif",
+      price: 35000,
+      pricePrefix: "Mulai",
+      description: "Perawatan pakaian formal dengan teknik dry clean presisi menjaga bentuk dan struktur kain pakaian berharga Anda.",
+      imageUrl: "/assets/templates/laundry/service-satuan.webp",
+      images: ["/assets/templates/laundry/service-satuan.webp"],
+      isFeatured: true,
+      orderIndex: 2,
+      specsJson: {
+        duration: "2 - 3 Hari Kerja",
+        unitType: "Per Pcs",
+        includes: ["Dry Cleaning Khusus", "Anti Kusut & Serat Terawat", "Hanger + Cover Jas Pelindung", "Formulir Cek Detail Noda"],
+        isExpressAvailable: true
+      },
+    },
+    {
+      title: "Treatment Deep Clean Sepatu & Sneakers",
+      slug: "treatment-cuci-sepatu-sneakers",
+      category: "Sepatu & Tas",
+      price: 40000,
+      pricePrefix: "Mulai",
+      description: "Pembersihan menyeluruh noda membandel pada upper, midsole, dan insole sepatu sneakers, kulit, atau suede.",
+      imageUrl: "/assets/templates/laundry/service-shoes.webp",
+      images: ["/assets/templates/laundry/service-shoes.webp"],
+      isFeatured: false,
+      orderIndex: 3,
+      specsJson: {
+        duration: "2 Hari Kerja",
+        unitType: "Per Pasang",
+        includes: ["Deep Clean Upper & Outsole", "Shampoo Khusus Material Sepatu", "Anti-Bacterial Spray", "Pengeringan UV Khusus"],
+        isExpressAvailable: false
+      },
+    },
+    {
+      title: "Cuci Bed Cover & Selimut King Size",
+      slug: "cuci-bed-cover-selimut-king",
+      category: "Bedding & Karpet",
+      price: 30000,
+      pricePrefix: "Mulai",
+      description: "Pencucian menggunakan mesin drum besar kapasitas 20 Kg. Tungau, debu, dan bau apek hilang maksimal.",
+      imageUrl: "/assets/templates/laundry/service-bedding.webp",
+      images: ["/assets/templates/laundry/service-bedding.webp"],
+      isFeatured: true,
+      orderIndex: 4,
+      specsJson: {
+        duration: "2 Hari Kerja",
+        unitType: "Per Pcs",
+        includes: ["Mesin Kapasitas Besar 20 Kg", "Tungau & Bakteri Hilang", "Parfum Tahan 14 Hari", "Packing Tas Bed Cover Bersih"],
+        isExpressAvailable: true
+      },
+    },
+    {
+      title: "Cuci Karpet Tebal Rumah / Masjid",
+      slug: "cuci-karpet-tebal",
+      category: "Bedding & Karpet",
+      price: 15000,
+      pricePrefix: "Mulai",
+      description: "Pencucian karpet menggunakan hydro vacuum dan mesin polisher karpet profesional. Bebas lembap dan wangi segar.",
+      imageUrl: "/assets/templates/laundry/service-bedding.webp",
+      images: ["/assets/templates/laundry/service-bedding.webp"],
+      isFeatured: false,
+      orderIndex: 5,
+      specsJson: {
+        duration: "3 Hari Kerja",
+        unitType: "Per Meter",
+        includes: ["Penyedotan Debu Hydro Vacuum", "Pencucian Polisher Khusus", "Pengering Spinner Cepat Kering", "Aroma Kasturi / Floral"],
+        isExpressAvailable: false
+      },
+    },
+  ];
+
+  for (const item of catalogItems5) {
+    await prisma.catalogItem.upsert({
+      where: { tenantId_slug: { tenantId: tenant5.id, slug: item.slug } },
+      update: { ...item },
+      create: { tenantId: tenant5.id, ...item },
+    });
+  }
+
+  // Galeri Workshop & Higienitas Laundry
+  const laundryGalleries = [
+    { id: "laundry-gal-1", imageUrl: "/assets/templates/laundry/process-1.webp", caption: "Penimbangan pakaian menggunakan timbangan digital akurat di hadapan pelanggan", orderIndex: 0 },
+    { id: "laundry-gal-2", imageUrl: "/assets/templates/laundry/process-2.webp", caption: "Proses pencucian higienis standar 1 mesin cuci khusus 1 pelanggan tidak dicampur", orderIndex: 1 },
+    { id: "laundry-gal-3", imageUrl: "/assets/templates/laundry/process-3.webp", caption: "Penyetrikaan uap boiler profesional agar pakaian rapi mulus tanpa merusak serat kain", orderIndex: 2 },
+    { id: "laundry-gal-4", imageUrl: "/assets/templates/laundry/process-4.webp", caption: "Quality control dan packing plastik tebal tersegel wangi siap diantar kurir ke rumah", orderIndex: 3 },
+  ];
+
+  for (const gal of laundryGalleries) {
+    await prisma.galleryItem.upsert({
+      where: { id: gal.id },
+      update: {
+        imageUrl: gal.imageUrl,
+        caption: gal.caption,
+        orderIndex: gal.orderIndex,
+      },
+      create: {
+        id: gal.id,
+        tenantId: tenant5.id,
+        imageUrl: gal.imageUrl,
+        caption: gal.caption,
+        orderIndex: gal.orderIndex,
+      },
+    });
+  }
+
+  // Testimoni Pelanggan Laundry
+  const laundryTestimonials = [
+    {
+      id: "laundry-testi-1",
+      tenantId: tenant5.id,
+      clientName: "Ibu Rina Setyowati",
+      customerName: "Ibu Rina Setyowati",
+      clientRole: "Ibu Rumah Tangga - Dago Atas",
+      comment: "Sudah langganan 6 bulan untuk kiloan dan bed cover. Pakaian selalu rapi, wangi tahan lama, dan kurirnya on time banget waktu ambil dan antar cucian.",
+      rating: 5,
+      avatarUrl: "/assets/templates/laundry/process-1.webp",
+    },
+    {
+      id: "laundry-testi-2",
+      tenantId: tenant5.id,
+      clientName: "Fajar Nugraha",
+      customerName: "Fajar Nugraha",
+      clientRole: "Mahasiswa ITB - Tubagus Ismail",
+      comment: "Fitur pickup-nya ngebantu banget pas lagi hectic tugas akhir. Cuci kilat 6 jam beneran kelar dan kemeja jas presentasi sidang disetrika rapi licin!",
+      rating: 5,
+      avatarUrl: "/assets/templates/laundry/process-2.webp",
+    },
+    {
+      id: "laundry-testi-3",
+      tenantId: tenant5.id,
+      clientName: "dr. Hendra Wijaya",
+      customerName: "dr. Hendra Wijaya",
+      clientRole: "Dokter Spesialis - Pasteur",
+      comment: "Sneakers putih saya yang kusam bisa balik kinclong lagi. Pemisahan baju kerja dan pakaian pribadi sangat higienis. Sangat recomended!",
+      rating: 5,
+      avatarUrl: "/assets/templates/laundry/process-3.webp",
+    },
+  ];
+
+  for (const item of laundryTestimonials) {
+    try {
+      await prisma.testimonial.upsert({
+        where: { id: item.id },
+        update: {
+          clientName: item.clientName,
+          clientRole: item.clientRole,
+          comment: item.comment,
+          rating: item.rating,
+          avatarUrl: item.avatarUrl,
+        },
+        create: {
+          id: item.id,
+          tenantId: item.tenantId,
+          clientName: item.clientName,
+          clientRole: item.clientRole,
+          comment: item.comment,
+          rating: item.rating,
+          avatarUrl: item.avatarUrl,
+        },
+      });
+    } catch {
+      await prisma.$executeRawUnsafe(`
+        INSERT INTO "Testimonial" ("id", "tenantId", "clientName", "customerName", "clientRole", "comment", "rating", "avatarUrl", "createdAt")
+        VALUES ($1, $2, $3, $3, $4, $5, $6, $7, NOW())
+        ON CONFLICT ("id") DO UPDATE 
+        SET "clientName" = EXCLUDED."clientName",
+            "comment" = EXCLUDED."comment",
+            "rating" = EXCLUDED."rating";
+      `, item.id, item.tenantId, item.clientName, item.clientRole, item.comment, item.rating, item.avatarUrl);
+    }
+  }
+
+  console.log("✅ Tenant 5 (Laundry):", tenant5.customDomain);
+
   console.log("\n🎉 Seeding selesai dengan Granular RBAC!");
   console.log("📋 Kredensial Login:");
   console.log("   - Super Admin: superadmin@etalase.online / admin123!");
@@ -1813,6 +2147,7 @@ async function main() {
   console.log("   - Owner Sewa : owner@bastian-rental.com / client123!");
   console.log("   - Owner Rumah: owner@properti-bandung.com / client123!");
   console.log("   - Owner Resto: owner@kuliner-kita.com / client123!");
+  console.log("   - Owner Jasa : owner@jasaprofesional.com / client123!");
 }
 
 main()

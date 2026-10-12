@@ -15,6 +15,7 @@ const MODULE_TYPES = [
   "PROPERTY_INQUIRY",
   "KPR_SIMULATION",
   "SITE_VISIT_BOOKING",
+  "LAUNDRY_PICKUP",
 ] as const;
 
 type ModuleType = (typeof MODULE_TYPES)[number];
