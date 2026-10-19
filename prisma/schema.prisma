@@ -86,7 +86,7 @@ model Tenant {
   expiresAt      DateTime?
 
   // Kontak & WhatsApp Floating CTA
-  whatsappNumber String          // Format: 6281234567890 (tanpa simbol +)
+  whatsappNumber String          // Format: 62895389974414 (tanpa simbol +)
   contactEmail   String?
   address        String?
   googleMapsUrl  String?

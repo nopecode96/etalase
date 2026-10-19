@@ -104,7 +104,7 @@ export function buildWhatsAppMessage(params: {
 
 /**
  * Buat URL WhatsApp yang siap dibuka browser.
- * @param waNumber - Nomor WhatsApp tanpa simbol + (misal: 6281234567890)
+ * @param waNumber - Nomor WhatsApp tanpa simbol + (misal: 62895389974414)
  * @param message  - Teks pesan yang sudah dibangun
  */
 export function buildWhatsAppUrl(waNumber: string, message: string): string {

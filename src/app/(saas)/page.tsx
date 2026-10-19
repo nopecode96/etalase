@@ -44,7 +44,7 @@ export default function SaasHomePage() {
 
       {/* 4. Floating WhatsApp CTA Widget */}
       <FloatingWhatsApp
-        whatsappNumber="6281234567890"
+        whatsappNumber="62895389974414"
         businessName="etalase.online"
         themeColor="#25D366"
       />

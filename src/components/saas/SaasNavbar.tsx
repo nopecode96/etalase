@@ -5,7 +5,7 @@ export default function SaasNavbar() {
   const waSalesMessage = encodeURIComponent(
     "Halo Tim etalase.online! Saya ingin konsultasi pembuatan website portofolio."
   );
-  const waSalesLink = `https://wa.me/6281234567890?text=${waSalesMessage}`;
+  const waSalesLink = `https://wa.me/62895389974414?text=${waSalesMessage}`;
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-800/80">

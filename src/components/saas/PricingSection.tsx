@@ -4,7 +4,7 @@ export default function PricingSection() {
   const waOrderMessage = encodeURIComponent(
     "Halo Tim etalase.online! 👋 Saya ingin memesan Paket Bisnis All-In-One (Rp 2.500.000) untuk website usaha saya. Boleh dibantu pendaftarannya?"
   );
-  const waOrderLink = `https://wa.me/6281234567890?text=${waOrderMessage}`;
+  const waOrderLink = `https://wa.me/62895389974414?text=${waOrderMessage}`;
 
   const inclusions = [
     "Domain Mandiri Resmi (.com / .id pilihan Anda)",

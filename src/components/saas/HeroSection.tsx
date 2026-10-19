@@ -5,7 +5,7 @@ export default function HeroSection() {
   const waSalesMessage = encodeURIComponent(
     "Halo Tim etalase.online! 👋 Saya tertarik untuk membuat website bisnis/portofolio sales berdomain sendiri. Boleh info konsultasi lengkapnya?"
   );
-  const waSalesLink = `https://wa.me/6281234567890?text=${waSalesMessage}`;
+  const waSalesLink = `https://wa.me/62895389974414?text=${waSalesMessage}`;
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-blue-900 via-slate-900 to-slate-950 text-white pt-24 pb-20 md:pt-32 md:pb-28">

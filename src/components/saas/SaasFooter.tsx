@@ -5,7 +5,7 @@ export default function SaasFooter() {
   const waContactMessage = encodeURIComponent(
     "Halo Tim etalase.online! Saya ingin bertanya tentang layanan pembuatan website portofolio."
   );
-  const waContactLink = `https://wa.me/6281234567890?text=${waContactMessage}`;
+  const waContactLink = `https://wa.me/62895389974414?text=${waContactMessage}`;
 
   return (
     <footer className="bg-slate-950 text-slate-400 border-t border-slate-800/80 pt-16 pb-12">
