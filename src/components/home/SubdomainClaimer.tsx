@@ -6,7 +6,15 @@ import { ArrowRight } from "lucide-react";
 
 const TYPEWRITER_WORDS = ["rafacreative", "kopisenja", "bastianmobil", "aisyahlook"];
 
-export function SubdomainClaimer() {
+interface SubdomainClaimerProps {
+  buttonText?: string;
+  defaultPlaceholder?: string;
+}
+
+export function SubdomainClaimer({
+  buttonText = "Klaim Gratis",
+  defaultPlaceholder = "namamu",
+}: SubdomainClaimerProps) {
   const router = useRouter();
   const [claimSlug, setClaimSlug] = useState("");
   const [placeholderText, setPlaceholderText] = useState("");
@@ -44,7 +52,7 @@ export function SubdomainClaimer() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const targetSlug = claimSlug.trim() || placeholderText || "namamu";
+    const targetSlug = claimSlug.trim() || placeholderText || defaultPlaceholder;
     const clean = targetSlug.toLowerCase().replace(/[^a-z0-9-]/g, "-");
     router.push(`/register?slug=${encodeURIComponent(clean)}`);
   };
@@ -57,7 +65,7 @@ export function SubdomainClaimer() {
       <div className="flex items-center w-full px-3 py-2 text-sm">
         <input
           type="text"
-          placeholder={placeholderText || "namamu"}
+          placeholder={placeholderText || defaultPlaceholder}
           value={claimSlug}
           onChange={(e) => setClaimSlug(e.target.value)}
           className="w-full bg-transparent text-[#1C1917] font-semibold focus:outline-none placeholder:text-[#57534E]/40 text-sm sm:text-base tracking-tight"
@@ -71,7 +79,7 @@ export function SubdomainClaimer() {
         type="submit"
         className="bg-[#D94E28] hover:bg-[#B83E1D] text-white font-semibold px-5 sm:px-6 py-3 rounded-xl text-xs sm:text-sm transition-colors shrink-0 shadow-xs flex items-center gap-1.5 cursor-pointer"
       >
-        <span>Klaim Gratis</span>
+        <span>{buttonText}</span>
         <ArrowRight className="w-3.5 h-3.5" />
       </button>
     </form>

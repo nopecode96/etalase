@@ -5,12 +5,20 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { EtalaseLogo } from "@/components/brand/EtalaseLogo";
 import { Menu, X, ChevronDown, ArrowRight } from "lucide-react";
+import { SupportedLocale } from "@/lib/config/constants";
 
 export function GlobalHeader() {
-  const pathname = usePathname();
+  const pathname = usePathname() || "";
+
+  let activeLocale: SupportedLocale = "id";
+  if (pathname.startsWith("/en")) activeLocale = "en";
+  else if (pathname.startsWith("/ms")) activeLocale = "ms";
+  else if (pathname.startsWith("/th")) activeLocale = "th";
+  else if (pathname.startsWith("/vi")) activeLocale = "vi";
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
-  const [selectedLang, setSelectedLang] = useState("ID");
+  const [selectedLang, setSelectedLang] = useState(activeLocale.toUpperCase());
 
   const languages = [
     { code: "ID", label: "Bahasa Indonesia" },
@@ -21,15 +29,12 @@ export function GlobalHeader() {
   ];
 
   useEffect(() => {
-    if (pathname.startsWith("/en")) setSelectedLang("EN");
-    else if (pathname.startsWith("/ms")) setSelectedLang("MS");
-    else if (pathname.startsWith("/th")) setSelectedLang("TH");
-    else if (pathname.startsWith("/vi")) setSelectedLang("VI");
-    else setSelectedLang("ID");
-
+    setSelectedLang(activeLocale.toUpperCase());
     setMobileMenuOpen(false);
     setLangDropdownOpen(false);
-  }, [pathname]);
+  }, [pathname, activeLocale]);
+
+  const currentLocale = activeLocale;
 
   const handleLangChange = (code: string) => {
     setSelectedLang(code);
@@ -44,24 +49,96 @@ export function GlobalHeader() {
     window.location.href = dest;
   };
 
+  const getLocalizedHref = (basePath: string) => {
+    if (currentLocale === "id") return basePath;
+    return `/${currentLocale}${basePath}`;
+  };
+
+  const headerTranslations: Record<
+    SupportedLocale,
+    {
+      solusi: string;
+      fitur: string;
+      template: string;
+      harga: string;
+      blog: string;
+      login: string;
+      getStarted: string;
+    }
+  > = {
+    id: {
+      solusi: "Solusi",
+      fitur: "Fitur",
+      template: "Template",
+      harga: "Harga",
+      blog: "Blog",
+      login: "Masuk",
+      getStarted: "Mulai Gratis",
+    },
+    en: {
+      solusi: "Solutions",
+      fitur: "Features",
+      template: "Templates",
+      harga: "Pricing",
+      blog: "Blog",
+      login: "Sign In",
+      getStarted: "Get Started Free",
+    },
+    ms: {
+      solusi: "Penyelesaian",
+      fitur: "Ciri-ciri",
+      template: "Templat",
+      harga: "Harga",
+      blog: "Blog",
+      login: "Log Masuk",
+      getStarted: "Mula Percuma",
+    },
+    th: {
+      solusi: "โซลูชัน",
+      fitur: "ฟีเจอร์",
+      template: "เทมเพลต",
+      harga: "ราคา",
+      blog: "บล็อก",
+      login: "เข้าสู่ระบบ",
+      getStarted: "เริ่มต้นฟรี",
+    },
+    vi: {
+      solusi: "Giải pháp",
+      fitur: "Tính năng",
+      template: "Mẫu giao diện",
+      harga: "Bảng giá",
+      blog: "Blog",
+      login: "Đăng nhập",
+      getStarted: "Bắt đầu miễn phí",
+    },
+  };
+
+  const t = headerTranslations[currentLocale] || headerTranslations.id;
+
   const navLinks = [
-    { href: "/solusi", label: "Solusi" },
-    { href: "/fitur", label: "Fitur" },
-    { href: "/template", label: "Template" },
-    { href: "/harga", label: "Harga" },
-    { href: "/blog", label: "Blog" },
+    { href: getLocalizedHref("/solusi"), label: t.solusi, base: "/solusi" },
+    { href: getLocalizedHref("/fitur"), label: t.fitur, base: "/fitur" },
+    { href: getLocalizedHref("/template"), label: t.template, base: "/template" },
+    { href: getLocalizedHref("/harga"), label: t.harga, base: "/harga" },
+    { href: getLocalizedHref("/blog"), label: t.blog, base: "/blog" },
   ];
 
   return (
     <header className="sticky top-0 z-50 backdrop-blur-md bg-[#FAF8F5]/90 border-b border-[#E7E5E4] transition-all">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         {/* Kiri: Logo Bersih */}
-        <EtalaseLogo size="md" />
+        <Link href={currentLocale === "id" ? "/" : `/${currentLocale}`}>
+          <EtalaseLogo size="md" />
+        </Link>
 
         {/* Tengah (Desktop lg:): 5 Menu Navigasi Utama */}
         <nav className="hidden lg:flex items-center gap-7 text-xs font-semibold text-[#57534E]">
           {navLinks.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+            const isActive =
+              pathname === item.href ||
+              pathname.startsWith(item.href + "/") ||
+              pathname === item.base ||
+              pathname.startsWith(item.base + "/");
             return (
               <Link
                 key={item.href}
@@ -81,17 +158,17 @@ export function GlobalHeader() {
         {/* Kanan (Desktop lg:): Masuk, Mulai Gratis, Dropdown Bahasa */}
         <div className="hidden lg:flex items-center gap-3">
           <Link
-            href="/login"
+            href={getLocalizedHref("/login")}
             className="text-xs font-semibold text-[#1C1917] hover:text-[#D94E28] border border-[#E7E5E4] hover:border-[#D94E28]/40 bg-white px-3.5 py-2 rounded-xl transition shadow-2xs"
           >
-            Masuk
+            {t.login}
           </Link>
 
           <Link
-            href="/register"
+            href={getLocalizedHref("/register")}
             className="bg-[#D94E28] hover:bg-[#B83E1D] text-white text-xs font-semibold px-4 py-2 rounded-xl transition shadow-xs flex items-center gap-1.5"
           >
-            <span>Mulai Gratis</span>
+            <span>{t.getStarted}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
 
@@ -133,10 +210,10 @@ export function GlobalHeader() {
         {/* Mobile (< lg): Logo + Mulai Gratis + Hamburger Menu */}
         <div className="flex lg:hidden items-center gap-2.5">
           <Link
-            href="/register"
+            href={getLocalizedHref("/register")}
             className="bg-[#D94E28] hover:bg-[#B83E1D] text-white text-xs font-semibold px-3.5 py-2 rounded-xl shadow-xs transition"
           >
-            Mulai Gratis
+            {t.getStarted}
           </Link>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -153,7 +230,11 @@ export function GlobalHeader() {
         <div className="lg:hidden bg-white/98 border-b border-[#E7E5E4] px-4 py-6 space-y-4 shadow-xl animate-fade-in">
           <div className="space-y-1">
             {navLinks.map((item) => {
-              const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+              const isActive =
+                pathname === item.href ||
+                pathname.startsWith(item.href + "/") ||
+                pathname === item.base ||
+                pathname.startsWith(item.base + "/");
               return (
                 <Link
                   key={item.href}
@@ -193,17 +274,10 @@ export function GlobalHeader() {
             </div>
 
             <Link
-              href="/login"
-              className="w-full text-center py-2.5 rounded-xl text-xs font-semibold text-[#1C1917] bg-[#FAF8F5] hover:bg-stone-100 border border-[#E7E5E4] transition"
+              href={getLocalizedHref("/login")}
+              className="text-center py-2.5 text-xs font-semibold border border-[#E7E5E4] rounded-xl text-[#1C1917] hover:bg-[#FAF8F5] transition"
             >
-              Masuk
-            </Link>
-            <Link
-              href="/register"
-              className="w-full text-center py-3 rounded-xl text-xs font-bold text-white bg-[#D94E28] hover:bg-[#B83E1D] shadow-xs flex items-center justify-center gap-1.5 transition"
-            >
-              <span>Mulai Gratis (0% Komisi)</span>
-              <ArrowRight className="w-4 h-4" />
+              {t.login}
             </Link>
           </div>
         </div>
