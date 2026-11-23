@@ -27,17 +27,17 @@ export const TEMPLATE_COMPONENTS: Record<string, React.FC<StoreTemplateProps>> =
 };
 
 export const TEMPLATE_METADATA = [
-  { id: "clean-minimal", name: "Clean Minimal", tag: "Gratis", category: "General / Creator" },
-  { id: "classic-dark", name: "Classic Dark", tag: "Gratis", category: "Tech / Personal" },
-  { id: "catalog-grid", name: "Catalog Grid", tag: "Gratis", category: "Online Shop" },
-  { id: "sage-creator", name: "Sage Creator", tag: "Pro", category: "Coaching & Courses" },
-  { id: "beauty-glam", name: "Beauty & Glam", tag: "Pro", category: "Skincare & Fashion" },
-  { id: "midnight-glow", name: "Midnight Glow", tag: "Pro", category: "Gaming & Crypto" },
-  { id: "editorial-paper", name: "Warm Editorial", tag: "Pro", category: "Writers & Books" },
-  { id: "sales-showcase", name: "Sales & Showroom", tag: "Pro", category: "Automotive & Property" },
-  { id: "cafe-menu", name: "Aesthetic Menu", tag: "Pro", category: "F&B & Coffee Shop" },
-  { id: "boutique-visual", name: "Visual Boutique", tag: "Pro", category: "Apparel & Jewelry" },
-  { id: "wellness-pro", name: "Wellness & Health", tag: "Pro", category: "Doctor & Fitness" },
+  { id: "clean-minimal", name: "Clean Minimal", tag: "Gratis", category: "General / Creator", description: "Latar putih bersih dengan kartu rounded dan kontras tipografi tinggi untuk semua kreator." },
+  { id: "classic-dark", name: "Classic Dark", tag: "Gratis", category: "Tech / Personal", description: "Latar obsidian gelap dengan aksen kontras tegas untuk tech reviewer dan personal branding." },
+  { id: "catalog-grid", name: "Catalog Grid", tag: "Gratis", category: "Online Shop", description: "Tata letak 2-kolom rapi untuk etalase katalog produk dan affiliator media sosial." },
+  { id: "sage-creator", name: "Sage Creator", tag: "Pro", category: "Coaching & Courses", description: "Nuansa sage/olive elegan dengan header besar dan statistik medsos untuk coach & edukator." },
+  { id: "beauty-glam", name: "Beauty & Glam", tag: "Pro", category: "Skincare & Fashion", description: "Palet blush rose lembut beraksen modern untuk brand kecantikan, skincare, dan fashion." },
+  { id: "midnight-glow", name: "Midnight Glow", tag: "Pro", category: "Gaming & Crypto", description: "Nuansa cyberpunk neon violet/cyan untuk gamer, streamer, dan kreator web3." },
+  { id: "editorial-paper", name: "Warm Editorial", tag: "Pro", category: "Writers & Books", description: "Tekstur kertas krem hangat dan tipografi serif untuk penulis, jurnalis, dan penerbit buku." },
+  { id: "sales-showcase", name: "Sales & Showroom", tag: "Pro", category: "Automotive & Property", description: "Format etalase unit, galeri serah terima, dan simulasi cicilan khusus sales mobil & properti." },
+  { id: "cafe-menu", name: "Aesthetic Menu", tag: "Pro", category: "F&B & Coffee Shop", description: "Buku menu visual F&B beraksen espresso hangat, jam operasional, dan arah Google Maps." },
+  { id: "boutique-visual", name: "Visual Boutique", tag: "Pro", category: "Apparel & Jewelry", description: "Etalase chic monochrome dengan banner promosi dan fokus visual fotografi produk." },
+  { id: "wellness-pro", name: "Wellness & Health", tag: "Pro", category: "Doctor & Fitness", description: "Palet teal/ocean menenangkan untuk dokter, klinik estetika, yoga, dan instruktur kebugaran." },
 ];
 
 export function getTemplateComponent(templateId: string): React.FC<StoreTemplateProps> {

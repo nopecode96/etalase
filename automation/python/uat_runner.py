@@ -76,6 +76,12 @@ def main():
         check_route("Course Learning Area", "demo.localhost:3005", "/learn/creator-os"),
         check_route("Booking Appointment Page", "demo.localhost:3005", "/book/consultation"),
         check_route("Tip & Support Page", "demo.localhost:3005", "/tip"),
+        check_route("Pricing Page", "localhost:3005", "/pricing"),
+        check_route("Templates Gallery Page", "localhost:3005", "/templates"),
+        check_route("Digital Product Page", "localhost:3005", "/digital-product"),
+        check_route("Event Ticketing Page", "localhost:3005", "/event"),
+        check_route("1-on-1 Consultation Page", "localhost:3005", "/consultation"),
+        check_route("Creator Affiliate Page", "localhost:3005", "/affiliate"),
     ]
 
     passed = all(tests)

@@ -47,10 +47,11 @@ export const CleanMinimal: React.FC<StoreTemplateProps> = ({
                   href={isPreview ? undefined : url}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-white shadow-sm transition hover:opacity-90"
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold text-white shadow-sm transition hover:opacity-90"
                   style={{ backgroundColor: cfg?.badgeColor || "#0f172a" }}
                 >
-                  <span>Chat di {cfg?.name || ch.channel}</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-white/70"></span>
+                  <span>{cfg?.name || ch.channel}</span>
                 </a>
               );
             })}
