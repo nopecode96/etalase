@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Sparkles, Check, Smartphone, ArrowRight } from "lucide-react";
 import { TEMPLATE_METADATA } from "@/components/templates";
+import { MarketingNavbar } from "@/components/layout/MarketingNavbar";
+import { MarketingFooter } from "@/components/layout/MarketingFooter";
 
 const CATEGORIES = ["Semua", "Kreator & Coach", "F&B / Cafe", "Sales Mobil & Properti", "Fashion & Beauty", "Minimalist"];
 
@@ -22,27 +24,7 @@ export default function TemplatesPage() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
-      {/* Navbar */}
-      <header className="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold text-base shadow-sm">
-              E
-            </div>
-            <span className="font-bold text-lg text-white">
-              etalase<span className="text-blue-500">.online</span>
-            </span>
-          </Link>
-          <div className="flex items-center gap-3">
-            <Link
-              href="/onboarding"
-              className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition"
-            >
-              Mulai Pakai Template
-            </Link>
-          </div>
-        </div>
-      </header>
+      <MarketingNavbar />
 
       {/* Hero */}
       <section className="pt-16 pb-8 px-4 text-center max-w-4xl mx-auto">
@@ -139,6 +121,8 @@ export default function TemplatesPage() {
           </div>
         ))}
       </section>
+
+      <MarketingFooter />
     </div>
   );
 }

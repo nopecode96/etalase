@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { ShowcaseCarousel } from "@/components/home/ShowcaseCarousel";
 import { CreatorMarquee } from "@/components/home/CreatorMarquee";
 import { HeroProductMockup } from "@/components/home/HeroProductMockup";
+import { MarketingNavbar } from "@/components/layout/MarketingNavbar";
+import { MarketingFooter } from "@/components/layout/MarketingFooter";
 import {
   ArrowRight,
   ShoppingBag,
@@ -31,53 +33,8 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-950 text-slate-100 selection:bg-blue-600 selection:text-white">
-      {/* Navigation Header */}
-      <header className="sticky top-0 z-50 backdrop-blur-md bg-slate-950/80 border-b border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-sm shadow-blue-500/30">
-              E
-            </div>
-            <span className="font-bold text-xl tracking-tight text-white">
-              etalase<span className="text-blue-500">.online</span>
-            </span>
-          </Link>
-
-          <nav className="hidden lg:flex items-center gap-7 text-xs font-semibold text-slate-300">
-            <Link href="/digital-product" className="hover:text-white transition">
-              Produk Digital
-            </Link>
-            <Link href="/event" className="hover:text-white transition">
-              Event &amp; Webinar
-            </Link>
-            <Link href="/consultation" className="hover:text-white transition">
-              Konsultasi 1-on-1
-            </Link>
-            <Link href="/affiliate" className="hover:text-white transition">
-              Afiliasi
-            </Link>
-            <Link href="/templates" className="hover:text-white transition">
-              Template (11)
-            </Link>
-            <Link href="/pricing" className="hover:text-white transition">
-              Harga
-            </Link>
-            <Link href="/tools" className="hover:text-white transition">
-              Free Tools
-            </Link>
-          </nav>
-
-          <div className="flex items-center gap-3">
-            <Link
-              href="/onboarding"
-              className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-lg shadow-blue-500/25 flex items-center gap-1.5"
-            >
-              <span>Mulai Gratis</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-        </div>
-      </header>
+      {/* Unified Marketing Navbar */}
+      <MarketingNavbar />
 
       {/* Hero Section with Split 2-Column & Product Inside Hero */}
       <section className="pt-12 sm:pt-20 pb-16 px-4 max-w-7xl mx-auto w-full">
@@ -299,78 +256,7 @@ export default function HomePage() {
       </section>
 
       {/* Comprehensive Footer */}
-      <footer className="mt-auto bg-slate-950 border-t border-slate-900 py-14 px-4 text-xs text-slate-400">
-        <div className="max-w-7xl mx-auto grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-8 mb-12">
-          {/* Col 1 & 2: Brand */}
-          <div className="col-span-2 space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold text-base">
-                E
-              </div>
-              <span className="font-bold text-lg text-white">etalase.online</span>
-            </div>
-            <p className="text-slate-500 text-xs leading-relaxed max-w-sm">
-              All-in-One Bio Link, Visual Storefront &amp; Chat-First Commerce Platform untuk kreator dan bisnis di Asia Tenggara.
-            </p>
-            <p className="text-[11px] text-slate-600">
-              Didukung Borderpay QRIS Cross-Border &amp; WhatsApp Automation Engine.
-            </p>
-          </div>
-
-          {/* Col 3: Fitur */}
-          <div className="space-y-2.5">
-            <h4 className="font-bold text-white text-xs uppercase tracking-wider">Fitur Utama</h4>
-            <ul className="space-y-2">
-              <li><Link href="/digital-product" className="hover:text-white transition">Produk Digital</Link></li>
-              <li><Link href="/event" className="hover:text-white transition">Event &amp; Webinar</Link></li>
-              <li><Link href="/consultation" className="hover:text-white transition">Konsultasi 1-on-1</Link></li>
-              <li><Link href="/affiliate" className="hover:text-white transition">Afiliasi Kreator</Link></li>
-            </ul>
-          </div>
-
-          {/* Col 4: Solusi */}
-          <div className="space-y-2.5">
-            <h4 className="font-bold text-white text-xs uppercase tracking-wider">Solusi Industri</h4>
-            <ul className="space-y-2">
-              <li><Link href="/creator" className="hover:text-white transition">Content Creator</Link></li>
-              <li><Link href="/sales" className="hover:text-white transition">Sales Mobil &amp; Properti</Link></li>
-              <li><Link href="/umkm" className="hover:text-white transition">F&amp;B &amp; Toko Offline</Link></li>
-              <li><Link href="/templates" className="hover:text-white transition">Galeri Template</Link></li>
-            </ul>
-          </div>
-
-          {/* Col 5: Tools & Harga */}
-          <div className="space-y-2.5">
-            <h4 className="font-bold text-white text-xs uppercase tracking-wider">Platform</h4>
-            <ul className="space-y-2">
-              <li><Link href="/pricing" className="hover:text-white transition">Paket &amp; Harga</Link></li>
-              <li><Link href="/tools" className="hover:text-white transition">Kalkulator Penghematan</Link></li>
-              <li><Link href="/tools" className="hover:text-white transition">WhatsApp Link Gen</Link></li>
-              <li><Link href="/mabes/login" className="hover:text-white transition">Mabes Admin</Link></li>
-            </ul>
-          </div>
-
-          {/* Col 6: Regional SEA */}
-          <div className="space-y-2.5">
-            <h4 className="font-bold text-white text-xs uppercase tracking-wider">Regional SEA</h4>
-            <div className="space-y-1.5 text-[11px] text-slate-500">
-              <div>🇮🇩 Indonesia (QRIS)</div>
-              <div>🇲🇾 Malaysia (Beg Kuning)</div>
-              <div>🇸🇬 Singapore (PayNow)</div>
-              <div>🇹🇭 Thailand (LINE)</div>
-              <div>🇻🇳 Vietnam (Zalo)</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="max-w-7xl mx-auto pt-6 border-t border-slate-900 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-500">
-          <div>&copy; {new Date().getFullYear()} etalase.online. Hak Cipta Dilindungi.</div>
-          <div className="flex items-center gap-4">
-            <Link href="/pricing" className="hover:text-slate-400">Privasi</Link>
-            <Link href="/pricing" className="hover:text-slate-400">Ketentuan Layanan</Link>
-          </div>
-        </div>
-      </footer>
+      <MarketingFooter />
     </div>
   );
 }

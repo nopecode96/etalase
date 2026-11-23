@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { MarketingNavbar } from "@/components/layout/MarketingNavbar";
+import { MarketingFooter } from "@/components/layout/MarketingFooter";
 
 export default function FreeToolsPage() {
   // Tool 1: Chat Link Generator
@@ -33,24 +35,20 @@ export default function FreeToolsPage() {
   const estimatedSavings = marketplaceFee - etalaseBorderpayFee;
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto space-y-12">
-        {/* Header */}
-        <div className="text-center space-y-4">
-          <Link
-            href="/"
-            className="inline-flex items-center text-sm font-medium text-emerald-400 hover:text-emerald-300"
-          >
-            ← Kembali ke Beranda etalase.online
-          </Link>
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white">
-            Free Growth Tools untuk Kreator & Seller SEA
-          </h1>
-          <p className="text-slate-400 max-w-2xl mx-auto text-base sm:text-lg">
-            Koleksi kalkulator profit dan generator link multi-channel gratis untuk mempercepat
-            penjualan langsung Anda di Asia Tenggara.
-          </p>
-        </div>
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
+      <MarketingNavbar />
+      <div className="py-12 px-4 sm:px-6 lg:px-8 flex-1">
+        <div className="max-w-4xl mx-auto space-y-12">
+          {/* Header */}
+          <div className="text-center space-y-4">
+            <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white">
+              Free Growth Tools untuk Kreator & Seller SEA
+            </h1>
+            <p className="text-slate-400 max-w-2xl mx-auto text-base sm:text-lg">
+              Koleksi kalkulator profit dan generator link multi-channel gratis untuk mempercepat
+              penjualan langsung Anda di Asia Tenggara.
+            </p>
+          </div>
 
         {/* Tool 1: Multi-Channel Chat Link Generator */}
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 space-y-6">
@@ -199,5 +197,7 @@ export default function FreeToolsPage() {
         </div>
       </div>
     </div>
+    <MarketingFooter />
+  </div>
   );
 }
