@@ -18,9 +18,9 @@ export const metadata: Metadata = {
     "alternatif lynk id",
     "toko online mobile",
   ],
-  authors: [{ name: "Tim Editorial Etalase.online", url: `${BASE_URL}/tentang-kami` }],
+  authors: [{ name: "Tim Editorial Etalase.online", url: `${BASE_URL}/about` }],
   creator: "Tim Editorial Etalase.online",
-  publisher: "PT Etalase Digital Asia",
+  publisher: "Rafa Kreasindo Teknologi",
   alternates: {
     canonical: BASE_URL,
     languages: {

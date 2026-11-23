@@ -77,9 +77,9 @@ export function generateLocalizedMetadata({
       "qris instan",
       "katalog digital asia tenggara",
     ],
-    authors: [{ name: resolvedAuthor, url: `${BASE_URL}/tentang-kami` }],
+    authors: [{ name: resolvedAuthor, url: `${BASE_URL}/about` }],
     creator: resolvedAuthor,
-    publisher: "PT Etalase Digital Asia",
+    publisher: "Rafa Kreasindo Teknologi",
     alternates: {
       canonical: canonicalUrl,
       languages: alternatesLanguages,
@@ -136,11 +136,11 @@ export function generateOrganizationJsonLd() {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "etalase.online",
-    legalName: "PT Etalase Digital Asia",
+    legalName: "Rafa Kreasindo Teknologi",
     url: BASE_URL,
     logo: `${BASE_URL}/favicon.svg`,
     description:
-      "Platform storefront terintegrasi, bio link visual, dan sistem checkout otomatis via WhatsApp & QRIS untuk pebisnis di Asia Tenggara.",
+      "Platform storefront terintegrasi, bio link visual, dan sistem checkout otomatis via WhatsApp & QRIS untuk pebisnis di Asia Tenggara, dikembangkan dan dikelola oleh Rafa Kreasindo Teknologi.",
     sameAs: [
       "https://instagram.com/etalase.online",
       "https://tiktok.com/@etalase.online",
@@ -148,7 +148,6 @@ export function generateOrganizationJsonLd() {
     ],
     contactPoint: {
       "@type": "ContactPoint",
-      telephone: "+62-812-3456-7890",
       contactType: "customer service",
       email: "support@etalase.online",
       availableLanguage: [
@@ -267,7 +266,7 @@ export function generateArticleJsonLd({
     author: {
       "@type": "Organization",
       name: author,
-      url: `${BASE_URL}/tentang-kami`,
+      url: `${BASE_URL}/about`,
     },
     publisher: {
       "@type": "Organization",

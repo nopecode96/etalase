@@ -613,7 +613,7 @@ export default async function ArticleDetailPage({
               </div>
             </div>
             <div className="pt-3 border-t border-[#E7E5E4] text-[11px] text-[#57534E] flex flex-wrap items-center justify-between gap-2">
-              <span>Publikasi Resmi PT Etalase Digital Asia &bull; Jakarta &amp; Singapura</span>
+              <span>Publikasi Resmi Rafa Kreasindo Teknologi &bull; Indonesia</span>
               <a
                 href="mailto:support@etalase.online"
                 className="text-[#D94E28] hover:underline font-medium"

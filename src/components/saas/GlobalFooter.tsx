@@ -4,11 +4,11 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { EtalaseLogo } from "@/components/brand/EtalaseLogo";
-import { MessageCircle, Mail, ShieldCheck, Zap } from "lucide-react";
+import { Mail, ShieldCheck, Zap, Building } from "lucide-react";
 import { SupportedLocale } from "@/lib/config/constants";
 
 export function GlobalFooter() {
-  const pathname = usePathname();
+  const pathname = usePathname() || "";
 
   let currentLocale: SupportedLocale = "id";
   if (pathname.startsWith("/en")) currentLocale = "en";
@@ -21,10 +21,13 @@ export function GlobalFooter() {
     return `/${currentLocale}${basePath}`;
   };
 
+  const currentYear = new Date().getFullYear() || 2026;
+
   const footerTexts: Record<
     SupportedLocale,
     {
       tagline: string;
+      managedBy: string;
       trust1: string;
       trust2: string;
       colSales: string;
@@ -33,6 +36,7 @@ export function GlobalFooter() {
       rights: string;
       statusNormal: string;
       links: {
+        about: string;
         digital: string;
         catalog: string;
         affiliate: string;
@@ -55,6 +59,7 @@ export function GlobalFooter() {
     id: {
       tagline:
         "Satu website etalase untuk semua jualan Anda di Asia Tenggara. Bio link visual, katalog instan, dan checkout chat tanpa potongan komisi.",
+      managedBy: "Pengembang & Pengelola",
       trust1: "Pembayaran QRIS Instan",
       trust2: "Kirim File Otomatis ke WA",
       colSales: "Jualan",
@@ -63,6 +68,7 @@ export function GlobalFooter() {
       rights: "Hak Cipta Dilindungi di Seluruh Asia Tenggara.",
       statusNormal: "Semua Sistem Normal",
       links: {
+        about: "Tentang Kami (About Us)",
         digital: "Produk Digital & E-Book",
         catalog: "Katalog Fisik & Showroom",
         affiliate: "Affiliate Keranjang Kuning",
@@ -84,6 +90,7 @@ export function GlobalFooter() {
     en: {
       tagline:
         "One storefront website for all your sales across Southeast Asia. Visual bio links, instant catalogs, and zero-commission chat checkouts.",
+      managedBy: "Developed & Operated by",
       trust1: "Instant QRIS Payments",
       trust2: "Automated WhatsApp Delivery",
       colSales: "Selling",
@@ -92,6 +99,7 @@ export function GlobalFooter() {
       rights: "All Rights Reserved across Southeast Asia.",
       statusNormal: "All Systems Operational",
       links: {
+        about: "About Us (Company Profile)",
         digital: "Digital Products & E-Books",
         catalog: "Physical Catalogs & Showrooms",
         affiliate: "TikTok Yellow Basket Affiliate",
@@ -113,6 +121,7 @@ export function GlobalFooter() {
     ms: {
       tagline:
         "Satu laman web etalase untuk semua jualan anda di Asia Tenggara. Pautan bio visual, katalog pantas, dan pesanan chat tanpa potongan komisen.",
+      managedBy: "Dibangun & Dikendalikan oleh",
       trust1: "Pembayaran QRIS Pantas",
       trust2: "Hantar Fail Automatik ke WhatsApp",
       colSales: "Jualan",
@@ -121,6 +130,7 @@ export function GlobalFooter() {
       rights: "Hak Cipta Terpelihara di Seluruh Asia Tenggara.",
       statusNormal: "Semua Sistem Beroperasi Normal",
       links: {
+        about: "Tentang Kami (Profil Syarikat)",
         digital: "Produk Digital & E-Buku",
         catalog: "Katalog Fizikal & Bilik Pameran",
         affiliate: "Afiliasi Beg Kuning TikTok",
@@ -142,6 +152,7 @@ export function GlobalFooter() {
     th: {
       tagline:
         "เว็บไซต์หน้าร้านเดียวสำหรับทุกยอดขายของคุณในเอเชียตะวันออกเฉียงใต้ ไบโอลิงก์แบบรูปภาพ แคตตาล็อกทันใจ และระบบชำระเงินผ่านแชตโดยไม่มีค่าคอมมิชชัน",
+      managedBy: "พัฒนาและดำเนินการโดย",
       trust1: "ชำระเงิน QRIS รวดเร็ว",
       trust2: "ส่งไฟล์อัตโนมัติถึง WhatsApp",
       colSales: "การขาย",
@@ -150,6 +161,7 @@ export function GlobalFooter() {
       rights: "สงวนลิขสิทธิ์ทั่วเอเชียตะวันออกเฉียงใต้",
       statusNormal: "ระบบทั้งหมดทำงานปกติ",
       links: {
+        about: "เกี่ยวกับเรา (ข้อมูลบริษัท)",
         digital: "สินค้าดิจิทัลและอีบุ๊ก",
         catalog: "แคตตาล็อกสินค้าจริงและโชว์รูม",
         affiliate: "แอฟฟิลิเอตตะกร้าเหลือง TikTok",
@@ -171,6 +183,7 @@ export function GlobalFooter() {
     vi: {
       tagline:
         "Một website storefront cho tất cả sản phẩm bán của bạn tại Đông Nam Á. Link bio trực quan, danh mục tức thì, và chốt đơn qua chat không mất phí hoa hồng.",
+      managedBy: "Phát triển & Quản lý bởi",
       trust1: "Thanh toán QRIS tức thì",
       trust2: "Gửi file tự động vào WhatsApp",
       colSales: "Bán hàng",
@@ -179,6 +192,7 @@ export function GlobalFooter() {
       rights: "Bảo lưu mọi quyền tại khu vực Đông Nam Á.",
       statusNormal: "Mọi hệ thống hoạt động bình thường",
       links: {
+        about: "Về chúng tôi (Hồ sơ công ty)",
         digital: "Sản phẩm số & E-Book",
         catalog: "Danh mục sản phẩm & Showroom",
         affiliate: "Tiếp thị liên kết Giỏ vàng TikTok",
@@ -214,21 +228,16 @@ export function GlobalFooter() {
           </p>
 
           <div className="pt-2 space-y-2 text-xs">
-            <a
-              href="https://wa.me/6281288003005"
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center gap-2 text-[#57534E] hover:text-[#D94E28] transition"
-            >
-              <MessageCircle className="w-4 h-4 text-[#D94E28] shrink-0" />
-              <span>WhatsApp: +62 812-8800-3005</span>
-            </a>
+            <div className="flex items-center gap-2 text-[#57534E]">
+              <Building className="w-4 h-4 text-[#D94E28] shrink-0" />
+              <span>{t.managedBy}: <strong className="text-[#1C1917]">Rafa Kreasindo Teknologi</strong></span>
+            </div>
             <a
               href="mailto:halo@etalase.online"
               className="flex items-center gap-2 text-[#57534E] hover:text-[#D94E28] transition"
             >
               <Mail className="w-4 h-4 text-[#D94E28] shrink-0" />
-              <span>Email: halo@etalase.online</span>
+              <span>Email Resmi: halo@etalase.online</span>
             </a>
           </div>
 
@@ -313,18 +322,23 @@ export function GlobalFooter() {
           <h4 className="font-bold text-[#1C1917] text-xs uppercase tracking-wider">{t.colCompany}</h4>
           <ul className="space-y-2.5">
             <li>
-              <Link href={getLocalizedHref("/blog")} className="hover:text-[#1C1917] transition font-medium text-[#D94E28]">
-                {t.links.blog}
+              <Link href={getLocalizedHref("/about")} className="hover:text-[#1C1917] transition font-semibold text-[#D94E28]">
+                {t.links.about}
               </Link>
             </li>
             <li>
-              <Link href={getLocalizedHref("/bantuan")} className="hover:text-[#1C1917] transition">
-                {t.links.helpCenter}
+              <Link href={getLocalizedHref("/blog")} className="hover:text-[#1C1917] transition font-medium">
+                {t.links.blog}
               </Link>
             </li>
             <li>
               <Link href={getLocalizedHref("/kontak")} className="hover:text-[#1C1917] transition">
                 {t.links.contact}
+              </Link>
+            </li>
+            <li>
+              <Link href={getLocalizedHref("/bantuan")} className="hover:text-[#1C1917] transition">
+                {t.links.helpCenter}
               </Link>
             </li>
             <li>
@@ -348,7 +362,7 @@ export function GlobalFooter() {
 
       <div className="max-w-6xl mx-auto pt-6 border-t border-[#E7E5E4] flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-[#57534E]">
         <div>
-          &copy; {new Date().getFullYear()} etalase.online. {t.rights}
+          &copy; {currentYear} Rafa Kreasindo Teknologi. {t.rights}
         </div>
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2 font-medium">

@@ -398,15 +398,13 @@ export function HargaContent() {
               </div>
             </div>
 
-            <a
-              href="https://wa.me/6281288003005?text=Halo%20tim%20etalase.online,%20saya%20tertarik%20dengan%20Layanan%20Terima%20Beres%20(DFY)"
-              target="_blank"
-              rel="noreferrer"
+            <Link
+              href="/kontak"
               className="w-full text-center py-3.5 rounded-xl text-xs font-bold text-white bg-stone-900 hover:bg-black transition flex items-center justify-center gap-1.5 cursor-pointer"
             >
-              <span>Konsultasi Terima Beres via WA</span>
+              <span>Konsultasi Layanan Terima Beres</span>
               <ArrowRight className="w-3.5 h-3.5" />
-            </a>
+            </Link>
           </div>
         </div>
       </section>
@@ -516,14 +514,12 @@ export function HargaContent() {
                     </Link>
                   </td>
                   <td className="p-4 sm:p-5 text-center bg-purple-50/50">
-                    <a
-                      href="https://wa.me/6281288003005?text=Halo%20tim%20etalase.online,%20saya%20tertarik%20dengan%20Layanan%20Terima%20Beres%20(DFY)"
-                      target="_blank"
-                      rel="noreferrer"
+                    <Link
+                      href="/kontak"
                       className="inline-block w-full py-2.5 px-3 rounded-xl text-xs font-bold text-white bg-stone-900 hover:bg-black transition shadow-xs"
                     >
-                      Konsultasi WA
-                    </a>
+                      Hubungi DFY
+                    </Link>
                   </td>
                 </tr>
               </tbody>
