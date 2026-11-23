@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { TemplateRenderer } from "../templates/TemplateRenderer";
+import { StoreTemplateProps } from "../templates/types";
 import {
   Zap,
   Store,
@@ -14,7 +16,208 @@ import {
   CheckCircle2,
   Clock,
   ExternalLink,
+  MessageCircle,
+  Shield,
+  Heart,
+  Share2,
 } from "lucide-react";
+
+// 1. Demo Store Data for Single Source of Truth
+const DEMO_RAFA_STORE: StoreTemplateProps["store"] = {
+  name: "Studio Rafa Creative",
+  slug: "rafa",
+  bio: "Digital Creator & Video Editor. Berbagi preset cinematic & kelas editing.",
+  locale: "id",
+  currency: "IDR",
+  tier: "FREE",
+  templateId: "clean-minimal",
+  avatarUrl: "/images/demo/avatar-rafa.jpg",
+  bannerUrl: "/images/demo/banner-creator.jpg",
+  chatChannel: "WHATSAPP",
+  chatHandle: "6281234567890",
+  chatChannels: [{ channel: "WHATSAPP", handle: "6281234567890", isPrimary: true }],
+  appearanceConfig: {
+    bgType: "pattern",
+    bgValue: "subtle-dots",
+    buttonStyle: "rounded",
+    accentColor: "#D94E28",
+    coverBannerUrl: "/images/demo/banner-creator.jpg",
+    socialLinks: {
+      tiktok: "https://tiktok.com/@rafacreative",
+      instagram: "https://instagram.com/rafacreative",
+      whatsapp: "https://wa.me/6281234567890",
+      youtube: "https://youtube.com/@rafacreative",
+    },
+  },
+};
+
+const DEMO_RAFA_PRODUCTS: StoreTemplateProps["products"] = [
+  {
+    id: "r1",
+    title: "Preset Lightroom Pro Cinematic Pack",
+    slug: "preset-cinematic",
+    price: 49000,
+    compareAtPrice: 99000,
+    images: ["/images/demo/product-preset.jpg"],
+    checkoutMode: "DIRECT_CHECKOUT",
+    isFeatured: true,
+  },
+  {
+    id: "r2",
+    title: "E-Book: 30 Hari Kuasai CapCut & Premiere",
+    slug: "ebook-capcut",
+    price: 99000,
+    compareAtPrice: 159000,
+    images: ["/images/demo/product-ebook.jpg"],
+    checkoutMode: "DIRECT_CHECKOUT",
+  },
+  {
+    id: "r3",
+    title: "Microphone Wireless Clip-On Studio",
+    slug: "mic-wireless",
+    price: 189000,
+    compareAtPrice: 249000,
+    images: ["/images/demo/product-mic.jpg"],
+    checkoutMode: "EXTERNAL_LINK",
+    externalPlatform: "TIKTOK_SHOP",
+    externalLabel: "Keranjang Kuning",
+  },
+  {
+    id: "r4",
+    title: "Mentoring 1-on-1 Content Growth",
+    slug: "mentoring-content",
+    price: 250000,
+    compareAtPrice: 500000,
+    images: ["/images/demo/product-mentoring.jpg"],
+    checkoutMode: "CHAT_ORDER",
+  },
+];
+
+const DEMO_BASTIAN_STORE: StoreTemplateProps["store"] = {
+  name: "Bastian Showroom Mobil",
+  slug: "bastianmobil",
+  bio: "Dealer Resmi Mobil Baru & Bekas. Simulasi DP Ringan & Booking Test Drive ke Rumah Anda.",
+  locale: "id",
+  currency: "IDR",
+  tier: "PRO",
+  templateId: "showroom-pro",
+  avatarUrl: "/images/demo/avatar-bastian.jpg",
+  bannerUrl: "/images/demo/banner-showroom.jpg",
+  chatChannel: "WHATSAPP",
+  chatHandle: "6281234567892",
+  chatChannels: [{ channel: "WHATSAPP", handle: "6281234567892", isPrimary: true }],
+  appearanceConfig: {
+    bgType: "solid",
+    bgValue: "#F4F5F7",
+    buttonStyle: "sharp",
+    accentColor: "#18181B",
+    coverBannerUrl: "/images/demo/banner-showroom.jpg",
+    socialLinks: {
+      tiktok: "https://tiktok.com/@bastianmobil",
+      instagram: "https://instagram.com/bastianmobil",
+      whatsapp: "https://wa.me/6281234567892",
+    },
+  },
+};
+
+const DEMO_BASTIAN_PRODUCTS: StoreTemplateProps["products"] = [
+  {
+    id: "s1",
+    title: "All-New SUV Hybrid 2026",
+    slug: "suv-hybrid",
+    price: 0,
+    images: ["/images/demo/product-car-suv.jpg"],
+    checkoutMode: "CHAT_ORDER",
+    isFeatured: true,
+  },
+  {
+    id: "s2",
+    title: "City Car Matic Sporty 1.2",
+    slug: "city-car",
+    price: 0,
+    images: ["/images/demo/product-car-city.jpg"],
+    checkoutMode: "CHAT_ORDER",
+  },
+  {
+    id: "s3",
+    title: "Cluster Modern Minimalis 2 Lantai",
+    slug: "cluster-modern",
+    price: 0,
+    images: ["/images/demo/product-property.jpg"],
+    checkoutMode: "CHAT_ORDER",
+  },
+];
+
+const DEMO_AISYAH_STORE: StoreTemplateProps["store"] = {
+  name: "Aisyah Hijab & Beauty",
+  slug: "aisyahlook",
+  bio: "Beauty, Hijab & Skincare Favorit. Rekomendasi racun harian yang beneran dipakai & worth to buy ✨",
+  locale: "id",
+  currency: "IDR",
+  tier: "PRO",
+  templateId: "editorial-pastel",
+  avatarUrl: "/images/demo/avatar-aisyah.jpg",
+  bannerUrl: "/images/demo/banner-beauty.jpg",
+  chatChannel: "WHATSAPP",
+  chatHandle: "6281234567893",
+  chatChannels: [{ channel: "WHATSAPP", handle: "6281234567893", isPrimary: true }],
+  appearanceConfig: {
+    bgType: "pattern",
+    bgValue: "organic-pastel",
+    buttonStyle: "pill",
+    accentColor: "#D94E28",
+    coverBannerUrl: "/images/demo/banner-beauty.jpg",
+    socialLinks: {
+      tiktok: "https://tiktok.com/@aisyahlook",
+      instagram: "https://instagram.com/aisyahlook",
+      whatsapp: "https://wa.me/6281234567893",
+    },
+  },
+};
+
+const DEMO_AISYAH_PRODUCTS: StoreTemplateProps["products"] = [
+  {
+    id: "b1",
+    title: "Glow Barrier Serum 30ml",
+    slug: "glow-serum",
+    price: 89000,
+    compareAtPrice: 149000,
+    images: ["/images/demo/product-serum.jpg"],
+    checkoutMode: "EXTERNAL_LINK",
+    externalPlatform: "TIKTOK_SHOP",
+    externalLabel: "Keranjang Kuning",
+    isFeatured: true,
+  },
+  {
+    id: "b2",
+    title: "Velvet Matte Lip Cream Silk",
+    slug: "lip-cream",
+    price: 79000,
+    compareAtPrice: 110000,
+    images: ["/images/demo/product-lipcream.jpg"],
+    checkoutMode: "EXTERNAL_LINK",
+    externalPlatform: "SHOPEE",
+    externalLabel: "Shopee Mall",
+  },
+  {
+    id: "b3",
+    title: "Hijab Segiempat Voal Premium",
+    slug: "hijab-voal",
+    price: 45000,
+    images: ["/images/demo/product-hijab.jpg"],
+    checkoutMode: "EXTERNAL_LINK",
+    externalPlatform: "TIKTOK_SHOP",
+  },
+  {
+    id: "b4",
+    title: "E-Book: 14 Hari Glowing Alami",
+    slug: "ebook-glowing",
+    price: 35000,
+    images: ["/images/demo/product-ebook.jpg"],
+    checkoutMode: "DIRECT_CHECKOUT",
+    productType: "DIGITAL",
+  },
+];
 
 export function InteractiveFeatureShowcase() {
   const [activeFeature, setActiveFeature] = useState<number>(0);
@@ -25,49 +228,49 @@ export function InteractiveFeatureShowcase() {
       title: "Produk Digital & Auto-WA",
       icon: Zap,
       desc: "Jual e-book, template Canva, preset foto, atau video course. Struk dan link download terkirim otomatis ke WhatsApp.",
-      rightView: "single-phone-digital",
+      rightView: "template-digital",
     },
     {
       id: "katalog",
       title: "Katalog Fisik & Showroom",
       icon: Store,
       desc: "Pajang unit mobil, motor, properti, pakaian, atau menu kuliner lengkap dengan foto tajam dan tombol chat tanya unit.",
-      rightView: "phone-showroom",
+      rightView: "template-showroom",
     },
     {
       id: "affiliate",
       title: "Affiliate Keranjang Kuning",
       icon: ShoppingBag,
       desc: "Kumpulkan rekomendasi produk dari TikTok Shop (Beg Kuning), Shopee, dan Tokopedia dalam 1 link tanpa batas tautan.",
-      rightView: "phone-affiliate",
+      rightView: "template-affiliate",
     },
     {
       id: "booking",
       title: "Booking & Konsultasi 1-on-1",
       icon: Calendar,
       desc: "Buka sesi mentoring privat, audit portofolio, atau konsultasi dokter dengan pemilihan tanggal dan slot jam otomatis.",
-      rightView: "dual-phone-booking",
+      rightView: "view-booking",
     },
     {
       id: "event",
       title: "Event & Webinar Online",
       icon: Ticket,
       desc: "Registrasi tiket webinar online & acara offline dengan auto-kirim link Google Meet dan reminder jadwal ke WhatsApp.",
-      rightView: "phone-event",
+      rightView: "view-event",
     },
     {
       id: "blog",
       title: "Blog & Artikel SEO",
       icon: FileText,
       desc: "Publikasikan artikel edukasi untuk menjaring trafik gratis dari pencarian Google yang langsung mengarah ke produk tokomu.",
-      rightView: "tablet-blog",
+      rightView: "view-blog",
     },
     {
       id: "bio",
       title: "Bio Link Visual All-in-One",
       icon: Sparkles,
       desc: "Satu halaman beranda mobile yang merangkum semua link medsos, katalog jualan, dan nomor WhatsApp admin.",
-      rightView: "phone-bio",
+      rightView: "template-bio",
     },
   ];
 
@@ -140,311 +343,256 @@ export function InteractiveFeatureShowcase() {
         </Link>
       </div>
 
-      {/* Kolom Kanan: Interactive Context-Aware Dynamic Device Preview */}
+      {/* Kolom Kanan: Single Source of Truth Phone Mockup */}
       <div className="lg:col-span-5 flex justify-center">
-        <div className="w-full max-w-[340px] sm:max-w-[360px] bg-[#1C1917] rounded-[2.8rem] p-3 shadow-2xl border-4 border-[#292524] relative flex flex-col items-center min-h-[560px]">
+        <div className="w-full max-w-[320px] sm:max-w-[340px] bg-[#1C1917] rounded-[2.8rem] p-3 shadow-2xl border-4 border-[#292524] relative flex flex-col items-center">
           {/* Dynamic Island Notch */}
           <div className="w-24 h-4 bg-black rounded-full mb-2 flex items-center justify-between px-2.5 shrink-0 z-20">
             <div className="w-1.5 h-1.5 rounded-full bg-stone-800"></div>
             <div className="w-2 h-2 rounded-full bg-stone-800 border border-stone-700"></div>
           </div>
 
-          {/* Screen Content based on Active Feature */}
-          <div className="w-full h-[500px] bg-[#FAF8F5] rounded-[2.1rem] overflow-y-auto no-scrollbar relative p-4 flex flex-col">
-            {/* View 1: Detail E-Book + QRIS + Auto-WA */}
+          {/* Screen Content - Modern Mini-Store View */}
+          <div className="w-full h-[540px] bg-[#FAF8F5] rounded-[2.1rem] overflow-y-auto no-scrollbar relative shadow-inner">
+            {/* View 0: Produk Digital (Clean Minimal Live Template) */}
             {activeFeature === 0 && (
-              <div className="space-y-4 animate-fade-in">
-                <div className="text-center pb-2 border-b border-[#E7E5E4]">
-                  <span className="text-[10px] font-bold text-[#D94E28] bg-[#FDF0EC] px-2 py-0.5 rounded-full">
-                    PRODUK DIGITAL
-                  </span>
-                  <div className="text-xs font-bold text-[#1C1917] mt-1">
-                    rafa.etalase.online
-                  </div>
-                </div>
-
-                <div className="w-full h-44 rounded-2xl overflow-hidden bg-stone-100 relative shadow-2xs">
-                  <img
-                    src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80"
-                    alt="E-book Cover"
-                    className="w-full h-full object-cover"
-                  />
-                  <span className="absolute top-2 right-2 bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-md">
-                    Instant Download
-                  </span>
-                </div>
-
-                <div>
-                  <h4 className="font-bold text-sm text-[#1C1917]">
-                    E-Book: 30 Hari Mahir Video Editing
-                  </h4>
-                  <div className="text-base font-extrabold text-[#D94E28] mt-1">
-                    Rp 99.000
-                  </div>
-                  <p className="text-[11px] text-[#57534E] mt-1">
-                    File PDF + link Google Drive materi video langsung dikirim ke WhatsApp begitu bayar.
-                  </p>
-                </div>
-
-                <div className="p-3 bg-white border border-[#E7E5E4] rounded-xl text-left space-y-1.5 text-xs">
-                  <div className="flex items-center gap-1.5 text-emerald-700 font-semibold text-[11px]">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    <span>Pembayaran QRIS Instan</span>
-                  </div>
-                  <div className="text-[10px] text-[#57534E]">
-                    Support: GoPay, OVO, ShopeePay, BCA, Mandiri
-                  </div>
-                </div>
-
-                <button className="w-full bg-[#D94E28] text-white py-3 rounded-xl font-bold text-xs shadow-xs">
-                  Beli Sekarang (Auto-Kirim WA)
-                </button>
-              </div>
+              <TemplateRenderer
+                store={DEMO_RAFA_STORE}
+                products={DEMO_RAFA_PRODUCTS}
+                isMockup={true}
+              />
             )}
 
-            {/* View 2: Katalog Showroom Unit */}
+            {/* View 1: Katalog Fisik & Showroom (Showroom Pro Live Template) */}
             {activeFeature === 1 && (
-              <div className="space-y-4 animate-fade-in">
-                <div className="text-center pb-2 border-b border-[#E7E5E4]">
-                  <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full">
-                    KATALOG SHOWROOM
+              <TemplateRenderer
+                store={DEMO_BASTIAN_STORE}
+                products={DEMO_BASTIAN_PRODUCTS}
+                isMockup={true}
+              />
+            )}
+
+            {/* View 2: Affiliate Keranjang Kuning (Editorial Pastel Live Template) */}
+            {activeFeature === 2 && (
+              <TemplateRenderer
+                store={DEMO_AISYAH_STORE}
+                products={DEMO_AISYAH_PRODUCTS}
+                isMockup={true}
+              />
+            )}
+
+            {/* View 3: Booking & Konsultasi 1-on-1 (Modern Appointment Storefront) */}
+            {activeFeature === 3 && (
+              <div className="min-h-full bg-[#FAF8F5] flex flex-col animate-fade-in text-left">
+                {/* TopBar */}
+                <div className="w-full px-4 py-2 flex items-center justify-between text-xs text-stone-500 border-b border-black/5 bg-white/70 backdrop-blur-xs select-none">
+                  <span className="font-mono text-[11px] font-semibold text-stone-700 truncate">
+                    mentoring.etalase.online
                   </span>
-                  <div className="text-xs font-bold text-[#1C1917] mt-1">
-                    bastianmobil.etalase.online
-                  </div>
+                  <Share2 className="w-3.5 h-3.5 text-stone-500" />
                 </div>
 
-                <div className="w-full h-40 rounded-2xl overflow-hidden bg-stone-100 relative shadow-2xs">
+                {/* Header Cover & Avatar Overlap */}
+                <div className="relative w-full h-28 bg-gradient-to-r from-emerald-800 via-teal-800 to-slate-900 overflow-hidden shrink-0">
+                  <div className="absolute inset-0 bg-black/20" />
+                </div>
+
+                <div className="px-4 pb-5 -mt-10 relative z-10 flex flex-col items-center text-center">
                   <img
-                    src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=400&q=80"
-                    alt="SUV Car"
-                    className="w-full h-full object-cover"
+                    src="/images/demo/avatar-rafa.jpg"
+                    alt="Rafa Consultant"
+                    className="w-20 h-20 rounded-full border-4 border-white shadow-md object-cover bg-white"
                   />
-                  <span className="absolute bottom-2 left-2 bg-black/80 text-white text-[10px] font-bold px-2 py-0.5 rounded-md">
-                    Unit Baru 2026
+                  <div className="flex items-center gap-1.5 mt-2">
+                    <h4 className="font-bold text-sm text-[#1C1917]">Rafa Creative</h4>
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  </div>
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-200 px-2.5 py-0.5 rounded-full mt-1">
+                    <Shield className="w-3 h-3" />
+                    <span>Sesi Mentoring Privat 1-on-1</span>
                   </span>
-                </div>
+                  <p className="text-[11px] text-[#57534E] mt-1.5 max-w-[240px]">
+                    Bedah portofolio &amp; strategi monetisasi konten langsung via Google Meet.
+                  </p>
 
-                <div>
-                  <h4 className="font-bold text-sm text-[#1C1917]">
-                    All-New SUV Hybrid Sport 2026
-                  </h4>
-                  <div className="text-sm font-extrabold text-blue-600 mt-1">
-                    Mulai DP 15 Juta &bull; Angsuran 4 Jt/Bln
+                  {/* Consultation Service Card */}
+                  <div className="w-full bg-white border border-[#E7E5E4] rounded-2xl p-3.5 mt-3 shadow-xs text-left space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-[#1C1917]">Sesi 60 Menit</span>
+                      <span className="text-xs font-extrabold text-[#D94E28]">
+                        Rp 250.000 <span className="line-through text-[10px] text-stone-400 font-normal">Rp 500rb</span>
+                      </span>
+                    </div>
+
+                    {/* Date Selector */}
+                    <div className="pt-1 border-t border-stone-100 space-y-1.5">
+                      <span className="text-[10px] font-bold text-stone-500 block">Pilih Tanggal:</span>
+                      <div className="grid grid-cols-4 gap-1.5 text-center text-xs">
+                        <span className="p-1.5 rounded-lg bg-[#D94E28] text-white font-bold shadow-xs">
+                          Sel 24
+                        </span>
+                        <span className="p-1.5 rounded-lg bg-stone-100 text-stone-600 font-medium">Rab 25</span>
+                        <span className="p-1.5 rounded-lg bg-stone-100 text-stone-600 font-medium">Kam 26</span>
+                        <span className="p-1.5 rounded-lg bg-stone-100 text-stone-600 font-medium">Jum 27</span>
+                      </div>
+                    </div>
+
+                    {/* Time Slot Chips */}
+                    <div className="pt-1 border-t border-stone-100 flex items-center justify-between text-[10px]">
+                      <span className="text-stone-500 flex items-center gap-1 font-medium">
+                        <Clock className="w-3 h-3 text-[#D94E28]" />
+                        <span>Slot: 10:00, 14:00, 19:30</span>
+                      </span>
+                      <span className="text-emerald-700 font-bold">2 Slot Tersedia</span>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="w-full bg-[#1C1917] hover:bg-black text-white py-2.5 rounded-xl font-bold text-xs shadow-xs flex items-center justify-center gap-1.5 transition cursor-pointer mt-2"
+                    >
+                      <MessageCircle className="w-3.5 h-3.5" />
+                      <span>Konfirmasi Jadwal via WhatsApp</span>
+                    </button>
                   </div>
                 </div>
-
-                <div className="grid grid-cols-2 gap-2 text-[10px]">
-                  <div className="p-2 bg-white rounded-lg border border-[#E7E5E4]">
-                    Transmission: <strong>Matic</strong>
-                  </div>
-                  <div className="p-2 bg-white rounded-lg border border-[#E7E5E4]">
-                    Garansi: <strong>5 Tahun</strong>
-                  </div>
-                </div>
-
-                <button className="w-full bg-[#1C1917] text-white py-3 rounded-xl font-bold text-xs shadow-xs flex items-center justify-center gap-1.5">
-                  <span>Tanya Unit &amp; Booking Test Drive</span>
-                </button>
               </div>
             )}
 
-            {/* View 3: Affiliate Keranjang Kuning */}
-            {activeFeature === 2 && (
-              <div className="space-y-3 animate-fade-in">
-                <div className="text-center pb-2 border-b border-[#E7E5E4]">
-                  <span className="text-[10px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full">
-                    AFFILIATE BIO LINK
+            {/* View 4: Event & Webinar Online (Modern Ticket Storefront) */}
+            {activeFeature === 4 && (
+              <div className="min-h-full bg-[#FAF8F5] flex flex-col animate-fade-in text-left">
+                {/* TopBar */}
+                <div className="w-full px-4 py-2 flex items-center justify-between text-xs text-stone-500 border-b border-black/5 bg-white/70 backdrop-blur-xs select-none">
+                  <span className="font-mono text-[11px] font-semibold text-stone-700 truncate">
+                    webinar.etalase.online
                   </span>
-                  <div className="text-xs font-bold text-[#1C1917] mt-1">
-                    aisyahlook.etalase.online
+                  <Share2 className="w-3.5 h-3.5 text-stone-500" />
+                </div>
+
+                {/* Banner Event */}
+                <div className="relative w-full h-32 overflow-hidden shrink-0">
+                  <img
+                    src="/images/demo/banner-creator.jpg"
+                    alt="Webinar Event Banner"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute top-2.5 left-2.5 bg-purple-700 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-md shadow-xs">
+                    Live via Zoom &amp; Meet
                   </div>
                 </div>
 
-                <div className="p-3 bg-white border border-[#E7E5E4] rounded-2xl space-y-2">
-                  <img
-                    src="https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=300&q=80"
-                    alt="Lip Cream"
-                    className="w-full h-28 object-cover rounded-xl"
-                  />
-                  <div className="text-xs font-bold text-[#1C1917]">
-                    Velvet Matte Lip Cream Silk
+                <div className="p-4 space-y-3">
+                  <div>
+                    <span className="text-[10px] font-bold text-purple-700 uppercase tracking-wider">
+                      Masterclass Interaktif 2026
+                    </span>
+                    <h4 className="font-bold text-sm text-[#1C1917] mt-0.5 leading-snug">
+                      Strategi Monetisasi Konten &amp; Menjual Produk Digital Pertama
+                    </h4>
+                    <div className="flex items-baseline gap-2 mt-1.5">
+                      <span className="text-base font-extrabold text-[#D94E28]">Rp 149.000</span>
+                      <span className="line-through text-xs text-stone-400">Rp 300.000</span>
+                      <span className="text-[10px] font-bold bg-[#FDF0EC] text-[#D94E28] px-2 py-0.5 rounded-full border border-[#FADCD3]">
+                        Hemat 50%
+                      </span>
+                    </div>
                   </div>
-                  <div className="text-xs font-bold text-rose-600">Rp 89.000</div>
-                  <button className="w-full bg-[#F59E0B] text-black text-xs font-bold py-2 rounded-lg">
-                    🟡 Beli di Keranjang Kuning TikTok
+
+                  <div className="bg-white border border-[#E7E5E4] rounded-xl p-3 text-xs space-y-1.5 text-stone-600">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-stone-900">📅 Waktu:</span>
+                      <span>Sabtu, 28 November 2026</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-stone-900">⏰ Jam:</span>
+                      <span>19:30 - 21:30 WIB</span>
+                    </div>
+                    <div className="text-[11px] text-purple-700 font-semibold pt-1 border-t border-stone-100">
+                      ✓ Link akses &amp; reminder dikirim otomatis ke WA Anda
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="w-full bg-[#D94E28] hover:bg-[#B83E1D] text-white py-3 rounded-xl font-bold text-xs shadow-xs flex items-center justify-center gap-1.5 transition cursor-pointer"
+                  >
+                    <span>Daftar Tiket (Auto-Kirim WA)</span>
+                    <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
-
-                <div className="p-2.5 bg-white border border-[#E7E5E4] rounded-xl flex items-center justify-between text-xs">
-                  <span className="font-semibold text-orange-600">🟠 Shopee Affiliate</span>
-                  <span className="text-[10px] text-[#57534E]">Buka Link &rarr;</span>
-                </div>
               </div>
             )}
 
-            {/* View 4: Booking & Konsultasi 1-on-1 (Dual Step) */}
-            {activeFeature === 3 && (
-              <div className="space-y-3.5 animate-fade-in">
-                <div className="text-center pb-2 border-b border-[#E7E5E4]">
-                  <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">
-                    BOOKING JADWAL 1-ON-1
-                  </span>
-                  <div className="text-xs font-bold text-[#1C1917] mt-1">
-                    drhendra.etalase.online
-                  </div>
-                </div>
-
-                <div className="p-3 bg-white border border-[#E7E5E4] rounded-2xl text-left">
-                  <div className="text-xs font-bold text-[#1C1917]">
-                    Mentoring Audit Portofolio
-                  </div>
-                  <div className="text-xs font-bold text-[#D94E28] mt-0.5">
-                    Rp 350.000 / 60 Menit
-                  </div>
-                </div>
-
-                {/* Mini Calendar Card */}
-                <div className="p-3 bg-white border border-stone-200 rounded-2xl space-y-2 text-left">
-                  <div className="flex items-center justify-between text-[11px] font-bold text-[#1C1917]">
-                    <span>Pilih Tanggal:</span>
-                    <span className="text-emerald-700">November 2026</span>
-                  </div>
-                  <div className="grid grid-cols-4 gap-1.5 text-center text-xs">
-                    <span className="p-1.5 rounded-lg bg-[#FDF0EC] text-[#D94E28] font-bold border border-[#FADCD3]">
-                      Sel 24
-                    </span>
-                    <span className="p-1.5 rounded-lg bg-stone-50 text-stone-600">Rab 25</span>
-                    <span className="p-1.5 rounded-lg bg-stone-50 text-stone-600">Kam 26</span>
-                    <span className="p-1.5 rounded-lg bg-stone-50 text-stone-600">Jum 27</span>
-                  </div>
-                  <div className="text-[10px] text-[#57534E] flex items-center gap-1 pt-1">
-                    <Clock className="w-3 h-3 text-[#D94E28]" />
-                    <span>Slot: 10:00, 14:00, 19:30 WIB</span>
-                  </div>
-                </div>
-
-                <button className="w-full bg-emerald-700 text-white py-2.5 rounded-xl font-bold text-xs shadow-xs">
-                  Konfirmasi Booking Google Meet
-                </button>
-              </div>
-            )}
-
-            {/* View 5: Event & Webinar Online */}
-            {activeFeature === 4 && (
-              <div className="space-y-4 animate-fade-in">
-                <div className="text-center pb-2 border-b border-[#E7E5E4]">
-                  <span className="text-[10px] font-bold text-purple-800 bg-purple-100 px-2 py-0.5 rounded-full">
-                    TIKET WEBINAR
-                  </span>
-                  <div className="text-xs font-bold text-[#1C1917] mt-1">
-                    webinar.etalase.online
-                  </div>
-                </div>
-
-                <div className="w-full h-36 rounded-2xl overflow-hidden bg-stone-100 relative shadow-2xs">
-                  <img
-                    src="https://images.unsplash.com/photo-1591115765373-5207764f72e7?auto=format&fit=crop&w=400&q=80"
-                    alt="Webinar Event"
-                    className="w-full h-full object-cover"
-                  />
-                  <span className="absolute top-2 left-2 bg-purple-700 text-white text-[10px] font-bold px-2 py-0.5 rounded-md">
-                    Live via Zoom
-                  </span>
-                </div>
-
-                <div>
-                  <h4 className="font-bold text-sm text-[#1C1917]">
-                    Masterclass: Strategi Dividen Saham 2026
-                  </h4>
-                  <div className="text-sm font-extrabold text-[#D94E28] mt-1">
-                    Rp 149.000 <span className="line-through text-stone-400 text-xs">Rp 300.000</span>
-                  </div>
-                </div>
-
-                <div className="text-[11px] text-[#57534E] bg-white p-2.5 rounded-xl border border-[#E7E5E4] space-y-1">
-                  <div>📅 Sabtu, 28 November 2026</div>
-                  <div>⏰ 19:30 - 21:30 WIB</div>
-                  <div className="text-purple-700 font-semibold text-[10px]">
-                    ✓ Link akses Zoom dikirim otomatis ke WA &amp; Email
-                  </div>
-                </div>
-
-                <button className="w-full bg-[#D94E28] text-white py-2.5 rounded-xl font-bold text-xs shadow-xs">
-                  Beli Tiket Sekarang
-                </button>
-              </div>
-            )}
-
-            {/* View 6: Blog & Artikel SEO */}
+            {/* View 5: Blog & Artikel SEO (Editorial Reader View) */}
             {activeFeature === 5 && (
-              <div className="space-y-3 animate-fade-in text-left">
-                <div className="text-center pb-2 border-b border-[#E7E5E4]">
-                  <span className="text-[10px] font-bold text-[#1C1917] bg-stone-200 px-2 py-0.5 rounded-full">
-                    BLOG &amp; ARTIKEL SEO
-                  </span>
-                  <div className="text-xs font-bold text-[#1C1917] mt-1">
+              <div className="min-h-full bg-[#FAF8F5] flex flex-col animate-fade-in text-left">
+                {/* TopBar */}
+                <div className="w-full px-4 py-2 flex items-center justify-between text-xs text-stone-500 border-b border-black/5 bg-white/70 backdrop-blur-xs select-none">
+                  <span className="font-mono text-[11px] font-semibold text-stone-700 truncate">
                     blog.etalase.online
-                  </div>
+                  </span>
+                  <Share2 className="w-3.5 h-3.5 text-stone-500" />
                 </div>
 
-                <div className="w-full h-28 rounded-xl overflow-hidden bg-stone-100">
+                <div className="relative w-full h-32 overflow-hidden shrink-0">
                   <img
-                    src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=400&q=80"
+                    src="/images/demo/banner-cafe.jpg"
                     alt="Blog Cover"
                     className="w-full h-full object-cover"
                   />
+                  <div className="absolute top-2.5 left-2.5 bg-stone-900/80 backdrop-blur-xs text-white text-[10px] font-bold px-2 py-0.5 rounded-md">
+                    Panduan Bisnis • 3 Min Read
+                  </div>
                 </div>
 
-                <div className="space-y-1">
-                  <span className="text-[10px] font-bold text-[#D94E28]">PANDUAN BISNIS</span>
-                  <h4 className="font-bold text-xs text-[#1C1917] leading-snug">
-                    5 Cara Menghasilkan 10 Juta Pertama dari Produk Digital Tanpa Modal Besar
-                  </h4>
-                  <p className="text-[10px] text-[#57534E] line-clamp-3">
-                    Pelajari langkah praktis membangun bio link berkonversi tinggi dan mengumpulkan order otomatis via chat...
-                  </p>
-                </div>
+                <div className="p-4 space-y-3">
+                  <div>
+                    <h4 className="font-bold text-sm text-[#1C1917] leading-snug">
+                      5 Cara Menghasilkan 10 Juta Pertama dari Produk Digital Tanpa Modal Besar
+                    </h4>
+                    <p className="text-[11px] text-[#57534E] mt-1.5 leading-relaxed line-clamp-3">
+                      Membangun bio link berkonversi tinggi jauh lebih efektif dibanding sekadar menumpuk link teks di media sosial...
+                    </p>
+                  </div>
 
-                <div className="p-2.5 bg-white border border-[#E7E5E4] rounded-xl flex items-center justify-between text-[11px]">
-                  <span className="font-semibold text-[#1C1917]">Baca Artikel Penuh</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-[#D94E28]" />
+                  {/* Embedded Recommended Product Callout */}
+                  <div className="bg-white border border-[#E7E5E4] rounded-xl p-3 shadow-2xs space-y-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#D94E28]">
+                      Rekomendasi Penulis
+                    </span>
+                    <div className="flex items-center gap-2.5">
+                      <img
+                        src="/images/demo/product-ebook.jpg"
+                        alt="E-book"
+                        className="w-11 h-11 rounded-lg object-cover bg-stone-100"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="font-bold text-xs text-[#1C1917] truncate">
+                          E-Book: 30 Hari Kuasai CapCut
+                        </div>
+                        <div className="text-[11px] font-extrabold text-[#D94E28]">Rp 99.000</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="w-full py-2.5 px-3 rounded-xl bg-[#1C1917] text-white font-bold text-xs flex items-center justify-center gap-1.5"
+                  >
+                    <span>Baca Artikel Penuh</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               </div>
             )}
 
-            {/* View 7: Bio Link Visual All-in-One */}
+            {/* View 6: Bio Link Visual All-in-One (Strict Single Source of Truth via TemplateRenderer) */}
             {activeFeature === 6 && (
-              <div className="space-y-3.5 animate-fade-in text-center">
-                <div className="w-14 h-14 rounded-full mx-auto overflow-hidden border-2 border-white shadow-sm">
-                  <img
-                    src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80"
-                    alt="Bio Avatar"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-
-                <div>
-                  <h4 className="font-bold text-sm text-[#1C1917]">Studio Rafa Creative</h4>
-                  <p className="text-[11px] text-[#57534E]">
-                    Kreator Video &bull; 140k di TikTok &amp; IG
-                  </p>
-                </div>
-
-                <div className="space-y-2 text-xs">
-                  <div className="p-2.5 bg-white border border-[#E7E5E4] rounded-xl font-bold text-[#1C1917] flex items-center justify-between shadow-2xs">
-                    <span>🎬 Paket Preset Video 2026</span>
-                    <span className="text-[#D94E28]">Rp 49rb</span>
-                  </div>
-                  <div className="p-2.5 bg-white border border-[#E7E5E4] rounded-xl font-bold text-[#1C1917] flex items-center justify-between shadow-2xs">
-                    <span>🎙 Mic Rekomendasi (Keranjang Kuning)</span>
-                    <ExternalLink className="w-3.5 h-3.5 text-stone-400" />
-                  </div>
-                  <div className="p-2.5 bg-emerald-600 text-white rounded-xl font-bold flex items-center justify-center gap-1.5 shadow-2xs">
-                    <span>Chat WhatsApp Admin</span>
-                  </div>
-                </div>
-              </div>
+              <TemplateRenderer
+                store={DEMO_RAFA_STORE}
+                products={DEMO_RAFA_PRODUCTS}
+                isMockup={true}
+              />
             )}
           </div>
         </div>
