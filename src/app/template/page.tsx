@@ -8,7 +8,7 @@ import { Showcase4Archetypes } from "@/components/home/Showcase4Archetypes";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { Sparkles, ArrowRight, CheckCircle2 } from "lucide-react";
 
-export function TemplateContent() {
+function TemplateContent() {
   return (
     <div className="flex flex-col min-h-screen bg-[#FAF8F5] text-[#1C1917]">
       <GlobalHeader />
@@ -47,20 +47,20 @@ export function TemplateContent() {
             <div className="p-5 bg-[#FAF8F5] border border-[#E7E5E4] rounded-2xl space-y-2">
               <div className="font-bold text-[#1C1917] flex items-center gap-1.5 text-sm">
                 <CheckCircle2 className="w-4 h-4 text-[#D94E28]" />
-                <span>Susunan Vertikal Anti-Collision</span>
+                <span>Desain Mobile-First yang Rapi</span>
               </div>
               <p className="leading-relaxed">
-                Foto di atas, judul &amp; harga rapi di tengah, tombol aksi penuh di bawah. Mencegah teks dan tombol saling menimpa di layar berukuran 360px.
+                Foto di atas, judul &amp; harga rapi di tengah, tombol aksi penuh di bawah. Memudahkan checkout 1-klik di layar smartphone.
               </p>
             </div>
 
             <div className="p-5 bg-[#FAF8F5] border border-[#E7E5E4] rounded-2xl space-y-2">
               <div className="font-bold text-[#1C1917] flex items-center gap-1.5 text-sm">
                 <CheckCircle2 className="w-4 h-4 text-[#D94E28]" />
-                <span>Format Dinamis Bebas Bug Rp 0</span>
+                <span>Mendukung Berbagai Format Harga</span>
               </div>
               <p className="leading-relaxed">
-                Sistem tidak akan merender Rp 0 untuk produk simulasi cicilan atau konsultasi tanya harga. Ditampilkan label manusiawi seperti &quot;Tanya Harga&quot; atau &quot;Mulai DP 15 Jt&quot;.
+                Mendukung harga pasti, simulasi DP, hingga tombol &apos;Tanya Harga&apos; yang nyaman untuk produk bernilai tinggi atau konsultasi.
               </p>
             </div>
 

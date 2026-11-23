@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma, serializePlain } from "@/lib/db/prisma";
-import { getTemplateComponent } from "@/components/templates";
-import { StoreTemplateProps } from "@/components/templates/types";
+import { TemplateRenderer } from "@/components/templates/TemplateRenderer";
 
 interface StorePageProps {
   params: {
@@ -14,9 +13,8 @@ export default async function StorefrontPage({ params }: StorePageProps) {
 
   // Provide mock fallback for "demo" slug if DB is not yet populated
   if (slug === "demo") {
-    const Template = getTemplateComponent("clean-minimal");
     return (
-      <Template
+      <TemplateRenderer
         store={{
           name: "Studio Demo Creative",
           slug: "demo",
@@ -24,6 +22,16 @@ export default async function StorefrontPage({ params }: StorePageProps) {
           locale: "id",
           currency: "IDR",
           tier: "FREE",
+          templateId: "clean-minimal",
+          chatChannel: "WHATSAPP",
+          chatHandle: "6281234567890",
+          appearanceConfig: {
+            bgType: "pattern",
+            bgValue: "subtle-dots",
+            buttonStyle: "rounded",
+            accentColor: "#D94E28",
+            coverBannerUrl: "/images/demo/banner-creator.jpg",
+          },
         }}
         products={[
           {
@@ -31,13 +39,18 @@ export default async function StorefrontPage({ params }: StorePageProps) {
             title: "Template Notion All-in-One Creator OS",
             slug: "creator-os",
             price: 79000,
+            compareAtPrice: 149000,
+            images: ["/images/demo/product-preset.jpg"],
             checkoutMode: "DIRECT_CHECKOUT",
+            isFeatured: true,
           },
           {
             id: "d2",
             title: "Lampu Ring Light Studio (Keranjang Kuning)",
             slug: "ring-light",
             price: 145000,
+            compareAtPrice: 200000,
+            images: ["/images/demo/product-mic.jpg"],
             checkoutMode: "EXTERNAL_LINK",
             externalPlatform: "TIKTOK_SHOP",
           },
@@ -46,6 +59,7 @@ export default async function StorefrontPage({ params }: StorePageProps) {
             title: "Konsultasi Brand & Social Media 1-on-1",
             slug: "konsultasi-brand",
             price: 300000,
+            images: ["/images/demo/product-mentoring.jpg"],
             checkoutMode: "CHAT_ORDER",
           },
         ]}
@@ -58,10 +72,10 @@ export default async function StorefrontPage({ params }: StorePageProps) {
     include: {
       products: {
         where: { isActive: true },
-        orderBy: { createdAt: "desc" },
+        orderBy: [{ isFeatured: "desc" }, { createdAt: "desc" }],
       },
-      blocks: {
-        where: { isVisible: true },
+      storeBlocks: {
+        where: { isActive: true },
         orderBy: { sortOrder: "asc" },
       },
     },
@@ -72,10 +86,39 @@ export default async function StorefrontPage({ params }: StorePageProps) {
   }
 
   const serializedStore = serializePlain(store);
-  const TemplateComponent = getTemplateComponent(serializedStore.templateId);
+
+  const formattedProducts = serializedStore.products.map((p) => ({
+    id: p.id,
+    title: p.title,
+    slug: p.slug,
+    description: p.description,
+    price: Number(p.price),
+    compareAtPrice: p.compareAtPrice ? Number(p.compareAtPrice) : null,
+    images: p.images,
+    checkoutMode: p.checkoutMode,
+    externalPlatform: p.externalPlatform,
+    externalUrl: p.externalUrl,
+    externalLabel: p.externalLabel,
+    isFeatured: p.isFeatured,
+    category: p.category,
+    secondaryModes: p.secondaryModes as any,
+  }));
+
+  const formattedBlocks = (serializedStore.storeBlocks || []).map((b) => ({
+    id: b.id,
+    type: b.type,
+    title: b.title,
+    subtitle: b.subtitle,
+    imageUrl: b.imageUrl,
+    targetUrl: b.targetUrl,
+    productId: b.productId,
+    badgeText: b.badgeText,
+    isActive: b.isActive,
+    sortOrder: b.sortOrder,
+  }));
 
   return (
-    <TemplateComponent
+    <TemplateRenderer
       store={{
         name: serializedStore.name,
         slug: serializedStore.slug,
@@ -86,21 +129,14 @@ export default async function StorefrontPage({ params }: StorePageProps) {
         currency: serializedStore.currency,
         chatChannel: serializedStore.chatChannel,
         chatHandle: serializedStore.chatHandle,
+        chatChannels: serializedStore.chatChannels as any,
         tier: serializedStore.tier,
+        templateId: serializedStore.templateId,
+        appearanceConfig: serializedStore.appearanceConfig as any,
+        blocks: formattedBlocks,
       }}
-      products={serializedStore.products.map((p) => ({
-        id: p.id,
-        title: p.title,
-        slug: p.slug,
-        description: p.description,
-        price: Number(p.price),
-        compareAtPrice: p.compareAtPrice ? Number(p.compareAtPrice) : null,
-        images: p.images,
-        checkoutMode: p.checkoutMode,
-        externalPlatform: p.externalPlatform,
-        externalUrl: p.externalUrl,
-        externalLabel: p.externalLabel,
-      }))}
+      products={formattedProducts}
+      blocks={formattedBlocks}
     />
   );
 }

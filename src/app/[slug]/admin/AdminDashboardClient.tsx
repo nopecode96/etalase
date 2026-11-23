@@ -16,6 +16,7 @@ import {
   Loader2,
   X,
   Share2,
+  Palette,
 } from "lucide-react";
 import { actionCreateProduct, actionDeleteProduct, actionUpdateStoreSettings } from "./actions";
 import { showServiceResultToast } from "@/components/ui/GlobalToast";
@@ -174,6 +175,13 @@ export function AdminDashboardClient({ store }: AdminDashboardProps) {
 
           <div className="flex items-center gap-2">
             <Link
+              href={`/${store.slug}/admin/appearance`}
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-[#D94E28] hover:bg-[#B83E1D] px-3.5 py-2 rounded-xl transition shadow-xs"
+            >
+              <Palette className="w-3.5 h-3.5" />
+              <span>Desain &amp; Susun Blok</span>
+            </Link>
+            <Link
               href={`/${store.slug}`}
               target="_blank"
               className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 hover:text-blue-600 px-3.5 py-2 rounded-xl border border-slate-200 bg-white transition shadow-sm"
@@ -217,6 +225,17 @@ export function AdminDashboardClient({ store }: AdminDashboardProps) {
               {channels.length} Saluran
             </span>
           </button>
+
+          <Link
+            href={`/${store.slug}/admin/appearance`}
+            className="py-3.5 text-sm font-semibold border-b-2 border-transparent text-[#57534E] hover:text-[#D94E28] transition flex items-center gap-2"
+          >
+            <Palette className="w-4 h-4 text-[#D94E28]" />
+            <span>Desain &amp; Susun Blok</span>
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#FDF0EC] text-[#D94E28] font-bold border border-[#FADCD3]">
+              Live Preview
+            </span>
+          </Link>
         </div>
       </div>
 
