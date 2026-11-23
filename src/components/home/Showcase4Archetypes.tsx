@@ -247,18 +247,18 @@ export function Showcase4Archetypes() {
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />
             </div>
             <p className="text-sm text-[#57534E] mt-3 leading-relaxed">
-              Dirancang khusus untuk kebutuhan {activeArchetype.industry}. Tata letak vertikal penuh mencegah benturan tombol dan memudahkan pembeli menyelesaikan pesanan dalam 1 kali klik.
+              Dirancang khusus untuk kebutuhan {activeArchetype.industry}. Desain mobile-first yang rapi dan memudahkan pembeli menyelesaikan pesanan dalam 1 kali klik.
             </p>
           </div>
 
           <div className="space-y-2.5 pt-2 border-t border-[#E7E5E4] text-xs text-[#57534E]">
             <div className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-[#D94E28]"></span>
-              <span>Tata letak vertikal anti-tabrakan untuk layar smartphone</span>
+              <span>Desain mobile-first yang rapi dan memudahkan checkout 1-klik</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-[#D94E28]"></span>
-              <span>Format harga dinamis (Bebas dari bug Rp 0)</span>
+              <span>Mendukung harga pasti, simulasi DP, hingga tombol &apos;Tanya Harga&apos;</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-[#D94E28]"></span>
@@ -268,7 +268,7 @@ export function Showcase4Archetypes() {
 
           <div className="pt-2">
             <Link
-              href={`/onboarding?template=${activeArchetype.id}`}
+              href={`/register?template=${activeArchetype.id}`}
               className="inline-flex items-center gap-2 bg-[#D94E28] hover:bg-[#B83E1D] text-white px-6 py-3 rounded-xl font-bold text-xs sm:text-sm shadow-xs transition"
             >
               <span>Gunakan Template Ini Sekarang</span>

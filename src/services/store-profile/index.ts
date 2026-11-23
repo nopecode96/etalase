@@ -1,5 +1,6 @@
 import { prisma, serializePlain } from "@/lib/db/prisma";
 import { ok, fail, withErrorHandler, ServiceResult } from "@/lib/core/response";
+import { isTemplateAllowedForTier } from "@/lib/constants/pricing";
 import { ChatChannel } from "@prisma/client";
 
 export interface UpdateStoreProfileInput {
@@ -28,6 +29,10 @@ export async function updateStoreProfile(
 
     if (!store) {
       return fail("NOT_FOUND", "Toko tidak ditemukan.");
+    }
+
+    if (input.templateId && !isTemplateAllowedForTier(input.templateId, store.tier)) {
+      return fail("FORBIDDEN", "Template premium hanya tersedia untuk paket PRO. Silakan upgrade paket toko Anda.");
     }
 
     const updated = await prisma.store.update({

@@ -1,229 +1,322 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { Suspense, useState, useEffect, useTransition } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { ArrowLeft, Check, AlertCircle, Loader2 } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import {
+  Check,
+  AlertCircle,
+  Loader2,
+  ArrowRight,
+  Sparkles,
+  Phone,
+  Store,
+  Compass,
+} from "lucide-react";
 import { actionCheckSlug, actionCreateStore } from "./actions";
 import { showServiceResultToast } from "@/components/ui/GlobalToast";
 
-export default function OnboardingPage() {
+const SEA_COUNTRY_CODES = [
+  { code: "+62", label: "🇮🇩 ID (+62)", name: "Indonesia" },
+  { code: "+60", label: "🇲🇾 MY (+60)", name: "Malaysia" },
+  { code: "+65", label: "🇸🇬 SG (+65)", name: "Singapura" },
+  { code: "+66", label: "🇹🇭 TH (+66)", name: "Thailand" },
+  { code: "+84", label: "🇻🇳 VN (+84)", name: "Vietnam" },
+  { code: "+63", label: "🇵🇭 PH (+63)", name: "Filipina" },
+];
+
+const BUSINESS_CATEGORIES = [
+  { id: "Kreator Digital", label: "Kreator Digital", desc: "E-Book, Preset & Mentoring" },
+  { id: "Cafe & F&B", label: "Cafe & F&B", desc: "Menu Visual & Order Kasir" },
+  { id: "Sales Mobil/Properti", label: "Sales Mobil/Properti", desc: "Showroom & Simulasi DP" },
+  { id: "Beauty & Affiliate", label: "Beauty & Affiliate", desc: "Keranjang Kuning & Shopee" },
+  { id: "UMKM Lainnya", label: "UMKM Lainnya", desc: "Produk Fisik, Jasa & Toko" },
+];
+
+function OnboardingContent() {
   const router = useRouter();
-  const [storeName, setStoreName] = useState("");
+  const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
+
   const [slug, setSlug] = useState("");
   const [slugStatus, setSlugStatus] = useState<"idle" | "checking" | "available" | "unavailable">("idle");
   const [slugMessage, setSlugMessage] = useState("");
-  const [templateId, setTemplateId] = useState("clean-minimal");
-  const [loading, setLoading] = useState(false);
 
-  const handleSlugChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value;
-    setSlug(raw);
+  const [countryCode, setCountryCode] = useState("+62");
+  const [whatsappNumber, setWhatsappNumber] = useState("");
+  const [category, setCategory] = useState("Kreator Digital");
 
-    if (raw.trim().length < 3) {
+  // Read ?slug=... on mount or fallback to sessionStorage / cookies
+  useEffect(() => {
+    let initialSlug = searchParams.get("slug") || "";
+
+    if (!initialSlug) {
+      try {
+        initialSlug = sessionStorage.getItem("claimed_slug") || "";
+        if (!initialSlug) {
+          const match = document.cookie.match(/(?:^|; )claimed_slug=([^;]*)/);
+          if (match) initialSlug = decodeURIComponent(match[1]);
+        }
+      } catch {
+        // Fallback
+      }
+    }
+
+    if (initialSlug) {
+      const clean = initialSlug.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-");
+      setSlug(clean);
+      performCheck(clean);
+    }
+  }, [searchParams]);
+
+  const performCheck = async (val: string) => {
+    const clean = val.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-");
+    if (clean.length < 3) {
       setSlugStatus("idle");
       setSlugMessage("");
       return;
     }
 
     setSlugStatus("checking");
-    const check = await actionCheckSlug(raw);
+    const check = await actionCheckSlug(clean);
     if (check.success && check.data.available) {
       setSlugStatus("available");
       setSlugMessage(`✓ ${check.data.slug}.etalase.online tersedia!`);
     } else {
       setSlugStatus("unavailable");
-      setSlugMessage(!check.success ? check.error : "Slug tidak tersedia");
+      setSlugMessage(!check.success ? check.error : "Subdomain tidak tersedia.");
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-");
+    setSlug(raw);
+    performCheck(raw);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!storeName || !slug) return;
+    const cleanSlug = slug.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-");
 
-    setLoading(true);
-    const result = await actionCreateStore({
-      name: storeName,
-      slug,
-      templateId,
-    });
-
-    setLoading(false);
-    showServiceResultToast(result);
-
-    if (result.success && result.data) {
-      const createdSlug = (result.data as { slug: string }).slug;
-      router.push(`/${createdSlug}/admin`);
+    if (cleanSlug.length < 3) {
+      setSlugStatus("unavailable");
+      setSlugMessage("Subdomain minimal terdiri dari 3 karakter.");
+      return;
     }
+
+    startTransition(async () => {
+      const res = await actionCreateStore({
+        slug: cleanSlug,
+        name: cleanSlug.charAt(0).toUpperCase() + cleanSlug.slice(1),
+        templateId: "clean-minimal",
+        category,
+        whatsappCountryCode: countryCode,
+        whatsappNumber: whatsappNumber.trim(),
+      });
+
+      showServiceResultToast(res);
+
+      if (res.success && res.data) {
+        const createdSlug = (res.data as { slug: string }).slug;
+        router.push(`/${createdSlug}/admin`);
+      }
+    });
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-800 mb-6 font-medium transition"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Kembali ke Beranda</span>
-        </Link>
-
-        <div className="flex items-center justify-center gap-2 mb-2">
-          <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold text-lg">
+    <div className="w-full max-w-xl bg-white rounded-3xl border border-[#E7E5E4] shadow-sm p-6 sm:p-10 space-y-8">
+      {/* Brand Header */}
+      <div className="text-center space-y-2">
+        <Link href="/" className="inline-flex items-center gap-2 group mb-2">
+          <div className="w-9 h-9 rounded-xl bg-[#D94E28] flex items-center justify-center text-white font-black text-lg shadow-xs group-hover:scale-105 transition-transform">
             E
           </div>
-          <span className="text-2xl font-bold tracking-tight text-slate-900">
-            etalase<span className="text-blue-600">.online</span>
+          <span className="font-bold text-xl tracking-tight text-[#1C1917]">
+            etalase<span className="text-[#D94E28]">.online</span>
           </span>
+        </Link>
+
+        <div className="inline-flex items-center gap-1.5 bg-[#FDF0EC] border border-[#FADCD3] text-[#D94E28] px-3 py-1 rounded-full text-xs font-semibold">
+          <Sparkles className="w-3.5 h-3.5" />
+          <span>Setup Kilat 30 Detik</span>
         </div>
 
-        <h2 className="text-center text-2xl font-extrabold text-slate-900">
-          Klaim Alamat Etalase Anda
-        </h2>
-        <p className="mt-2 text-center text-sm text-slate-600">
-          Hanya butuh nama toko dan alamat URL untuk mulai jualan.
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1C1917]">
+          Buka Etalase Online Anda
+        </h1>
+        <p className="text-xs sm:text-sm text-[#57534E] max-w-md mx-auto leading-relaxed">
+          Lengkapi 3 data singkat di bawah ini. Toko Anda langsung siap menerima order dan terhubung ke WhatsApp.
         </p>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-6 shadow-sm border border-slate-200 rounded-3xl sm:px-10">
-          {/* Google Connect Button */}
-          <div className="mb-6">
-            <button
-              type="button"
-              onClick={() => alert("Fitur Google Connect aktif. Silakan hubungkan client ID Google di .env")}
-              className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-slate-200 rounded-xl shadow-sm text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 transition"
-            >
-              <svg className="w-5 h-5" viewBox="0 0 24 24">
-                <path
-                  fill="#4285F4"
-                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                />
-                <path
-                  fill="#34A853"
-                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                />
-                <path
-                  fill="#FBBC05"
-                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-                />
-                <path
-                  fill="#EA4335"
-                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
-                />
-              </svg>
-              <span>Masuk dengan Google (1-Klik)</span>
-            </button>
-            <div className="relative my-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-slate-200" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white px-2 text-slate-400">Atau lengkapi info toko</span>
-              </div>
-            </div>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* 1. Subdomain Etalase */}
+        <div className="space-y-2">
+          <label className="flex items-center justify-between text-xs font-bold text-[#1C1917] uppercase tracking-wider">
+            <span className="flex items-center gap-1.5">
+              <Store className="w-3.5 h-3.5 text-[#D94E28]" />
+              <span>1. Alamat Subdomain Toko</span>
+            </span>
+            <span className="text-[11px] font-normal text-[#57534E] lowercase">
+              Gratis selamanya
+            </span>
+          </label>
+
+          <div className="flex rounded-xl border border-[#E7E5E4] bg-white overflow-hidden shadow-2xs focus-within:border-[#D94E28] focus-within:ring-2 focus-within:ring-[#D94E28]/15 transition">
+            <input
+              type="text"
+              required
+              value={slug}
+              onChange={handleSlugChange}
+              placeholder="namatoko"
+              className="flex-1 px-3.5 py-3 text-sm sm:text-base font-semibold text-[#1C1917] focus:outline-none placeholder:text-[#57534E]/40"
+            />
+            <span className="bg-[#FAF8F5] text-[#57534E] text-xs sm:text-sm px-3.5 py-3 flex items-center border-l border-[#E7E5E4] font-mono select-none font-medium">
+              .etalase.online
+            </span>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                Nama Toko / Brand
-              </label>
-              <input
-                type="text"
-                required
-                value={storeName}
-                onChange={(e) => {
-                  setStoreName(e.target.value);
-                  if (!slug) {
-                    handleSlugChange({
-                      target: { value: e.target.value },
-                    } as React.ChangeEvent<HTMLInputElement>);
-                  }
-                }}
-                placeholder="Misal: Studio Rafa, Warung Kopi Senja"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                Alamat URL Etalase
-              </label>
-              <div className="flex rounded-xl border border-slate-200 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500">
-                <input
-                  type="text"
-                  required
-                  value={slug}
-                  onChange={handleSlugChange}
-                  placeholder="namatoko"
-                  className="flex-1 px-3.5 py-2.5 text-sm focus:outline-none"
-                />
-                <span className="bg-slate-100 text-slate-500 text-xs px-3 py-2.5 flex items-center border-l border-slate-200 font-mono">
-                  .etalase.online
+          {slugStatus !== "idle" && (
+            <div className="pt-0.5 text-xs">
+              {slugStatus === "checking" && (
+                <span className="text-[#57534E] flex items-center gap-1">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-[#D94E28]" />
+                  <span>Memeriksa ketersediaan...</span>
                 </span>
-              </div>
-              {slugStatus !== "idle" && (
-                <div className="mt-1.5 flex items-center gap-1.5 text-xs">
-                  {slugStatus === "checking" && (
-                    <span className="text-slate-400 flex items-center gap-1">
-                      <Loader2 className="w-3 h-3 animate-spin" /> Memeriksa ketersediaan...
-                    </span>
-                  )}
-                  {slugStatus === "available" && (
-                    <span className="text-emerald-600 flex items-center gap-1 font-medium">
-                      <Check className="w-3.5 h-3.5" /> {slugMessage}
-                    </span>
-                  )}
-                  {slugStatus === "unavailable" && (
-                    <span className="text-rose-600 flex items-center gap-1 font-medium">
-                      <AlertCircle className="w-3.5 h-3.5" /> {slugMessage}
-                    </span>
-                  )}
-                </div>
+              )}
+              {slugStatus === "available" && (
+                <span className="text-emerald-600 flex items-center gap-1 font-semibold">
+                  <Check className="w-3.5 h-3.5" />
+                  <span>{slugMessage}</span>
+                </span>
+              )}
+              {slugStatus === "unavailable" && (
+                <span className="text-rose-600 flex items-center gap-1 font-semibold">
+                  <AlertCircle className="w-3.5 h-3.5" />
+                  <span>{slugMessage}</span>
+                </span>
               )}
             </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                Pilih Template Dasar
-              </label>
-              <div className="grid grid-cols-3 gap-2 text-center text-xs">
-                {[
-                  { id: "clean-minimal", label: "Clean" },
-                  { id: "classic-dark", label: "Dark" },
-                  { id: "catalog-grid", label: "Grid" },
-                ].map((tpl) => (
-                  <button
-                    type="button"
-                    key={tpl.id}
-                    onClick={() => setTemplateId(tpl.id)}
-                    className={`p-2.5 rounded-xl border font-semibold transition ${
-                      templateId === tpl.id
-                        ? "border-blue-600 bg-blue-50 text-blue-700"
-                        : "border-slate-200 text-slate-600 hover:bg-slate-50"
-                    }`}
-                  >
-                    {tpl.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading || slugStatus === "unavailable"}
-              className="w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none disabled:opacity-50 transition"
-            >
-              {loading ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                "Buka Etalase Sekarang"
-              )}
-            </button>
-          </form>
+          )}
         </div>
-      </div>
+
+        {/* 2. Nomor WhatsApp Aktif */}
+        <div className="space-y-2">
+          <label className="flex items-center justify-between text-xs font-bold text-[#1C1917] uppercase tracking-wider">
+            <span className="flex items-center gap-1.5">
+              <Phone className="w-3.5 h-3.5 text-[#D94E28]" />
+              <span>2. Nomor WhatsApp Aktif</span>
+            </span>
+            <span className="text-[11px] font-normal text-[#57534E]">
+              Untuk notifikasi pesanan
+            </span>
+          </label>
+
+          <div className="flex rounded-xl border border-[#E7E5E4] bg-white overflow-hidden shadow-2xs focus-within:border-[#D94E28] focus-within:ring-2 focus-within:ring-[#D94E28]/15 transition">
+            <select
+              value={countryCode}
+              onChange={(e) => setCountryCode(e.target.value)}
+              className="bg-[#FAF8F5] text-[#1C1917] text-xs sm:text-sm font-semibold px-3 py-3 border-r border-[#E7E5E4] focus:outline-none cursor-pointer"
+            >
+              {SEA_COUNTRY_CODES.map((c) => (
+                <option key={c.code} value={c.code}>
+                  {c.label}
+                </option>
+              ))}
+            </select>
+            <input
+              type="tel"
+              required
+              value={whatsappNumber}
+              onChange={(e) => setWhatsappNumber(e.target.value.replace(/[^0-9]/g, ""))}
+              placeholder="81234567890"
+              className="flex-1 px-3.5 py-3 text-sm sm:text-base text-[#1C1917] font-semibold focus:outline-none placeholder:text-[#57534E]/40"
+            />
+          </div>
+          <p className="text-[11px] text-[#57534E]">
+            Order chat dan struk transaksi akan otomatis terkirim ke WhatsApp ini tanpa perantara.
+          </p>
+        </div>
+
+        {/* 3. Kategori Bisnis (Pilihan Cepat) */}
+        <div className="space-y-2.5">
+          <label className="flex items-center gap-1.5 text-xs font-bold text-[#1C1917] uppercase tracking-wider">
+            <Compass className="w-3.5 h-3.5 text-[#D94E28]" />
+            <span>3. Kategori Bisnis (Pilihan Cepat)</span>
+          </label>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            {BUSINESS_CATEGORIES.map((item) => {
+              const isSelected = category === item.id;
+              return (
+                <button
+                  type="button"
+                  key={item.id}
+                  onClick={() => setCategory(item.id)}
+                  className={`text-left p-3 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between ${
+                    isSelected
+                      ? "border-[#D94E28] bg-[#FDF0EC] text-[#1C1917] shadow-xs"
+                      : "border-[#E7E5E4] bg-white hover:bg-[#FAF8F5] text-[#57534E]"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-[#1C1917]">
+                      {item.label}
+                    </span>
+                    {isSelected && (
+                      <span className="w-2 h-2 rounded-full bg-[#D94E28]" />
+                    )}
+                  </div>
+                  <span className="text-[11px] text-[#57534E] mt-0.5">
+                    {item.desc}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* CTA Button: Buka Etalase Saya Sekarang */}
+        <div className="pt-2">
+          <button
+            type="submit"
+            disabled={isPending || slugStatus === "unavailable"}
+            className="w-full bg-[#D94E28] hover:bg-[#B83E1D] text-white font-bold text-sm py-4 px-6 rounded-xl shadow-xs hover:shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isPending ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Menyiapkan Etalase Anda...</span>
+              </>
+            ) : (
+              <>
+                <span>Buka Etalase Saya Sekarang</span>
+                <ArrowRight className="w-4 h-4" />
+              </>
+            )}
+          </button>
+
+          <div className="text-center text-[11px] text-[#57534E] pt-3 font-medium">
+            Paket Gratis Selamanya &bull; 0% Komisi Order Chat &bull; Template Default Clean Minimal
+          </div>
+        </div>
+      </form>
     </div>
+  );
+}
+
+export default function OnboardingPage() {
+  return (
+    <main className="min-h-screen bg-[#FAF8F5] flex flex-col justify-center items-center px-4 py-12 selection:bg-[#D94E28] selection:text-white">
+      <Suspense
+        fallback={
+          <div className="w-full max-w-xl bg-white rounded-3xl border border-[#E7E5E4] p-10 text-center animate-pulse text-[#57534E] text-xs">
+            Memuat langkah onboarding...
+          </div>
+        }
+      >
+        <OnboardingContent />
+      </Suspense>
+    </main>
   );
 }

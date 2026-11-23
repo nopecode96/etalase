@@ -1,4 +1,5 @@
 import { prisma, serializePlain } from "@/lib/db/prisma";
+import { getFeeRateForTier } from "@/lib/constants/pricing";
 import { ok, fail, withErrorHandler, ServiceResult } from "@/lib/core/response";
 import { createBorderpayInvoice } from "../payment-borderpay";
 import { emitN8nEvent } from "@/lib/n8n/dispatcher";
@@ -34,8 +35,8 @@ export async function createCheckoutOrder(
     const product = store.products[0];
     const amount = Number(product.price);
 
-    // Platform fee calculation (FREE: 3.5%, PRO: 1%, DFY: 0%)
-    const feeRate = store.tier === "FREE" ? 0.035 : store.tier === "PRO" ? 0.01 : 0;
+    // Platform fee calculation (FREE: 4.5%, PRO: 2%, DFY: 2%)
+    const feeRate = getFeeRateForTier(store.tier);
     const platformFee = Math.round(amount * feeRate);
     const netAmount = amount - platformFee;
 

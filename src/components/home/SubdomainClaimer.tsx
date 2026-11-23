@@ -46,7 +46,7 @@ export function SubdomainClaimer() {
     e.preventDefault();
     const targetSlug = claimSlug.trim() || placeholderText || "namamu";
     const clean = targetSlug.toLowerCase().replace(/[^a-z0-9-]/g, "-");
-    router.push(`/onboarding?slug=${encodeURIComponent(clean)}`);
+    router.push(`/register?slug=${encodeURIComponent(clean)}`);
   };
 
   return (

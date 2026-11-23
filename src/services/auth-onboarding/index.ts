@@ -5,12 +5,14 @@ import { emitN8nEvent } from "@/lib/n8n/dispatcher";
 import { slugify } from "@/lib/core/formatters";
 
 export interface OnboardingInput {
-  name: string;
+  name?: string;
   slug: string;
   templateId?: string;
   locale?: string;
   currency?: string;
   category?: string;
+  whatsappCountryCode?: string;
+  whatsappNumber?: string;
 }
 
 /**
@@ -56,15 +58,30 @@ export async function createInitialStore(
 
     const cleanSlug = slugCheck.data.slug;
 
+    // Normalize WhatsApp handle
+    let cleanWhatsapp: string | null = null;
+    if (input.whatsappNumber) {
+      const code = (input.whatsappCountryCode || "+62").replace("+", "");
+      const num = input.whatsappNumber.replace(/^0+/, "").replace(/[^0-9]/g, "");
+      cleanWhatsapp = `${code}${num}`;
+    }
+
+    const storeName = input.name?.trim() || (cleanSlug.charAt(0).toUpperCase() + cleanSlug.slice(1));
+    const storeBio = input.category ? `Etalase resmi ${input.category}` : "Selamat datang di etalase online kami.";
+
     const newStore = await prisma.store.create({
       data: {
         ownerId: userId,
         slug: cleanSlug,
-        name: input.name.trim(),
+        name: storeName,
+        bio: storeBio,
         templateId: input.templateId || "clean-minimal",
         locale: input.locale || "id",
         currency: input.currency || "IDR",
         tier: "FREE",
+        chatChannel: "WHATSAPP",
+        chatHandle: cleanWhatsapp,
+        chatChannels: cleanWhatsapp ? [{ channel: "WHATSAPP", handle: cleanWhatsapp, isPrimary: true }] : undefined,
       },
     });
 

@@ -267,7 +267,7 @@ export default function SolusiPage() {
             {/* Bottom Actions */}
             <div className="pt-6 border-t border-[#E7E5E4] flex flex-col sm:flex-row items-center justify-between gap-4">
               <Link
-                href="/onboarding"
+                href="/register"
                 className="w-full sm:w-auto bg-[#D94E28] hover:bg-[#B83E1D] text-white px-8 py-3.5 rounded-xl font-bold text-xs sm:text-sm shadow-xs transition flex items-center justify-center gap-2"
               >
                 <span>Buka Etalase untuk {current.title}</span>

@@ -96,7 +96,7 @@ export const authConfig: NextAuthConfig = {
     },
   },
   pages: {
-    signIn: "/onboarding",
-    error: "/onboarding",
+    signIn: "/login",
+    error: "/login",
   },
 };

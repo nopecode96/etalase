@@ -25,7 +25,7 @@ export default function BantuanPage() {
     {
       q: "Apakah benar etalase.online bisa digunakan secara gratis selamanya?",
       tag: "POPULER",
-      a: "Benar sekali. Paket Gratis etalase.online berlaku selamanya tanpa batas waktu trial. Anda mendapatkan 1 subdomain mandiri (namamu.etalase.online), hingga 5 produk aktif, dan 0% komisi transaksi di jalur pemesanan chat WhatsApp.",
+      a: "Benar sekali. Paket Gratis etalase.online berlaku selamanya tanpa batas waktu trial. Anda mendapatkan 1 subdomain mandiri (namamu.etalase.online), produk & tautan tanpa batas (unlimited), dan 0% komisi transaksi di jalur pemesanan chat WhatsApp.",
     },
     {
       q: "Bagaimana cara kerja pengiriman file otomatis ke WhatsApp pembeli?",

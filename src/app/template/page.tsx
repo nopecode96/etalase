@@ -77,7 +77,7 @@ export function TemplateContent() {
 
           <div className="pt-6 text-center">
             <Link
-              href="/onboarding"
+              href="/register"
               className="inline-flex items-center gap-2 bg-[#D94E28] hover:bg-[#B83E1D] text-white px-8 py-3.5 rounded-xl font-bold text-sm shadow-xs transition"
             >
               <span>Pilih Template &amp; Buka Etalase Sekarang</span>

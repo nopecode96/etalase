@@ -355,7 +355,7 @@ export default function FiturPage() {
 
             <div className="pt-4 border-t border-[#E7E5E4] flex flex-col sm:flex-row items-center justify-between gap-3">
               <Link
-                href="/onboarding"
+                href="/register"
                 className="w-full sm:w-auto bg-[#D94E28] hover:bg-[#B83E1D] text-white px-6 py-3 rounded-xl font-bold text-xs sm:text-sm shadow-xs transition flex items-center justify-center gap-1.5"
               >
                 <span>Coba Fitur Ini Gratis</span>

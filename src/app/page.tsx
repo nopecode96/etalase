@@ -112,7 +112,7 @@ export default function HomePage() {
               Pilih Arketipe yang Tepat untuk Karakter Bisnismu
             </h2>
             <p className="text-[#57534E] text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
-              Semua template terisolasi dengan struktur vertikal anti-tabrakan tombol dan subdomain mandiri siap pakai.
+              Semua template terisolasi dengan desain mobile-first yang rapi dan subdomain mandiri siap pakai.
             </p>
           </div>
         </ScrollReveal>
@@ -130,16 +130,16 @@ export default function HomePage() {
             </div>
 
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#1C1917] leading-tight">
-              Satu Website Etalase untuk Semua Jualan Anda.
+              Amankan Nama Subdomain Bisnismu Sebelum Diambil Orang Lain.
             </h2>
 
             <p className="text-sm sm:text-base text-[#57534E] max-w-xl mx-auto leading-relaxed">
-              Buka etalase online Anda sekarang. 0% komisi order chat, tanpa kontrak tersembunyi, dan langsung terhubung ke WhatsApp Anda dalam 3 menit.
+              Daftar gratis dalam 30 detik pakai akun Google. 0% komisi order chat, tanpa kartu kredit, dan langsung terhubung ke WhatsApp Anda.
             </p>
 
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
-                href="/onboarding"
+                href="/register"
                 className="w-full sm:w-auto bg-[#D94E28] hover:bg-[#B83E1D] text-white font-semibold px-8 py-3.5 rounded-xl text-sm transition shadow-xs hover:shadow-md inline-flex items-center justify-center gap-2 cursor-pointer"
               >
                 <span>Buat Etalase Gratis Sekarang</span>
