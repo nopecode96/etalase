@@ -218,7 +218,16 @@ export default async function ArticleDetailPage({
 
   // Localized UI Labels
   const ui = {
-    home: locale === "id" ? "Beranda" : "Home",
+    home:
+      locale === "id"
+        ? "Beranda"
+        : locale === "ms"
+        ? "Utama"
+        : locale === "th"
+        ? "หน้าแรก"
+        : locale === "vi"
+        ? "Trang chủ"
+        : "Home",
     factChecked:
       locale === "id"
         ? "Ditinjau & Terverifikasi Praktisi FinTech"
@@ -299,6 +308,16 @@ export default async function ArticleDetailPage({
         : locale === "th"
         ? "สมัครฟรีด้วยบัญชี Google"
         : "Đăng ký Miễn phí với Google",
+    ctaCompare:
+      locale === "id"
+        ? "Bandingkan Paket Harga"
+        : locale === "en"
+        ? "Compare Pricing Plans"
+        : locale === "ms"
+        ? "Bandingkan Pelan Harga"
+        : locale === "th"
+        ? "เปรียบเทียบแพ็กเกจราคา"
+        : "So Sánh Gói Giá",
     updatedOn:
       locale === "id"
         ? "Diperbarui"
@@ -309,6 +328,51 @@ export default async function ArticleDetailPage({
         : locale === "th"
         ? "อัปเดตเมื่อ"
         : "Cập nhật",
+    readingTime: (min: number) => {
+      switch (locale) {
+        case "en":
+          return `${min} min read`;
+        case "ms":
+          return `${min} min baca`;
+        case "th":
+          return `${min} นาทีในการอ่าน`;
+        case "vi":
+          return `${min} phút đọc`;
+        case "id":
+        default:
+          return `${min} min baca`;
+      }
+    },
+    availableLanguages:
+      locale === "id"
+        ? "Bahasa yang tersedia:"
+        : locale === "en"
+        ? "Available languages:"
+        : locale === "ms"
+        ? "Bahasa yang tersedia:"
+        : locale === "th"
+        ? "ภาษาที่มีให้บริการ:"
+        : "Ngôn ngữ khả dụng:",
+    officialPub:
+      locale === "id"
+        ? "Publikasi Resmi Rafa Kreasindo Teknologi • Indonesia"
+        : locale === "en"
+        ? "Official Publication of Rafa Kreasindo Teknologi • Indonesia"
+        : locale === "ms"
+        ? "Penerbitan Rasmi Rafa Kreasindo Teknologi • Indonesia"
+        : locale === "th"
+        ? "สิ่งพิมพ์อย่างเป็นทางการของ Rafa Kreasindo Teknologi • อินโดนีเซีย"
+        : "Ấn phẩm chính thức của Rafa Kreasindo Teknologi • Indonesia",
+    authorBio:
+      locale === "id"
+        ? "Praktisi e-commerce dan arsitek transaksi chat dengan rekam jejak membantu lebih dari 10.000 kreator di Asia Tenggara memaksimalkan margin keuntungan."
+        : locale === "en"
+        ? "E-commerce practitioner and chat commerce architect helping over 10,000 creators across Southeast Asia maximize their profit margins."
+        : locale === "ms"
+        ? "Pakar e-dagang dan perdagangan chat yang membantu lebih 10,000 pencipta di Asia Tenggara memaksimumkan keuntungan."
+        : locale === "th"
+        ? "ผู้เชี่ยวชาญด้านอีคอมเมิร์ซและการค้าผ่านแชต ที่ช่วยครีเอเตอร์กว่า 10,000 รายทั่วเอเชียตะวันออกเฉียงใต้เพิ่มผลกำไรสูงสุด"
+        : "Chuyên gia thương mại điện tử và bán hàng qua chat hỗ trợ hơn 10.000 nhà sáng tạo tại Đông Nam Á tối ưu hóa lợi nhuận.",
     fallbackNoticeTitle:
       locale === "id"
         ? "Terjemahan Belum Tersedia"
@@ -383,7 +447,7 @@ export default async function ArticleDetailPage({
                   {ui.fallbackNoticeDesc}
                 </p>
                 <div className="pt-2 flex flex-wrap items-center gap-2 text-xs">
-                  <span className="font-semibold text-amber-900">Bahasa yang tersedia:</span>
+                  <span className="font-semibold text-amber-900">{ui.availableLanguages}</span>
                   {article.translations.map((t) => (
                     <Link
                       key={t.locale}
@@ -441,7 +505,7 @@ export default async function ArticleDetailPage({
               <span className="hidden sm:inline text-[#E7E5E4]">&bull;</span>
               <div className="flex items-center gap-1.5">
                 <Clock className="w-4 h-4 text-[#57534E]" />
-                <span>{article.readingTimeMin} min baca</span>
+                <span>{ui.readingTime(article.readingTimeMin)}</span>
               </div>
             </div>
           </header>
@@ -608,12 +672,12 @@ export default async function ArticleDetailPage({
                   <p className="text-xs font-semibold text-[#D94E28]">{article.authorRole}</p>
                 )}
                 <p className="text-xs text-[#57534E] leading-relaxed">
-                  Praktisi e-commerce dan arsitek transaksi chat dengan rekam jejak membantu lebih dari 10.000 kreator di Asia Tenggara memaksimalkan margin keuntungan.
+                  {ui.authorBio}
                 </p>
               </div>
             </div>
             <div className="pt-3 border-t border-[#E7E5E4] text-[11px] text-[#57534E] flex flex-wrap items-center justify-between gap-2">
-              <span>Publikasi Resmi Rafa Kreasindo Teknologi &bull; Indonesia</span>
+              <span>{ui.officialPub}</span>
               <a
                 href="mailto:support@etalase.online"
                 className="text-[#D94E28] hover:underline font-medium"
@@ -647,7 +711,7 @@ export default async function ArticleDetailPage({
                 href="/harga"
                 className="w-full sm:w-auto bg-white hover:bg-stone-50 border border-[#E7E5E4] text-[#1C1917] font-semibold px-5 py-3 rounded-xl text-xs sm:text-sm transition"
               >
-                {locale === "id" ? "Bandingkan Paket Harga" : "View Pricing"}
+                {ui.ctaCompare}
               </Link>
             </div>
           </section>

@@ -74,6 +74,22 @@ export function BlogListClient({
     vi: "VI",
   };
 
+  const formatReadingTime = (mins: number) => {
+    switch (locale) {
+      case "en":
+        return `${mins} min read`;
+      case "ms":
+        return `${mins} min baca`;
+      case "th":
+        return `${mins} นาทีในการอ่าน`;
+      case "vi":
+        return `${mins} phút đọc`;
+      case "id":
+      default:
+        return `${mins} min baca`;
+    }
+  };
+
   return (
     <div className="w-full space-y-12">
       {/* Category Filter Pills */}
@@ -148,7 +164,7 @@ export function BlogListClient({
                   <span>&bull;</span>
                   <span className="flex items-center gap-1">
                     <Clock className="w-3.5 h-3.5" />
-                    <span>{item.readingTimeMin} min baca</span>
+                    <span>{formatReadingTime(item.readingTimeMin)}</span>
                   </span>
                 </div>
 

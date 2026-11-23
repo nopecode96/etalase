@@ -82,10 +82,13 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
 
   const contactTranslations = {
     id: {
+      breadcrumbHome: "Beranda",
+      breadcrumbContact: "Kontak",
       badge: "Saluran Resmi Pengelola",
       h1: "Kami Siap Mendukung Pertumbuhan Bisnis Anda.",
       subtitle:
         "Punya kendala teknis, pertanyaan integrasi, atau ingin berkonsultasi mengenai paket Terima Beres? Tim Rafa Kreasindo Teknologi siap membantu.",
+      card1Badge: "Helpdesk & Support Prioritas",
       card1Title: "Pusat Bantuan & Tiket CS Prioritas",
       card1Desc:
         "Gunakan saluran dukungan tiket terpadu untuk respon cepat dari tim teknisi kami. Melayani kendala integrasi domain, setup QRIS BorderPay, dan verifikasi akun.",
@@ -93,6 +96,8 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
       hours1: "Senin - Sabtu: 08:00 - 21:00 WIB",
       hours2: "Minggu & Hari Libur: 09:00 - 17:00 WIB",
       helpDeskBtn: "Kirim Tiket Bantuan ke support@etalase.online",
+      helpCenterBtn: "Kunjungi Pusat Bantuan & Dokumentasi",
+      card2Badge: "Korespondensi Resmi",
       card2Title: "Korespondensi Resmi Per Divisi",
       card2Desc:
         "Pilih divisi terkait untuk memastikan surat atau penawaran Anda ditangani oleh tim yang tepat:",
@@ -103,10 +108,13 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
         "Pengelola Resmi: Rafa Kreasindo Teknologi • Bandung Digital Hub, Jawa Barat, Indonesia.",
     },
     en: {
+      breadcrumbHome: "Home",
+      breadcrumbContact: "Contact",
       badge: "Official Correspondence Channels",
       h1: "We are Here to Support Your Business Growth.",
       subtitle:
         "Have technical questions, domain setup inquiries, or interested in our Done-For-You (DFY) service? The Rafa Kreasindo Teknologi team is ready to assist.",
+      card1Badge: "Help Desk & Priority Support",
       card1Title: "Help Desk & Priority Support Ticket",
       card1Desc:
         "Connect directly with our engineering support team for rapid resolution of domain routing, BorderPay QRIS settlements, and account verifications.",
@@ -114,6 +122,8 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
       hours1: "Monday - Saturday: 08:00 - 21:00 WIB",
       hours2: "Sunday & Holidays: 09:00 - 17:00 WIB",
       helpDeskBtn: "Submit Support Ticket to support@etalase.online",
+      helpCenterBtn: "Visit Help Center & Documentation",
+      card2Badge: "Official Correspondence",
       card2Title: "Departmental Corporate Correspondence",
       card2Desc:
         "Direct your inquiry to the dedicated department to ensure expedited processing:",
@@ -124,10 +134,13 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
         "Official Operator: Rafa Kreasindo Teknologi • Bandung Digital Hub, West Java, Indonesia.",
     },
     ms: {
+      breadcrumbHome: "Utama",
+      breadcrumbContact: "Hubungi Kami",
       badge: "Saluran Rasmi Pengendali",
       h1: "Kami Bersedia Menyokong Pertumbuhan Perniagaan Anda.",
       subtitle:
         "Sebarang pertanyaan teknikal, bantuan persediaan domain, atau perkhidmatan DFY? Pasukan Rafa Kreasindo Teknologi sedia membantu.",
+      card1Badge: "Pusat Bantuan & Sokongan Keutamaan",
       card1Title: "Pusat Bantuan & Tiket Keutamaan",
       card1Desc:
         "Hubungi jurutera sokongan kami untuk penyelesaian pantas berkenaan domain, penyelesaian QRIS dan akaun.",
@@ -135,6 +148,8 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
       hours1: "Isnin - Sabtu: 08:00 - 21:00 WIB",
       hours2: "Ahad & Cuti Umum: 09:00 - 17:00 WIB",
       helpDeskBtn: "Hantar Tiket ke support@etalase.online",
+      helpCenterBtn: "Lawati Pusat Bantuan & Dokumentasi",
+      card2Badge: "Surat-Menyurat Rasmi",
       card2Title: "Surat-Menyurat Mengikut Bahagian",
       card2Desc: "Pilih bahagian yang berkaitan untuk memproses pertanyaan anda dengan pantas:",
       deptGeneral: "Pertanyaan Umum & Sokongan Akaun",
@@ -144,10 +159,13 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
         "Pengendali Rasmi: Rafa Kreasindo Teknologi • Bandung Digital Hub, Jawa Barat, Indonesia.",
     },
     th: {
+      breadcrumbHome: "หน้าแรก",
+      breadcrumbContact: "ติดต่อเรา",
       badge: "ช่องทางติดต่ออย่างเป็นทางการ",
       h1: "เราพร้อมสนับสนุนการเติบโตของธุรกิจคุณ",
       subtitle:
         "มีข้อสงสัยทางเทคนิค การตั้งค่าโดเมน หรือบริการ DFY? ทีมงาน Rafa Kreasindo Teknologi พร้อมช่วยเหลือคุณ",
+      card1Badge: "ศูนย์ช่วยเหลือและการสนับสนุนเร่งด่วน",
       card1Title: "ศูนย์ช่วยเหลือและแจ้งปัญหาเร่งด่วน",
       card1Desc:
         "ติดต่อทีมวิศวกรของเราโดยตรงเพื่อแก้ไขปัญหาการเชื่อมต่อโดเมน ระบบชำระเงิน QRIS และการยืนยันบัญชี",
@@ -155,6 +173,8 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
       hours1: "จันทร์ - เสาร์: 08:00 - 21:00 น. (GMT+7)",
       hours2: "อาทิตย์และวันหยุด: 09:00 - 17:00 น. (GMT+7)",
       helpDeskBtn: "ส่งข้อความถึง support@etalase.online",
+      helpCenterBtn: "ไปที่ศูนย์ช่วยเหลือและคู่มือการใช้งาน",
+      card2Badge: "การติดต่ออย่างเป็นทางการ",
       card2Title: "การติดต่อแยกตามแผนกงาน",
       card2Desc: "เลือกแผนกที่เกี่ยวข้องเพื่อให้เรื่องของคุณได้รับการจัดการอย่างรวดเร็วที่สุด:",
       deptGeneral: "สอบถามข้อมูลทั่วไปและการใช้งาน",
@@ -164,10 +184,13 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
         "ผู้ดำเนินงานอย่างเป็นทางการ: Rafa Kreasindo Teknologi • Bandung Digital Hub, อินโดนีเซีย",
     },
     vi: {
+      breadcrumbHome: "Trang chủ",
+      breadcrumbContact: "Liên Hệ",
       badge: "Kênh Liên Hệ Chính Thức",
       h1: "Chúng Tôi Sẵn Sàng Đồng Hành Cùng Doanh Nghiệp Bạn.",
       subtitle:
         "Bạn có thắc mắc kỹ thuật, cấu hình tên miền, hoặc dịch vụ trọn gói DFY? Đội ngũ Rafa Kreasindo Teknologi luôn sẵn sàng hỗ trợ.",
+      card1Badge: "Bộ phận Hỗ trợ & Tiếp nhận ưu tiên",
       card1Title: "Trung Tâm Trợ Giúp & Hỗ Trợ Kỹ Thuật",
       card1Desc:
         "Kết nối trực tiếp với đội ngũ kỹ thuật để được hỗ trợ nhanh chóng về cấu hình tên miền riêng và xác thực thanh toán QRIS.",
@@ -175,6 +198,8 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
       hours1: "Thứ Hai - Thứ Bảy: 08:00 - 21:00 (GMT+7)",
       hours2: "Chủ Nhật & Ngày Lễ: 09:00 - 17:00 (GMT+7)",
       helpDeskBtn: "Gửi yêu cầu đến support@etalase.online",
+      helpCenterBtn: "Truy cập Trung tâm Trợ giúp & Tài liệu",
+      card2Badge: "Thư tín chính thức",
       card2Title: "Hòm Thư Liên Hệ Theo Bộ Phận",
       card2Desc: "Lựa chọn bộ phận phù hợp để thư của bạn được xử lý nhanh chóng nhất:",
       deptGeneral: "Thắc mắc chung & Hỗ trợ tài khoản",
@@ -188,8 +213,8 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
   const copy = contactTranslations[locale] || contactTranslations.id;
 
   const breadcrumbsJsonLd = generateBreadcrumbJsonLd([
-    { name: locale === "id" ? "Beranda" : "Home", url: "/" },
-    { name: locale === "id" ? "Kontak" : "Contact", url: getLocalizedHref("/kontak") },
+    { name: copy.breadcrumbHome, url: "/" },
+    { name: copy.breadcrumbContact, url: getLocalizedHref("/kontak") },
   ]);
 
   const contactJsonLd = {
@@ -243,11 +268,11 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-6">
           <nav aria-label="Breadcrumb" className="text-xs text-[#57534E] flex items-center gap-2">
             <Link href={locale === "id" ? "/" : `/${locale}`} className="hover:text-[#D94E28] transition">
-              {locale === "id" ? "Beranda" : "Home"}
+              {copy.breadcrumbHome}
             </Link>
             <span>/</span>
             <span className="font-semibold text-[#1C1917]">
-              {locale === "id" ? "Kontak" : "Contact"}
+              {copy.breadcrumbContact}
             </span>
           </nav>
         </div>
@@ -275,7 +300,7 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
             <div className="bg-white border-2 border-[#D94E28] rounded-3xl p-8 sm:p-10 shadow-lg space-y-6 flex flex-col justify-between">
               <div className="space-y-4">
                 <span className="text-xs font-bold uppercase tracking-wider text-[#D94E28] bg-[#FDF0EC] px-3 py-1 rounded-full">
-                  Helpdesk &amp; Support Prioritas
+                  {copy.card1Badge}
                 </span>
 
                 <h2 className="text-2xl font-bold text-[#1C1917]">
@@ -312,7 +337,7 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
                   className="w-full bg-[#FAF8F5] hover:bg-stone-100 text-[#1C1917] border border-[#E7E5E4] py-3 rounded-xl font-semibold text-xs transition flex items-center justify-center gap-1.5"
                 >
                   <LifeBuoy className="w-4 h-4 text-[#D94E28]" />
-                  <span>Kunjungi Pusat Bantuan &amp; Dokumentasi</span>
+                  <span>{copy.helpCenterBtn}</span>
                 </Link>
               </div>
             </div>
@@ -321,7 +346,7 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
             <div className="bg-white border border-[#E7E5E4] rounded-3xl p-8 sm:p-10 shadow-2xs space-y-6 flex flex-col justify-between">
               <div className="space-y-4">
                 <span className="text-xs font-bold uppercase tracking-wider text-[#57534E] bg-stone-100 px-3 py-1 rounded-full">
-                  Korespondensi Resmi
+                  {copy.card2Badge}
                 </span>
 
                 <h2 className="text-2xl font-bold text-[#1C1917]">

@@ -132,8 +132,19 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
 
   const copy = heroCopy[locale] || heroCopy.id;
 
+  const homeLabel =
+    locale === "id"
+      ? "Beranda"
+      : locale === "ms"
+      ? "Utama"
+      : locale === "th"
+      ? "หน้าแรก"
+      : locale === "vi"
+      ? "Trang chủ"
+      : "Home";
+
   const breadcrumbsJsonLd = generateBreadcrumbJsonLd([
-    { name: locale === "id" ? "Beranda" : "Home", url: "/" },
+    { name: homeLabel, url: "/" },
     { name: "Blog", url: locale === "id" ? "/blog" : `/${locale}/blog` },
   ]);
 
@@ -200,7 +211,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
       <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 pt-6">
         <nav aria-label="Breadcrumb" className="text-xs text-[#57534E] flex items-center gap-2">
           <a href={locale === "id" ? "/" : `/${locale}`} className="hover:text-[#D94E28] transition">
-            {locale === "id" ? "Beranda" : "Home"}
+            {homeLabel}
           </a>
           <span>/</span>
           <span className="font-semibold text-[#1C1917]">Blog</span>

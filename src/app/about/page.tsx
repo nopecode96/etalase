@@ -82,15 +82,20 @@ export default function AboutPage({ searchParams }: AboutPageProps) {
 
   const aboutTranslations = {
     id: {
+      breadcrumbHome: "Beranda",
+      breadcrumbAbout: "Tentang Kami",
       badge: "Profil Entitas Resmi",
       h1: "Membangun Ekosistem Jualan Digital Mandiri di Asia Tenggara.",
       subtitle:
         "etalase.online dikembangkan dan dikelola sepenuhnya oleh Rafa Kreasindo Teknologi untuk membebaskan pebisnis lokal dari jeratan komisi tinggi dan ketergantungan marketplace.",
+      entityBadge: "Entitas Pengembang & Pengelola",
       whoWeAreTitle: "Siapa Rafa Kreasindo Teknologi?",
       whoWeAreDesc1:
         "Rafa Kreasindo Teknologi adalah badan teknologi dan rekayasa perangkat lunak modern yang berfokus menghadirkan infrastruktur e-commerce mandiri untuk kreator konten, penjual produk digital, konsultan showroom, dan UMKM di seluruh Asia Tenggara.",
       whoWeAreDesc2:
         "Kami percaya bahwa setiap pemilik bisnis berhak atas 100% margin keuntungan dan data pelanggan mereka sendiri tanpa dipotong komisi sepihak atau dibatasi oleh format link teks kaku era lampau.",
+      bullet1: "Pengembangan internal berkelanjutan dengan arsitektur Next.js & Prisma modern.",
+      bullet2: "Didukung tim insinyur perangkat lunak dan spesialis e-commerce Asia Tenggara.",
       valuesTitle: "Prinsip Inti & Komitmen Kami",
       values: [
         {
@@ -115,9 +120,15 @@ export default function AboutPage({ searchParams }: AboutPageProps) {
         },
       ],
       legalTitle: "Informasi Entitas & Kantor Operasional",
+      cardDevLabel: "Badan Pengembang & Pengelola",
       companyName: "Rafa Kreasindo Teknologi",
+      platformLabel: "Platform: etalase.online",
+      cardOfficeLabel: "Kantor Operasional",
       operationalOffice: "Bandung Digital Hub, Jawa Barat, Indonesia",
+      countryName: "Indonesia",
+      cardPartnershipLabel: "Korespondensi & Kemitraan",
       officialEmail: "halo@etalase.online",
+      cardSupportLabel: "Dukungan Teknis & Merchant",
       supportEmail: "support@etalase.online",
       ctaTitle: "Mulai Bangun Toko Mandiri Anda Hari Ini",
       ctaDesc:
@@ -126,15 +137,20 @@ export default function AboutPage({ searchParams }: AboutPageProps) {
       ctaContactBtn: "Hubungi Tim Kami",
     },
     en: {
+      breadcrumbHome: "Home",
+      breadcrumbAbout: "About Us",
       badge: "Official Entity Profile",
       h1: "Empowering Independent Digital Commerce Across Southeast Asia.",
       subtitle:
         "etalase.online is engineered and operated exclusively by Rafa Kreasindo Teknologi to liberate local merchants from exorbitant marketplace commissions and platform lock-in.",
+      entityBadge: "Development & Operating Entity",
       whoWeAreTitle: "Who is Rafa Kreasindo Teknologi?",
       whoWeAreDesc1:
         "Rafa Kreasindo Teknologi is a modern software engineering and technology entity focused on building sovereign e-commerce infrastructure for creators, digital merchants, auto showroom consultants, and SMBs across Southeast Asia.",
       whoWeAreDesc2:
         "We believe business owners deserve 100% of their margins and full customer data ownership without paying hefty marketplace fees or being constrained by dull text links.",
+      bullet1: "Continuous internal engineering powered by modern Next.js & Prisma architecture.",
+      bullet2: "Backed by software engineers and Southeast Asian e-commerce growth specialists.",
       valuesTitle: "Our Core Principles & Commitment",
       values: [
         {
@@ -159,9 +175,15 @@ export default function AboutPage({ searchParams }: AboutPageProps) {
         },
       ],
       legalTitle: "Official Corporate & Operational Details",
+      cardDevLabel: "Developer & Operator Entity",
       companyName: "Rafa Kreasindo Teknologi",
+      platformLabel: "Platform: etalase.online",
+      cardOfficeLabel: "Operational Office",
       operationalOffice: "Bandung Digital Hub, West Java, Indonesia",
+      countryName: "Indonesia",
+      cardPartnershipLabel: "Correspondence & Partnerships",
       officialEmail: "halo@etalase.online",
+      cardSupportLabel: "Technical & Merchant Support",
       supportEmail: "support@etalase.online",
       ctaTitle: "Launch Your Sovereign Storefront Today",
       ctaDesc:
@@ -170,15 +192,20 @@ export default function AboutPage({ searchParams }: AboutPageProps) {
       ctaContactBtn: "Contact Our Team",
     },
     ms: {
+      breadcrumbHome: "Utama",
+      breadcrumbAbout: "Mengenai Kami",
       badge: "Profil Entiti Rasmi",
       h1: "Membina Ekosistem Jualan Digital Berdikari di Asia Tenggara.",
       subtitle:
         "etalase.online dibangunkan dan dikendalikan sepenuhnya oleh Rafa Kreasindo Teknologi untuk membebaskan peniaga daripada potongan komisen pasaran yang tinggi.",
+      entityBadge: "Entiti Pembangun & Pengendali",
       whoWeAreTitle: "Siapakah Rafa Kreasindo Teknologi?",
       whoWeAreDesc1:
         "Rafa Kreasindo Teknologi ialah entiti kejuruteraan perisian yang berdedikasi membina infrastruktur e-dagang berdaulat untuk pencipta dan perniagaan di seluruh Asia Tenggara.",
       whoWeAreDesc2:
         "Kami percaya pemilik perniagaan berhak memiliki 100% margin keuntungan dan data pelanggan mereka sendiri.",
+      bullet1: "Pembangunan dalaman berterusan dengan seni bina moden Next.js & Prisma.",
+      bullet2: "Disokong oleh jurutera perisian dan pakar e-dagang Asia Tenggara.",
       valuesTitle: "Prinsip Teras Kami",
       values: [
         {
@@ -203,9 +230,15 @@ export default function AboutPage({ searchParams }: AboutPageProps) {
         },
       ],
       legalTitle: "Maklumat Entiti & Pejabat Operasi",
+      cardDevLabel: "Badan Pembangun & Pengendali",
       companyName: "Rafa Kreasindo Teknologi",
+      platformLabel: "Platform: etalase.online",
+      cardOfficeLabel: "Pejabat Operasi",
       operationalOffice: "Bandung Digital Hub, Jawa Barat, Indonesia",
+      countryName: "Indonesia",
+      cardPartnershipLabel: "Surat-Menyurat & Perkongsian",
       officialEmail: "halo@etalase.online",
+      cardSupportLabel: "Sokongan Teknikal & Peniaga",
       supportEmail: "support@etalase.online",
       ctaTitle: "Mula Bina Kedai Digital Anda Hari Ini",
       ctaDesc:
@@ -214,15 +247,20 @@ export default function AboutPage({ searchParams }: AboutPageProps) {
       ctaContactBtn: "Hubungi Kami",
     },
     th: {
+      breadcrumbHome: "หน้าแรก",
+      breadcrumbAbout: "เกี่ยวกับเรา",
       badge: "ข้อมูลองค์กรอย่างเป็นทางการ",
       h1: "สร้างระบบนิเวศการค้าดิจิทัลที่เป็นอิสระในเอเชียตะวันออกเฉียงใต้",
       subtitle:
         "etalase.online ได้รับการพัฒนาและดำเนินการโดย Rafa Kreasindo Teknologi เพื่อปลดล็อกร้านค้าจากค่าคอมมิชชันที่สูงเกินไปของมาร์เก็ตเพลส",
+      entityBadge: "หน่วยงานพัฒนาและดำเนินงาน",
       whoWeAreTitle: "Rafa Kreasindo Teknologi คือใคร?",
       whoWeAreDesc1:
         "Rafa Kreasindo Teknologi คือบริษัทวิศวกรรมซอฟต์แวร์ที่มุ่งเน้นการสร้างโครงสร้างพื้นฐานอีคอมเมิร์ซสำหรับครีเอเตอร์และธุรกิจทั่วเอเชียตะวันออกเฉียงใต้",
       whoWeAreDesc2:
         "เราเชื่อมั่นว่าเจ้าของธุรกิจควรได้รับผลกำไรเต็ม 100% และเป็นเจ้าของฐานข้อมูลลูกค้าของตนเองอย่างสมบูรณ์",
+      bullet1: "การพัฒนาภายในอย่างต่อเนื่องด้วยสถาปัตยกรรม Next.js และ Prisma ที่ทันสมัย",
+      bullet2: "ขับเคลื่อนโดยวิศวกรซอฟต์แวร์และผู้เชี่ยวชาญด้านอีคอมเมิร์ซในเอเชียตะวันออกเฉียงใต้",
       valuesTitle: "หลักการสำคัญของเรา",
       values: [
         {
@@ -247,9 +285,15 @@ export default function AboutPage({ searchParams }: AboutPageProps) {
         },
       ],
       legalTitle: "ข้อมูลบริษัทและสำนักงานปฏิบัติการ",
+      cardDevLabel: "หน่วยงานพัฒนาและดำเนินงาน",
       companyName: "Rafa Kreasindo Teknologi",
+      platformLabel: "แพลตฟอร์ม: etalase.online",
+      cardOfficeLabel: "สำนักงานปฏิบัติการ",
       operationalOffice: "Bandung Digital Hub, ชวาตะวันตก, อินโดนีเซีย",
+      countryName: "อินโดนีเซีย",
+      cardPartnershipLabel: "การติดต่อและความร่วมมือ",
       officialEmail: "halo@etalase.online",
+      cardSupportLabel: "ฝ่ายสนับสนุนเทคนิคและร้านค้า",
       supportEmail: "support@etalase.online",
       ctaTitle: "เริ่มสร้างหน้าร้านของคุณวันนี้",
       ctaDesc: "สมัครฟรีใน 30 วินาทีด้วยบัญชี Google ไม่ต้องใช้บัตรเครดิต",
@@ -257,15 +301,20 @@ export default function AboutPage({ searchParams }: AboutPageProps) {
       ctaContactBtn: "ติดต่อเรา",
     },
     vi: {
+      breadcrumbHome: "Trang chủ",
+      breadcrumbAbout: "Về Chúng Tôi",
       badge: "Hồ Sơ Doanh Nghiệp Chính Thức",
       h1: "Xây Dựng Hệ Sinh Thái Bán Hàng Số Độc Lập Tại Đông Nam Á",
       subtitle:
         "etalase.online được phát triển và vận hành bởi Rafa Kreasindo Teknologi nhằm trao quyền tự chủ tối đa cho người kinh doanh trực tuyến.",
+      entityBadge: "Đơn vị phát triển & quản trị",
       whoWeAreTitle: "Rafa Kreasindo Teknologi Là Ai?",
       whoWeAreDesc1:
         "Rafa Kreasindo Teknologi là đơn vị công nghệ phần mềm chuyên xây dựng hạ tầng thương mại điện tử độc lập cho nhà sáng tạo và doanh nghiệp tại Đông Nam Á.",
       whoWeAreDesc2:
         "Chúng tôi tin rằng người bán xứng đáng giữ trọn 100% lợi nhuận và sở hữu toàn bộ dữ liệu khách hàng của mình mà không bị chi phối bởi các sàn trung gian.",
+      bullet1: "Phát triển nội bộ liên tục với kiến trúc Next.js và Prisma hiện đại.",
+      bullet2: "Được hỗ trợ bởi đội ngũ kỹ sư phần mềm và chuyên gia thương mại điện tử Đông Nam Á.",
       valuesTitle: "Giá Trị Cốt Lõi Của Chúng Tôi",
       values: [
         {
@@ -290,9 +339,15 @@ export default function AboutPage({ searchParams }: AboutPageProps) {
         },
       ],
       legalTitle: "Thông Tin Pháp Lý & Trụ Sở Hoạt Động",
+      cardDevLabel: "Đơn vị phát triển & quản trị",
       companyName: "Rafa Kreasindo Teknologi",
+      platformLabel: "Nền tảng: etalase.online",
+      cardOfficeLabel: "Trụ sở hoạt động",
       operationalOffice: "Bandung Digital Hub, Tây Java, Indonesia",
+      countryName: "Indonesia",
+      cardPartnershipLabel: "Liên hệ & Hợp tác",
       officialEmail: "halo@etalase.online",
+      cardSupportLabel: "Hỗ trợ kỹ thuật & người bán",
       supportEmail: "support@etalase.online",
       ctaTitle: "Bắt Đầu Xây Dựng Storefront Ngay Hôm Nay",
       ctaDesc: "Đăng ký miễn phí sau 30 giây bằng Google. Không cần thẻ tín dụng.",
@@ -304,8 +359,8 @@ export default function AboutPage({ searchParams }: AboutPageProps) {
   const content = aboutTranslations[locale] || aboutTranslations.id;
 
   const breadcrumbsJsonLd = generateBreadcrumbJsonLd([
-    { name: locale === "id" ? "Beranda" : "Home", url: "/" },
-    { name: locale === "id" ? "Tentang Kami" : "About Us", url: getLocalizedHref("/about") },
+    { name: content.breadcrumbHome, url: "/" },
+    { name: content.breadcrumbAbout, url: getLocalizedHref("/about") },
   ]);
 
   const organizationJsonLd = {
@@ -348,11 +403,11 @@ export default function AboutPage({ searchParams }: AboutPageProps) {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-6">
           <nav aria-label="Breadcrumb" className="text-xs text-[#57534E] flex items-center gap-2">
             <Link href={locale === "id" ? "/" : `/${locale}`} className="hover:text-[#D94E28] transition">
-              {locale === "id" ? "Beranda" : "Home"}
+              {content.breadcrumbHome}
             </Link>
             <span>/</span>
             <span className="font-semibold text-[#1C1917]">
-              {locale === "id" ? "Tentang Kami" : "About Us"}
+              {content.breadcrumbAbout}
             </span>
           </nav>
         </div>
@@ -378,7 +433,7 @@ export default function AboutPage({ searchParams }: AboutPageProps) {
           <div className="bg-white border border-[#E7E5E4] rounded-3xl p-8 sm:p-12 shadow-xs space-y-6">
             <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#D94E28] bg-[#FDF0EC] px-3 py-1 rounded-full">
               <HeartHandshake className="w-3.5 h-3.5" />
-              <span>Entitas Pengembang &amp; Pengelola</span>
+              <span>{content.entityBadge}</span>
             </div>
 
             <h2 className="text-2xl sm:text-3xl font-bold text-[#1C1917] tracking-tight">
@@ -393,11 +448,11 @@ export default function AboutPage({ searchParams }: AboutPageProps) {
             <div className="pt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-[#E7E5E4] text-xs text-[#57534E]">
               <div className="flex items-start gap-2.5">
                 <CheckCircle2 className="w-4 h-4 text-[#D94E28] shrink-0 mt-0.5" />
-                <span>Pengembangan internal berkelanjutan dengan arsitektur Next.js &amp; Prisma modern.</span>
+                <span>{content.bullet1}</span>
               </div>
               <div className="flex items-start gap-2.5">
                 <CheckCircle2 className="w-4 h-4 text-[#D94E28] shrink-0 mt-0.5" />
-                <span>Didukung tim insinyur perangkat lunak dan spesialis e-commerce Asia Tenggara.</span>
+                <span>{content.bullet2}</span>
               </div>
             </div>
           </div>
@@ -440,31 +495,31 @@ export default function AboutPage({ searchParams }: AboutPageProps) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-xs sm:text-sm">
               <div className="space-y-1 bg-white p-4 rounded-2xl border border-[#E7E5E4]">
                 <span className="text-[11px] uppercase font-bold text-[#57534E] block">
-                  Badan Pengembang &amp; Pengelola
+                  {content.cardDevLabel}
                 </span>
                 <span className="font-bold text-[#1C1917] text-base block">
                   {content.companyName}
                 </span>
                 <span className="text-xs text-[#57534E] block">
-                  Platform: etalase.online
+                  {content.platformLabel}
                 </span>
               </div>
 
               <div className="space-y-1 bg-white p-4 rounded-2xl border border-[#E7E5E4]">
                 <span className="text-[11px] uppercase font-bold text-[#57534E] block">
-                  Kantor Operasional
+                  {content.cardOfficeLabel}
                 </span>
                 <span className="font-semibold text-[#1C1917] block">
                   {content.operationalOffice}
                 </span>
                 <span className="text-xs text-[#57534E] block">
-                  Indonesia
+                  {content.countryName}
                 </span>
               </div>
 
               <div className="space-y-1 bg-white p-4 rounded-2xl border border-[#E7E5E4]">
                 <span className="text-[11px] uppercase font-bold text-[#57534E] block">
-                  Korespondensi &amp; Kemitraan
+                  {content.cardPartnershipLabel}
                 </span>
                 <a
                   href={`mailto:${content.officialEmail}`}
@@ -476,7 +531,7 @@ export default function AboutPage({ searchParams }: AboutPageProps) {
 
               <div className="space-y-1 bg-white p-4 rounded-2xl border border-[#E7E5E4]">
                 <span className="text-[11px] uppercase font-bold text-[#57534E] block">
-                  Dukungan Teknis &amp; Merchant
+                  {content.cardSupportLabel}
                 </span>
                 <a
                   href={`mailto:${content.supportEmail}`}
