@@ -15,6 +15,7 @@ import {
   Clock,
   Sparkles,
   ExternalLink,
+  Globe,
 } from "lucide-react";
 
 export function InteractiveFeatureShowcase() {
@@ -339,12 +340,61 @@ export function InteractiveFeatureShowcase() {
             </div>
           </div>
         </div>
+
+        {/* ============================================================== */}
+        {/* KARTU 7 (1 Kolom): Custom Domain Pribadi & Analitik Pixel Ads */}
+        {/* ============================================================== */}
+        <div className="bg-white border border-[#E7E5E4] rounded-3xl p-6 sm:p-7 flex flex-col justify-between shadow-2xs hover:shadow-xs transition-shadow">
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-700 flex items-center justify-center">
+                <Globe className="w-5 h-5" />
+              </div>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-800 bg-indigo-100 px-3 py-1 rounded-full">
+                Custom Domain + Ads
+              </span>
+            </div>
+
+            <h3 className="text-lg font-bold text-[#1C1917] tracking-tight mb-2">
+              Domain Pribadi &amp; Tracking Ads Pixel
+            </h3>
+            <p className="text-xs text-[#57534E] leading-relaxed">
+              Tingkatkan wibawa tokomu dengan domain sendiri (<code>namabrand.com</code>) + SSL gratis. Terhubung langsung ke Meta Pixel, TikTok Ads, dan Google Analytics 4.
+            </p>
+          </div>
+
+          {/* Micro-UI: Browser URL Bar + Tracking Chips */}
+          <div className="mt-5 pt-4 border-t border-stone-100 space-y-2.5">
+            <div className="bg-[#FAF8F5] border border-[#E7E5E4] rounded-xl px-3 py-2 flex items-center justify-between text-xs font-mono">
+              <span className="text-stone-700 font-semibold truncate flex items-center gap-1.5">
+                <span className="text-emerald-600 text-[10px]">🔒</span>
+                namabrand.com
+              </span>
+              <span className="text-[9px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded shrink-0">
+                SSL Aktif
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-1.5 text-[10px] text-stone-600 font-medium">
+              <div className="bg-stone-50 border border-stone-200/70 rounded-lg p-1.5 text-center truncate">
+                ✓ Meta Pixel &amp; CAPI
+              </div>
+              <div className="bg-stone-50 border border-stone-200/70 rounded-lg p-1.5 text-center truncate">
+                ✓ Google Analytics 4
+              </div>
+            </div>
+
+            <p className="text-[10px] text-stone-400 text-center">
+              Setup DNS 1-klik &bull; Hapus branding etalase.online
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Bottom Bar: Link Eksplorasi ke Halaman Fitur & Harga */}
       <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4 p-5 rounded-2xl bg-white border border-[#E7E5E4] shadow-2xs">
         <div className="text-xs text-[#57534E] text-center sm:text-left">
-          <strong>Masih banyak kemampuan lainnya:</strong> Custom domain pribadi (<code>.com</code>), analitik pengunjung real-time, Meta Pixel &amp; CAPI, Google Analytics 4, hingga dukungan multi-mata uang SEA.
+          <strong>Ekosistem Lengkap Lainnya:</strong> Multi-bahasa antarmuka SEA (ID, EN, MS, TH, VI), watermark PDF otomatis anti-bajak, voucher promo &amp; diskon bertingkat, hingga pelacakan parameter UTM.
         </div>
 
         <div className="flex items-center gap-3 shrink-0">
