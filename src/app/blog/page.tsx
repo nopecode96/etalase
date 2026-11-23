@@ -1,164 +1,200 @@
-"use client";
-
-import React, { useState } from "react";
-import Link from "next/link";
+import React from "react";
+import { Metadata } from "next";
 import { GlobalHeader } from "@/components/saas/GlobalHeader";
 import { GlobalFooter } from "@/components/saas/GlobalFooter";
-import { ScrollReveal } from "@/components/ui/ScrollReveal";
+import { BlogListClient } from "@/components/blog/BlogListClient";
+import { BookOpen } from "lucide-react";
 import {
-  BookOpen,
-  Calendar,
-  Clock,
-  ArrowRight,
-  Sparkles,
-  TrendingUp,
-} from "lucide-react";
+  getAllArticles,
+  getAllCategories,
+} from "@/lib/blog/articles-data";
+import {
+  generateLocalizedMetadata,
+  generateBreadcrumbJsonLd,
+  BASE_URL,
+} from "@/lib/seo/metadata-helper";
+import { SupportedLocale, SUPPORTED_LOCALES } from "@/lib/config/constants";
 
-export default function BlogPage() {
-  const [selectedCategory, setSelectedCategory] = useState("Semua");
+interface BlogPageProps {
+  searchParams?: {
+    lang?: string;
+  };
+}
 
-  const categories = ["Semua", "Produk Digital", "Otomasi WhatsApp", "Sales & Properti", "Afiliasi"];
+export async function generateMetadata({
+  searchParams,
+}: BlogPageProps): Promise<Metadata> {
+  const rawLang = searchParams?.lang;
+  const locale: SupportedLocale =
+    rawLang && (SUPPORTED_LOCALES as readonly string[]).includes(rawLang)
+      ? (rawLang as SupportedLocale)
+      : "id";
 
-  const articles = [
-    {
-      id: "cara-jual-produk-digital-2027",
-      title: "5 Cara Menghasilkan 10 Juta Pertama dari Produk Digital Tanpa Modal Iklan",
-      category: "Produk Digital",
-      readTime: "5 min baca",
-      date: "20 November 2026",
-      summary:
-        "Panduan langkah demi langkah mengubah keahlian, template Canva, dan e-book PDF menjadi aset digital berulang dengan sistem pengiriman otomatis via WhatsApp.",
-      image: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80",
-      featured: true,
-    },
-    {
-      id: "strategi-closing-sales-mobil-chat",
-      title: "Rahasia Closing 12 Unit Mobil Per Bulan dengan Katalog Online & WhatsApp",
-      category: "Sales & Properti",
-      readTime: "4 min baca",
-      date: "18 November 2026",
-      summary:
-        "Bagaimana konsultan otomotif senior mengganti brosur PDF yang berat dengan showroom mobile yang ringan dan menghasilkan prospek test drive berkualitas.",
-      image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=600&q=80",
-      featured: false,
-    },
-    {
-      id: "optimasi-keranjang-kuning-tiktok",
-      title: "Trik Meningkatkan Klik Keranjang Kuning TikTok Tanpa Terkena Pelanggaran Bio",
-      category: "Afiliasi",
-      readTime: "6 min baca",
-      date: "15 November 2026",
-      summary:
-        "Cara menyusun etalase visual produk rekomendasi agar followers tidak bingung mencari link produk yang Anda ulas di konten video pendek.",
-      image: "https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=600&q=80",
-      featured: false,
-    },
-    {
-      id: "otomasi-chat-qris-instan",
-      title: "Mengapa 78% Pembeli di Indonesia Lebih Memilih Bayar via QRIS Dibanding Transfer Manual",
-      category: "Otomasi WhatsApp",
-      readTime: "4 min baca",
-      date: "12 November 2026",
-      summary:
-        "Studi kasus perilaku konsumen digital di Asia Tenggara: Kecepatan verifikasi 2 detik melipatgandakan omset penjual tanpa drama cek mutasi bank.",
-      image: "https://images.unsplash.com/photo-1556742049-0a67c5574f73?auto=format&fit=crop&w=600&q=80",
-      featured: false,
-    },
-  ];
+  const titles: Record<SupportedLocale, string> = {
+    id: "Blog & Panduan Monetisasi Chat Commerce Asia Tenggara — etalase.online",
+    en: "Southeast Asia Chat Commerce & Monetization Playbooks — etalase.online",
+    ms: "Blog & Panduan Pengewangan Perdagangan Chat SEA — etalase.online",
+    th: "บล็อกและคู่มือสร้างรายได้ผ่านแชตในเอเชียตะวันออกเฉียงใต้ — etalase.online",
+    vi: "Blog & Cẩm nang Tối ưu Bán hàng qua Chat Đông Nam Á — etalase.online",
+  };
 
-  const filtered =
-    selectedCategory === "Semua"
-      ? articles
-      : articles.filter((a) => a.category === selectedCategory);
+  const descriptions: Record<SupportedLocale, string> = {
+    id: "Kumpulan artikel edukasi teknis, studi kasus seller lokal, optimasi bio link keranjang kuning, otomasi QRIS, dan panduan jualan produk digital di Asia Tenggara.",
+    en: "Expert engineering guides, seller case studies, TikTok bio optimization, instant QRIS automation, and digital product sales strategies for Southeast Asia.",
+    ms: "Koleksi panduan teknikal, kajian kes peniaga, pengoptimuman pautan bio TikTok, automasi QRIS dan penjualan produk digital.",
+    th: "รวมบทความเทคนิค กรณีศึกษาผู้ขายจริง การปรับแต่งไบโอลิงก์ TikTok ระบบอัตโนมัติ QRIS และกลยุทธ์ขายสินค้าดิจิทัล",
+    vi: "Tuyển tập bài viết chuyên sâu, case study bán hàng, tối ưu bio link tiếp thị liên kết và hạ tầng tự động hóa thanh toán QRIS.",
+  };
+
+  return generateLocalizedMetadata({
+    path: "/blog",
+    locale,
+    title: titles[locale],
+    description: descriptions[locale],
+    imageUrl: `${BASE_URL}/og-preview.png`,
+    type: "website",
+    keywords: [
+      "blog etalase",
+      "panduan jualan whatsapp",
+      "tutorial produk digital",
+      "tips afiliasi tiktok",
+      "qris borderpay otomasi",
+    ],
+  });
+}
+
+export default function BlogPage({ searchParams }: BlogPageProps) {
+  const rawLang = searchParams?.lang;
+  const locale: SupportedLocale =
+    rawLang && (SUPPORTED_LOCALES as readonly string[]).includes(rawLang)
+      ? (rawLang as SupportedLocale)
+      : "id";
+
+  const articles = getAllArticles(locale);
+  const categories = getAllCategories(locale);
+
+  const heroCopy: Record<
+    SupportedLocale,
+    { badge: string; h1: string; subtitle: string; readMore: string }
+  > = {
+    id: {
+      badge: "Blog & Panduan Monetisasi SEA",
+      h1: "Edukasi & Trik Praktis Menjual di Jalur Chat.",
+      subtitle:
+        "Artikel panduan teknis, studi kasus seller lokal, dan strategi memaksimalkan konversi bio link untuk pasar Asia Tenggara.",
+      readMore: "Baca Selengkapnya",
+    },
+    en: {
+      badge: "Blog & SEA Monetization Playbooks",
+      h1: "Tactical Playbooks & Chat Commerce Conversion Guides.",
+      subtitle:
+        "Actionable engineering playbooks, local seller case studies, and bio link conversion optimization for Southeast Asian merchants.",
+      readMore: "Read Full Article",
+    },
+    ms: {
+      badge: "Blog & Panduan Pengewangan SEA",
+      h1: "Panduan Taktikal & Rahsia Jualan Jalur Chat.",
+      subtitle:
+        "Artikel panduan teknikal, kajian kes peniaga tempatan dan strategi memaksimumkan penukaran jualan di Asia Tenggara.",
+      readMore: "Baca Penuh",
+    },
+    th: {
+      badge: "บล็อกและแนวทางการสร้างรายได้ในเอเชียตะวันออกเฉียงใต้",
+      h1: "กลยุทธ์และคู่มือการค้าผ่านแชตในเอเชียตะวันออกเฉียงใต้",
+      subtitle:
+        "บทความแนะนำทางเทคนิค กรณีศึกษาผู้ขายจริง และกลยุทธ์เพิ่มอัตราการสั่งซื้อผ่านไบโอลิงก์",
+      readMore: "อ่านบทความฉบับเต็ม",
+    },
+    vi: {
+      badge: "Blog & Cẩm nang Kiếm tiền Trực tuyến Đông Nam Á",
+      h1: "Cẩm nang Chiến thuật & Tối ưu Bán hàng qua Tin nhắn.",
+      subtitle:
+        "Các bài viết hướng dẫn thực chiến, case study bán hàng thực tế và chiến lược tối ưu hóa chuyển đổi link bio.",
+      readMore: "Đọc toàn bộ bài viết",
+    },
+  };
+
+  const copy = heroCopy[locale] || heroCopy.id;
+
+  const breadcrumbsJsonLd = generateBreadcrumbJsonLd([
+    { name: locale === "id" ? "Beranda" : "Home", url: "/" },
+    { name: "Blog", url: locale === "id" ? "/blog" : `/${locale}/blog` },
+  ]);
+
+  const blogSchemaJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    name: copy.h1,
+    description: copy.subtitle,
+    url: `${BASE_URL}${locale === "id" ? "" : `/${locale}`}/blog`,
+    publisher: {
+      "@type": "Organization",
+      name: "etalase.online",
+      url: BASE_URL,
+      logo: `${BASE_URL}/favicon.svg`,
+    },
+    blogPost: articles.map((a) => ({
+      "@type": "BlogPosting",
+      headline: a.title,
+      description: a.summary,
+      url: `${BASE_URL}${locale === "id" ? "" : `/${locale}`}/blog/${a.slug}`,
+      datePublished: a.datePublished,
+      dateModified: a.dateModified,
+      image: a.image.url,
+      author: {
+        "@type": "Organization",
+        name: a.author.name,
+      },
+    })),
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-[#FAF8F5] text-[#1C1917]">
+      {/* Schema.org Breadcrumbs & Blog JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogSchemaJsonLd) }}
+      />
+
       <GlobalHeader />
 
-      <section className="pt-16 pb-12 px-4 sm:px-6 text-center max-w-4xl mx-auto">
-        <ScrollReveal direction="up" delay={50}>
-          <div className="inline-flex items-center gap-1.5 bg-[#FDF0EC] border border-[#FADCD3] text-[#D94E28] px-3.5 py-1.5 rounded-full text-xs font-semibold mb-4">
-            <BookOpen className="w-3.5 h-3.5" />
-            <span>Blog &amp; Panduan Monetisasi SEA</span>
-          </div>
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-[#1C1917] mb-4">
-            Edukasi &amp; Trik Praktis Menjual di Jalur Chat.
-          </h1>
-          <p className="text-[#57534E] text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-            Artikel panduan teknis, studi kasus seller lokal, dan strategi memaksimalkan konversi bio link untuk pasar Asia Tenggara.
-          </p>
+      {/* Semantic Breadcrumbs Bar */}
+      <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 pt-6">
+        <nav aria-label="Breadcrumb" className="text-xs text-[#57534E] flex items-center gap-2">
+          <a href={locale === "id" ? "/" : `/${locale}`} className="hover:text-[#D94E28] transition">
+            {locale === "id" ? "Beranda" : "Home"}
+          </a>
+          <span>/</span>
+          <span className="font-semibold text-[#1C1917]">Blog</span>
+        </nav>
+      </div>
 
-          {/* Filter Pills */}
-          <div className="flex flex-wrap items-center justify-center gap-2 mt-8">
-            {categories.map((c) => (
-              <button
-                key={c}
-                onClick={() => setSelectedCategory(c)}
-                className={`px-4 py-2 rounded-xl text-xs font-semibold transition cursor-pointer ${
-                  selectedCategory === c
-                    ? "bg-[#D94E28] text-white shadow-xs"
-                    : "bg-white text-[#57534E] hover:text-[#1C1917] border border-[#E7E5E4]"
-                }`}
-              >
-                {c}
-              </button>
-            ))}
-          </div>
-        </ScrollReveal>
+      {/* Header Section */}
+      <section className="pt-8 pb-10 px-4 sm:px-6 text-center max-w-4xl mx-auto">
+        <div className="inline-flex items-center gap-1.5 bg-[#FDF0EC] border border-[#FADCD3] text-[#D94E28] px-3.5 py-1.5 rounded-full text-xs font-semibold mb-4">
+          <BookOpen className="w-3.5 h-3.5" />
+          <span>{copy.badge}</span>
+        </div>
+        <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-[#1C1917] mb-4">
+          {copy.h1}
+        </h1>
+        <p className="text-[#57534E] text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+          {copy.subtitle}
+        </p>
       </section>
 
-      {/* Grid Artikel */}
+      {/* Articles Grid with Interactive Filter Client */}
       <section className="pb-24 px-4 sm:px-6 max-w-6xl mx-auto w-full">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {filtered.map((item) => (
-            <article
-              key={item.id}
-              className="bg-white border border-[#E7E5E4] rounded-3xl overflow-hidden shadow-2xs hover:shadow-lg transition-all duration-300 flex flex-col justify-between group"
-            >
-              <div>
-                <div className="w-full h-56 overflow-hidden bg-stone-100 relative">
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <span className="absolute top-3 left-3 bg-[#D94E28] text-white text-[11px] font-bold px-3 py-1 rounded-md shadow-xs">
-                    {item.category}
-                  </span>
-                </div>
-
-                <div className="p-6 sm:p-8 space-y-3">
-                  <div className="flex items-center gap-3 text-[11px] text-[#57534E]">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5" />
-                      <span>{item.date}</span>
-                    </span>
-                    <span>&bull;</span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5" />
-                      <span>{item.readTime}</span>
-                    </span>
-                  </div>
-
-                  <h2 className="text-xl font-bold text-[#1C1917] group-hover:text-[#D94E28] transition-colors leading-snug">
-                    {item.title}
-                  </h2>
-
-                  <p className="text-xs sm:text-sm text-[#57534E] leading-relaxed">
-                    {item.summary}
-                  </p>
-                </div>
-              </div>
-
-              <div className="px-6 pb-6 sm:px-8 sm:pb-8 pt-0">
-                <span className="inline-flex items-center text-xs font-bold text-[#D94E28] gap-1 group-hover:gap-2 transition-all">
-                  <span>Baca Selengkapnya</span>
-                  <ArrowRight className="w-4 h-4" />
-                </span>
-              </div>
-            </article>
-          ))}
-        </div>
+        <BlogListClient
+          articles={articles}
+          categories={categories}
+          locale={locale}
+          readMoreLabel={copy.readMore}
+        />
       </section>
 
       <GlobalFooter />

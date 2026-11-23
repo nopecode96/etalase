@@ -114,6 +114,11 @@ export function GlobalFooter() {
           <h4 className="font-bold text-[#1C1917] text-xs uppercase tracking-wider">Perusahaan &amp; Bantuan</h4>
           <ul className="space-y-2.5">
             <li>
+              <Link href="/blog" className="hover:text-[#1C1917] transition font-medium text-[#D94E28]">
+                Blog &amp; Panduan Monetisasi
+              </Link>
+            </li>
+            <li>
               <Link href="/bantuan" className="hover:text-[#1C1917] transition">
                 Pusat Bantuan &amp; Panduan
               </Link>
@@ -148,15 +153,15 @@ export function GlobalFooter() {
         </div>
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2 font-medium">
-            <span className="text-[#1C1917] font-bold">ID</span>
+            <Link href="/" className="text-[#1C1917] font-bold hover:text-[#D94E28] transition">ID</Link>
             <span className="text-[#E7E5E4]">|</span>
-            <span className="hover:text-[#1C1917] cursor-pointer">EN</span>
+            <Link href="/en" className="hover:text-[#D94E28] transition">EN</Link>
             <span className="text-[#E7E5E4]">|</span>
-            <span className="hover:text-[#1C1917] cursor-pointer">MS</span>
+            <Link href="/ms" className="hover:text-[#D94E28] transition">MS</Link>
             <span className="text-[#E7E5E4]">|</span>
-            <span className="hover:text-[#1C1917] cursor-pointer">TH</span>
+            <Link href="/th" className="hover:text-[#D94E28] transition">TH</Link>
             <span className="text-[#E7E5E4]">|</span>
-            <span className="hover:text-[#1C1917] cursor-pointer">VI</span>
+            <Link href="/vi" className="hover:text-[#D94E28] transition">VI</Link>
           </div>
           <span className="inline-flex items-center gap-1.5 text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 font-medium">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>

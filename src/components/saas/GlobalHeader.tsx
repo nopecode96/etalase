@@ -21,9 +21,28 @@ export function GlobalHeader() {
   ];
 
   useEffect(() => {
+    if (pathname.startsWith("/en")) setSelectedLang("EN");
+    else if (pathname.startsWith("/ms")) setSelectedLang("MS");
+    else if (pathname.startsWith("/th")) setSelectedLang("TH");
+    else if (pathname.startsWith("/vi")) setSelectedLang("VI");
+    else setSelectedLang("ID");
+
     setMobileMenuOpen(false);
     setLangDropdownOpen(false);
   }, [pathname]);
+
+  const handleLangChange = (code: string) => {
+    setSelectedLang(code);
+    setLangDropdownOpen(false);
+    const targetLocale = code.toLowerCase();
+    const cleanPath = pathname.replace(/^\/(id|en|ms|th|vi)(\/|$)/, "/");
+    const targetPath = cleanPath === "" ? "/" : cleanPath;
+    const dest =
+      targetLocale === "id"
+        ? targetPath
+        : `/${targetLocale}${targetPath === "/" ? "" : targetPath}`;
+    window.location.href = dest;
+  };
 
   const navLinks = [
     { href: "/solusi", label: "Solusi" },
@@ -95,10 +114,7 @@ export function GlobalHeader() {
                   <button
                     key={lang.code}
                     type="button"
-                    onClick={() => {
-                      setSelectedLang(lang.code);
-                      setLangDropdownOpen(false);
-                    }}
+                    onClick={() => handleLangChange(lang.code)}
                     className={`w-full text-left px-3 py-2 text-xs rounded-xl flex items-center justify-between transition cursor-pointer ${
                       selectedLang === lang.code
                         ? "bg-[#FDF0EC] text-[#D94E28] font-bold"
@@ -163,7 +179,7 @@ export function GlobalHeader() {
                   <button
                     key={l.code}
                     type="button"
-                    onClick={() => setSelectedLang(l.code)}
+                    onClick={() => handleLangChange(l.code)}
                     className={`px-2 py-1 rounded-lg text-[11px] font-bold cursor-pointer ${
                       selectedLang === l.code
                         ? "bg-[#FDF0EC] text-[#D94E28]"

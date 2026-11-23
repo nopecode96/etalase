@@ -11,10 +11,33 @@ import { InteractiveFeatureShowcase } from "@/components/home/InteractiveFeature
 import { Showcase4Archetypes } from "@/components/home/Showcase4Archetypes";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { Sparkles, ArrowRight } from "lucide-react";
+import {
+  generateOrganizationJsonLd,
+  generateWebsiteJsonLd,
+  generateSoftwareAppJsonLd,
+} from "@/lib/seo/metadata-helper";
 
 export default function HomePage() {
+  const orgJsonLd = generateOrganizationJsonLd();
+  const websiteJsonLd = generateWebsiteJsonLd("id");
+  const softwareAppJsonLd = generateSoftwareAppJsonLd();
+
   return (
     <div className="flex flex-col min-h-screen bg-[#FAF8F5] text-[#1C1917] selection:bg-[#D94E28] selection:text-white">
+      {/* Schema.org Structured Data for SEO / GEO / AIO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareAppJsonLd) }}
+      />
+
       {/* 1. Global Header Terpusat */}
       <GlobalHeader />
 

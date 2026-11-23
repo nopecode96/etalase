@@ -30,6 +30,11 @@ export const RESERVED_SLUGS = [
   "template",
   "templates",
   "pricing",
+  "id",
+  "en",
+  "ms",
+  "th",
+  "vi",
 ] as const;
 
 export const SUPPORTED_LOCALES = ["id", "en", "ms", "th", "vi"] as const;

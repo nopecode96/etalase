@@ -65,7 +65,11 @@ export const VisualMenuGrid: React.FC<StoreTemplateProps> = ({
         </div>
 
         <div className={styles.nameRow}>
-          <h1 className={styles.storeName}>{store.name}</h1>
+          {isMockup ? (
+            <div className={styles.storeName}>{store.name}</div>
+          ) : (
+            <h1 className={styles.storeName}>{store.name}</h1>
+          )}
           <Coffee className="w-4 h-4 text-[#D94E28] shrink-0" />
         </div>
 

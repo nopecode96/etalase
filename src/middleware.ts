@@ -41,6 +41,17 @@ export default async function middleware(req: NextRequest) {
     host === "localhost" ||
     host === "127.0.0.1"
   ) {
+    // Check if path starts with localized prefix: /(id|en|ms|th|vi)(/.*)?
+    const localeMatch = path.match(/^\/(id|en|ms|th|vi)(\/.*)?$/);
+    if (localeMatch) {
+      const locale = localeMatch[1];
+      const restPath = localeMatch[2] || "/";
+      const targetUrl = new URL(restPath, req.url);
+      targetUrl.searchParams.set("lang", locale);
+      const res = NextResponse.rewrite(targetUrl);
+      res.headers.set("x-locale", locale);
+      return res;
+    }
     return NextResponse.next();
   }
 
