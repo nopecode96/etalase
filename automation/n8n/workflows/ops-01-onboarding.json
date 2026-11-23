@@ -1,0 +1,22 @@
+{
+  "name": "ops-01-onboarding",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "tenant.created",
+        "options": {}
+      },
+      "id": "webhook-tenant-created",
+      "name": "Webhook Tenant Created",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300]
+    }
+  ],
+  "connections": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

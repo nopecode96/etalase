@@ -1,0 +1,22 @@
+{
+  "common": {
+    "brand": "etalase.online",
+    "tagline": "Bio Link & Etalase Katalog Visual untuk Kreator & UMKM",
+    "login": "Masuk dengan Google",
+    "getStarted": "Mulai Gratis",
+    "dashboard": "Dashboard Toko",
+    "buyNow": "Beli Sekarang",
+    "orderChat": "Pesan via Chat",
+    "search": "Cari produk...",
+    "freeTier": "Gratis",
+    "proTier": "Pro"
+  },
+  "nav": {
+    "features": "Fitur",
+    "templates": "Template",
+    "pricing": "Harga",
+    "creators": "Untuk Kreator",
+    "sales": "Untuk Sales",
+    "umkm": "Untuk UMKM"
+  }
+}

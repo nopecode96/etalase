@@ -1,0 +1,125 @@
+.container {
+  min-height: 100vh;
+  background-color: #faf6ef;
+  color: #2b2621;
+  padding: 3rem 1.25rem;
+  font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.profileCard {
+  width: 100%;
+  max-width: 480px;
+  text-align: center;
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e8decb;
+}
+
+.avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 9999px;
+  object-fit: cover;
+  margin: 0 auto 1.25rem;
+  border: 1px solid #dcd2bd;
+  background-color: #ede5d5;
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #2b2621;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.5rem;
+}
+
+.bio {
+  font-size: 0.95rem;
+  color: #635b54;
+  line-height: 1.6;
+  font-style: italic;
+  max-width: 380px;
+  margin: 0 auto;
+}
+
+.productList {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.productCard {
+  background-color: #ffffff;
+  border: 1px solid #e6ddce;
+  border-radius: 0.5rem;
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  transition: border-color 0.15s ease;
+}
+
+.productCard:hover {
+  border-color: #a89885;
+}
+
+.productImage {
+  width: 72px;
+  height: 72px;
+  border-radius: 0.25rem;
+  object-fit: cover;
+  background-color: #f3ece0;
+  flex-shrink: 0;
+  border: 1px solid #e8decb;
+}
+
+.productInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.productTitle {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #2b2621;
+  line-height: 1.3;
+}
+
+.productPrice {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #8c6d48;
+  margin-top: 0.25rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.actionBtn {
+  background-color: #2b2621;
+  color: #fbf8f3;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.footer {
+  margin-top: 4rem;
+  font-size: 0.75rem;
+  color: #8c837b;
+  text-align: center;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}

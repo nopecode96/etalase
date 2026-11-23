@@ -1,0 +1,122 @@
+.container {
+  min-height: 100vh;
+  background-color: #fff6f8;
+  color: #591b2c;
+  padding: 2.5rem 1rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.profileCard {
+  width: 100%;
+  max-width: 480px;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 9999px;
+  object-fit: cover;
+  margin: 0 auto 1.25rem;
+  border: 3px solid #ffccd9;
+  box-shadow: 0 4px 15px rgba(224, 76, 115, 0.15);
+  background-color: #ffe0e9;
+}
+
+.title {
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: #701a31;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.5rem;
+}
+
+.bio {
+  font-size: 0.9rem;
+  color: #944d62;
+  line-height: 1.5;
+  max-width: 380px;
+  margin: 0 auto;
+}
+
+.productList {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.productCard {
+  background-color: #ffffff;
+  border: 1px solid #ffd6e0;
+  border-radius: 1.25rem;
+  padding: 1.15rem;
+  display: flex;
+  align-items: center;
+  gap: 1.15rem;
+  box-shadow: 0 2px 10px rgba(224, 76, 115, 0.05);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.productCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(224, 76, 115, 0.12);
+}
+
+.productImage {
+  width: 76px;
+  height: 76px;
+  border-radius: 1rem;
+  object-fit: cover;
+  background-color: #fff0f3;
+  flex-shrink: 0;
+}
+
+.productInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.productTitle {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #701a31;
+  line-height: 1.35;
+}
+
+.productPrice {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #c93b63;
+  margin-top: 0.25rem;
+}
+
+.actionBtn {
+  background-color: #c93b63;
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.55rem 1.1rem;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(201, 59, 99, 0.25);
+  transition: background-color 0.15s ease;
+}
+
+.actionBtn:hover {
+  background-color: #b02a51;
+}
+
+.footer {
+  margin-top: 3.5rem;
+  font-size: 0.8rem;
+  color: #b37385;
+  text-align: center;
+}

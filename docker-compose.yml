@@ -1,0 +1,92 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: etalase_web
+    restart: unless-stopped
+    ports:
+      - "${HOST_PORT:-3005}:3005"
+    environment:
+      - NODE_ENV=production
+      - PORT=3005
+      - DATABASE_URL=postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_NAME:-etalase_online}?schema=public
+      - NEXT_PUBLIC_ROOT_DOMAIN=${NEXT_PUBLIC_ROOT_DOMAIN:-etalase.online}
+      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-http://localhost:3005}
+    volumes:
+      - ./uploads:/app/public/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - etalase_net
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: etalase_postgres
+    restart: unless-stopped
+    ports:
+      - "${DB_HOST_PORT:-5435}:5432"
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-etalase_online}
+    volumes:
+      - etalase_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-etalase_online}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - etalase_net
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    container_name: etalase_n8n
+    restart: unless-stopped
+    ports:
+      - "${N8N_HOST_PORT:-5679}:5678"
+    environment:
+      - N8N_HOST=flow.${NEXT_PUBLIC_ROOT_DOMAIN:-etalase.online}
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=https
+      - NODE_ENV=production
+      - WEBHOOK_URL=https://flow.${NEXT_PUBLIC_ROOT_DOMAIN:-etalase.online}/
+      - GENERIC_TIMEZONE=Asia/Jakarta
+    volumes:
+      - etalase_n8n_data:/home/node/.n8n
+      - ./automation/n8n/workflows:/data/workflows
+    networks:
+      - etalase_net
+
+  nginx:
+    image: nginx:alpine
+    container_name: etalase_nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_HTTP_PORT:-3080}:80"
+      - "${NGINX_HTTPS_PORT:-3443}:443"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./uploads:/var/www/uploads:ro
+      - ./certbot/conf:/etc/letsencrypt:ro
+      - ./certbot/www:/var/www/certbot:ro
+    depends_on:
+      - web
+    networks:
+      - etalase_net
+
+volumes:
+  etalase_pg_data:
+    name: etalase_postgres_data
+  etalase_n8n_data:
+    name: etalase_n8n_data
+
+networks:
+  etalase_net:
+    name: etalase_network
+    driver: bridge

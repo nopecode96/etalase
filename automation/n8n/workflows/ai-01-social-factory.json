@@ -1,0 +1,49 @@
+{
+  "name": "ai-01-social-factory",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * 1"
+            }
+          ]
+        }
+      },
+      "id": "cron-weekly-monday",
+      "name": "Cron Weekly Monday 09:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate 7 viral TikTok / Reels content briefs for SEA creators\nconst ideas = [\n  { day: 'Senin', hook: '3 Cara Jualan di TikTok Tanpa Kena Potongan Fee!', topic: 'Creator Commerce' },\n  { day: 'Selasa', hook: 'Stop Pake Bio Link Jadul! Ini Cara Bikin Katalog WA Otomatis', topic: 'Productivity' },\n  { day: 'Rabu', hook: 'Bedah Etalase Sales Mobil Omset Ratusan Juta', topic: 'Sales Showcase' },\n  { day: 'Kamis', hook: 'QRIS Meja Kasir yang Otomatis Minta Review Google Maps', topic: 'Local Business' },\n  { day: 'Jumat', hook: 'Rahasia Affiliator Beg Kuning & Toko Orange Cuan Maksimal', topic: 'Affiliate SEA' },\n  { day: 'Sabtu', hook: 'Tutorial 1-Klik Setup Toko Digital via Google', topic: 'Tech Tutorial' },\n  { day: 'Minggu', hook: 'Kenapa Creator Asia Tenggara Pindah ke etalase.online?', topic: 'Brand Story' }\n];\n\nreturn ideas.map(i => ({ json: i }));"
+      },
+      "id": "generate-content-schedule",
+      "name": "Generate Content Schedule",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    }
+  ],
+  "connections": {
+    "Cron Weekly Monday 09:00": {
+      "main": [
+        [
+          {
+            "node": "Generate Content Schedule",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

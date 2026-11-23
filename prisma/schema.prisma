@@ -1,0 +1,277 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  SUPER_ADMIN
+}
+
+enum PlanTier {
+  FREE
+  PRO
+  DFY_BUSINESS
+}
+
+enum CheckoutMode {
+  DIRECT_CHECKOUT  // Bayar otomatis via Borderpay QRIS / PayPal
+  EXTERNAL_LINK    // Klik Keranjang Kuning / Shopee / Lazada / Tokopedia / Custom
+  CHAT_ORDER       // Direct Chat (WhatsApp, LINE, Zalo, Messenger)
+}
+
+enum ExternalPlatform {
+  TIKTOK_SHOP      // Keranjang Kuning / Beg Kuning / Yellow Basket (All SEA)
+  SHOPEE           // Orange App / Toko Orange (All SEA)
+  LAZADA           // Blue App (All SEA)
+  TOKOPEDIA        // Toko Hijau (Indonesia Only - locale === "id")
+  CUSTOM           // Link Eksternal Bebas
+}
+
+enum ChatChannel {
+  WHATSAPP
+  LINE
+  ZALO
+  MESSENGER
+  WECHAT
+  TELEGRAM
+}
+
+enum ProductType {
+  DIGITAL
+  PHYSICAL
+  COURSE
+  EVENT_WEBINAR
+  APPOINTMENT
+  SUPPORT_TIP
+  AFFILIATE_LINK
+}
+
+enum PaymentProvider {
+  BORDERPAY_QRIS
+  PAYPAL
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  EXPIRED
+  FAILED
+  REFUNDED
+}
+
+// --- AUTH.JS (GOOGLE OAUTH ONLY) ---
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  role          UserRole  @default(USER)
+  preferredLang String    @default("id")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  stores        Store[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// --- MULTI-TENANT STOREFRONT ---
+model Store {
+  id              String      @id @default(cuid())
+  ownerId         String
+  owner           User        @relation(fields: [ownerId], references: [id])
+
+  slug            String      @unique // [slug].etalase.online
+  customDomain    String?     @unique // namabrand.com (PRO)
+  domainVerified  Boolean     @default(false)
+
+  name            String
+  bio             String?
+  avatarUrl       String?
+  bannerUrl       String?
+
+  // Regional & Chat Settings (SEA Ready)
+  locale          String      @default("id")     // id, en, ms, th, vi
+  currency        String      @default("IDR")    // IDR, MYR, SGD, THB, PHP, VND, USD
+  chatChannel     ChatChannel @default(WHATSAPP)
+  chatHandle      String?     // No WA (628...), ID LINE, Zalo, WeChat ID, dll.
+  chatChannels    Json?       // Master Data multi-channel: [{ channel, handle, isPrimary }]
+  mapsUrl         String?
+  googleReviewUrl String?
+
+  // Plan, Template & Demo Flag
+  tier            PlanTier    @default(FREE)
+  planExpiresAt   DateTime?
+  isDemo          Boolean     @default(false)    // Dikecualikan dari kalkulasi finansial Mabes
+  isActive        Boolean     @default(true)
+
+  templateId      String      @default("clean-minimal")
+  displayMode     String      @default("HYBRID") // BIO_LINK | CATALOG | HYBRID
+  themeConfig     Json?       // Custom accent color, font, background (PRO)
+
+  // Marketing & Payment Config
+  metaPixelId     String?
+  tiktokPixelId   String?
+  gaMeasurementId String?
+  paypalEmail     String?
+  walletBalance   Decimal     @default(0) @db.Decimal(14, 2)
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  blocks          BioBlock[]
+  products        Product[]
+  orders          Order[]
+  posts           BlogPost[]
+  vouchers        Voucher[]
+  withdrawals     Withdrawal[]
+}
+
+model BioBlock {
+  id        String   @id @default(cuid())
+  storeId   String
+  store     Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  type      String   // LINK | TEXT | IMAGE | VIDEO_EMBED | PRODUCT_REF | DIVIDER
+  title     String?
+  content   Json?
+  sortOrder Int      @default(0)
+  isVisible Boolean  @default(true)
+  clicks    Int      @default(0)
+}
+
+model Product {
+  id               String            @id @default(cuid())
+  storeId          String
+  store            Store             @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  title            String
+  slug             String
+  description      String?           @db.Text
+  category         String?
+  images           String[]
+  price            Decimal           @default(0) @db.Decimal(14, 2)
+  compareAtPrice   Decimal?          @db.Decimal(14, 2)
+
+  productType      ProductType       @default(DIGITAL)
+  checkoutMode     CheckoutMode      @default(DIRECT_CHECKOUT)
+  secondaryModes   Json?             // Multi-checkout: [{ mode, label, externalUrl, chatChannel, chatHandle }]
+
+  externalPlatform ExternalPlatform? // TIKTOK_SHOP | SHOPEE | LAZADA | TOKOPEDIA (ID) | CUSTOM
+  externalUrl      String?
+  externalLabel    String?
+  digitalFileUrl   String?
+  chatMessage      String?
+  stock            Int?
+
+  isFeatured       Boolean           @default(false)
+  isActive         Boolean           @default(true)
+  views            Int               @default(0)
+  clicks           Int               @default(0)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  orders           Order[]
+  @@unique([storeId, slug])
+}
+
+model Order {
+  id               String          @id @default(cuid())
+  orderCode        String          @unique
+  storeId          String
+  store            Store           @relation(fields: [storeId], references: [id])
+  productId        String
+  product          Product         @relation(fields: [productId], references: [id])
+
+  buyerName        String
+  buyerWhatsapp    String
+  buyerEmail       String?
+  shippingAddress  String?
+
+  currency         String          @default("IDR")
+  amount           Decimal         @db.Decimal(14, 2)
+  platformFee      Decimal         @default(0) @db.Decimal(14, 2)
+  netAmount        Decimal         @db.Decimal(14, 2)
+
+  paymentProvider  PaymentProvider @default(BORDERPAY_QRIS)
+  paymentRef       String?
+  paymentUrl       String?
+  status           OrderStatus     @default(PENDING)
+  waDeliveredAt    DateTime?
+
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+}
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  storeId     String
+  store       Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  title       String
+  slug        String
+  coverImage  String?
+  content     String   @db.Text
+  isPublished Boolean  @default(false)
+  views       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@unique([storeId, slug])
+}
+
+model Voucher {
+  id            String    @id @default(cuid())
+  storeId       String
+  store         Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  code          String
+  discountType  String    // PERCENT | FIXED
+  discountValue Decimal   @db.Decimal(14, 2)
+  maxUses       Int?
+  usedCount     Int       @default(0)
+  expiresAt     DateTime?
+  isActive      Boolean   @default(true)
+  @@unique([storeId, code])
+}
+
+model Withdrawal {
+  id            String   @id @default(cuid())
+  storeId       String
+  store         Store    @relation(fields: [storeId], references: [id])
+  amount        Decimal  @db.Decimal(14, 2)
+  currency      String   @default("IDR")
+  destination   String
+  status        String   @default("PENDING") // PENDING | APPROVED | REJECTED
+  adminNotes    String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}

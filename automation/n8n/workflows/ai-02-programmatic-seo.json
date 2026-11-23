@@ -1,0 +1,49 @@
+{
+  "name": "ai-02-programmatic-seo",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 2 * * 0"
+            }
+          ]
+        }
+      },
+      "id": "cron-weekly-sunday",
+      "name": "Cron Weekly Sunday",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "command": "python3 automation/python/growth_worker.py seo_enrichment"
+      },
+      "id": "exec-python-growth-worker",
+      "name": "Exec Growth Worker",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [460, 300]
+    }
+  ],
+  "connections": {
+    "Cron Weekly Sunday": {
+      "main": [
+        [
+          {
+            "node": "Exec Growth Worker",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

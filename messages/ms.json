@@ -1,0 +1,22 @@
+{
+  "common": {
+    "brand": "etalase.online",
+    "tagline": "Pautan Bio & Etalase Katalog Visual untuk Pencipta & PKS",
+    "login": "Log masuk dengan Google",
+    "getStarted": "Mula Percuma",
+    "dashboard": "Papan Pemuka Kedai",
+    "buyNow": "Beli Sekarang",
+    "orderChat": "Pesan melalui Chat",
+    "search": "Cari produk...",
+    "freeTier": "Percuma",
+    "proTier": "Pro"
+  },
+  "nav": {
+    "features": "Ciri-ciri",
+    "templates": "Templat",
+    "pricing": "Harga",
+    "creators": "Untuk Pencipta",
+    "sales": "Untuk Jurujual",
+    "umkm": "Untuk PKS"
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "name": "ops-05-mabes-alerts",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "mabes.alert",
+        "options": {}
+      },
+      "id": "webhook-mabes-alert",
+      "name": "Webhook Mabes Alert",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 21 * * *"
+            }
+          ]
+        }
+      },
+      "id": "cron-daily-2100",
+      "name": "Cron Daily 21:00 WIB",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 480]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://web:3005/api/health"
+      },
+      "id": "check-web-health",
+      "name": "Check Health",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [460, 480]
+    }
+  ],
+  "connections": {
+    "Cron Daily 21:00 WIB": {
+      "main": [
+        [
+          {
+            "node": "Check Health",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

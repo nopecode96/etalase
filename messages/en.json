@@ -1,0 +1,22 @@
+{
+  "common": {
+    "brand": "etalase.online",
+    "tagline": "All-in-One Bio Link & Visual Storefront for Creators & Businesses",
+    "login": "Sign in with Google",
+    "getStarted": "Get Started Free",
+    "dashboard": "Store Dashboard",
+    "buyNow": "Buy Now",
+    "orderChat": "Order via Chat",
+    "search": "Search products...",
+    "freeTier": "Free",
+    "proTier": "Pro"
+  },
+  "nav": {
+    "features": "Features",
+    "templates": "Templates",
+    "pricing": "Pricing",
+    "creators": "For Creators",
+    "sales": "For Sales",
+    "umkm": "For SMBs"
+  }
+}

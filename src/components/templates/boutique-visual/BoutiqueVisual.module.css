@@ -1,0 +1,128 @@
+.container {
+  min-height: 100vh;
+  background-color: #fafafa;
+  color: #171717;
+  padding: 2.5rem 1rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.profileCard {
+  width: 100%;
+  max-width: 480px;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 9999px;
+  object-fit: cover;
+  margin: 0 auto 1.25rem;
+  border: 2px solid #171717;
+  background-color: #e5e5e5;
+}
+
+.title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #171717;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
+
+.bio {
+  font-size: 0.85rem;
+  color: #737373;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+}
+
+.productList {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.productCard {
+  background-color: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 1rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.productCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.06);
+}
+
+.imageWrapper {
+  width: 100%;
+  height: 200px;
+  background-color: #f5f5f5;
+}
+
+.productImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cardBody {
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.productTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #171717;
+}
+
+.productPrice {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #171717;
+  margin-top: 0.25rem;
+}
+
+.actionBtn {
+  background-color: #171717;
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.65rem 1.25rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s ease;
+}
+
+.actionBtn:hover {
+  background-color: #404040;
+}
+
+.footer {
+  margin-top: 4rem;
+  font-size: 0.75rem;
+  color: #a3a3a3;
+  text-align: center;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}

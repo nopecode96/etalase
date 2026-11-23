@@ -1,0 +1,68 @@
+{
+  "name": "ops-06-cicd-notify",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "cicd.deploy_status",
+        "options": {}
+      },
+      "id": "webhook-cicd-status",
+      "name": "Webhook CI/CD Deploy Status",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.fonnte.com/send",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $env.FONNTE_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "target",
+              "value": "={{ $json.body.ownerPhone }}"
+            },
+            {
+              "name": "message",
+              "value": "=🚀 [etalase.online CI/CD]\nStatus: {{ $json.body.status }}\nCommit: {{ $json.body.commit }}\nMessage: {{ $json.body.message }}\nUAT: {{ $json.body.uatPassed ? '✅ PASSED' : '❌ FAILED' }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fonnte-notify-owner",
+      "name": "Fonnte Notify Owner",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [480, 300]
+    }
+  ],
+  "connections": {
+    "Webhook CI/CD Deploy Status": {
+      "main": [
+        [
+          {
+            "node": "Fonnte Notify Owner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

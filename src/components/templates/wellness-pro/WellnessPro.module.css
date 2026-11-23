@@ -1,0 +1,121 @@
+.container {
+  min-height: 100vh;
+  background-color: #f0fdfa;
+  color: #134e4a;
+  padding: 2.5rem 1rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.profileCard {
+  width: 100%;
+  max-width: 480px;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 9999px;
+  object-fit: cover;
+  margin: 0 auto 1.25rem;
+  border: 3px solid #99f6e4;
+  box-shadow: 0 4px 14px rgba(15, 118, 110, 0.1);
+  background-color: #ccfbf1;
+}
+
+.title {
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: #115e59;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.5rem;
+}
+
+.bio {
+  font-size: 0.9rem;
+  color: #0f766e;
+  line-height: 1.5;
+  max-width: 380px;
+  margin: 0 auto;
+}
+
+.productList {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+}
+
+.productCard {
+  background-color: #ffffff;
+  border: 1px solid #ccfbf1;
+  border-radius: 1.25rem;
+  padding: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  box-shadow: 0 2px 8px rgba(15, 118, 110, 0.04);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.productCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(15, 118, 110, 0.08);
+}
+
+.productImage {
+  width: 76px;
+  height: 76px;
+  border-radius: 1rem;
+  object-fit: cover;
+  background-color: #e6fffa;
+  flex-shrink: 0;
+}
+
+.productInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.productTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #115e59;
+  line-height: 1.35;
+}
+
+.productPrice {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0d9488;
+  margin-top: 0.25rem;
+}
+
+.actionBtn {
+  background-color: #0f766e;
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.55rem 1.15rem;
+  border-radius: 0.75rem;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s ease;
+}
+
+.actionBtn:hover {
+  background-color: #115e59;
+}
+
+.footer {
+  margin-top: 3.5rem;
+  font-size: 0.8rem;
+  color: #14b8a6;
+  text-align: center;
+}

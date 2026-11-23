@@ -1,0 +1,22 @@
+{
+  "common": {
+    "brand": "etalase.online",
+    "tagline": "Link Bio & Cửa hàng Danh mục Hình ảnh cho Nhà sáng tạo & Doanh nghiệp",
+    "login": "Đăng nhập bằng Google",
+    "getStarted": "Bắt đầu miễn phí",
+    "dashboard": "Bảng điều khiển",
+    "buyNow": "Mua ngay",
+    "orderChat": "Đặt hàng qua Chat",
+    "search": "Tìm kiếm sản phẩm...",
+    "freeTier": "Miễn phí",
+    "proTier": "Pro"
+  },
+  "nav": {
+    "features": "Tính năng",
+    "templates": "Mẫu giao diện",
+    "pricing": "Bảng giá",
+    "creators": "Cho Nhà sáng tạo",
+    "sales": "Cho Nhân viên bán hàng",
+    "umkm": "Cho Doanh nghiệp"
+  }
+}

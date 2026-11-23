@@ -1,0 +1,88 @@
+{
+  "name": "ops-02-order-delivery",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "order.paid",
+        "options": {}
+      },
+      "id": "webhook-order-paid",
+      "name": "Webhook Order Paid",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepare WA message tailored to buyer locale\nconst data = $input.item.json.data;\nconst locale = data.locale || 'id';\nlet text = '';\n\nif (locale === 'id' || locale === 'ms') {\n  text = `Halo ${data.buyerName}! Pembayaran pesanan *${data.orderCode}* telah kami terima.\\n\\n*Produk:* ${data.productTitle}\\n*Akses Produk:* ${data.digitalFileUrl || 'https://etalase.online/' + data.storeSlug}\\n\\nTerima kasih telah berbelanja di ${data.storeSlug}.etalase.online!`;\n} else {\n  text = `Hello ${data.buyerName}! We have received payment for order *${data.orderCode}*.\\n\\n*Item:* ${data.productTitle}\\n*Access Link:* ${data.digitalFileUrl || 'https://etalase.online/' + data.storeSlug}\\n\\nThank you for shopping at ${data.storeSlug}.etalase.online!`;\n}\n\nreturn [{ json: { target: data.buyerWhatsapp, message: text, orderCode: data.orderCode } }];"
+      },
+      "id": "format-wa-message",
+      "name": "Format WA Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.fonnte.com/send",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $env.FONNTE_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "target",
+              "value": "={{ $json.target }}"
+            },
+            {
+              "name": "message",
+              "value": "={{ $json.message }}"
+            }
+          ]
+        }
+      },
+      "id": "send-fonnte-wa",
+      "name": "Send Fonnte WA",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [680, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Order Paid": {
+      "main": [
+        [
+          {
+            "node": "Format WA Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format WA Message": {
+      "main": [
+        [
+          {
+            "node": "Send Fonnte WA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
