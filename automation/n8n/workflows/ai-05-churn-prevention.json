@@ -1,0 +1,49 @@
+{
+  "name": "ai-05-churn-prevention",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 10 * * *"
+            }
+          ]
+        }
+      },
+      "id": "cron-daily-churn",
+      "name": "Daily 10:00 WIB",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "command": "python3 /opt/etalase/automation/python/growth_worker.py --churn-check"
+      },
+      "id": "run-churn-worker",
+      "name": "Check At-Risk Tenants",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [460, 300]
+    }
+  ],
+  "connections": {
+    "Daily 10:00 WIB": {
+      "main": [
+        [
+          {
+            "node": "Check At-Risk Tenants",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

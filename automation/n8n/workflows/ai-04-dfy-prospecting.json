@@ -1,0 +1,68 @@
+{
+  "name": "ai-04-dfy-prospecting",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "prospect.input",
+        "options": {}
+      },
+      "id": "webhook-prospect-input",
+      "name": "Webhook Prospect Input",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.fonnte.com/send",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $env.FONNTE_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "target",
+              "value": "={{ $json.body.leadPhone }}"
+            },
+            {
+              "name": "message",
+              "value": "=Halo {{ $json.body.businessName }}! 👋\n\nKami melihat showroom/katalog Anda berpotensi meningkat omsetnya dengan storefront visual profesional:\n👉 Contoh Demo Interaktif: https://demo.etalase.online\n\nKami ada paket Terima Beres (DFY) tanpa pusing coding. Ingin kami bantu siapkan katalog resmi brand Anda dalam 24 jam?"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fonnte-prospect-reachout",
+      "name": "Fonnte Prospect Reachout",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [480, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Prospect Input": {
+      "main": [
+        [
+          {
+            "node": "Fonnte Prospect Reachout",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

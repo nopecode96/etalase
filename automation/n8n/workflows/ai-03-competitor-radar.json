@@ -1,0 +1,94 @@
+{
+  "name": "ai-03-competitor-radar",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 * * 1"
+            }
+          ]
+        }
+      },
+      "id": "cron-weekly-radar",
+      "name": "Weekly Monday 08:00 WIB",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "command": "python3 /opt/etalase/automation/python/growth_worker.py --competitor-radar"
+      },
+      "id": "run-competitor-worker",
+      "name": "Execute Growth Worker",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.fonnte.com/send",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $env.FONNTE_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "target",
+              "value": "={{ $env.OWNER_WHATSAPP }}"
+            },
+            {
+              "name": "message",
+              "value": "=📡 [Radar Kompetitor SEA]\n{{ $json.stdout }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "notify-owner-radar",
+      "name": "Notify Owner Radar Summary",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [680, 300]
+    }
+  ],
+  "connections": {
+    "Weekly Monday 08:00 WIB": {
+      "main": [
+        [
+          {
+            "node": "Execute Growth Worker",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Growth Worker": {
+      "main": [
+        [
+          {
+            "node": "Notify Owner Radar Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

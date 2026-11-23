@@ -1,0 +1,90 @@
+{
+  "name": "ops-03-cart-recovery",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "order.created",
+        "options": {}
+      },
+      "id": "webhook-order-created",
+      "name": "Webhook Order Created",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "amount": 30,
+        "unit": "minutes"
+      },
+      "id": "wait-30-minutes",
+      "name": "Wait 30 Menit",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.fonnte.com/send",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $env.FONNTE_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "target",
+              "value": "={{ $json.body.buyerWhatsapp }}"
+            },
+            {
+              "name": "message",
+              "value": "=Halo kak {{ $json.body.buyerName }}! 👋\n\nPembayaran untuk pesanan *{{ $json.body.productTitle }}* ({{ $json.body.orderCode }}) belum selesai nih. Yuk selesaikan via QRIS instan di link ini sebelum slot habis:\n👉 {{ $json.body.paymentUrl }}\n\nAda kendala saat pembayaran? Balas pesan ini ya, kami siap bantu! 😊"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fonnte-cart-reminder",
+      "name": "Fonnte Cart Recovery WA",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [680, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Order Created": {
+      "main": [
+        [
+          {
+            "node": "Wait 30 Menit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 30 Menit": {
+      "main": [
+        [
+          {
+            "node": "Fonnte Cart Recovery WA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

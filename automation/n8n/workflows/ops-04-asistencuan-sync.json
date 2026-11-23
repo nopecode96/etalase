@@ -1,0 +1,117 @@
+{
+  "name": "ops-04-asistencuan-sync",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "tier.upgraded",
+        "options": {}
+      },
+      "id": "webhook-tier-upgraded",
+      "name": "Webhook Tier Upgraded",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://asistencuan.shop/api/partner-bundle-claim",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.ASISTENCUAN_BUNDLE_SECRET }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "tenantEmail",
+              "value": "={{ $json.body.ownerEmail }}"
+            },
+            {
+              "name": "tier",
+              "value": "={{ $json.body.tier }}"
+            },
+            {
+              "name": "storeSlug",
+              "value": "={{ $json.body.storeSlug }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "sync-asistencuan-bundle",
+      "name": "Sync AsistenCuan Bundle API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.fonnte.com/send",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $env.FONNTE_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "target",
+              "value": "={{ $json.body.ownerPhone }}"
+            },
+            {
+              "name": "message",
+              "value": "=🎉 Selamat Toko *{{ $json.body.storeSlug }}* Resmi Upgrade ke {{ $json.body.tier }}!\n\nBonus Akses Ekosistem Eksklusif AsistenCuan Anda telah aktif:\n🔗 Login: https://asistencuan.shop/login\n📧 Akun: {{ $json.body.ownerEmail }}\n\nNikmati semua template premium dan automasi 0% komisi Anda sekarang!"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fonnte-send-bonus",
+      "name": "Fonnte Send Bonus Access",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [680, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Tier Upgraded": {
+      "main": [
+        [
+          {
+            "node": "Sync AsistenCuan Bundle API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sync AsistenCuan Bundle API": {
+      "main": [
+        [
+          {
+            "node": "Fonnte Send Bonus Access",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

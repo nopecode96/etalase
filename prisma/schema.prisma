@@ -147,6 +147,7 @@ model Store {
   gaMeasurementId String?
   paypalEmail     String?
   walletBalance   Decimal     @default(0) @db.Decimal(14, 2)
+  affiliateCommission Decimal? @default(10) @db.Decimal(5, 2) // Default 10%
 
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
@@ -157,6 +158,7 @@ model Store {
   posts           BlogPost[]
   vouchers        Voucher[]
   withdrawals     Withdrawal[]
+  affiliates      AffiliateReferral[]
 }
 
 model BioBlock {
@@ -188,6 +190,14 @@ model Product {
   checkoutMode     CheckoutMode      @default(DIRECT_CHECKOUT)
   secondaryModes   Json?             // Multi-checkout: [{ mode, label, externalUrl, chatChannel, chatHandle }]
 
+  // Course, Event, Appointment & Tip Extensions
+  courseModules    Json?             // [{ id, title, duration, videoUrl, isFreePreview }]
+  eventDate        DateTime?
+  eventLocation    String?           // Zoom link / Meet link / venue
+  appointmentDuration Int?           // in minutes (e.g. 30, 60)
+  appointmentSlots Json?             // ["09:00", "11:00", "14:00", "16:00"]
+  supportTipOptions Json?            // [10000, 25000, 50000, 100000]
+
   externalPlatform ExternalPlatform? // TIKTOK_SHOP | SHOPEE | LAZADA | TOKOPEDIA (ID) | CUSTOM
   externalUrl      String?
   externalLabel    String?
@@ -218,6 +228,9 @@ model Order {
   buyerWhatsapp    String
   buyerEmail       String?
   shippingAddress  String?
+  buyerNotes       String?         // Tip message or appointment notes
+  bookedSlot       String?         // "2026-11-25 14:00 WIB"
+  affiliateCode    String?         // Referring creator code
 
   currency         String          @default("IDR")
   amount           Decimal         @db.Decimal(14, 2)
@@ -230,6 +243,18 @@ model Order {
   status           OrderStatus     @default(PENDING)
   waDeliveredAt    DateTime?
 
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+}
+
+model AffiliateReferral {
+  id               String          @id @default(cuid())
+  storeId          String
+  store            Store           @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  orderId          String          @unique
+  affiliateCode    String
+  commissionAmount Decimal         @db.Decimal(14, 2)
+  status           String          @default("PENDING") // PENDING | PAID
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
 }

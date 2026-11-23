@@ -630,10 +630,10 @@ model Withdrawal {
 - [x] Halaman **Programmatic SEO** & **Free Tools** (`etalase.online/tools`) + Python `growth_worker.py` terhubung ke n8n `ai-01-social-factory.json` & `ai-02-programmatic-seo.json`.
 
 ### Phase 4: Ekspansi Kreator, Ekosistem Bundling & Full Hybrid AI Growth Engine
-- [ ] Modul **Course / Video E-Learning**, **Event/Webinar/Appointment Booking**, **Support/Tip**, & **Affiliate Internal**.
-- [ ] Aktifkan workflow n8n **`ops-03-cart-recovery.json`** (pengingat 1x via Fonnte setelah 30 menit).
-- [ ] Aktifkan workflow n8n **`ops-04-asistencuan-sync.json`** untuk otomasi bundling **`asistencuan.shop`**.
-- [ ] Lengkapi seluruh file skill 7 pilar di `.agents/skills/` + workflow n8n `ai-03-competitor-radar.json`, `ai-04-dfy-prospecting.json`, & `ai-05-churn-prevention.json` (ditopang Python `growth_worker.py`).
+- [x] Modul **Course / Video E-Learning** (`/[slug]/learn/[productSlug]`), **Event/Webinar/Appointment Booking** (`/[slug]/book/[productSlug]`), **Support/Tip** (`/[slug]/tip`), & **Affiliate Internal** (komisi otomatis & referral tracking).
+- [x] Aktifkan workflow n8n **`ops-03-cart-recovery.json`** (pengingat 1x via Fonnte setelah 30 menit).
+- [x] Aktifkan workflow n8n **`ops-04-asistencuan-sync.json`** untuk otomasi bundling **`asistencuan.shop`**.
+- [x] Lengkapi seluruh file skill 7 pilar di `.agents/skills/` (38 skills lengkap) + workflow n8n `ai-03-competitor-radar.json`, `ai-04-dfy-prospecting.json`, & `ai-05-churn-prevention.json` (ditopang Python `growth_worker.py`).
 
 ## 12. Environment Variables Utama (`.env`)
 
