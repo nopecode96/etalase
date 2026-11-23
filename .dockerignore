@@ -1,0 +1,17 @@
+node_modules
+.next
+.git
+.github
+.gemini
+.local
+.cache
+.config
+.npm
+.ssh
+.bash*
+.profile
+backups
+uploads
+*.log
+.env*.local
+automation/n8n/workflows
