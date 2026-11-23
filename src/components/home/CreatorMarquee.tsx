@@ -5,7 +5,7 @@ import { CheckCircle2, ShoppingBag, MessageCircle, Zap } from "lucide-react";
 
 interface CreatorCard {
   name: string;
-  handle: string;
+  subdomain: string;
   role: string;
   avatar: string;
   templateName: string;
@@ -20,11 +20,11 @@ interface CreatorCard {
 const CREATORS: CreatorCard[] = [
   {
     name: "Rafa Creative Studio",
-    handle: "rafa",
+    subdomain: "rafa.etalase.online",
     role: "Video Editor & Digital Creator",
     avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
-    templateName: "Sage Creator Studio",
-    templateTag: "Pro",
+    templateName: "Clean Minimal",
+    templateTag: "Gratis",
     productTitle: "Preset Lightroom Cinematic Pack",
     productPrice: "Rp 49.000",
     modeIcon: "qris",
@@ -33,10 +33,10 @@ const CREATORS: CreatorCard[] = [
   },
   {
     name: "Kopi Senja & Roastery",
-    handle: "kopisenja",
+    subdomain: "kopisenja.etalase.online",
     role: "Artisan Cafe & F&B Bandung",
     avatar: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=200&q=80",
-    templateName: "Aesthetic Menu Card",
+    templateName: "Visual Menu Grid",
     templateTag: "Pro",
     productTitle: "Buku Menu Visual & Meja Kasir QR",
     productPrice: "Rp 25.000",
@@ -46,23 +46,23 @@ const CREATORS: CreatorCard[] = [
   },
   {
     name: "Bastian Showroom Mobil",
-    handle: "bastiansales",
+    subdomain: "bastianmobil.etalase.online",
     role: "Senior Automotive Consultant",
     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80",
-    templateName: "Sales & Showroom Pro",
+    templateName: "Showroom Pro",
     templateTag: "Pro",
     productTitle: "Katalog Unit & Simulasi Cicilan",
-    productPrice: "DP 15 Juta",
+    productPrice: "Mulai DP 15 Jt",
     modeIcon: "chat",
     modeLabel: "Chat Test Drive Langsung",
     stat: "12 Unit Terjual",
   },
   {
     name: "Aisyah Hijab & Beauty",
-    handle: "aisyahlook",
+    subdomain: "aisyahlook.etalase.online",
     role: "Beauty & Fashion Creator",
     avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=80",
-    templateName: "Beauty Glam & Boutique",
+    templateName: "Editorial Pastel",
     templateTag: "Pro",
     productTitle: "Rekomendasi Lipcream & Pashmina Silk",
     productPrice: "Keranjang Kuning",
@@ -72,11 +72,11 @@ const CREATORS: CreatorCard[] = [
   },
   {
     name: "Dr. Hendra Wibowo",
-    handle: "drhendra",
+    subdomain: "drhendra.etalase.online",
     role: "Konsultan Finansial & Edukasi Saham",
     avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80",
-    templateName: "Clean Minimal Editorial",
-    templateTag: "Free",
+    templateName: "Clean Minimal",
+    templateTag: "Gratis",
     productTitle: "Mentoring Portfolio Audit 1-on-1",
     productPrice: "Rp 350.000",
     modeIcon: "qris",
@@ -85,10 +85,10 @@ const CREATORS: CreatorCard[] = [
   },
   {
     name: "Nurul Kitchen KL",
-    handle: "nurulkl",
+    subdomain: "nurulkl.etalase.online",
     role: "Kek & Pastri Homebaker Malaysia",
     avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80",
-    templateName: "Catalog Grid Modern",
+    templateName: "Visual Menu Grid",
     templateTag: "Pro",
     productTitle: "Order Kek Batik & Brownies",
     productPrice: "RM 35.00",
@@ -103,51 +103,50 @@ export function CreatorMarquee() {
 
   return (
     <div className="w-full overflow-hidden py-4">
-      <div className="flex gap-5 animate-marquee hover:[animation-play-state:paused] w-max">
+      <div className="flex gap-4 animate-marquee hover:[animation-play-state:paused] w-max">
         {allCards.map((c, i) => (
           <div
-            key={`${c.handle}-${i}`}
-            className="w-[310px] sm:w-[340px] shrink-0 bg-white border border-[#E2ECEA] rounded-3xl p-5 shadow-xs hover:shadow-md hover:border-[#0F766E]/30 transition-all group flex flex-col justify-between"
+            key={`${c.subdomain}-${i}`}
+            className="w-[310px] sm:w-[330px] shrink-0 bg-white border border-[#E7E5E4] rounded-3xl p-5 shadow-2xs hover:shadow-md hover:border-[#D94E28]/30 transition-all group flex flex-col justify-between"
           >
-            {/* Header: Avatar, Name, Handle, Badge */}
             <div>
               <div className="flex items-start justify-between gap-3 mb-3">
                 <div className="flex items-center gap-3">
                   <img
                     src={c.avatar}
                     alt={c.name}
-                    className="w-11 h-11 rounded-2xl object-cover border border-[#E2ECEA] shrink-0"
+                    className="w-11 h-11 rounded-2xl object-cover border border-[#E7E5E4] shrink-0"
                   />
                   <div>
                     <div className="flex items-center gap-1">
-                      <span className="font-bold text-sm text-[#111C1B] group-hover:text-[#0F766E] transition-colors">
+                      <span className="font-bold text-sm text-[#1C1917] group-hover:text-[#D94E28] transition-colors">
                         {c.name}
                       </span>
-                      <CheckCircle2 className="w-3.5 h-3.5 text-[#0F766E] shrink-0" />
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[#D94E28] shrink-0" />
                     </div>
-                    <span className="text-[11px] text-[#526664] font-mono">
-                      etalase.online/{c.handle}
+                    <span className="text-[11px] text-[#57534E] font-mono font-medium">
+                      {c.subdomain}
                     </span>
                   </div>
                 </div>
-                <span className="text-[10px] font-semibold bg-[#F4F8F7] text-[#526664] px-2 py-0.5 rounded-full border border-[#E2ECEA] shrink-0">
+                <span className="text-[10px] font-bold bg-[#FAF8F5] text-[#57534E] px-2 py-0.5 rounded-full border border-[#E7E5E4] shrink-0">
                   {c.templateTag}
                 </span>
               </div>
 
-              <p className="text-xs text-[#526664] mb-3.5 line-clamp-1">{c.role}</p>
+              <p className="text-xs text-[#57534E] mb-3.5 line-clamp-1">{c.role}</p>
 
               {/* Product preview card */}
-              <div className="bg-[#F4F8F7] border border-[#E2ECEA] rounded-2xl p-3 mb-3.5 space-y-1.5">
-                <div className="text-xs font-semibold text-[#111C1B] line-clamp-1">
+              <div className="bg-[#FAF8F5] border border-[#E7E5E4] rounded-2xl p-3 mb-3.5 space-y-1.5">
+                <div className="text-xs font-semibold text-[#1C1917] line-clamp-1">
                   {c.productTitle}
                 </div>
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-[#111C1B]">{c.productPrice}</span>
-                  <span className="inline-flex items-center gap-1 text-[10px] font-medium text-[#526664]">
-                    {c.modeIcon === "qris" && <Zap className="w-3 h-3 text-[#0F766E]" />}
-                    {c.modeIcon === "yellow" && <ShoppingBag className="w-3 h-3 text-[#0F766E]" />}
-                    {c.modeIcon === "chat" && <MessageCircle className="w-3 h-3 text-[#0F766E]" />}
+                  <span className="font-bold text-[#1C1917]">{c.productPrice}</span>
+                  <span className="inline-flex items-center gap-1 text-[10px] font-medium text-[#57534E]">
+                    {c.modeIcon === "qris" && <Zap className="w-3 h-3 text-[#D94E28]" />}
+                    {c.modeIcon === "yellow" && <ShoppingBag className="w-3 h-3 text-[#D94E28]" />}
+                    {c.modeIcon === "chat" && <MessageCircle className="w-3 h-3 text-[#D94E28]" />}
                     <span>{c.modeLabel}</span>
                   </span>
                 </div>
@@ -155,9 +154,9 @@ export function CreatorMarquee() {
             </div>
 
             {/* Bottom: Template Name & Verified Metric */}
-            <div className="flex items-center justify-between pt-3 border-t border-[#F4F8F7] text-[11px]">
-              <span className="text-[#526664] font-medium">{c.templateName}</span>
-              <span className="font-semibold text-[#0F766E] bg-[#E6F4F1] px-2 py-0.5 rounded-md">
+            <div className="flex items-center justify-between pt-3 border-t border-[#FAF8F5] text-[11px]">
+              <span className="text-[#57534E] font-medium">{c.templateName}</span>
+              <span className="font-bold text-[#D94E28] bg-[#FDF0EC] px-2 py-0.5 rounded-md">
                 {c.stat}
               </span>
             </div>

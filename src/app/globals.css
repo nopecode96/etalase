@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #09090b;
+  --background: #FAF8F5;
+  --foreground: #1C1917;
 }
 
 body {
@@ -62,4 +62,26 @@ body {
 
 .animate-float-delayed {
   animation: floatDelayed 5s ease-in-out 1s infinite;
+}
+
+/* 3D Tilt Utilities for Hero Device */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+.tilt-3d-hero {
+  transform: rotateY(-8deg) rotateX(4deg) rotateZ(1deg);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tilt-3d-hero:hover {
+  transform: rotateY(-4deg) rotateX(2deg) rotateZ(0deg);
+}
+
+.tilt-3d-depth-layer {
+  transform: translateZ(-35px) scale(0.96) translateX(18px) translateY(14px);
 }

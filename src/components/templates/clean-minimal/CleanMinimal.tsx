@@ -1,56 +1,67 @@
+"use client";
+
 import React from "react";
-import styles from "./CleanMinimal.module.css";
 import { StoreTemplateProps } from "../types";
 import { formatCurrency, buildChatUrl } from "@/lib/core/formatters";
-import { MARKETPLACE_PRESETS } from "@/lib/config/constants";
-import { CHAT_CHANNELS_REGISTRY } from "@/lib/master-data/sea-registry";
+import { CHAT_CHANNELS, MARKETPLACE_PRESETS } from "@/lib/config/constants";
+import styles from "./CleanMinimal.module.css";
+import { Sparkles, CheckCircle2 } from "lucide-react";
 
 export const CleanMinimal: React.FC<StoreTemplateProps> = ({
   store,
   products = [],
   isPreview = false,
 }) => {
-  const activeChannels = (store.chatChannels && store.chatChannels.length > 0)
-    ? store.chatChannels
-    : store.chatHandle
-    ? [{ channel: store.chatChannel || "WHATSAPP", handle: store.chatHandle }]
-    : [];
-
   return (
     <div className={styles.container}>
-      <div className={styles.profileCard}>
-        <div className={styles.avatar}>
+      {/* Profil Header */}
+      <div className={styles.profileHeader}>
+        <div className="relative mb-3 inline-block">
           {store.avatarUrl ? (
             <img
               src={store.avatarUrl}
               alt={store.name}
-              className="w-full h-full rounded-full object-cover"
+              className={styles.avatar}
             />
           ) : (
-            <div className="w-full h-full rounded-full flex items-center justify-center font-bold text-slate-500 text-2xl">
-              {store.name.charAt(0).toUpperCase()}
+            <div className={`${styles.avatar} bg-slate-900 text-white flex items-center justify-center font-bold text-xl`}>
+              {store.name.charAt(0)}
             </div>
           )}
+          <span className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white"></span>
         </div>
-        <h1 className={styles.title}>{store.name}</h1>
-        {store.bio && <p className={styles.bio}>{store.bio}</p>}
 
-        {/* Multi-Channel SEA Chat Row */}
-        {activeChannels.length > 0 && (
-          <div className="flex flex-wrap items-center justify-center gap-2 mt-4">
-            {activeChannels.map((ch, idx) => {
-              const cfg = CHAT_CHANNELS_REGISTRY[ch.channel.toUpperCase()];
-              const url = buildChatUrl(ch.channel, ch.handle, `Halo ${store.name}`);
+        <div className="flex items-center justify-center gap-1.5 mb-1">
+          <h1 className={styles.storeName}>{store.name}</h1>
+          <CheckCircle2 className="w-4 h-4 text-[#D94E28]" />
+        </div>
+
+        {store.bio && <p className={styles.storeBio}>{store.bio}</p>}
+
+        {/* Chat Channels Badge */}
+        {store.chatChannels && store.chatChannels.length > 0 && (
+          <div className="flex flex-wrap items-center justify-center gap-1.5 mt-3">
+            {store.chatChannels.map((ch, idx) => {
+              const cfg = CHAT_CHANNELS[ch.channel as keyof typeof CHAT_CHANNELS];
+              const channelColor =
+                ch.channel === "WHATSAPP"
+                  ? "#16A34A"
+                  : ch.channel === "LINE"
+                  ? "#06C755"
+                  : ch.channel === "ZALO"
+                  ? "#0068FF"
+                  : "#1C1917";
+
               return (
                 <a
                   key={idx}
-                  href={isPreview ? undefined : url}
+                  href={isPreview ? undefined : buildChatUrl(ch.channel, ch.handle)}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold text-white shadow-sm transition hover:opacity-90"
-                  style={{ backgroundColor: cfg?.badgeColor || "#0f172a" }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold text-white shadow-2xs transition hover:opacity-90"
+                  style={{ backgroundColor: channelColor }}
                 >
-                  <span className="w-1.5 h-1.5 rounded-full bg-white/70"></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-white/80"></span>
                   <span>{cfg?.name || ch.channel}</span>
                 </a>
               );
@@ -59,9 +70,10 @@ export const CleanMinimal: React.FC<StoreTemplateProps> = ({
         )}
       </div>
 
+      {/* Product List - Strict Vertical Stacking (Anti-Collision) */}
       <div className={styles.productList}>
-        {products.map((item) => {
-          let btnLabel = "Beli Sekarang";
+        {products.map((item, index) => {
+          let btnLabel = "Beli via QRIS Instan";
           let actionUrl = "#";
 
           if (item.checkoutMode === "EXTERNAL_LINK") {
@@ -73,7 +85,7 @@ export const CleanMinimal: React.FC<StoreTemplateProps> = ({
               "Beli";
             actionUrl = item.externalUrl || "#";
           } else if (item.checkoutMode === "CHAT_ORDER") {
-            btnLabel = "Chat Penjual";
+            btnLabel = "Pesan via WhatsApp";
             actionUrl = buildChatUrl(
               store.chatChannel || "WHATSAPP",
               store.chatHandle,
@@ -84,24 +96,34 @@ export const CleanMinimal: React.FC<StoreTemplateProps> = ({
           }
 
           const hasSecondary = item.secondaryModes && item.secondaryModes.length > 0;
+          const isFeatured = index === 0;
 
           return (
-            <div key={item.id} className={styles.productCard}>
-              {item.images && item.images.length > 0 ? (
-                <img
-                  src={item.images[0]}
-                  alt={item.title}
-                  className={styles.productImage}
-                />
-              ) : (
-                <div className={`${styles.productImage} flex items-center justify-center text-xs text-slate-400 bg-slate-100`}>
-                  <svg className="w-5 h-5 opacity-40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
-                    <circle cx="9" cy="9" r="2"/>
-                    <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
-                  </svg>
-                </div>
-              )}
+            <div
+              key={item.id}
+              className={`${styles.productCard} ${isFeatured ? styles.featuredCard : ""}`}
+            >
+              {/* Image Top */}
+              <div className={isFeatured ? styles.featuredImageWrapper : styles.imageWrapper}>
+                {item.images && item.images.length > 0 ? (
+                  <img
+                    src={item.images[0]}
+                    alt={item.title}
+                    className={styles.productImage}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-stone-100 text-stone-400">
+                    <Sparkles className="w-6 h-6 opacity-40" />
+                  </div>
+                )}
+                {isFeatured && (
+                  <span className="absolute top-2.5 left-2.5 bg-[#D94E28] text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-xs">
+                    PILIHAN UTAMA
+                  </span>
+                )}
+              </div>
+
+              {/* Title & Price Center */}
               <div className={styles.productInfo}>
                 <h3 className={styles.productTitle}>{item.title}</h3>
                 <div className={styles.productPrice}>
@@ -109,7 +131,8 @@ export const CleanMinimal: React.FC<StoreTemplateProps> = ({
                 </div>
               </div>
 
-              <div className="flex flex-col gap-1 shrink-0">
+              {/* CTA Button Full Width Bottom */}
+              <div className="w-full flex flex-col gap-1.5 mt-auto pt-2">
                 <a
                   href={isPreview ? undefined : actionUrl}
                   target={item.checkoutMode === "EXTERNAL_LINK" ? "_blank" : undefined}
@@ -136,7 +159,7 @@ export const CleanMinimal: React.FC<StoreTemplateProps> = ({
                         href={isPreview ? undefined : secUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-[11px] font-semibold text-slate-600 hover:text-blue-600 text-center py-1 transition"
+                        className="text-[11px] font-semibold text-[#57534E] hover:text-[#D94E28] text-center py-0.5 transition"
                       >
                         {sec.label || "Tanya via Chat"}
                       </a>
@@ -149,7 +172,7 @@ export const CleanMinimal: React.FC<StoreTemplateProps> = ({
       </div>
 
       <footer className={styles.footer}>
-        Ditenagai oleh <span className="font-semibold text-slate-700">etalase.online</span>
+        Ditenagai oleh <span className="font-bold text-[#1C1917]">etalase.online</span>
       </footer>
     </div>
   );

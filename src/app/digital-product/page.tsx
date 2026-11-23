@@ -12,7 +12,7 @@ export const metadata = {
 
 export default function DigitalProductPage() {
   return (
-    <div className="min-h-screen bg-[#FAFAF9] text-slate-800 flex flex-col">
+    <div className="min-h-screen bg-[#FAF8F5] text-[#1C1917] flex flex-col">
       <MarketingNavbar />
 
       <main className="max-w-5xl mx-auto px-4 py-16 flex-1 space-y-16">

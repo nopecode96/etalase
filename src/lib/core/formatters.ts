@@ -1,11 +1,28 @@
 import { CHAT_CHANNELS, SupportedCurrency, SupportedLocale } from "../config/constants";
 
 export function formatCurrency(
-  amount: number | string | { toString(): string },
+  amount: number | string | { toString(): string } | undefined | null,
   currency: SupportedCurrency = "IDR",
   locale: SupportedLocale = "id"
 ): string {
-  const numericAmount = typeof amount === "number" ? amount : Number(amount) || 0;
+  if (amount === undefined || amount === null) {
+    return "Tanya Harga";
+  }
+
+  // Handle custom string labels directly (e.g. "DP 15 Juta", "Mulai DP 15 Jt", "Tanya Harga")
+  if (typeof amount === "string") {
+    const trimmed = amount.trim();
+    if (isNaN(Number(trimmed))) {
+      return trimmed;
+    }
+  }
+
+  const numericAmount = typeof amount === "number" ? amount : Number(amount);
+  
+  // HARAM DATA BUG Rp 0: If zero, negative or NaN, display "Tanya Harga"
+  if (isNaN(numericAmount) || numericAmount <= 0) {
+    return "Tanya Harga";
+  }
 
   const localeMap: Record<SupportedLocale, string> = {
     id: "id-ID",

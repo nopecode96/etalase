@@ -21,6 +21,14 @@ export const RESERVED_SLUGS = [
   "sales",
   "umkm",
   "tools",
+  "fitur",
+  "solusi",
+  "harga",
+  "bantuan",
+  "kontak",
+  "template",
+  "templates",
+  "pricing",
 ] as const;
 
 export const SUPPORTED_LOCALES = ["id", "en", "ms", "th", "vi"] as const;
@@ -144,20 +152,36 @@ export const CHAT_CHANNELS = {
     name: "WhatsApp",
     prefix: "https://wa.me/",
     regions: ["id", "ms", "en"],
+    badgeColor: "#25D366",
   },
   LINE: {
     name: "LINE",
     prefix: "https://line.me/ti/p/~",
     regions: ["th"],
+    badgeColor: "#06C755",
   },
   ZALO: {
     name: "Zalo",
     prefix: "https://zalo.me/",
     regions: ["vi"],
+    badgeColor: "#0068FF",
   },
   MESSENGER: {
     name: "Facebook Messenger",
     prefix: "https://m.me/",
     regions: ["en", "ph"],
+    badgeColor: "#0084FF",
+  },
+  WECHAT: {
+    name: "WeChat",
+    prefix: "weixin://dl/chat?",
+    regions: ["th", "vi"],
+    badgeColor: "#07C160",
+  },
+  TELEGRAM: {
+    name: "Telegram",
+    prefix: "https://t.me/",
+    regions: ["id", "ms", "en"],
+    badgeColor: "#229ED9",
   },
 } as const;

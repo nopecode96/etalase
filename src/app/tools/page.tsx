@@ -2,8 +2,8 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { MarketingNavbar } from "@/components/layout/MarketingNavbar";
-import { MarketingFooter } from "@/components/layout/MarketingFooter";
+import { GlobalHeader } from "@/components/saas/GlobalHeader";
+import { GlobalFooter } from "@/components/saas/GlobalFooter";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { Wrench, ArrowRight, MessageCircle, DollarSign, Sparkles } from "lucide-react";
 
@@ -37,21 +37,21 @@ export default function FreeToolsPage() {
   const estimatedSavings = marketplaceFee - etalaseBorderpayFee;
 
   return (
-    <div className="min-h-screen bg-[#FAFAF9] text-slate-800 flex flex-col">
-      <MarketingNavbar />
+    <div className="min-h-screen bg-[#FAF8F5] text-[#1C1917] flex flex-col">
+      <GlobalHeader />
       <div className="py-16 px-4 sm:px-6 lg:px-8 flex-1">
         <div className="max-w-4xl mx-auto space-y-12">
           {/* Header */}
           <ScrollReveal direction="up" delay={50}>
             <div className="text-center space-y-4">
-              <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 text-blue-700 px-3.5 py-1.5 rounded-full text-xs font-semibold">
-                <Wrench className="w-3.5 h-3.5 text-blue-600" />
+              <div className="inline-flex items-center gap-2 bg-[#FDF0EC] border border-[#FADCD3] text-[#D94E28] px-3.5 py-1.5 rounded-full text-xs font-semibold">
+                <Wrench className="w-3.5 h-3.5 text-[#D94E28]" />
                 <span>Free Growth Tools untuk Kreator &amp; Seller SEA</span>
               </div>
-              <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-900">
+              <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-[#1C1917]">
                 Alat Bantu Gratis untuk Akselerasi Bisnis Anda.
               </h1>
-              <p className="text-slate-600 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
+              <p className="text-[#57534E] max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
                 Koleksi kalkulator profit dan generator link multi-channel gratis untuk mempercepat penjualan langsung Anda di Asia Tenggara.
               </p>
             </div>
@@ -59,15 +59,15 @@ export default function FreeToolsPage() {
 
           {/* Tool 1: Multi-Channel Chat Link Generator */}
           <ScrollReveal direction="up" delay={100}>
-            <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xs">
+            <div className="bg-white border border-[#E7E5E4] rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xs">
               <div>
-                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                  Tool #1 • Multi-Channel SEA
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[#FDF0EC] text-[#D94E28] border border-[#FADCD3]">
+                  Tool #1 &bull; Multi-Channel SEA
                 </span>
-                <h2 className="text-2xl font-bold text-slate-900 mt-3">
+                <h2 className="text-2xl font-bold text-[#1C1917] mt-3">
                   Direct Chat Order Link Generator
                 </h2>
-                <p className="text-slate-600 text-sm mt-1">
+                <p className="text-[#57534E] text-sm mt-1">
                   Buat link chat otomatis (WhatsApp, Zalo, LINE) yang siap dipasang di bio media sosial Anda.
                 </p>
               </div>
@@ -75,13 +75,13 @@ export default function FreeToolsPage() {
               <form onSubmit={handleGenerateChatLink} className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 mb-1">
+                    <label className="block text-xs font-semibold text-[#1C1917] mb-1">
                       Pilih Saluran Chat
                     </label>
                     <select
                       value={channel}
                       onChange={(e) => setChannel(e.target.value as any)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full bg-[#FAF8F5] border border-[#E7E5E4] rounded-xl px-4 py-2.5 text-[#1C1917] text-sm focus:outline-none focus:ring-2 focus:ring-[#D94E28]/20"
                     >
                       <option value="whatsapp">WhatsApp (ID, MY, SG)</option>
                       <option value="zalo">Zalo (Vietnam)</option>
@@ -90,7 +90,7 @@ export default function FreeToolsPage() {
                   </div>
 
                   <div className="sm:col-span-2">
-                    <label className="block text-xs font-medium text-slate-700 mb-1">
+                    <label className="block text-xs font-semibold text-[#1C1917] mb-1">
                       Nomor HP (Contoh: 628123456789)
                     </label>
                     <input
@@ -98,44 +98,36 @@ export default function FreeToolsPage() {
                       placeholder="628xxxxxxxxxx"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      required
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full bg-[#FAF8F5] border border-[#E7E5E4] rounded-xl px-4 py-2.5 text-[#1C1917] text-sm focus:outline-none focus:ring-2 focus:ring-[#D94E28]/20"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">
-                    Draf Pesan Otomatis Pembeli
+                  <label className="block text-xs font-semibold text-[#1C1917] mb-1">
+                    Format Pesan Pembuka
                   </label>
                   <textarea
-                    rows={3}
+                    rows={2}
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full bg-[#FAF8F5] border border-[#E7E5E4] rounded-xl px-4 py-2.5 text-[#1C1917] text-sm focus:outline-none focus:ring-2 focus:ring-[#D94E28]/20"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl transition shadow-sm"
+                  className="bg-[#D94E28] hover:bg-[#B83E1D] text-white px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition shadow-xs"
                 >
-                  Generate Link Sekarang
+                  Generate Link Chat
                 </button>
               </form>
 
               {generatedLink && (
-                <div className="mt-4 p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
-                  <p className="text-xs text-slate-600 font-medium">Link Siap Pakai:</p>
-                  <div className="flex items-center justify-between gap-2 overflow-hidden">
-                    <code className="text-blue-600 text-sm truncate font-mono">{generatedLink}</code>
-                    <button
-                      type="button"
-                      onClick={() => navigator.clipboard.writeText(generatedLink)}
-                      className="px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-100 rounded-lg text-xs font-semibold text-slate-800 shrink-0 shadow-xs"
-                    >
-                      Salin Link
-                    </button>
+                <div className="p-4 bg-[#FAF8F5] border border-[#E7E5E4] rounded-2xl space-y-2">
+                  <div className="text-xs font-bold text-[#1C1917]">Link Anda Siap Dipakai:</div>
+                  <div className="p-3 bg-white border border-[#E7E5E4] rounded-xl text-xs font-mono text-[#D94E28] break-all select-all">
+                    {generatedLink}
                   </div>
                 </div>
               )}
@@ -143,24 +135,24 @@ export default function FreeToolsPage() {
           </ScrollReveal>
 
           {/* Tool 2: Fee Savings Calculator */}
-          <ScrollReveal direction="up" delay={200}>
-            <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xs">
+          <ScrollReveal direction="up" delay={150}>
+            <div className="bg-white border border-[#E7E5E4] rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xs">
               <div>
-                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
-                  Tool #2 • Kalkulator Penghematan
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                  Tool #2 &bull; Kalkulator Penghematan
                 </span>
-                <h2 className="text-2xl font-bold text-slate-900 mt-3">
+                <h2 className="text-2xl font-bold text-[#1C1917] mt-3">
                   Kalkulator Potongan Marketplace vs Direct Storefront
                 </h2>
-                <p className="text-slate-600 text-sm mt-1">
+                <p className="text-[#57534E] text-sm mt-1">
                   Bandingkan berapa juta rupiah yang bisa Anda hemat tiap bulan dengan direct checkout di etalase.online (0.7% QRIS Instan) vs potongan 10–12% marketplace.
                 </p>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-2">
-                    Omset Penjualan Bulanan: <span className="text-blue-600 text-base">Rp {monthlyGmv.toLocaleString("id-ID")}</span>
+                  <label className="block text-xs font-semibold text-[#1C1917] mb-2">
+                    Omset Penjualan Bulanan: <span className="text-[#D94E28] text-base font-bold">Rp {monthlyGmv.toLocaleString("id-ID")}</span>
                   </label>
                   <input
                     type="range"
@@ -169,21 +161,21 @@ export default function FreeToolsPage() {
                     step="1000000"
                     value={monthlyGmv}
                     onChange={(e) => setMonthlyGmv(Number(e.target.value))}
-                    className="w-full accent-blue-600 cursor-pointer"
+                    className="w-full accent-[#D94E28] cursor-pointer"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
-                  <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl">
-                    <p className="text-xs text-rose-800">Potongan Marketplace (~10%)</p>
-                    <p className="text-xl font-bold text-rose-700 mt-1">
+                  <div className="p-4 bg-red-50/60 border border-red-200 rounded-2xl">
+                    <p className="text-xs text-red-800">Potongan Marketplace (~10%)</p>
+                    <p className="text-xl font-bold text-red-700 mt-1">
                       Rp {marketplaceFee.toLocaleString("id-ID")}
                     </p>
                   </div>
 
-                  <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl">
-                    <p className="text-xs text-slate-600">Biaya etalase QRIS (0.7%)</p>
-                    <p className="text-xl font-bold text-slate-900 mt-1">
+                  <div className="p-4 bg-[#FAF8F5] border border-[#E7E5E4] rounded-2xl">
+                    <p className="text-xs text-[#57534E]">Biaya etalase QRIS (0.7%)</p>
+                    <p className="text-xl font-bold text-[#1C1917] mt-1">
                       Rp {etalaseBorderpayFee.toLocaleString("id-ID")}
                     </p>
                   </div>
@@ -197,10 +189,10 @@ export default function FreeToolsPage() {
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-slate-100 text-center">
+              <div className="pt-4 border-t border-[#E7E5E4] text-center">
                 <Link
                   href="/onboarding"
-                  className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-bold px-8 py-3.5 rounded-xl transition shadow-sm text-sm"
+                  className="inline-flex items-center gap-2 bg-[#D94E28] hover:bg-[#B83E1D] text-white font-bold px-8 py-3.5 rounded-xl transition shadow-xs text-sm"
                 >
                   <span>Mulai Simpan Profit Anda dengan etalase.online</span>
                   <ArrowRight className="w-4 h-4" />
@@ -210,7 +202,7 @@ export default function FreeToolsPage() {
           </ScrollReveal>
         </div>
       </div>
-      <MarketingFooter />
+      <GlobalFooter />
     </div>
   );
 }
