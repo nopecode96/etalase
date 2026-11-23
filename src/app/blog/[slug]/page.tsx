@@ -2,12 +2,10 @@ import React from "react";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Link from "next/link";
+import { prisma } from "@/lib/db/prisma";
 import { GlobalHeader } from "@/components/saas/GlobalHeader";
 import { GlobalFooter } from "@/components/saas/GlobalFooter";
-import {
-  ARTICLES_DATA,
-  getArticleBySlugAndLocale,
-} from "@/lib/blog/articles-data";
+import { getPostBySlugAndLocale } from "@/lib/queries/blog";
 import {
   generateLocalizedMetadata,
   generateArticleJsonLd,
@@ -25,7 +23,7 @@ import {
   ArrowRight,
   HelpCircle,
   Sparkles,
-  Share2,
+  Globe,
 } from "lucide-react";
 
 interface ArticlePageProps {
@@ -37,10 +35,27 @@ interface ArticlePageProps {
   };
 }
 
+export const revalidate = 60; // ISR cache revalidation every 60s
+
 export async function generateStaticParams() {
-  return ARTICLES_DATA.map((article) => ({
-    slug: article.slug,
-  }));
+  try {
+    const posts = await prisma.post.findMany({
+      where: { isPublished: true },
+      select: { slug: true },
+    });
+    return posts.map((post) => ({
+      slug: post.slug,
+    }));
+  } catch (error) {
+    console.error("Failed to generate static params for blog:", error);
+    return [
+      { slug: "cara-jual-produk-digital-2027" },
+      { slug: "strategi-closing-sales-mobil-chat" },
+      { slug: "optimasi-keranjang-kuning-tiktok" },
+      { slug: "otomasi-chat-qris-instan" },
+      { slug: "panduan-ekspansi-e-commerce-asean" },
+    ];
+  }
 }
 
 export async function generateMetadata({
@@ -54,7 +69,7 @@ export async function generateMetadata({
       ? (rawLang as SupportedLocale)
       : "id";
 
-  const article = getArticleBySlugAndLocale(slug, locale);
+  const article = await getPostBySlugAndLocale(slug, locale);
   if (!article) {
     return {
       title: "Artikel Tidak Ditemukan — etalase.online",
@@ -62,17 +77,22 @@ export async function generateMetadata({
     };
   }
 
+  const title = article.seoTitle || `${article.title} — etalase.online`;
+  const description = article.seoDescription || article.excerpt;
+
   return generateLocalizedMetadata({
     path: `/blog/${slug}`,
     locale,
-    title: `${article.title} — etalase.online`,
-    description: article.summary,
-    imageUrl: article.image.url,
-    imageAlt: article.image.alt,
+    title,
+    description,
+    imageUrl:
+      article.coverImage ||
+      `${BASE_URL}/og-preview.png`,
+    imageAlt: article.coverAlt,
     type: "article",
-    publishedTime: article.datePublished,
-    modifiedTime: article.dateModified,
-    authorName: article.author.name,
+    publishedTime: article.publishedAt ? article.publishedAt.toISOString() : undefined,
+    modifiedTime: article.updatedAt.toISOString(),
+    authorName: article.authorName,
     keywords: [
       article.category.toLowerCase(),
       "panduan etalase online",
@@ -82,7 +102,55 @@ export async function generateMetadata({
   });
 }
 
-export default function ArticleDetailPage({
+interface ParsedContent {
+  directAnswer?: string;
+  keyTakeaways?: string[];
+  table?: {
+    caption: string;
+    headers: string[];
+    rows: string[][];
+  };
+  sections?: {
+    heading: string;
+    directAnswer?: string;
+    content: string[];
+    bulletPoints?: string[];
+  }[];
+  faqs?: {
+    question: string;
+    answer: string;
+  }[];
+  body?: string;
+}
+
+function parseArticleContent(rawContent: string): ParsedContent {
+  try {
+    if (rawContent.trim().startsWith("{")) {
+      return JSON.parse(rawContent) as ParsedContent;
+    }
+  } catch {
+    // If not JSON, treat as standard plain text
+  }
+  return {
+    body: rawContent,
+    sections: [
+      {
+        heading: "Ulasan Panduan Lengkap",
+        content: [rawContent],
+      },
+    ],
+  };
+}
+
+const LOCALE_DISPLAY_NAMES: Record<string, string> = {
+  id: "Bahasa Indonesia",
+  en: "English",
+  ms: "Bahasa Melayu",
+  th: "ภาษาไทย (Thai)",
+  vi: "Tiếng Việt (Vietnamese)",
+};
+
+export default async function ArticleDetailPage({
   params,
   searchParams,
 }: ArticlePageProps) {
@@ -93,17 +161,18 @@ export default function ArticleDetailPage({
       ? (rawLang as SupportedLocale)
       : "id";
 
-  const article = getArticleBySlugAndLocale(slug, locale);
+  const article = await getPostBySlugAndLocale(slug, locale);
   if (!article) {
     notFound();
   }
 
+  const parsed = parseArticleContent(article.content);
   const articleUrl = `${BASE_URL}${locale === "id" ? "" : `/${locale}`}/blog/${article.slug}`;
 
-  // Formatted date strings
-  const formatDate = (isoDate: string) => {
+  const formatDate = (date: Date | null) => {
+    if (!date) return "";
     try {
-      return new Date(isoDate).toLocaleDateString(
+      return date.toLocaleDateString(
         locale === "id"
           ? "id-ID"
           : locale === "en"
@@ -116,7 +185,7 @@ export default function ArticleDetailPage({
         { day: "numeric", month: "long", year: "numeric" }
       );
     } catch {
-      return isoDate;
+      return date.toISOString();
     }
   };
 
@@ -129,18 +198,22 @@ export default function ArticleDetailPage({
 
   const articleJsonLd = generateArticleJsonLd({
     title: article.title,
-    description: article.summary,
+    description: article.excerpt,
     url: articleUrl,
-    imageUrl: article.image.url,
-    datePublished: article.datePublished,
-    dateModified: article.dateModified,
-    authorName: article.author.name,
+    imageUrl:
+      article.coverImage ||
+      `${BASE_URL}/og-preview.png`,
+    datePublished: article.publishedAt
+      ? article.publishedAt.toISOString()
+      : article.createdAt.toISOString(),
+    dateModified: article.updatedAt.toISOString(),
+    authorName: article.authorName,
     locale,
   });
 
   const faqJsonLd =
-    article.faqs && article.faqs.length > 0
-      ? generateFaqJsonLd(article.faqs)
+    parsed.faqs && parsed.faqs.length > 0
+      ? generateFaqJsonLd(parsed.faqs)
       : null;
 
   // Localized UI Labels
@@ -236,6 +309,26 @@ export default function ArticleDetailPage({
         : locale === "th"
         ? "อัปเดตเมื่อ"
         : "Cập nhật",
+    fallbackNoticeTitle:
+      locale === "id"
+        ? "Terjemahan Belum Tersedia"
+        : locale === "en"
+        ? "Translation Not Yet Available"
+        : locale === "ms"
+        ? "Terjemahan Belum Tersedia"
+        : locale === "th"
+        ? "ยังไม่มีคำแปลในภาษานี้"
+        : "Chưa có bản dịch cho ngôn ngữ này",
+    fallbackNoticeDesc:
+      locale === "id"
+        ? `Artikel ini belum tersedia dalam bahasa pilihan Anda. Kami menampilkan versi bahasa ${LOCALE_DISPLAY_NAMES[article.resolvedLocale] || article.resolvedLocale.toUpperCase()}.`
+        : locale === "en"
+        ? `This article is not yet translated into your selected language. Showing the ${LOCALE_DISPLAY_NAMES[article.resolvedLocale] || article.resolvedLocale.toUpperCase()} version.`
+        : locale === "ms"
+        ? `Artikel ini belum diterjemahkan ke dalam bahasa pilihan anda. Memaparkan versi ${LOCALE_DISPLAY_NAMES[article.resolvedLocale] || article.resolvedLocale.toUpperCase()}.`
+        : locale === "th"
+        ? `บทความนี้ยังไม่ได้แปลเป็นภาษาที่คุณเลือก กำลังแสดงเวอร์ชันภาษา ${LOCALE_DISPLAY_NAMES[article.resolvedLocale] || article.resolvedLocale.toUpperCase()}`
+        : `Bài viết này chưa được dịch sang ngôn ngữ bạn chọn. Đang hiển thị phiên bản tiếng ${LOCALE_DISPLAY_NAMES[article.resolvedLocale] || article.resolvedLocale.toUpperCase()}.`,
   };
 
   return (
@@ -276,8 +369,35 @@ export default function ArticleDetailPage({
           </nav>
         </div>
 
-        {/* Article Header & EEAT Credentials */}
+        {/* Article Container */}
         <article className="max-w-4xl mx-auto px-4 sm:px-6 pb-20">
+          {/* Language Fallback Notice if active locale has no translation */}
+          {!article.isExactLocale && (
+            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 sm:p-5 mb-8 text-xs sm:text-sm text-amber-900 flex items-start gap-3 shadow-2xs">
+              <Globe className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <p className="font-bold text-amber-950">
+                  {ui.fallbackNoticeTitle}
+                </p>
+                <p className="text-amber-800 leading-relaxed">
+                  {ui.fallbackNoticeDesc}
+                </p>
+                <div className="pt-2 flex flex-wrap items-center gap-2 text-xs">
+                  <span className="font-semibold text-amber-900">Bahasa yang tersedia:</span>
+                  {article.translations.map((t) => (
+                    <Link
+                      key={t.locale}
+                      href={t.locale === "id" ? `/blog/${article.slug}` : `/${t.locale}/blog/${article.slug}`}
+                      className="px-2.5 py-1 bg-white border border-amber-300 rounded-md font-semibold text-amber-900 hover:bg-amber-100 transition"
+                    >
+                      {LOCALE_DISPLAY_NAMES[t.locale] || t.locale.toUpperCase()}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
           <header className="space-y-4 mb-8">
             <div className="flex flex-wrap items-center gap-2">
               <span className="bg-[#D94E28] text-white text-xs font-bold px-3 py-1 rounded-md shadow-2xs">
@@ -300,82 +420,90 @@ export default function ArticleDetailPage({
                   <User className="w-4 h-4" />
                 </div>
                 <div>
-                  <span className="font-semibold text-[#1C1917] block">{article.author.name}</span>
-                  <span className="text-[11px] text-[#57534E]">{article.author.role}</span>
+                  <span className="font-semibold text-[#1C1917] block">{article.authorName}</span>
+                  {article.authorRole && (
+                    <span className="text-[11px] text-[#57534E]">{article.authorRole}</span>
+                  )}
                 </div>
               </div>
-              <span className="hidden sm:inline text-[#E7E5E4]">&bull;</span>
-              <div className="flex items-center gap-1.5">
-                <Calendar className="w-4 h-4 text-[#57534E]" />
-                <span>{formatDate(article.datePublished)}</span>
-                <span className="text-[#57534E]/60 text-xs">
-                  ({ui.updatedOn}: {formatDate(article.dateModified)})
-                </span>
-              </div>
+              {article.publishedAt && (
+                <>
+                  <span className="hidden sm:inline text-[#E7E5E4]">&bull;</span>
+                  <div className="flex items-center gap-1.5">
+                    <Calendar className="w-4 h-4 text-[#57534E]" />
+                    <span>{formatDate(article.publishedAt)}</span>
+                    <span className="text-[#57534E]/60 text-xs">
+                      ({ui.updatedOn}: {formatDate(article.updatedAt)})
+                    </span>
+                  </div>
+                </>
+              )}
               <span className="hidden sm:inline text-[#E7E5E4]">&bull;</span>
               <div className="flex items-center gap-1.5">
                 <Clock className="w-4 h-4 text-[#57534E]" />
-                <span>{article.readTime}</span>
+                <span>{article.readingTimeMin} min baca</span>
               </div>
             </div>
           </header>
 
-          {/* Featured Image with Semantic Alt & Caption */}
-          <figure className="mb-10">
-            <div className="w-full aspect-16/9 overflow-hidden rounded-3xl bg-stone-100 border border-[#E7E5E4] shadow-xs">
-              <img
-                src={article.image.url}
-                alt={article.image.alt}
-                width={article.image.width}
-                height={article.image.height}
-                className="w-full h-full object-cover"
-                loading="eager"
-              />
-            </div>
-            {article.image.caption && (
+          {/* Featured Cover Image with Semantic Alt */}
+          {article.coverImage && (
+            <figure className="mb-10">
+              <div className="w-full aspect-16/9 overflow-hidden rounded-3xl bg-stone-100 border border-[#E7E5E4] shadow-xs">
+                <img
+                  src={article.coverImage}
+                  alt={article.coverAlt}
+                  width={1200}
+                  height={675}
+                  className="w-full h-full object-cover"
+                  loading="eager"
+                />
+              </div>
               <figcaption className="text-xs text-[#57534E] text-center mt-2.5 italic">
-                {article.image.caption}
+                {article.coverAlt}
               </figcaption>
-            )}
-          </figure>
+            </figure>
+          )}
 
           {/* AEO Direct Answer & Key Takeaways Highlight Box */}
-          <div className="bg-[#FDF0EC] border border-[#FADCD3] rounded-3xl p-6 sm:p-8 mb-12 shadow-2xs space-y-4">
-            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#D94E28] uppercase tracking-wider">
-              <Sparkles className="w-4 h-4" />
-              <span>{ui.quickAnswer}</span>
-            </div>
-            <p className="text-sm sm:text-base text-[#1C1917] font-medium leading-relaxed">
-              {article.directAnswer}
-            </p>
-            {article.keyTakeaways && article.keyTakeaways.length > 0 && (
-              <div className="pt-2 border-t border-[#FADCD3]/60 space-y-2">
-                <span className="text-xs font-bold text-[#1C1917] block">
-                  {ui.keyTakeawaysTitle}
-                </span>
-                <ul className="space-y-2 text-xs sm:text-sm text-[#57534E]">
-                  {article.keyTakeaways.map((point, idx) => (
-                    <li key={idx} className="flex items-start gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-[#D94E28] shrink-0 mt-0.5" />
-                      <span>{point}</span>
-                    </li>
-                  ))}
-                </ul>
+          {parsed.directAnswer && (
+            <div className="bg-[#FDF0EC] border border-[#FADCD3] rounded-3xl p-6 sm:p-8 mb-12 shadow-2xs space-y-4">
+              <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#D94E28] uppercase tracking-wider">
+                <Sparkles className="w-4 h-4" />
+                <span>{ui.quickAnswer}</span>
               </div>
-            )}
-          </div>
+              <p className="text-sm sm:text-base text-[#1C1917] font-medium leading-relaxed">
+                {parsed.directAnswer}
+              </p>
+              {parsed.keyTakeaways && parsed.keyTakeaways.length > 0 && (
+                <div className="pt-2 border-t border-[#FADCD3]/60 space-y-2">
+                  <span className="text-xs font-bold text-[#1C1917] block">
+                    {ui.keyTakeawaysTitle}
+                  </span>
+                  <ul className="space-y-2 text-xs sm:text-sm text-[#57534E]">
+                    {parsed.keyTakeaways.map((point, idx) => (
+                      <li key={idx} className="flex items-start gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-[#D94E28] shrink-0 mt-0.5" />
+                        <span>{point}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* GEO / AEO Comparison Table if provided */}
-          {article.table && (
+          {parsed.table && (
             <div className="my-10 space-y-3">
               <h3 className="text-lg font-bold text-[#1C1917]">
-                {article.table.caption}
+                {parsed.table.caption}
               </h3>
               <div className="overflow-x-auto rounded-2xl border border-[#E7E5E4] bg-white shadow-2xs">
                 <table className="w-full text-left text-xs sm:text-sm border-collapse">
                   <thead>
                     <tr className="bg-[#FAF8F5] border-b border-[#E7E5E4]">
-                      {article.table.headers.map((h, i) => (
+                      {parsed.table.headers.map((h, i) => (
                         <th
                           key={i}
                           className={`p-3.5 sm:p-4 font-bold text-[#1C1917] ${
@@ -388,7 +516,7 @@ export default function ArticleDetailPage({
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#E7E5E4]">
-                    {article.table.rows.map((row, rIdx) => (
+                    {parsed.table.rows.map((row, rIdx) => (
                       <tr key={rIdx} className="hover:bg-stone-50/60 transition">
                         {row.map((cell, cIdx) => (
                           <td
@@ -409,35 +537,37 @@ export default function ArticleDetailPage({
           )}
 
           {/* Main Article Sections with Semantic H2 and Paragraphs */}
-          <div className="space-y-10 my-10">
-            {article.sections.map((section, idx) => (
-              <section key={idx} className="space-y-4">
-                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1C1917] pt-2">
-                  {section.heading}
-                </h2>
-                {section.directAnswer && (
-                  <p className="text-sm sm:text-base font-semibold text-[#D94E28] bg-[#FDF0EC]/50 p-4 rounded-xl border border-[#FADCD3]/40">
-                    {section.directAnswer}
-                  </p>
-                )}
-                {section.content.map((p, pIdx) => (
-                  <p key={pIdx} className="text-sm sm:text-base text-[#57534E] leading-relaxed">
-                    {p}
-                  </p>
-                ))}
-                {section.bulletPoints && section.bulletPoints.length > 0 && (
-                  <ul className="space-y-2 pl-4 text-sm sm:text-base text-[#57534E] list-disc list-inside">
-                    {section.bulletPoints.map((bp, bIdx) => (
-                      <li key={bIdx}>{bp}</li>
-                    ))}
-                  </ul>
-                )}
-              </section>
-            ))}
-          </div>
+          {parsed.sections && parsed.sections.length > 0 && (
+            <div className="space-y-10 my-10">
+              {parsed.sections.map((section, idx) => (
+                <section key={idx} className="space-y-4">
+                  <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1C1917] pt-2">
+                    {section.heading}
+                  </h2>
+                  {section.directAnswer && (
+                    <p className="text-sm sm:text-base font-semibold text-[#D94E28] bg-[#FDF0EC]/50 p-4 rounded-xl border border-[#FADCD3]/40">
+                      {section.directAnswer}
+                    </p>
+                  )}
+                  {section.content.map((p, pIdx) => (
+                    <p key={pIdx} className="text-sm sm:text-base text-[#57534E] leading-relaxed">
+                      {p}
+                    </p>
+                  ))}
+                  {section.bulletPoints && section.bulletPoints.length > 0 && (
+                    <ul className="space-y-2 pl-4 text-sm sm:text-base text-[#57534E] list-disc list-inside">
+                      {section.bulletPoints.map((bp, bIdx) => (
+                        <li key={bIdx}>{bp}</li>
+                      ))}
+                    </ul>
+                  )}
+                </section>
+              ))}
+            </div>
+          )}
 
           {/* AEO/AIO FAQ Section */}
-          {article.faqs && article.faqs.length > 0 && (
+          {parsed.faqs && parsed.faqs.length > 0 && (
             <section className="my-14 pt-8 border-t border-[#E7E5E4] space-y-6">
               <div className="flex items-center gap-2">
                 <HelpCircle className="w-5 h-5 text-[#D94E28]" />
@@ -446,7 +576,7 @@ export default function ArticleDetailPage({
                 </h2>
               </div>
               <div className="space-y-4">
-                {article.faqs.map((faq, fIdx) => (
+                {parsed.faqs.map((faq, fIdx) => (
                   <div
                     key={fIdx}
                     className="bg-white border border-[#E7E5E4] rounded-2xl p-5 sm:p-6 shadow-2xs space-y-2"
@@ -473,10 +603,12 @@ export default function ArticleDetailPage({
                 E
               </div>
               <div className="space-y-1">
-                <h3 className="text-lg font-bold text-[#1C1917]">{article.author.name}</h3>
-                <p className="text-xs font-semibold text-[#D94E28]">{article.author.role}</p>
+                <h3 className="text-lg font-bold text-[#1C1917]">{article.authorName}</h3>
+                {article.authorRole && (
+                  <p className="text-xs font-semibold text-[#D94E28]">{article.authorRole}</p>
+                )}
                 <p className="text-xs text-[#57534E] leading-relaxed">
-                  {article.author.bio}
+                  Praktisi e-commerce dan arsitek transaksi chat dengan rekam jejak membantu lebih dari 10.000 kreator di Asia Tenggara memaksimalkan margin keuntungan.
                 </p>
               </div>
             </div>

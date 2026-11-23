@@ -330,3 +330,38 @@ model Withdrawal {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
+
+// --- GLOBAL SAAS PLATFORM BLOG & MULTI-LANGUAGE TRANSLATIONS ---
+model Post {
+  id           String            @id @default(cuid())
+  slug         String            @unique
+  category     String
+  coverImage   String?
+  authorName   String
+  authorRole   String?
+  isPublished  Boolean           @default(false)
+  publishedAt  DateTime?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  translations PostTranslation[]
+}
+
+model PostTranslation {
+  id             String   @id @default(cuid())
+  postId         String
+  post           Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  locale         String   // "id" | "en" | "ms" | "th" | "vi"
+  title          String
+  excerpt        String   @db.Text
+  content        String   @db.Text
+  coverAlt       String?
+  seoTitle       String?
+  seoDescription String?  @db.Text
+  readingTimeMin Int      @default(4)
+  isPublished    Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([postId, locale])
+  @@index([locale, isPublished])
+}

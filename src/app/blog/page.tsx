@@ -2,12 +2,12 @@ import React from "react";
 import { Metadata } from "next";
 import { GlobalHeader } from "@/components/saas/GlobalHeader";
 import { GlobalFooter } from "@/components/saas/GlobalFooter";
-import { BlogListClient } from "@/components/blog/BlogListClient";
+import { BlogListClient, BlogListItemProps } from "@/components/blog/BlogListClient";
 import { BookOpen } from "lucide-react";
 import {
-  getAllArticles,
-  getAllCategories,
-} from "@/lib/blog/articles-data";
+  getPublishedPostsByLocale,
+  getPublishedCategories,
+} from "@/lib/queries/blog";
 import {
   generateLocalizedMetadata,
   generateBreadcrumbJsonLd,
@@ -20,6 +20,8 @@ interface BlogPageProps {
     lang?: string;
   };
 }
+
+export const revalidate = 60; // Revalidate at most every 60 seconds
 
 export async function generateMetadata({
   searchParams,
@@ -49,8 +51,8 @@ export async function generateMetadata({
   return generateLocalizedMetadata({
     path: "/blog",
     locale,
-    title: titles[locale],
-    description: descriptions[locale],
+    title: titles[locale] || titles.id,
+    description: descriptions[locale] || descriptions.id,
     imageUrl: `${BASE_URL}/og-preview.png`,
     type: "website",
     keywords: [
@@ -63,15 +65,29 @@ export async function generateMetadata({
   });
 }
 
-export default function BlogPage({ searchParams }: BlogPageProps) {
+export default async function BlogPage({ searchParams }: BlogPageProps) {
   const rawLang = searchParams?.lang;
   const locale: SupportedLocale =
     rawLang && (SUPPORTED_LOCALES as readonly string[]).includes(rawLang)
       ? (rawLang as SupportedLocale)
       : "id";
 
-  const articles = getAllArticles(locale);
-  const categories = getAllCategories(locale);
+  // Query posts and categories directly from PostgreSQL database with language fallback
+  const dbPosts = await getPublishedPostsByLocale(locale);
+  const dbCategories = await getPublishedCategories();
+
+  const allLabel =
+    locale === "id"
+      ? "Semua"
+      : locale === "en"
+      ? "All"
+      : locale === "ms"
+      ? "Semua"
+      : locale === "th"
+      ? "ทั้งหมด"
+      : "Tất cả";
+
+  const categories = [allLabel, ...dbCategories];
 
   const heroCopy: Record<
     SupportedLocale,
@@ -133,20 +149,38 @@ export default function BlogPage({ searchParams }: BlogPageProps) {
       url: BASE_URL,
       logo: `${BASE_URL}/favicon.svg`,
     },
-    blogPost: articles.map((a) => ({
+    blogPost: dbPosts.map((a) => ({
       "@type": "BlogPosting",
       headline: a.title,
-      description: a.summary,
+      description: a.excerpt,
       url: `${BASE_URL}${locale === "id" ? "" : `/${locale}`}/blog/${a.slug}`,
-      datePublished: a.datePublished,
-      dateModified: a.dateModified,
-      image: a.image.url,
+      datePublished: a.publishedAt?.toISOString(),
+      dateModified: a.updatedAt.toISOString(),
+      image: a.coverImage || `${BASE_URL}/og-preview.png`,
       author: {
         "@type": "Organization",
-        name: a.author.name,
+        name: a.authorName,
       },
     })),
   };
+
+  // Convert Date objects to strings for Client Component
+  const serializableArticles: BlogListItemProps[] = dbPosts.map((p) => ({
+    id: p.id,
+    slug: p.slug,
+    title: p.title,
+    excerpt: p.excerpt,
+    category: p.category,
+    readingTimeMin: p.readingTimeMin,
+    publishedAt: p.publishedAt ? p.publishedAt.toISOString() : null,
+    coverImage: p.coverImage,
+    coverAlt: p.coverAlt,
+    authorName: p.authorName,
+    authorRole: p.authorRole,
+    resolvedLocale: p.resolvedLocale,
+    isExactLocale: p.isExactLocale,
+    availableLocales: p.availableLocales,
+  }));
 
   return (
     <div className="flex flex-col min-h-screen bg-[#FAF8F5] text-[#1C1917]">
@@ -190,7 +224,7 @@ export default function BlogPage({ searchParams }: BlogPageProps) {
       {/* Articles Grid with Interactive Filter Client */}
       <section className="pb-24 px-4 sm:px-6 max-w-6xl mx-auto w-full">
         <BlogListClient
-          articles={articles}
+          articles={serializableArticles}
           categories={categories}
           locale={locale}
           readMoreLabel={copy.readMore}

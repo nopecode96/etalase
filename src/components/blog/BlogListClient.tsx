@@ -2,29 +2,28 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Calendar, Clock, ArrowRight, User } from "lucide-react";
+import { Calendar, Clock, ArrowRight, User, Globe } from "lucide-react";
 import { SupportedLocale } from "@/lib/config/constants";
 
-interface ArticleItem {
+export interface BlogListItemProps {
+  id: string;
   slug: string;
   title: string;
-  summary: string;
+  excerpt: string;
   category: string;
-  readTime: string;
-  datePublished: string;
-  image: {
-    url: string;
-    alt: string;
-    caption: string;
-  };
-  author: {
-    name: string;
-    role: string;
-  };
+  readingTimeMin: number;
+  publishedAt: string | null;
+  coverImage: string | null;
+  coverAlt: string;
+  authorName: string;
+  authorRole: string | null;
+  resolvedLocale: string;
+  isExactLocale: boolean;
+  availableLocales: string[];
 }
 
 interface BlogListClientProps {
-  articles: ArticleItem[];
+  articles: BlogListItemProps[];
   categories: string[];
   locale: SupportedLocale;
   readMoreLabel: string;
@@ -47,7 +46,8 @@ export function BlogListClient({
     return locale === "id" ? `/blog/${slug}` : `/${locale}/blog/${slug}`;
   };
 
-  const formatDate = (isoDate: string) => {
+  const formatDate = (isoDate: string | null) => {
+    if (!isoDate) return "";
     try {
       return new Date(isoDate).toLocaleDateString(
         locale === "id"
@@ -64,6 +64,14 @@ export function BlogListClient({
     } catch {
       return isoDate;
     }
+  };
+
+  const localeNames: Record<string, string> = {
+    id: "ID",
+    en: "EN",
+    ms: "MS",
+    th: "TH",
+    vi: "VI",
   };
 
   return (
@@ -98,16 +106,27 @@ export function BlogListClient({
               {/* Image Container with Stable Aspect Ratio & Semantic Alt */}
               <div className="w-full aspect-16/9 overflow-hidden bg-stone-100 relative">
                 <img
-                  src={item.image.url}
-                  alt={item.image.alt}
+                  src={
+                    item.coverImage ||
+                    "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=1200&q=80"
+                  }
+                  alt={item.coverAlt}
                   loading="lazy"
                   width={600}
                   height={338}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
-                <span className="absolute top-3 left-3 bg-[#D94E28] text-white text-[11px] font-bold px-3 py-1 rounded-md shadow-xs">
-                  {item.category}
-                </span>
+                <div className="absolute top-3 left-3 flex items-center gap-2">
+                  <span className="bg-[#D94E28] text-white text-[11px] font-bold px-3 py-1 rounded-md shadow-xs">
+                    {item.category}
+                  </span>
+                  {!item.isExactLocale && (
+                    <span className="inline-flex items-center gap-1 bg-white/95 text-amber-800 text-[10px] font-bold px-2 py-1 rounded-md shadow-xs border border-amber-200">
+                      <Globe className="w-3 h-3 text-amber-600" />
+                      <span>{localeNames[item.resolvedLocale] || item.resolvedLocale.toUpperCase()} Version</span>
+                    </span>
+                  )}
+                </div>
               </div>
 
               {/* Text Info */}
@@ -115,17 +134,21 @@ export function BlogListClient({
                 <div className="flex flex-wrap items-center gap-3 text-[11px] text-[#57534E]">
                   <span className="flex items-center gap-1">
                     <User className="w-3.5 h-3.5 text-[#D94E28]" />
-                    <span className="font-medium text-[#1C1917]">{item.author.name}</span>
+                    <span className="font-medium text-[#1C1917]">{item.authorName}</span>
                   </span>
-                  <span>&bull;</span>
-                  <span className="flex items-center gap-1">
-                    <Calendar className="w-3.5 h-3.5" />
-                    <span>{formatDate(item.datePublished)}</span>
-                  </span>
+                  {item.publishedAt && (
+                    <>
+                      <span>&bull;</span>
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-3.5 h-3.5" />
+                        <span>{formatDate(item.publishedAt)}</span>
+                      </span>
+                    </>
+                  )}
                   <span>&bull;</span>
                   <span className="flex items-center gap-1">
                     <Clock className="w-3.5 h-3.5" />
-                    <span>{item.readTime}</span>
+                    <span>{item.readingTimeMin} min baca</span>
                   </span>
                 </div>
 
@@ -134,16 +157,33 @@ export function BlogListClient({
                 </h2>
 
                 <p className="text-xs sm:text-sm text-[#57534E] leading-relaxed line-clamp-3">
-                  {item.summary}
+                  {item.excerpt}
                 </p>
               </div>
             </div>
 
-            <div className="px-6 pb-6 sm:px-8 sm:pb-8 pt-0">
+            <div className="px-6 pb-6 sm:px-8 sm:pb-8 pt-0 flex items-center justify-between">
               <span className="inline-flex items-center text-xs font-bold text-[#D94E28] gap-1.5 group-hover:gap-2.5 transition-all">
                 <span>{readMoreLabel}</span>
                 <ArrowRight className="w-4 h-4" />
               </span>
+
+              {item.availableLocales.length > 1 && (
+                <div className="flex items-center gap-1 text-[10px] font-mono text-[#57534E]">
+                  {item.availableLocales.map((loc) => (
+                    <span
+                      key={loc}
+                      className={`px-1.5 py-0.5 rounded ${
+                        loc === item.resolvedLocale
+                          ? "bg-[#FDF0EC] text-[#D94E28] font-bold"
+                          : "text-stone-400"
+                      }`}
+                    >
+                      {loc.toUpperCase()}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           </Link>
         ))}
