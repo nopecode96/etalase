@@ -153,7 +153,7 @@ export default function FreeToolsPage() {
                   Kalkulator Potongan Marketplace vs Direct Storefront
                 </h2>
                 <p className="text-slate-600 text-sm mt-1">
-                  Bandingkan berapa juta rupiah yang bisa Anda hemat tiap bulan dengan direct checkout di etalase.online (0.7% Borderpay QRIS) vs potongan 10–12% marketplace.
+                  Bandingkan berapa juta rupiah yang bisa Anda hemat tiap bulan dengan direct checkout di etalase.online (0.7% QRIS Instan) vs potongan 10–12% marketplace.
                 </p>
               </div>
 

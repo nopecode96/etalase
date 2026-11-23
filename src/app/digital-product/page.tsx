@@ -63,7 +63,7 @@ export default function DigitalProductPage() {
               </div>
               <h3 className="text-lg font-bold text-slate-900">Auto-Delivery WhatsApp</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                n8n &amp; Fonnte langsung menembakkan struk lunas dan tautan akses eksklusif ke nomor WhatsApp pembeli secara otomatis.
+                Sistem WhatsApp langsung mengirimkan struk lunas dan tautan akses eksklusif ke nomor WhatsApp pembeli secara otomatis.
               </p>
             </div>
           </ScrollReveal>
@@ -89,7 +89,7 @@ export default function DigitalProductPage() {
                 <ul className="space-y-2 text-emerald-900">
                   <li>• Notifikasi instan masuk ke WhatsApp pembeli dalam 3 detik.</li>
                   <li>• 100% otomatis 24 jam nonstop bahkan saat Anda sedang tidur.</li>
-                  <li>• Komisi terendah: Borderpay QRIS 0.7%, saldo masuk wallet real-time.</li>
+                  <li>• Biaya terendah: Pembayaran QRIS Instan 0.7%, saldo masuk wallet real-time.</li>
                 </ul>
               </div>
             </div>

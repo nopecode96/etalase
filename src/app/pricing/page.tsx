@@ -65,7 +65,7 @@ export default function PricingPage() {
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Checkout Otomatis Borderpay QRIS &amp; PayPal</span>
+                  <span>Checkout Otomatis Pembayaran QRIS Instan &amp; PayPal</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -125,7 +125,7 @@ export default function PricingPage() {
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span><strong>WhatsApp Cart Recovery Otomatis</strong> (Follow-up 30 menit n8n)</span>
+                  <span><strong>WhatsApp Cart Recovery Otomatis</strong> (Follow-up 30 menit otomatis)</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0" />

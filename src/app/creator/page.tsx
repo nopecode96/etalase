@@ -43,7 +43,7 @@ export default function CreatorPage() {
                 Instant Digital Delivery via WhatsApp
               </h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Begitu pembeli membayar via Borderpay QRIS atau PayPal, workflow n8n otomatis mengirim file download atau link Zoom ke WhatsApp pembeli secara instan tanpa delay email spam.
+                Begitu pembeli membayar via Pembayaran QRIS Instan atau PayPal, sistem otomatis mengirim file download atau link Zoom ke WhatsApp pembeli secara instan tanpa delay email spam.
               </p>
             </div>
           </ScrollReveal>

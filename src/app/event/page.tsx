@@ -62,7 +62,7 @@ export default function EventPage() {
               </div>
               <h3 className="text-lg font-bold text-slate-900">Pengingat Jadwal Otomatis</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Workflow n8n otomatis mengingatkan peserta H-1 dan 1 jam sebelum event dimulai agar tingkat kehadiran maksimal.
+                Sistem otomatis mengingatkan peserta H-1 dan 1 jam sebelum event dimulai agar tingkat kehadiran maksimal.
               </p>
             </div>
           </ScrollReveal>

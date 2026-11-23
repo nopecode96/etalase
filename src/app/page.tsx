@@ -12,12 +12,14 @@ import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import {
   ArrowRight,
   Zap,
-  MessageCircle,
+  ShoppingBag,
   Calendar,
-  Users,
-  CheckCircle2,
+  Layers,
   ChevronRight,
   Sparkles,
+  Globe,
+  Store,
+  FileText,
 } from "lucide-react";
 
 export default function HomePage() {
@@ -31,207 +33,252 @@ export default function HomePage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#FAFAF9] text-slate-800 selection:bg-blue-600 selection:text-white">
-      {/* Unified Marketing Navbar */}
+    <div className="flex flex-col min-h-screen bg-white text-[#111C1B] selection:bg-[#0F766E] selection:text-white">
+      {/* Unified Minimalist Marketing Navbar */}
       <MarketingNavbar />
 
-      {/* Hero Section with Split 2-Column & Product Inside Hero */}
-      <section className="pt-12 sm:pt-20 pb-16 px-4 sm:px-6 max-w-7xl mx-auto w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-          {/* Left Column: Copywriting & Instant Slug Claim */}
-          <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
-            <ScrollReveal direction="up" delay={50}>
-              <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-200/80 text-blue-700 px-3.5 py-1.5 rounded-full text-xs font-semibold">
-                <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-                <span>All-in-One Bio Link &amp; Chat Commerce Asia Tenggara</span>
-              </div>
-            </ScrollReveal>
-
-            <ScrollReveal direction="up" delay={120}>
-              <h1 className="text-4xl sm:text-6xl font-black text-slate-900 tracking-tight leading-[1.1]">
-                Satu Link Bio untuk Semua Penjualan{" "}
-                <span className="text-blue-600">TikTok, IG &amp; WhatsApp</span> Anda.
-              </h1>
-            </ScrollReveal>
-
-            <ScrollReveal direction="up" delay={200}>
-              <p className="text-slate-600 text-base sm:text-lg max-w-xl mx-auto lg:mx-0 leading-relaxed">
-                Jual file digital dengan auto-delivery WhatsApp instan, terima pembayaran QRIS otomatis, rekomendasikan Keranjang Kuning, dan dapatkan pesanan chat dengan <strong>0% komisi platform</strong>.
-              </p>
-            </ScrollReveal>
-
-            {/* 1-Step Instant Username Claimer Form */}
-            <ScrollReveal direction="up" delay={260}>
-              <form
-                onSubmit={handleClaim}
-                className="max-w-md mx-auto lg:mx-0 bg-white border border-slate-200 rounded-2xl p-2 shadow-lg shadow-slate-200/50 flex flex-col sm:flex-row items-center gap-2"
-              >
-                <div className="flex items-center w-full px-3 py-2 text-sm text-slate-500 font-mono">
-                  <span className="text-slate-400 select-none">etalase.online/</span>
-                  <input
-                    type="text"
-                    placeholder="namamu"
-                    value={claimSlug}
-                    onChange={(e) => setClaimSlug(e.target.value)}
-                    className="w-full bg-transparent text-slate-900 font-bold focus:outline-none ml-0.5 placeholder:text-slate-300"
-                  />
+      {/* Hero Section - Soft Mist Background (#F4F8F7) with 2-Column Clean Layout */}
+      <section className="bg-[#F4F8F7] border-b border-[#E2ECEA] pt-16 sm:pt-20 lg:pt-24 pb-20 lg:pb-28 px-4 sm:px-6">
+        <div className="max-w-6xl mx-auto w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-center">
+            {/* Left Column: Focused Copywriting & Inline Claim Input Bar */}
+            <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
+              <ScrollReveal direction="up" delay={50}>
+                <div className="inline-flex items-center gap-2 bg-[#E6F4F1] border border-[#C4E5DF] text-[#0F766E] px-3.5 py-1.5 rounded-full text-xs font-semibold">
+                  <Sparkles className="w-3.5 h-3.5 text-[#0F766E]" />
+                  <span>Bio Link &amp; Etalase Jualan Asia Tenggara</span>
                 </div>
-                <button
-                  type="submit"
-                  className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white font-semibold px-6 py-3 rounded-xl text-xs transition shrink-0 shadow-sm flex items-center justify-center gap-1.5"
+              </ScrollReveal>
+
+              <ScrollReveal direction="up" delay={120}>
+                <h1 className="text-4xl sm:text-5xl lg:text-5xl font-bold text-[#111C1B] tracking-tight leading-[1.15]">
+                  Satu Link Etalase untuk Semua Jualan Anda.
+                </h1>
+              </ScrollReveal>
+
+              <ScrollReveal direction="up" delay={180}>
+                <p className="text-[#526664] text-base sm:text-lg max-w-xl mx-auto lg:mx-0 leading-relaxed">
+                  Jual produk digital, pajang katalog fisik, tautkan keranjang kuning, atau terima pesanan langsung ke WhatsApp. Siap pakai dalam hitungan menit.
+                </p>
+              </ScrollReveal>
+
+              {/* Inline Claim Input Bar (Seamless Lynk.id style) */}
+              <ScrollReveal direction="up" delay={240}>
+                <form
+                  onSubmit={handleClaim}
+                  className="max-w-md mx-auto lg:mx-0 bg-white border border-[#E2ECEA] rounded-2xl p-1.5 shadow-sm focus-within:border-[#0F766E] focus-within:ring-2 focus-within:ring-[#0F766E]/20 transition-all flex items-center justify-between"
                 >
-                  <span>Klaim Link</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </form>
-            </ScrollReveal>
+                  <div className="flex items-center w-full px-3 py-2 text-sm text-[#526664]">
+                    <span className="text-[#526664]/60 font-medium select-none text-xs sm:text-sm">
+                      etalase.online/
+                    </span>
+                    <input
+                      type="text"
+                      placeholder="namamu"
+                      value={claimSlug}
+                      onChange={(e) => setClaimSlug(e.target.value)}
+                      className="w-full bg-transparent text-[#111C1B] font-semibold focus:outline-none ml-1 placeholder:text-[#526664]/40 text-sm"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="bg-[#0F766E] hover:bg-[#115E59] text-white font-semibold px-5 sm:px-6 py-3 rounded-xl text-xs sm:text-sm transition-colors shrink-0 shadow-xs flex items-center gap-1.5"
+                  >
+                    <span>Klaim Gratis</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </form>
+              </ScrollReveal>
 
-            <ScrollReveal direction="up" delay={320}>
-              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-5 text-xs text-slate-500 pt-1">
-                <span className="flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  <span>0% Komisi Order Chat</span>
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  <span>Auto-Kirim WA via n8n</span>
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              {/* Micro-trust line (Calm, 0 rainbow colors) */}
+              <ScrollReveal direction="up" delay={300}>
+                <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 text-xs text-[#526664] pt-1 font-medium">
                   <span>Gratis Selamanya</span>
-                </span>
-              </div>
-            </ScrollReveal>
-          </div>
+                  <span className="text-[#E2ECEA]">•</span>
+                  <span>0% Komisi Order Chat</span>
+                  <span className="text-[#E2ECEA]">•</span>
+                  <span>Kirim Otomatis ke WhatsApp</span>
+                </div>
+              </ScrollReveal>
+            </div>
 
-          {/* Right Column: Live Interactive Smartphone Mockup with Floating Badges */}
-          <div className="lg:col-span-5 flex justify-center">
-            <ScrollReveal direction="none" delay={250}>
-              <HeroProductMockup />
-            </ScrollReveal>
+            {/* Right Column: 1 Clean Phone Mockup (Zero Overlapping Badges) */}
+            <div className="lg:col-span-5 flex justify-center">
+              <ScrollReveal direction="none" delay={200}>
+                <HeroProductMockup />
+              </ScrollReveal>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Infinite Horizontal Scrolling Cards (Creator Marquee) */}
-      <section className="py-8 bg-white border-y border-slate-200/80">
-        <div className="max-w-7xl mx-auto px-4 text-center mb-2">
-          <ScrollReveal direction="up" delay={100}>
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-              Digunakan Kreator, Coach &amp; Pebisnis di Seluruh Asia Tenggara
+      {/* Social Proof / Creator Marquee Section */}
+      <section className="py-10 bg-white border-b border-[#E2ECEA]">
+        <div className="max-w-6xl mx-auto px-4 text-center mb-4">
+          <ScrollReveal direction="up" delay={80}>
+            <span className="text-xs font-bold uppercase tracking-wider text-[#526664]">
+              Dipercaya Kreator, Coach &amp; Pebisnis di Seluruh Asia Tenggara
             </span>
           </ScrollReveal>
         </div>
         <CreatorMarquee />
       </section>
 
-      {/* Multi-Page Feature Pillars Section */}
-      <section className="py-24 px-4 sm:px-6 max-w-7xl mx-auto w-full">
+      {/* Feature Section: "Lebih dari Sekadar Link di Bio" */}
+      <section className="py-20 lg:py-28 px-4 sm:px-6 max-w-6xl mx-auto w-full">
         <ScrollReveal direction="up" delay={100}>
           <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
-              Ekosistem Monetisasi Terlengkap
+            <span className="text-xs font-bold uppercase tracking-wider text-[#0F766E] bg-[#E6F4F1] border border-[#C4E5DF] px-3 py-1 rounded-full">
+              Fitur Lengkap
             </span>
-            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
-              Semua Fitur Monetisasi dalam Satu Genggaman
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#111C1B] tracking-tight">
+              Lebih dari Sekadar Link di Bio
             </h2>
-            <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-              Bukan sekadar daftar link statis, melainkan platform penjualan visual berkonversi tinggi:
+            <p className="text-[#526664] text-sm sm:text-base leading-relaxed">
+              Satu platform dengan ekosistem jualan lengkap yang dirancang khusus untuk mempermudah transaksi langsung dan closing di Asia Tenggara.
             </p>
           </div>
         </ScrollReveal>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Card 1: Produk Digital */}
-          <ScrollReveal direction="up" delay={150}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Card 1: Produk Digital & Auto-WA */}
+          <ScrollReveal direction="up" delay={120}>
             <Link
               href="/digital-product"
-              className="h-full group bg-white border border-slate-200 hover:border-blue-300 hover:shadow-xl hover:shadow-slate-200/60 rounded-3xl p-7 transition-all duration-300 flex flex-col justify-between"
+              className="h-full group bg-white border border-[#E2ECEA] hover:border-[#0F766E]/40 hover:shadow-lg rounded-3xl p-8 transition-all duration-300 flex flex-col justify-between shadow-xs"
             >
-              <div className="space-y-4">
-                <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <div>
+                <div className="w-12 h-12 rounded-2xl bg-[#E6F4F1] text-[#0F766E] flex items-center justify-center mb-5 group-hover:scale-105 transition-transform">
                   <Zap className="w-6 h-6" />
                 </div>
-                <h3 className="text-lg font-bold text-slate-900 group-hover:text-blue-600 transition">
-                  Produk Digital &amp; E-Learning
+                <h3 className="text-lg font-bold text-[#111C1B] group-hover:text-[#0F766E] transition-colors mb-2.5">
+                  Produk Digital &amp; Auto-WA
                 </h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Jual e-book, template Canva/Notion, preset foto, dan video modul dengan auto-delivery WhatsApp instan via n8n.
+                <p className="text-xs sm:text-sm text-[#526664] leading-relaxed">
+                  Jual e-book, template Canva/Notion, preset foto, dan video course dengan pengiriman file dan invoice otomatis langsung ke WhatsApp pembeli.
                 </p>
               </div>
-              <div className="pt-6 flex items-center text-xs font-bold text-blue-600 gap-1">
+              <div className="pt-6 flex items-center text-xs font-semibold text-[#0F766E] gap-1">
                 <span>Pelajari Fitur</span>
                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
             </Link>
           </ScrollReveal>
 
-          {/* Card 2: Event & Webinar */}
-          <ScrollReveal direction="up" delay={250}>
+          {/* Card 2: Katalog Fisik & Showroom */}
+          <ScrollReveal direction="up" delay={180}>
             <Link
-              href="/event"
-              className="h-full group bg-white border border-slate-200 hover:border-emerald-300 hover:shadow-xl hover:shadow-slate-200/60 rounded-3xl p-7 transition-all duration-300 flex flex-col justify-between"
+              href="/sales"
+              className="h-full group bg-white border border-[#E2ECEA] hover:border-[#0F766E]/40 hover:shadow-lg rounded-3xl p-8 transition-all duration-300 flex flex-col justify-between shadow-xs"
             >
-              <div className="space-y-4">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Calendar className="w-6 h-6" />
+              <div>
+                <div className="w-12 h-12 rounded-2xl bg-[#E6F4F1] text-[#0F766E] flex items-center justify-center mb-5 group-hover:scale-105 transition-transform">
+                  <Store className="w-6 h-6" />
                 </div>
-                <h3 className="text-lg font-bold text-slate-900 group-hover:text-emerald-600 transition">
-                  Tiket Event &amp; Webinar
+                <h3 className="text-lg font-bold text-[#111C1B] group-hover:text-[#0F766E] transition-colors mb-2.5">
+                  Katalog Fisik &amp; Showroom
                 </h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Registrasi tiket webinar online &amp; acara offline dengan auto-kirim link Zoom/GMeet dan reminder jadwal.
+                <p className="text-xs sm:text-sm text-[#526664] leading-relaxed">
+                  Tampilkan unit mobil, properti, pakaian, atau menu kuliner lengkap dengan foto tajam, spesifikasi, dan tombol chat konsultasi langsung.
                 </p>
               </div>
-              <div className="pt-6 flex items-center text-xs font-bold text-emerald-600 gap-1">
+              <div className="pt-6 flex items-center text-xs font-semibold text-[#0F766E] gap-1">
                 <span>Pelajari Fitur</span>
                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
             </Link>
           </ScrollReveal>
 
-          {/* Card 3: Konsultasi 1-on-1 */}
-          <ScrollReveal direction="up" delay={350}>
-            <Link
-              href="/consultation"
-              className="h-full group bg-white border border-slate-200 hover:border-amber-300 hover:shadow-xl hover:shadow-slate-200/60 rounded-3xl p-7 transition-all duration-300 flex flex-col justify-between"
-            >
-              <div className="space-y-4">
-                <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <MessageCircle className="w-6 h-6" />
-                </div>
-                <h3 className="text-lg font-bold text-slate-900 group-hover:text-amber-600 transition">
-                  Konsultasi &amp; Booking 1-on-1
-                </h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Buka sesi mentoring, review portfolio, atau konsultasi privat via Google Meet dengan pemilihan slot waktu instan.
-                </p>
-              </div>
-              <div className="pt-6 flex items-center text-xs font-bold text-amber-600 gap-1">
-                <span>Pelajari Fitur</span>
-                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </div>
-            </Link>
-          </ScrollReveal>
-
-          {/* Card 4: Afiliasi */}
-          <ScrollReveal direction="up" delay={450}>
+          {/* Card 3: Affiliate Keranjang Kuning */}
+          <ScrollReveal direction="up" delay={240}>
             <Link
               href="/affiliate"
-              className="h-full group bg-white border border-slate-200 hover:border-purple-300 hover:shadow-xl hover:shadow-slate-200/60 rounded-3xl p-7 transition-all duration-300 flex flex-col justify-between"
+              className="h-full group bg-white border border-[#E2ECEA] hover:border-[#0F766E]/40 hover:shadow-lg rounded-3xl p-8 transition-all duration-300 flex flex-col justify-between shadow-xs"
             >
-              <div className="space-y-4">
-                <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Users className="w-6 h-6" />
+              <div>
+                <div className="w-12 h-12 rounded-2xl bg-[#E6F4F1] text-[#0F766E] flex items-center justify-center mb-5 group-hover:scale-105 transition-transform">
+                  <ShoppingBag className="w-6 h-6" />
                 </div>
-                <h3 className="text-lg font-bold text-slate-900 group-hover:text-purple-600 transition">
-                  Jaringan Afiliasi Kreator
+                <h3 className="text-lg font-bold text-[#111C1B] group-hover:text-[#0F766E] transition-colors mb-2.5">
+                  Affiliate Keranjang Kuning
                 </h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Rekrut pasukan affiliator untuk menjualkan produk Anda dengan sistem komisi otomatis dan link referral transparan.
+                <p className="text-xs sm:text-sm text-[#526664] leading-relaxed">
+                  Kumpulkan rekomendasi produk dari TikTok Shop, Shopee, dan Tokopedia dalam satu bio link rapi tanpa batasan jumlah tautan.
                 </p>
               </div>
-              <div className="pt-6 flex items-center text-xs font-bold text-purple-600 gap-1">
+              <div className="pt-6 flex items-center text-xs font-semibold text-[#0F766E] gap-1">
+                <span>Pelajari Fitur</span>
+                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
+          </ScrollReveal>
+
+          {/* Card 4: Event, Webinar & Booking */}
+          <ScrollReveal direction="up" delay={300}>
+            <Link
+              href="/event"
+              className="h-full group bg-white border border-[#E2ECEA] hover:border-[#0F766E]/40 hover:shadow-lg rounded-3xl p-8 transition-all duration-300 flex flex-col justify-between shadow-xs"
+            >
+              <div>
+                <div className="w-12 h-12 rounded-2xl bg-[#E6F4F1] text-[#0F766E] flex items-center justify-center mb-5 group-hover:scale-105 transition-transform">
+                  <Calendar className="w-6 h-6" />
+                </div>
+                <h3 className="text-lg font-bold text-[#111C1B] group-hover:text-[#0F766E] transition-colors mb-2.5">
+                  Event, Webinar &amp; Booking
+                </h3>
+                <p className="text-xs sm:text-sm text-[#526664] leading-relaxed">
+                  Registrasi tiket workshop online &amp; acara offline, sesi mentoring privat 1-on-1, dan booking kalender dengan integrasi Google Meet otomatis.
+                </p>
+              </div>
+              <div className="pt-6 flex items-center text-xs font-semibold text-[#0F766E] gap-1">
+                <span>Pelajari Fitur</span>
+                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
+          </ScrollReveal>
+
+          {/* Card 5: Blog SEO & Artikel */}
+          <ScrollReveal direction="up" delay={360}>
+            <Link
+              href="/tools"
+              className="h-full group bg-white border border-[#E2ECEA] hover:border-[#0F766E]/40 hover:shadow-lg rounded-3xl p-8 transition-all duration-300 flex flex-col justify-between shadow-xs"
+            >
+              <div>
+                <div className="w-12 h-12 rounded-2xl bg-[#E6F4F1] text-[#0F766E] flex items-center justify-center mb-5 group-hover:scale-105 transition-transform">
+                  <FileText className="w-6 h-6" />
+                </div>
+                <h3 className="text-lg font-bold text-[#111C1B] group-hover:text-[#0F766E] transition-colors mb-2.5">
+                  Blog SEO &amp; Artikel
+                </h3>
+                <p className="text-xs sm:text-sm text-[#526664] leading-relaxed">
+                  Publikasikan artikel edukasi dan optimasi mesin pencari untuk menjaring trafik organik dari Google yang langsung terhubung ke tokomu.
+                </p>
+              </div>
+              <div className="pt-6 flex items-center text-xs font-semibold text-[#0F766E] gap-1">
+                <span>Pelajari Fitur</span>
+                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
+          </ScrollReveal>
+
+          {/* Card 6: Custom Domain Sendiri */}
+          <ScrollReveal direction="up" delay={420}>
+            <Link
+              href="/pricing"
+              className="h-full group bg-white border border-[#E2ECEA] hover:border-[#0F766E]/40 hover:shadow-lg rounded-3xl p-8 transition-all duration-300 flex flex-col justify-between shadow-xs"
+            >
+              <div>
+                <div className="w-12 h-12 rounded-2xl bg-[#E6F4F1] text-[#0F766E] flex items-center justify-center mb-5 group-hover:scale-105 transition-transform">
+                  <Globe className="w-6 h-6" />
+                </div>
+                <h3 className="text-lg font-bold text-[#111C1B] group-hover:text-[#0F766E] transition-colors mb-2.5">
+                  Custom Domain Sendiri
+                </h3>
+                <p className="text-xs sm:text-sm text-[#526664] leading-relaxed">
+                  Gunakan domain brand profesional Anda sendiri (contoh: namabrand.com) untuk membangun reputasi bisnis yang kredibel dan terpercaya.
+                </p>
+              </div>
+              <div className="pt-6 flex items-center text-xs font-semibold text-[#0F766E] gap-1">
                 <span>Pelajari Fitur</span>
                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
@@ -240,61 +287,81 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Interactive Template Showcase */}
-      <section className="bg-slate-100/60 border-y border-slate-200/80 py-20 px-4 sm:px-6">
+      {/* Interactive Creator Showcase Carousel Section (#F4F8F7) */}
+      <section className="bg-[#F4F8F7] border-y border-[#E2ECEA] py-20 lg:py-28 px-4 sm:px-6">
         <ScrollReveal direction="up" delay={100}>
           <div className="max-w-6xl mx-auto text-center mb-12 space-y-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500 bg-white px-3 py-1 rounded-full border border-slate-200">
-              Galeri 11 Archetype Desain
+            <span className="text-xs font-bold uppercase tracking-wider text-[#0F766E] bg-white px-3 py-1 rounded-full border border-[#E2ECEA] shadow-2xs">
+              Showcase Kreator &amp; Bisnis
             </span>
-            <h2 className="text-3xl sm:text-4xl font-black text-slate-900">
-              Pilih Gaya Visual yang Sesuai dengan Brand Anda
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#111C1B] tracking-tight">
+              Lihat Bagaimana Mereka Berjualan dengan etalase.online
             </h2>
-            <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto">
-              Dari minimalis elegan, warm cafe, hingga beauty glam. Tampil menawan di layar HP pengunjung.
+            <p className="text-[#526664] text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
+              Dari kreator edukasi, kedai kopi, sales showroom mobil, hingga beauty influencer di Asia Tenggara.
             </p>
           </div>
         </ScrollReveal>
 
+        {/* 5-Phone Horizontal Showcase Carousel */}
         <ShowcaseCarousel />
 
         <ScrollReveal direction="up" delay={200}>
           <div className="text-center mt-10">
             <Link
               href="/templates"
-              className="bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 font-semibold px-6 py-3 rounded-xl text-xs transition-all shadow-sm inline-flex items-center gap-1.5"
+              className="bg-white hover:bg-[#F4F8F7] border border-[#E2ECEA] text-[#111C1B] font-semibold px-6 py-3 rounded-xl text-xs sm:text-sm transition-all shadow-xs inline-flex items-center gap-2"
             >
-              <span>Jelajahi Semua 11 Template</span>
+              <Layers className="w-4 h-4 text-[#0F766E]" />
+              <span>Jelajahi Semua 11 Pilihan Template</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </ScrollReveal>
       </section>
 
-      {/* Simple Warm CTA Banner */}
-      <section className="py-24 px-4 sm:px-6 max-w-5xl mx-auto w-full text-center">
+      {/* Closing CTA Banner - Harmonious Soft Teal Tint (#E6F4F1), Zero Dark #0B1220 Block */}
+      <section className="py-20 lg:py-28 px-4 sm:px-6 max-w-5xl mx-auto w-full">
         <ScrollReveal direction="up" delay={150}>
-          <div className="bg-slate-900 rounded-3xl p-10 sm:p-14 shadow-xl text-white space-y-5">
-            <h2 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight">
-              Mulai Buat Etalase Bio Link Anda Sekarang.
+          <div className="bg-[#E6F4F1] border border-[#C4E5DF] rounded-3xl p-10 sm:p-16 text-center shadow-xs space-y-6">
+            <div className="inline-flex items-center gap-2 bg-white/90 border border-[#C4E5DF] text-[#0F766E] px-3.5 py-1.5 rounded-full text-xs font-semibold">
+              <Sparkles className="w-3.5 h-3.5 text-[#0F766E]" />
+              <span>Mulai Gratis Tanpa Kartu Kredit</span>
+            </div>
+
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#111C1B] leading-tight">
+              Satu Link untuk Semua Penjualan Anda.
             </h2>
-            <p className="text-sm sm:text-base text-slate-300 max-w-xl mx-auto leading-relaxed">
-              Daftar gratis dalam hitungan detik. 0% komisi order chat, tanpa kontrak, tanpa biaya langganan bulanan tersembunyi.
+
+            <p className="text-sm sm:text-base text-[#526664] max-w-xl mx-auto leading-relaxed">
+              Buka etalase online Anda sekarang. 0% komisi order chat, tanpa kontrak tersembunyi, dan langsung terhubung ke WhatsApp Anda dalam 3 menit.
             </p>
-            <div className="pt-3">
+
+            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
                 href="/onboarding"
-                className="bg-white hover:bg-slate-100 text-slate-950 font-bold px-8 py-3.5 rounded-2xl text-sm transition shadow-md inline-flex items-center gap-2"
+                className="w-full sm:w-auto bg-[#0F766E] hover:bg-[#115E59] text-white font-semibold px-8 py-3.5 rounded-xl text-sm transition shadow-xs hover:shadow-md inline-flex items-center justify-center gap-2"
               >
-                <span>Buka Etalase Gratis</span>
+                <span>Buat Etalase Gratis Sekarang</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
+              <Link
+                href="https://demo.etalase.online"
+                target="_blank"
+                className="w-full sm:w-auto bg-white hover:bg-[#F4F8F7] border border-[#E2ECEA] text-[#111C1B] font-semibold px-6 py-3.5 rounded-xl text-sm transition inline-flex items-center justify-center gap-2 shadow-2xs"
+              >
+                <span>Lihat Demo Storefront</span>
+              </Link>
+            </div>
+
+            <div className="text-xs text-[#526664] pt-2">
+              Gratis Selamanya • Setup Kurang dari 3 Menit • Tanpa Biaya Tersembunyi
             </div>
           </div>
         </ScrollReveal>
       </section>
 
-      {/* Comprehensive Footer */}
+      {/* Comprehensive Minimalist Footer */}
       <MarketingFooter />
     </div>
   );
