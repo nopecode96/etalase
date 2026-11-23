@@ -1,152 +1,73 @@
-"use client";
+import type { Metadata } from "next";
+import { SupportedLocale, SUPPORTED_LOCALES } from "@/lib/config/constants";
+import { RegisterClient } from "@/components/auth/RegisterClient";
 
-import React, { Suspense, useState, useEffect } from "react";
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { signIn } from "next-auth/react";
-import { Sparkles, ArrowRight, CheckCircle2, ShieldCheck } from "lucide-react";
-import { EtalaseLogo } from "@/components/brand/EtalaseLogo";
-
-function GoogleIcon() {
-  return (
-    <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
-      <path
-        fill="#4285F4"
-        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-      />
-      <path
-        fill="#34A853"
-        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-      />
-      <path
-        fill="#FBBC05"
-        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-      />
-      <path
-        fill="#EA4335"
-        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
-      />
-    </svg>
-  );
+interface RegisterPageProps {
+  searchParams?: {
+    lang?: string;
+    slug?: string;
+  };
 }
 
-function RegisterCard() {
-  const searchParams = useSearchParams();
-  const slugParam = searchParams.get("slug") || "";
-  const [slug, setSlug] = useState(slugParam);
-  const [loading, setLoading] = useState(false);
+export async function generateMetadata({
+  searchParams,
+}: RegisterPageProps): Promise<Metadata> {
+  const rawLang = searchParams?.lang;
+  const locale: SupportedLocale =
+    rawLang && (SUPPORTED_LOCALES as readonly string[]).includes(rawLang)
+      ? (rawLang as SupportedLocale)
+      : "id";
 
-  useEffect(() => {
-    if (slugParam) {
-      const clean = slugParam.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-");
-      setSlug(clean);
-      try {
-        sessionStorage.setItem("claimed_slug", clean);
-        document.cookie = `claimed_slug=${encodeURIComponent(clean)}; path=/; max-age=3600; SameSite=Lax`;
-      } catch {
-        // Safe fallback if storage blocked
-      }
-    }
-  }, [slugParam]);
-
-  const handleGoogleConnect = async () => {
-    setLoading(true);
-    const targetSlug = slug ? slug.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-") : "";
-    if (targetSlug) {
-      try {
-        sessionStorage.setItem("claimed_slug", targetSlug);
-        document.cookie = `claimed_slug=${encodeURIComponent(targetSlug)}; path=/; max-age=3600; SameSite=Lax`;
-      } catch {
-        // Storage fallback
-      }
-    }
-
-    const callbackUrl = targetSlug
-      ? `/onboarding?slug=${encodeURIComponent(targetSlug)}`
-      : "/onboarding";
-
-    try {
-      await signIn("google", { callbackUrl });
-    } catch {
-      // In local dev without live Google credentials, fall back directly to onboarding
-      window.location.href = callbackUrl;
-    }
+  const titles: Record<SupportedLocale, string> = {
+    id: "Mulai Gratis dengan Google — Klaim Subdomain Tokomu | etalase.online",
+    en: "Start Free with Google — Claim Your Storefront Subdomain | etalase.online",
+    ms: "Mula Percuma dengan Google — Buka Kedai Etalase Anda | etalase.online",
+    th: "เริ่มต้นใช้งานฟรีด้วย Google — เปิดหน้าร้านของคุณ | etalase.online",
+    vi: "Bắt đầu miễn phí với Google — Mở cửa hàng ngay | etalase.online",
   };
 
-  return (
-    <div className="w-full max-w-md bg-white rounded-3xl border border-[#E7E5E4] shadow-sm p-8 sm:p-10 text-center space-y-6">
-      {/* Logo etalase.online di tengah atas */}
-      <div className="flex justify-center">
-        <EtalaseLogo size="lg" />
-      </div>
+  const descriptions: Record<SupportedLocale, string> = {
+    id: "Klaim subdomain tokomu dalam 30 detik. Jual produk digital, katalog fisik, dan affiliate tanpa potongan komisi lewat link di bio WhatsApp.",
+    en: "Claim your custom etalase subdomain in 30 seconds. Sell digital products, physical catalogs, and affiliate links with 0% commission.",
+    ms: "Tuntut subdomain etalase anda dalam masa 30 saat. Jual produk digital, katalog fizikal, dan pautan affiliate tanpa potongan komisen.",
+    th: "จองซับโดเมนร้านค้าของคุณได้ภายใน 30 วินาที ขายสินค้าดิจิทัล แคตตาล็อกสินค้า และลิงก์แอฟฟิลิเอต ค่าคอมมิชชัน 0% ผ่านลิงก์ในไบโอ",
+    vi: "Sở hữu tên miền phụ cửa hàng trong 30 giây. Bán sản phẩm số, danh mục vật lý và link affiliate với 0% hoa hồng qua link bio.",
+  };
 
-      {/* Judul & Subjudul */}
-      <div className="space-y-2">
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1C1917]">
-          Mulai Gratis dengan Google
-        </h1>
-        <p className="text-xs sm:text-sm text-[#57534E] leading-relaxed">
-          Klaim subdomain etalasemu dalam 30 detik.
-        </p>
-      </div>
+  const canonicalPath = locale === "id" ? "/register" : `/${locale}/register`;
 
-      {/* Badge Konfirmasi Subdomain Kalem (?slug=...) */}
-      {slug ? (
-        <div className="inline-flex items-center gap-2 bg-[#FDF0EC] border border-[#FADCD3] text-[#B83E1D] px-3.5 py-2 rounded-2xl text-xs font-semibold w-full justify-center">
-          <CheckCircle2 className="w-4 h-4 text-[#D94E28] shrink-0" />
-          <span className="truncate">
-            Subdomain pilihanmu: <strong>{slug}.etalase.online</strong>
-          </span>
-        </div>
-      ) : null}
-
-      {/* 1 Tombol Utama: Lanjutkan dengan Google */}
-      <div className="pt-1 space-y-3">
-        <button
-          type="button"
-          onClick={handleGoogleConnect}
-          disabled={loading}
-          className="w-full py-3.5 px-4 rounded-xl border border-[#E7E5E4] bg-white hover:bg-[#FAF8F5] font-semibold text-[#1C1917] shadow-xs flex items-center justify-center gap-3 transition-all hover:border-[#D94E28]/40 hover:shadow-sm cursor-pointer disabled:opacity-60"
-        >
-          <GoogleIcon />
-          <span className="text-sm">
-            {loading ? "Menghubungkan..." : "Lanjutkan dengan Google"}
-          </span>
-        </button>
-
-        {/* Micro-trust Guarantee */}
-        <div className="flex items-center justify-center gap-2 text-[11px] text-[#57534E] font-medium pt-1">
-          <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-          <span>0% Komisi order chat &bull; Tanpa kartu kredit &bull; Siap 30 detik</span>
-        </div>
-      </div>
-
-      {/* Teks Kecil di Bawah Kartu: Sudah punya akun? Masuk */}
-      <div className="pt-4 border-t border-[#E7E5E4] flex items-center justify-center gap-2 text-xs text-[#57534E]">
-        <span>Sudah punya akun?</span>
-        <Link
-          href="/login"
-          className="font-bold text-[#D94E28] hover:text-[#B83E1D] hover:underline"
-        >
-          Masuk
-        </Link>
-      </div>
-    </div>
-  );
+  return {
+    title: titles[locale] || titles.id,
+    description: descriptions[locale] || descriptions.id,
+    alternates: {
+      canonical: `https://etalase.online${canonicalPath}`,
+      languages: {
+        id: "https://etalase.online/register",
+        en: "https://etalase.online/en/register",
+        ms: "https://etalase.online/ms/register",
+        th: "https://etalase.online/th/register",
+        vi: "https://etalase.online/vi/register",
+        "x-default": "https://etalase.online/register",
+      },
+    },
+    openGraph: {
+      title: titles[locale] || titles.id,
+      description: descriptions[locale] || descriptions.id,
+      url: `https://etalase.online${canonicalPath}`,
+      siteName: "etalase.online",
+      type: "website",
+    },
+  };
 }
 
-export default function RegisterPage() {
-  return (
-    <main className="min-h-screen bg-[#FAF8F5] flex flex-col justify-center items-center px-4 py-12 selection:bg-[#D94E28] selection:text-white">
-      <Suspense
-        fallback={
-          <div className="w-full max-w-md bg-white rounded-3xl border border-[#E7E5E4] p-10 text-center animate-pulse text-[#57534E] text-xs">
-            Memuat formulir pendaftaran...
-          </div>
-        }
-      >
-        <RegisterCard />
-      </Suspense>
-    </main>
-  );
+export default function RegisterPage({ searchParams }: RegisterPageProps) {
+  const rawLang = searchParams?.lang;
+  const locale: SupportedLocale =
+    rawLang && (SUPPORTED_LOCALES as readonly string[]).includes(rawLang)
+      ? (rawLang as SupportedLocale)
+      : "id";
+
+  const slug = searchParams?.slug || "";
+
+  return <RegisterClient locale={locale} initialSlug={slug} />;
 }

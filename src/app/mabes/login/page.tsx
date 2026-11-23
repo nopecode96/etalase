@@ -25,13 +25,13 @@ export default function MabesLoginPage() {
       });
 
       if (res?.error) {
-        setErrorMessage("Email atau Password Super Admin salah.");
+        setErrorMessage("Invalid Super Admin email or password.");
       } else {
         router.push("/mabes");
         router.refresh();
       }
     } catch {
-      setErrorMessage("Terjadi kesalahan saat mencoba masuk.");
+      setErrorMessage("An unexpected error occurred while signing in.");
     } finally {
       setIsPending(false);
     }
@@ -112,11 +112,11 @@ export default function MabesLoginPage() {
               {isPending ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Mengotentikasi...</span>
+                  <span>Authenticating...</span>
                 </>
               ) : (
                 <>
-                  <span>Masuk ke Mabes</span>
+                  <span>Sign In to Mabes</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
@@ -124,7 +124,7 @@ export default function MabesLoginPage() {
           </form>
 
           <div className="mt-6 text-center text-xs text-slate-500">
-            Login 100% menggunakan kredensial email &amp; password lokal terenkripsi. Otentikasi Google dinonaktifkan untuk Mabes.
+            Sign in uses 100% local encrypted credentials. Google OAuth is disabled for Mabes operations.
           </div>
         </div>
       </div>
