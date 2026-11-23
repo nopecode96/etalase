@@ -1,8 +1,9 @@
 import React from "react";
 import Link from "next/link";
-import { ArrowLeft, Clock, Video, Calendar, ArrowRight } from "lucide-react";
+import { Clock, Video, Calendar, ArrowRight } from "lucide-react";
 import { MarketingNavbar } from "@/components/layout/MarketingNavbar";
 import { MarketingFooter } from "@/components/layout/MarketingFooter";
+import { ScrollReveal } from "@/components/ui/ScrollReveal";
 
 export const metadata = {
   title: "Booking Sesi Konsultasi 1-on-1 — etalase.online",
@@ -11,57 +12,73 @@ export const metadata = {
 
 export default function ConsultationPage() {
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-[#FAFAF9] text-slate-800 flex flex-col">
       <MarketingNavbar />
 
       <main className="max-w-5xl mx-auto px-4 py-16 flex-1 space-y-16">
-        <div className="text-center max-w-3xl mx-auto space-y-4">
-          <span className="text-xs font-bold text-amber-400 uppercase tracking-widest bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full">
-            Fitur #3 • 1-on-1 Consultation Booking
-          </span>
-          <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
-            Ubah Pengalaman Anda Jadi Penghasilan Konsultasi 1-on-1.
-          </h1>
-          <p className="text-slate-400 text-base sm:text-lg leading-relaxed">
-            Klien memilih slot waktu yang tersedia, mengisi topik yang ingin dibahas, dan membayar via QRIS. Anda tinggal masuk ke ruang Google Meet saat jamnya tiba.
-          </p>
-        </div>
+        <ScrollReveal direction="up" delay={50}>
+          <div className="text-center max-w-3xl mx-auto space-y-4">
+            <span className="text-xs font-bold text-amber-800 uppercase tracking-widest bg-amber-50 border border-amber-200 px-3.5 py-1.5 rounded-full">
+              Fitur #3 • Booking 1-on-1
+            </span>
+            <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight">
+              Monetisasi Waktu &amp; Keahlian Anda dengan Kalender Booking Instan.
+            </h1>
+            <p className="text-slate-600 text-base sm:text-lg leading-relaxed">
+              Atur ketersediaan slot hari dan jam Anda. Klien memilih jadwal, membayar biaya konsultasi via QRIS, dan undangan Google Meet langsung terkirim otomatis.
+            </p>
+          </div>
+        </ScrollReveal>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-3">
-            <Clock className="w-8 h-8 text-amber-400" />
-            <h3 className="text-lg font-bold text-white">Atur Durasi &amp; Tarif Bebas</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Tentukan durasi sesi (misal 30, 45, atau 60 menit) dan pasang harga jasa profesional Anda sendiri.
-            </p>
-          </div>
+          <ScrollReveal direction="up" delay={100}>
+            <div className="h-full bg-white border border-slate-200 rounded-3xl p-7 space-y-3 shadow-xs hover:shadow-lg transition-all">
+              <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center font-black">
+                <Clock className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-bold text-slate-900">Atur Jadwal Fleksibel</h3>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Tentukan durasi sesi (30, 45, 60 menit) dan hari aktif Anda agar waktu pribadi Anda tetap terjaga.
+              </p>
+            </div>
+          </ScrollReveal>
 
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-3">
-            <Calendar className="w-8 h-8 text-blue-400" />
-            <h3 className="text-lg font-bold text-white">Slot Waktu Fleksibel</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Klien hanya bisa memilih jam yang Anda aktifkan, mencegah bentrok jadwal atau panggilan tiba-tiba.
-            </p>
-          </div>
+          <ScrollReveal direction="up" delay={200}>
+            <div className="h-full bg-white border border-slate-200 rounded-3xl p-7 space-y-3 shadow-xs hover:shadow-lg transition-all">
+              <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-black">
+                <Video className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-bold text-slate-900">Google Meet Otomatis</h3>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Link sesi privat ter-generate otomatis dan tersinkronisasi ke Google Calendar Anda dan klien secara rapi.
+              </p>
+            </div>
+          </ScrollReveal>
 
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-3">
-            <Video className="w-8 h-8 text-emerald-400" />
-            <h3 className="text-lg font-bold text-white">Google Meet Otomatis</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Detail link video call dan topik klien terkirim rapi ke WhatsApp Anda dan klien sebelum sesi dimulai.
-            </p>
-          </div>
+          <ScrollReveal direction="up" delay={300}>
+            <div className="h-full bg-white border border-slate-200 rounded-3xl p-7 space-y-3 shadow-xs hover:shadow-lg transition-all">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-black">
+                <Calendar className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-bold text-slate-900">Pembayaran di Muka</h3>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Klien membayar lunas di awal sebelum slot terkunci, mencegah terjadinya ghosting atau pembatalan sepihak.
+              </p>
+            </div>
+          </ScrollReveal>
         </div>
 
-        <div className="text-center py-8">
-          <Link
-            href="/onboarding"
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-4 rounded-2xl text-sm transition shadow-lg shadow-blue-500/25 inline-flex items-center gap-2"
-          >
-            <span>Mulai Jadwalkan Sesi Konsultasi Anda</span>
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
+        <ScrollReveal direction="up" delay={150}>
+          <div className="text-center py-6">
+            <Link
+              href="/onboarding"
+              className="bg-slate-900 hover:bg-slate-800 text-white font-bold px-8 py-4 rounded-2xl text-sm transition shadow-sm inline-flex items-center gap-2"
+            >
+              <span>Buka Layanan Konsultasi Anda</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </ScrollReveal>
       </main>
 
       <MarketingFooter />

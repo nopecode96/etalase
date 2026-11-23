@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Check, X, ArrowRight, Zap, Shield, Sparkles, HelpCircle } from "lucide-react";
 import { MarketingNavbar } from "@/components/layout/MarketingNavbar";
 import { MarketingFooter } from "@/components/layout/MarketingFooter";
+import { ScrollReveal } from "@/components/ui/ScrollReveal";
 
 export const metadata = {
   title: "Paket & Harga — etalase.online",
@@ -11,269 +12,290 @@ export const metadata = {
 
 export default function PricingPage() {
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-[#FAFAF9] text-slate-800 flex flex-col">
       <MarketingNavbar />
 
       {/* Hero Header */}
       <section className="pt-16 pb-12 px-4 text-center max-w-4xl mx-auto">
-        <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 text-blue-400 px-3.5 py-1.5 rounded-full text-xs font-semibold mb-6">
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>Biaya Transaksi Terendah &amp; Paling Transparan di SEA</span>
-        </div>
-        <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight mb-4">
-          Pilih Paket yang Sesuai dengan Skala Bisnis Anda.
-        </h1>
-        <p className="text-slate-400 max-w-2xl mx-auto text-base sm:text-lg">
-          Mulai gratis selamanya. Upgrade ke Pro saat Anda ingin custom domain dan automasi penuh tanpa watermark.
-        </p>
+        <ScrollReveal direction="up" delay={50}>
+          <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-200/80 text-blue-700 px-3.5 py-1.5 rounded-full text-xs font-semibold mb-6">
+            <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+            <span>Biaya Transaksi Terendah &amp; Paling Transparan di SEA</span>
+          </div>
+          <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight mb-4">
+            Pilih Paket yang Sesuai dengan Kebutuhan Anda.
+          </h1>
+          <p className="text-slate-600 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
+            Mulai gratis selamanya. Upgrade ke Pro saat Anda ingin custom domain pribadi dan automasi WhatsApp penuh tanpa watermark.
+          </p>
+        </ScrollReveal>
       </section>
 
       {/* Pricing Cards */}
       <section className="max-w-6xl mx-auto px-4 pb-20 grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* FREE PLAN */}
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-white">FREE</h3>
-              <span className="text-[10px] font-bold bg-slate-800 text-slate-300 px-2.5 py-1 rounded-full">
-                Gratis Selamanya
-              </span>
+        <ScrollReveal direction="up" delay={100}>
+          <div className="h-full bg-white border border-slate-200 rounded-3xl p-8 flex flex-col justify-between shadow-xs hover:shadow-lg transition-all">
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold text-slate-900">GRATIS</h3>
+                <span className="text-[10px] font-bold bg-slate-100 text-slate-700 px-2.5 py-1 rounded-full">
+                  Selamanya
+                </span>
+              </div>
+              <div className="mb-6">
+                <span className="text-4xl font-black text-slate-900">Rp 0</span>
+                <span className="text-xs text-slate-500"> / bulan</span>
+              </div>
+              <p className="text-xs text-slate-600 mb-6 leading-relaxed">
+                Solusi ideal untuk kreator pemula, affiliator, dan penjual yang baru mulai membangun etalase bio link.
+              </p>
+              <ul className="space-y-3 text-xs text-slate-700 border-t border-slate-100 pt-6">
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Subdomain <code>[namamu].etalase.online</code></span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>3 Template Dasar (Clean Minimal, Classic Dark, Catalog Grid)</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span><strong>0% Komisi</strong> Order via Chat WhatsApp/LINE/Zalo</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Checkout Otomatis Borderpay QRIS &amp; PayPal</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Preset Marketplace SEA (Keranjang Kuning/Shopee)</span>
+                </li>
+                <li className="flex items-center gap-2 text-slate-400">
+                  <X className="w-4 h-4 text-slate-300 shrink-0" />
+                  <span>Custom Domain Pribadi</span>
+                </li>
+                <li className="flex items-center gap-2 text-slate-400">
+                  <X className="w-4 h-4 text-slate-300 shrink-0" />
+                  <span>Hapus Watermark etalase.online</span>
+                </li>
+              </ul>
             </div>
-            <div className="mb-6">
-              <span className="text-4xl font-black text-white">Rp 0</span>
-              <span className="text-xs text-slate-400"> / bulan</span>
-            </div>
-            <p className="text-xs text-slate-400 mb-6 leading-relaxed">
-              Solusi ideal untuk kreator pemula, affiliator, dan penjual yang baru mulai membangun etalase bio link.
-            </p>
-            <ul className="space-y-3 text-xs text-slate-300 border-t border-slate-800 pt-6">
-              <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Subdomain <code>[namamu].etalase.online</code></span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>3 Template Dasar (Clean Minimal, Classic Dark, Catalog Grid)</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span><strong>0% Komisi</strong> Order via Chat WhatsApp/LINE/Zalo</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Checkout Otomatis Borderpay QRIS &amp; PayPal</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Preset Marketplace SEA (Keranjang Kuning/Shopee)</span>
-              </li>
-              <li className="flex items-center gap-2 text-slate-500">
-                <X className="w-4 h-4 text-slate-600 shrink-0" />
-                <span>Custom Domain Pribadi</span>
-              </li>
-              <li className="flex items-center gap-2 text-slate-500">
-                <X className="w-4 h-4 text-slate-600 shrink-0" />
-                <span>Hapus Watermark etalase.online</span>
-              </li>
-            </ul>
+            <Link
+              href="/onboarding"
+              className="w-full mt-8 bg-slate-100 hover:bg-slate-200 text-slate-900 font-bold py-3 rounded-xl text-xs text-center transition"
+            >
+              Mulai Gratis
+            </Link>
           </div>
-          <Link
-            href="/onboarding"
-            className="w-full mt-8 bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 rounded-xl text-xs text-center transition"
-          >
-            Mulai Gratis Sekarang
-          </Link>
-        </div>
+        </ScrollReveal>
 
         {/* PRO PLAN */}
-        <div className="bg-gradient-to-b from-blue-950/40 via-slate-900 to-slate-900 border-2 border-blue-500 rounded-3xl p-8 flex flex-col justify-between relative shadow-2xl shadow-blue-500/10">
-          <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-[11px] font-black uppercase tracking-wider px-4 py-1 rounded-full shadow-md">
-            Paling Populer
-          </div>
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-white">PRO</h3>
-              <span className="text-[10px] font-bold bg-blue-500/20 text-blue-400 px-2.5 py-1 rounded-full border border-blue-500/30">
-                Kreator &amp; Bisnis
-              </span>
+        <ScrollReveal direction="up" delay={200}>
+          <div className="h-full bg-white border-2 border-blue-600 rounded-3xl p-8 flex flex-col justify-between shadow-xl shadow-blue-500/10 relative">
+            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-[10px] font-black uppercase tracking-wider px-3.5 py-1 rounded-full shadow-sm">
+              Paling Populer
             </div>
-            <div className="mb-6">
-              <span className="text-4xl font-black text-white">Rp 79.000</span>
-              <span className="text-xs text-slate-400"> / bulan (atau $6/bln)</span>
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold text-slate-900">PRO CREATOR</h3>
+                <span className="text-[10px] font-bold bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full border border-blue-200">
+                  White Label
+                </span>
+              </div>
+              <div className="mb-6">
+                <span className="text-4xl font-black text-slate-900">Rp 79.000</span>
+                <span className="text-xs text-slate-500"> / bulan (atau $6/bln)</span>
+              </div>
+              <p className="text-xs text-slate-600 mb-6 leading-relaxed">
+                Untuk kreator profesional, coach, dan brand yang ingin white-label, domain sendiri, dan automasi penjualan penuh.
+              </p>
+              <ul className="space-y-3 text-xs text-slate-700 border-t border-slate-100 pt-6">
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span><strong>Custom Domain Pribadi</strong> (<code>namabrand.com</code>)</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span><strong>Hapus Watermark</strong> (100% White-Label)</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span><strong>Semua 11 Template Premium</strong> + Custom CSS &amp; Font</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span><strong>WhatsApp Cart Recovery Otomatis</strong> (Follow-up 30 menit n8n)</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Modul E-Learning Video &amp; Booking 1-on-1 Konsultasi</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Meta Pixel, TikTok Pixel &amp; Google Analytics</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Termasuk Akses Bundling Ekosistem <code>asistencuan.shop</code></span>
+                </li>
+              </ul>
             </div>
-            <p className="text-xs text-slate-300 mb-6 leading-relaxed">
-              Untuk kreator profesional, coach, dan brand yang ingin white-label, domain sendiri, dan automasi penjualan penuh.
-            </p>
-            <ul className="space-y-3 text-xs text-slate-200 border-t border-slate-800 pt-6">
-              <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span><strong>Custom Domain Pribadi</strong> (<code>namabrand.com</code>)</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span><strong>Hapus Watermark</strong> (100% White-Label)</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span><strong>Semua 11 Template Premium</strong> + Custom CSS &amp; Font</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span><strong>WhatsApp Cart Recovery Otomatis</strong> (Follow-up 30 menit n8n)</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Modul E-Learning Video &amp; Booking 1-on-1 Konsultasi</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Meta Pixel, TikTok Pixel &amp; Google Analytics Terintegrasi</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Termasuk Akses Bundling Ekosistem <code>asistencuan.shop</code></span>
-              </li>
-            </ul>
+            <Link
+              href="/onboarding"
+              className="w-full mt-8 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl text-xs text-center transition shadow-md shadow-blue-500/20"
+            >
+              Pilih Paket Pro
+            </Link>
           </div>
-          <Link
-            href="/onboarding"
-            className="w-full mt-8 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl text-xs text-center transition shadow-lg shadow-blue-600/30"
-          >
-            Pilih Paket Pro
-          </Link>
-        </div>
+        </ScrollReveal>
 
         {/* DFY BUSINESS */}
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-white">TERIMA BERES (DFY)</h3>
-              <span className="text-[10px] font-bold bg-amber-500/20 text-amber-300 px-2.5 py-1 rounded-full border border-amber-500/30">
-                Full Service
-              </span>
+        <ScrollReveal direction="up" delay={300}>
+          <div className="h-full bg-white border border-slate-200 rounded-3xl p-8 flex flex-col justify-between shadow-xs hover:shadow-lg transition-all">
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold text-slate-900">TERIMA BERES (DFY)</h3>
+                <span className="text-[10px] font-bold bg-amber-50 text-amber-800 px-2.5 py-1 rounded-full border border-amber-200">
+                  Full Service
+                </span>
+              </div>
+              <div className="mb-6">
+                <span className="text-3xl font-black text-slate-900">Rp 750rb – 1,5jt</span>
+                <span className="text-xs text-slate-500"> / tahun</span>
+              </div>
+              <p className="text-xs text-slate-600 mb-6 leading-relaxed">
+                Khusus pemilik bisnis lokal, F&amp;B cafe, showroom, dan sales yang tidak ingin repot setup manual. Tim kami siapkan semuanya!
+              </p>
+              <ul className="space-y-3 text-xs text-slate-700 border-t border-slate-100 pt-6">
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Semua Fitur Paket Pro Termasuk</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Setup Desain Banner, Foto Produk &amp; Bio oleh Desainer</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Pengaturan Custom Domain + DNS Handled 100%</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Kit Pemasaran Fisik Siap Cetak (A5 Tent Card Kasir &amp; Poster)</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Dedicated Priority WhatsApp Support</span>
+                </li>
+              </ul>
             </div>
-            <div className="mb-6">
-              <span className="text-3xl font-black text-white">Rp 750rb – 1,5jt</span>
-              <span className="text-xs text-slate-400"> / tahun</span>
-            </div>
-            <p className="text-xs text-slate-400 mb-6 leading-relaxed">
-              Khusus pemilik bisnis lokal, F&amp;B cafe, showroom, dan sales yang tidak ingin repot setup manual. Tim kami siapkan semuanya!
-            </p>
-            <ul className="space-y-3 text-xs text-slate-300 border-t border-slate-800 pt-6">
-              <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Semua Fitur Paket Pro Termasuk</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Setup Lengkap Desain Banner, Foto Produk &amp; Bio oleh Desainer</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Pengaturan Custom Domain + DNS Handled 100%</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Kit Pemasaran Fisik Siap Cetak (A5 Tent Card Kasir &amp; Story Poster)</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Dedicated Priority WhatsApp Support</span>
-              </li>
-            </ul>
+            <Link
+              href="/sales"
+              className="w-full mt-8 bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl text-xs text-center transition"
+            >
+              Konsultasi Paket DFY
+            </Link>
           </div>
-          <Link
-            href="/sales"
-            className="w-full mt-8 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3 rounded-xl text-xs text-center transition"
-          >
-            Konsultasi Paket DFY
-          </Link>
-        </div>
+        </ScrollReveal>
       </section>
 
       {/* Comparison vs Lynk.id Table */}
-      <section className="bg-slate-900 border-y border-slate-800 py-16 px-4">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-10">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white">
-              Mengapa etalase.online Lebih Unggul dari Lynk.id?
-            </h2>
-            <p className="text-slate-400 text-sm mt-1">
-              Bandingkan fitur dan efisiensi biaya secara langsung:
-            </p>
-          </div>
+      <section className="bg-white border-y border-slate-200/80 py-20 px-4 sm:px-6">
+        <ScrollReveal direction="up" delay={100}>
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-12">
+              <span className="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
+                Komparasi Transparan
+              </span>
+              <h2 className="text-2xl sm:text-4xl font-black text-slate-900 mt-3">
+                Mengapa etalase.online Lebih Menguntungkan dari Lynk.id?
+              </h2>
+              <p className="text-slate-600 text-sm sm:text-base mt-2">
+                Bandingkan efisiensi biaya dan keunggulan fitur secara langsung:
+              </p>
+            </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs border border-slate-800 rounded-2xl overflow-hidden">
-              <thead className="bg-slate-800/80 text-slate-200">
-                <tr>
-                  <th className="p-4 font-bold">Fitur &amp; Kemampuan</th>
-                  <th className="p-4 font-bold text-blue-400">etalase.online</th>
-                  <th className="p-4 font-bold text-slate-400">Lynk.id</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800 bg-slate-900">
-                <tr>
-                  <td className="p-4 font-medium text-slate-300">Komisi Order via Chat WhatsApp/LINE</td>
-                  <td className="p-4 font-bold text-emerald-400">0% Komisi Selamanya</td>
-                  <td className="p-4 text-slate-400">Tidak ada fitur chat-first order</td>
-                </tr>
-                <tr>
-                  <td className="p-4 font-medium text-slate-300">Biaya Paket Pro Bulanan</td>
-                  <td className="p-4 font-bold text-emerald-400">Rp 79.000 / bln</td>
-                  <td className="p-4 text-slate-400">Rp 99.000 – Rp 100.000 / bln</td>
-                </tr>
-                <tr>
-                  <td className="p-4 font-medium text-slate-300">Pilihan Arketipe Template</td>
-                  <td className="p-4 font-bold text-white">11 Template Khusus Industri (F&amp;B, Sales Mobil, Skincare, Tech)</td>
-                  <td className="p-4 text-slate-400">Template standar bio link</td>
-                </tr>
-                <tr>
-                  <td className="p-4 font-medium text-slate-300">Ekosistem Regional Asia Tenggara</td>
-                  <td className="p-4 font-bold text-white">Zalo (VN), LINE (TH), WeChat, Beg Kuning (MY), Toko Orange</td>
-                  <td className="p-4 text-slate-400">Fokus domestik Indonesia saja</td>
-                </tr>
-                <tr>
-                  <td className="p-4 font-medium text-slate-300">Offline Marketing Kit (Standee Meja Kasir A5 QR)</td>
-                  <td className="p-4 font-bold text-emerald-400">Tersedia Siap Cetak (A5 &amp; Story 9:16)</td>
-                  <td className="p-4 text-slate-400">Hanya QR code standar</td>
-                </tr>
-              </tbody>
-            </table>
+            <div className="overflow-x-auto bg-white border border-slate-200 rounded-2xl shadow-xs">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-50 border-b border-slate-200 text-slate-700">
+                  <tr>
+                    <th className="p-4 font-bold">Fitur &amp; Kemampuan</th>
+                    <th className="p-4 font-bold text-blue-600">etalase.online</th>
+                    <th className="p-4 font-bold text-slate-400">Lynk.id</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  <tr className="hover:bg-slate-50/50">
+                    <td className="p-4 font-medium text-slate-800">Komisi Order via Chat WhatsApp/LINE</td>
+                    <td className="p-4 font-bold text-emerald-600">0% Komisi Selamanya</td>
+                    <td className="p-4 text-slate-400">Tidak ada fitur chat-first order</td>
+                  </tr>
+                  <tr className="hover:bg-slate-50/50">
+                    <td className="p-4 font-medium text-slate-800">Biaya Paket Pro Bulanan</td>
+                    <td className="p-4 font-bold text-emerald-600">Rp 79.000 / bln</td>
+                    <td className="p-4 text-slate-400">Rp 99.000 – Rp 100.000 / bln</td>
+                  </tr>
+                  <tr className="hover:bg-slate-50/50">
+                    <td className="p-4 font-medium text-slate-800">Pilihan Arketipe Template</td>
+                    <td className="p-4 font-bold text-slate-900">11 Template Khusus Industri (F&amp;B, Sales Mobil, Skincare, Tech)</td>
+                    <td className="p-4 text-slate-400">Template standar bio link</td>
+                  </tr>
+                  <tr className="hover:bg-slate-50/50">
+                    <td className="p-4 font-medium text-slate-800">Ekosistem Regional Asia Tenggara</td>
+                    <td className="p-4 font-bold text-slate-900">Zalo (VN), LINE (TH), WeChat, Beg Kuning (MY), Shopee</td>
+                    <td className="p-4 text-slate-400">Fokus domestik Indonesia saja</td>
+                  </tr>
+                  <tr className="hover:bg-slate-50/50">
+                    <td className="p-4 font-medium text-slate-800">Offline Marketing Kit (Standee Meja Kasir A5 QR)</td>
+                    <td className="p-4 font-bold text-emerald-600">Tersedia Siap Cetak (A5 &amp; Story 9:16)</td>
+                    <td className="p-4 text-slate-400">Hanya QR code standar</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
+        </ScrollReveal>
       </section>
 
       {/* FAQ */}
-      <section className="max-w-4xl mx-auto px-4 py-16 space-y-6">
-        <h2 className="text-2xl font-bold text-white text-center mb-8">
-          Pertanyaan yang Sering Diajukan (FAQ)
-        </h2>
+      <section className="max-w-4xl mx-auto px-4 py-20 space-y-6">
+        <ScrollReveal direction="up" delay={100}>
+          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 text-center mb-8">
+            Pertanyaan yang Sering Diajukan (FAQ)
+          </h2>
+        </ScrollReveal>
         <div className="space-y-4">
-          <div className="p-5 bg-slate-900 border border-slate-800 rounded-2xl">
-            <h4 className="font-bold text-white text-sm mb-1">
-              Apakah paket gratis benar-benar gratis selamanya?
-            </h4>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Ya, 100% gratis tanpa batasan waktu. Anda bisa menjual produk digital, menghubungkan link marketplace, dan menerima pesanan chat tanpa dipungut biaya langganan bulanan.
-            </p>
-          </div>
-          <div className="p-5 bg-slate-900 border border-slate-800 rounded-2xl">
-            <h4 className="font-bold text-white text-sm mb-1">
-              Bagaimana cara kerja pembayaran otomatis QRIS?
-            </h4>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Pembayaran QRIS diproses secara instan melalui gateway resmi Borderpay. Begitu pembeli scan dan bayar, dana langsung tercatat di saldo wallet etalase Anda, dan struk otomatis dikirim via WhatsApp pembeli.
-            </p>
-          </div>
-          <div className="p-5 bg-slate-900 border border-slate-800 rounded-2xl">
-            <h4 className="font-bold text-white text-sm mb-1">
-              Bisakah saya menggunakan domain sendiri seperti nama saya.com?
-            </h4>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Bisa! Pada paket PRO dan TERIMA BERES (DFY), Anda bisa menghubungkan domain kustom sendiri tanpa watermark etalase.online.
-            </p>
-          </div>
+          <ScrollReveal direction="up" delay={150}>
+            <div className="p-6 bg-white border border-slate-200 rounded-2xl shadow-xs">
+              <h4 className="font-bold text-slate-900 text-sm mb-1.5">
+                Apakah paket gratis benar-benar gratis selamanya?
+              </h4>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Ya, 100% gratis tanpa batasan waktu. Anda bisa menjual produk digital, menghubungkan link marketplace, dan menerima pesanan chat tanpa dipungut biaya langganan bulanan.
+              </p>
+            </div>
+          </ScrollReveal>
+          <ScrollReveal direction="up" delay={200}>
+            <div className="p-6 bg-white border border-slate-200 rounded-2xl shadow-xs">
+              <h4 className="font-bold text-slate-900 text-sm mb-1.5">
+                Bagaimana cara kerja pembayaran otomatis QRIS?
+              </h4>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Pembayaran QRIS diproses secara instan melalui gateway resmi Borderpay. Begitu pembeli scan dan bayar, dana langsung tercatat di saldo wallet etalase Anda, dan struk otomatis dikirim via WhatsApp pembeli.
+              </p>
+            </div>
+          </ScrollReveal>
+          <ScrollReveal direction="up" delay={250}>
+            <div className="p-6 bg-white border border-slate-200 rounded-2xl shadow-xs">
+              <h4 className="font-bold text-slate-900 text-sm mb-1.5">
+                Bisakah saya menggunakan domain sendiri seperti nama saya.com?
+              </h4>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Bisa! Pada paket PRO dan TERIMA BERES (DFY), Anda bisa menghubungkan domain kustom sendiri tanpa watermark etalase.online.
+              </p>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
 
