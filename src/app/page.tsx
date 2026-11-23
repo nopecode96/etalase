@@ -276,7 +276,7 @@ export default function HomePage({ searchParams }: HomePageProps) {
             {/* Kolom Kanan: CSS 3D Tilt Smartphone Mockup + Secondary Depth Layer + 4 Outer Floating 3D Badges */}
             <div className="lg:col-span-5 flex justify-center">
               <ScrollReveal direction="none" delay={200}>
-                <Hero3DDevice />
+                <Hero3DDevice locale={locale} />
               </ScrollReveal>
             </div>
           </div>
@@ -311,7 +311,7 @@ export default function HomePage({ searchParams }: HomePageProps) {
           </div>
         </ScrollReveal>
 
-        <InteractiveFeatureShowcase />
+        <InteractiveFeatureShowcase locale={locale} />
       </section>
 
       {/* 5. 4 Arketipe Template Tenant Terisolasi */}
@@ -330,7 +330,7 @@ export default function HomePage({ searchParams }: HomePageProps) {
           </div>
         </ScrollReveal>
 
-        <Showcase4Archetypes />
+        <Showcase4Archetypes locale={locale} />
       </section>
 
       {/* 6. Closing CTA Banner - Harmonis Soft Tint (#FDF0EC) */}

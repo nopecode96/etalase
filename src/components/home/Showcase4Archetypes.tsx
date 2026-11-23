@@ -2,9 +2,11 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { TemplateRenderer } from "../templates/TemplateRenderer";
 import { StoreTemplateProps } from "../templates/types";
 import { CheckCircle2, ArrowRight } from "lucide-react";
+import { SupportedLocale } from "@/lib/config/constants";
 
 interface ArchetypeDemo {
   id: string;
@@ -15,6 +17,95 @@ interface ArchetypeDemo {
   store: StoreTemplateProps["store"];
   products: StoreTemplateProps["products"];
 }
+
+const ARCHETYPE_LOCALES: Record<
+  string,
+  Record<
+    SupportedLocale,
+    {
+      name: string;
+      tag: string;
+      industry: string;
+    }
+  >
+> = {
+  creator: {
+    id: { name: "Kreator Digital", tag: "Clean Minimal", industry: "E-Book, Preset & Mentoring" },
+    en: { name: "Digital Creator", tag: "Clean Minimal", industry: "E-Books, Presets & Mentoring" },
+    ms: { name: "Pencipta Digital", tag: "Clean Minimal", industry: "E-Buku, Preset & Pementoran" },
+    th: { name: "ครีเอเตอร์ดิจิทัล", tag: "Clean Minimal", industry: "อีบุ๊ก, พรีเซ็ต และการให้คำปรึกษา" },
+    vi: { name: "Nhà Sáng Tạo Số", tag: "Clean Minimal", industry: "E-Book, Preset & Khóa học" },
+  },
+  cafe: {
+    id: { name: "Cafe & F&B", tag: "Visual Menu Grid", industry: "Menu Visual & Order Kasir WA" },
+    en: { name: "Cafe & Dining", tag: "Visual Menu Grid", industry: "Visual Menu & WhatsApp Ordering" },
+    ms: { name: "Kafe & F&B", tag: "Visual Menu Grid", industry: "Menu Visual & Pesanan WhatsApp" },
+    th: { name: "คาเฟ่และร้านอาหาร", tag: "Visual Menu Grid", industry: "เมนูรูปภาพและสั่งออเดอร์ทาง WhatsApp" },
+    vi: { name: "Cafe & Nhà hàng", tag: "Visual Menu Grid", industry: "Thực đơn Hình ảnh & Đặt món qua WhatsApp" },
+  },
+  sales: {
+    id: { name: "Sales Mobil & Properti", tag: "Showroom Pro", industry: "Katalog Showroom & Simulasi DP" },
+    en: { name: "Auto & Property Sales", tag: "Showroom Pro", industry: "Showroom Catalog & DP Calculator" },
+    ms: { name: "Jurujual Kereta & Hartanah", tag: "Showroom Pro", industry: "Katalog Bilik Pameran & Simulasi Wang Muka" },
+    th: { name: "ฝ่ายขายรถยนต์และอสังหาฯ", tag: "Showroom Pro", industry: "แคตตาล็อกโชว์รูมและระบบคำนวณเงินดาวน์" },
+    vi: { name: "Kinh Doanh Ô Tô & BĐS", tag: "Showroom Pro", industry: "Danh Mục Showroom & Dự Tính Trả Trước" },
+  },
+  beauty: {
+    id: { name: "Beauty & Affiliate", tag: "Editorial Pastel", industry: "Rekomendasi Skincare & OOTD" },
+    en: { name: "Beauty & Affiliate", tag: "Editorial Pastel", industry: "Skincare Recommendations & OOTD" },
+    ms: { name: "Kecantikan & Afiliasi", tag: "Editorial Pastel", industry: "Syor Penjagaan Kulit & OOTD" },
+    th: { name: "ความงามและแอฟฟิลิเอต", tag: "Editorial Pastel", industry: "แนะนำสกินแคร์และแฟชั่น OOTD" },
+    vi: { name: "Làm Đẹp & Tiếp Thị", tag: "Editorial Pastel", industry: "Gợi Ý Chăm Sóc Da & OOTD" },
+  },
+};
+
+const UI_TEXT = {
+  id: {
+    badge: "Subdomain Mandiri Aktif",
+    descPrefix: "Dirancang khusus untuk kebutuhan",
+    descSuffix: "Desain mobile-first yang rapi dan memudahkan pembeli menyelesaikan pesanan dalam 1 kali klik.",
+    point1: "Desain mobile-first yang rapi dan memudahkan checkout 1-klik",
+    point2: "Mendukung harga pasti, simulasi DP, hingga tombol 'Tanya Harga'",
+    point3: "Terhubung langsung ke WhatsApp & Checkout QRIS Instan",
+    btn: "Gunakan Template Ini Sekarang",
+  },
+  en: {
+    badge: "Active Dedicated Subdomain",
+    descPrefix: "Engineered specifically for",
+    descSuffix: "Polished mobile-first layout designed to help buyers complete orders in a single click.",
+    point1: "Refined mobile-first layout enabling frictionless 1-click checkout",
+    point2: "Supports fixed prices, down-payment estimates, and 'Inquire Price' buttons",
+    point3: "Directly connected to WhatsApp & instant QR payment checkout",
+    btn: "Use This Template Now",
+  },
+  ms: {
+    badge: "Subdomain Sendiri Aktif",
+    descPrefix: "Direka khas untuk keperluan",
+    descSuffix: "Reka bentuk mobile-first yang kemas dan memudahkan pembeli menyelesaikan pesanan dalam 1 klik.",
+    point1: "Reka bentuk mobile-first kemas untuk pembelian 1-klik mudah",
+    point2: "Menyokong harga tetap, simulasi wang pendahuluan, dan butang 'Tanya Harga'",
+    point3: "Terhubung terus ke WhatsApp & pembayaran QR pantas",
+    btn: "Gunakan Templat Ini Sekarang",
+  },
+  th: {
+    badge: "ซับโดเมนส่วนตัวพร้อมใช้งาน",
+    descPrefix: "ออกแบบมาเป็นพิเศษสำหรับ",
+    descSuffix: "เลย์เอาต์แนวตั้งสำหรับมือถือที่สวยงาม ช่วยให้ลูกค้าสั่งซื้อเสร็จสิ้นได้ในคลิกเดียว",
+    point1: "เลย์เอาต์สำหรับมือถือที่ใช้งานง่าย สั่งซื้อได้ในคลิกเดียว",
+    point2: "รองรับราคาคงที่ การจำลองเงินดาวน์ และปุ่ม 'สอบถามราคา'",
+    point3: "เชื่อมต่อกับ WhatsApp โดยตรงและระบบชำระเงิน QR อัตโนมัติ",
+    btn: "ใช้เทมเพลตนี้ตอนนี้",
+  },
+  vi: {
+    badge: "Tên Miền Phụ Độc Lập Sẵn Sàng",
+    descPrefix: "Được thiết kế chuyên biệt cho",
+    descSuffix: "Giao diện tối ưu di động tinh tế giúp người mua hoàn tất đơn hàng chỉ với 1 chạm.",
+    point1: "Thiết kế tối ưu di động giúp chốt đơn trong 1 chạm",
+    point2: "Hỗ trợ giá niêm yết, dự tính trả trước và nút 'Hỏi giá'",
+    point3: "Kết nối trực tiếp đến WhatsApp & Cổng thanh toán mã QR tức thì",
+    btn: "Sử Dụng Giao Diện Này Ngay",
+  },
+};
 
 const ARCHETYPES: ArchetypeDemo[] = [
   {
@@ -305,9 +396,29 @@ const ARCHETYPES: ArchetypeDemo[] = [
   },
 ];
 
-export function Showcase4Archetypes() {
+export function Showcase4Archetypes({ locale: propLocale }: { locale?: SupportedLocale } = {}) {
+  const pathname = usePathname() || "";
+  let locale: SupportedLocale = propLocale || "id";
+  if (!propLocale) {
+    if (pathname.startsWith("/en")) locale = "en";
+    else if (pathname.startsWith("/ms")) locale = "ms";
+    else if (pathname.startsWith("/th")) locale = "th";
+    else if (pathname.startsWith("/vi")) locale = "vi";
+  }
+
+  const copy = UI_TEXT[locale] || UI_TEXT.id;
   const [activeTab, setActiveTab] = useState(0);
   const activeArchetype = ARCHETYPES[activeTab];
+  const activeLocInfo = ARCHETYPE_LOCALES[activeArchetype.id]?.[locale] || {
+    name: activeArchetype.name,
+    tag: activeArchetype.tag,
+    industry: activeArchetype.industry,
+  };
+
+  const getLocalizedRegisterHref = (templateId: string) => {
+    if (locale === "id") return `/register?template=${templateId}`;
+    return `/${locale}/register?template=${templateId}`;
+  };
 
   return (
     <div className="w-full max-w-6xl mx-auto flex flex-col items-center">
@@ -315,6 +426,10 @@ export function Showcase4Archetypes() {
       <div className="flex flex-wrap items-center justify-center gap-2 mb-10 p-1.5 bg-white border border-[#E7E5E4] rounded-2xl shadow-xs">
         {ARCHETYPES.map((arch, index) => {
           const isSelected = activeTab === index;
+          const locInfo = ARCHETYPE_LOCALES[arch.id]?.[locale] || {
+            name: arch.name,
+            tag: arch.tag,
+          };
           return (
             <button
               key={arch.id}
@@ -325,13 +440,13 @@ export function Showcase4Archetypes() {
                   : "text-[#57534E] hover:text-[#1C1917] hover:bg-[#FAF8F5]"
               }`}
             >
-              <span>{arch.name}</span>
+              <span>{locInfo.name}</span>
               <span
                 className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                   isSelected ? "bg-white/20 text-white" : "bg-[#FAF8F5] text-[#57534E]"
                 }`}
               >
-                {arch.tag}
+                {locInfo.tag}
               </span>
             </button>
           );
@@ -343,43 +458,43 @@ export function Showcase4Archetypes() {
         {/* Left Column: Archetype Details */}
         <div className="lg:col-span-6 space-y-6 text-left">
           <div className="inline-flex items-center gap-1.5 bg-[#FDF0EC] border border-[#FADCD3] text-[#D94E28] text-xs font-bold px-3 py-1 rounded-full">
-            <span>Subdomain Mandiri Aktif</span>
+            <span>{copy.badge}</span>
           </div>
 
           <div>
             <h3 className="text-2xl sm:text-3xl font-bold text-[#1C1917]">
-              {activeArchetype.name}
+              {activeLocInfo.name}
             </h3>
             <div className="font-mono text-sm sm:text-base font-bold text-[#D94E28] mt-1 flex items-center gap-1.5">
               <span>https://{activeArchetype.subdomain}</span>
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />
             </div>
             <p className="text-sm text-[#57534E] mt-3 leading-relaxed">
-              Dirancang khusus untuk kebutuhan {activeArchetype.industry}. Desain mobile-first yang rapi dan memudahkan pembeli menyelesaikan pesanan dalam 1 kali klik.
+              {copy.descPrefix} {activeLocInfo.industry}. {copy.descSuffix}
             </p>
           </div>
 
           <div className="space-y-2.5 pt-2 border-t border-[#E7E5E4] text-xs text-[#57534E]">
             <div className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-[#D94E28]"></span>
-              <span>Desain mobile-first yang rapi dan memudahkan checkout 1-klik</span>
+              <span>{copy.point1}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-[#D94E28]"></span>
-              <span>Mendukung harga pasti, simulasi DP, hingga tombol &apos;Tanya Harga&apos;</span>
+              <span>{copy.point2}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-[#D94E28]"></span>
-              <span>Terhubung langsung ke WhatsApp &amp; Checkout QRIS Instan</span>
+              <span>{copy.point3}</span>
             </div>
           </div>
 
           <div className="pt-2">
             <Link
-              href={`/register?template=${activeArchetype.id}`}
+              href={getLocalizedRegisterHref(activeArchetype.id)}
               className="inline-flex items-center gap-2 bg-[#D94E28] hover:bg-[#B83E1D] text-white px-6 py-3 rounded-xl font-bold text-xs sm:text-sm shadow-xs transition"
             >
-              <span>Gunakan Template Ini Sekarang</span>
+              <span>{copy.btn}</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>

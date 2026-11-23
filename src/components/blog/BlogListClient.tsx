@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { Calendar, Clock, ArrowRight, User, Globe } from "lucide-react";
 import { SupportedLocale } from "@/lib/config/constants";
+import { getLocalizedCategory } from "@/lib/blog/category-translations";
 
 export interface BlogListItemProps {
   id: string;
@@ -35,10 +36,31 @@ export function BlogListClient({
   locale,
   readMoreLabel,
 }: BlogListClientProps) {
-  const [selectedCategory, setSelectedCategory] = useState(categories[0] || "Semua");
+  const [selectedCategory, setSelectedCategory] = useState("ALL");
+
+  const allLabel =
+    locale === "id"
+      ? "Semua"
+      : locale === "en"
+      ? "All"
+      : locale === "ms"
+      ? "Semua"
+      : locale === "th"
+      ? "ทั้งหมด"
+      : "Tất cả";
+
+  const filterOptions = [
+    { id: "ALL", label: allLabel },
+    ...categories
+      .filter((c) => c !== "Semua" && c !== "All" && c !== "ทั้งหมด" && c !== "Tất cả")
+      .map((c) => ({
+        id: c,
+        label: getLocalizedCategory(c, locale),
+      })),
+  ];
 
   const filtered =
-    selectedCategory === categories[0]
+    selectedCategory === "ALL"
       ? articles
       : articles.filter((a) => a.category === selectedCategory);
 
@@ -94,18 +116,18 @@ export function BlogListClient({
     <div className="w-full space-y-12">
       {/* Category Filter Pills */}
       <div className="flex flex-wrap items-center justify-center gap-2">
-        {categories.map((c) => (
+        {filterOptions.map((opt) => (
           <button
-            key={c}
-            onClick={() => setSelectedCategory(c)}
+            key={opt.id}
+            onClick={() => setSelectedCategory(opt.id)}
             type="button"
             className={`px-4 py-2 rounded-xl text-xs font-semibold transition cursor-pointer ${
-              selectedCategory === c
+              selectedCategory === opt.id
                 ? "bg-[#D94E28] text-white shadow-xs"
                 : "bg-white text-[#57534E] hover:text-[#1C1917] border border-[#E7E5E4]"
             }`}
           >
-            {c}
+            {opt.label}
           </button>
         ))}
       </div>
@@ -134,7 +156,7 @@ export function BlogListClient({
                 />
                 <div className="absolute top-3 left-3 flex items-center gap-2">
                   <span className="bg-[#D94E28] text-white text-[11px] font-bold px-3 py-1 rounded-md shadow-xs">
-                    {item.category}
+                    {getLocalizedCategory(item.category, locale)}
                   </span>
                   {!item.isExactLocale && (
                     <span className="inline-flex items-center gap-1 bg-white/95 text-amber-800 text-[10px] font-bold px-2 py-1 rounded-md shadow-xs border border-amber-200">

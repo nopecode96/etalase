@@ -14,6 +14,7 @@ import {
   BASE_URL,
 } from "@/lib/seo/metadata-helper";
 import { SupportedLocale, SUPPORTED_LOCALES } from "@/lib/config/constants";
+import { getLocalizedCategory } from "@/lib/blog/category-translations";
 import {
   Calendar,
   Clock,
@@ -465,7 +466,7 @@ export default async function ArticleDetailPage({
           <header className="space-y-4 mb-8">
             <div className="flex flex-wrap items-center gap-2">
               <span className="bg-[#D94E28] text-white text-xs font-bold px-3 py-1 rounded-md shadow-2xs">
-                {article.category}
+                {getLocalizedCategory(article.category, locale)}
               </span>
               <span className="inline-flex items-center gap-1 bg-[#FDF0EC] text-[#D94E28] border border-[#FADCD3] text-xs font-semibold px-3 py-1 rounded-md">
                 <ShieldCheck className="w-3.5 h-3.5" />

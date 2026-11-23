@@ -1,9 +1,80 @@
 "use client";
 
 import React from "react";
+import { usePathname } from "next/navigation";
 import { TemplateRenderer } from "../templates/TemplateRenderer";
 import { Zap, ShoppingBag, MessageCircle, Store } from "lucide-react";
 import { StoreTemplateProps } from "../templates/types";
+import { SupportedLocale } from "@/lib/config/constants";
+
+interface Hero3DDeviceProps {
+  locale?: SupportedLocale;
+}
+
+const HERO_BADGES: Record<
+  SupportedLocale,
+  {
+    b1Title: string;
+    b1Sub: string;
+    b2Title: string;
+    b2Sub: string;
+    b3Title: string;
+    b3Sub: string;
+    b4Title: string;
+    b4Sub: string;
+  }
+> = {
+  id: {
+    b1Title: "Produk Digital",
+    b1Sub: "Auto-Kirim ke WA",
+    b2Title: "Order Direct Chat",
+    b2Sub: "0% Komisi",
+    b3Title: "Katalog Showroom",
+    b3Sub: "Mobil & Properti",
+    b4Title: "Keranjang Kuning",
+    b4Sub: "+TikTok & Shopee",
+  },
+  en: {
+    b1Title: "Digital Products",
+    b1Sub: "Auto-Sent to WA",
+    b2Title: "Direct Chat Orders",
+    b2Sub: "0% Commission",
+    b3Title: "Showroom Catalog",
+    b3Sub: "Auto & Property",
+    b4Title: "Yellow Basket",
+    b4Sub: "+TikTok & Shopee",
+  },
+  ms: {
+    b1Title: "Produk Digital",
+    b1Sub: "Auto-Hantar ke WA",
+    b2Title: "Pesanan Direct Chat",
+    b2Sub: "0% Komisen",
+    b3Title: "Katalog Showroom",
+    b3Sub: "Kereta & Hartanah",
+    b4Title: "Beg Kuning",
+    b4Sub: "+TikTok & Shopee",
+  },
+  th: {
+    b1Title: "สินค้าดิจิทัล",
+    b1Sub: "ส่งอัตโนมัติถึง WA",
+    b2Title: "ออเดอร์ทางแชต",
+    b2Sub: "0% คอมมิชชัน",
+    b3Title: "แคตตาล็อกโชว์รูม",
+    b3Sub: "รถยนต์และอสังหาฯ",
+    b4Title: "ตะกร้าเหลือง",
+    b4Sub: "+TikTok & Shopee",
+  },
+  vi: {
+    b1Title: "Sản Phẩm Số",
+    b1Sub: "Tự gửi qua WA",
+    b2Title: "Đặt Hàng Qua Chat",
+    b2Sub: "0% Hoa Hồng",
+    b3Title: "Danh Mục Showroom",
+    b3Sub: "Xe & Bất Động Sản",
+    b4Title: "Giỏ Hàng Vàng",
+    b4Sub: "+TikTok & Shopee",
+  },
+};
 
 const DEMO_STORE: StoreTemplateProps["store"] = {
   name: "Studio Rafa Creative",
@@ -75,19 +146,31 @@ const DEMO_PRODUCTS: StoreTemplateProps["products"] = [
   },
 ];
 
-export function Hero3DDevice() {
+export function Hero3DDevice({ locale: propLocale }: Hero3DDeviceProps = {}) {
+  const pathname = usePathname() || "";
+
+  let currentLocale: SupportedLocale = propLocale || "id";
+  if (!propLocale) {
+    if (pathname.startsWith("/en")) currentLocale = "en";
+    else if (pathname.startsWith("/ms")) currentLocale = "ms";
+    else if (pathname.startsWith("/th")) currentLocale = "th";
+    else if (pathname.startsWith("/vi")) currentLocale = "vi";
+  }
+
+  const b = HERO_BADGES[currentLocale] || HERO_BADGES.id;
+
   return (
     <div className="relative w-full max-w-[340px] sm:max-w-[370px] mx-auto perspective-1000 select-none py-6">
       {/* 4 Floating Badges Outside the Mockup Frame */}
-      
+
       {/* Badge 1: Top Left Outer (Produk Digital) */}
       <div className="absolute -top-1 -left-4 sm:-left-12 z-20 animate-float-slow hidden xs:flex items-center gap-2 bg-white/95 border border-[#E7E5E4] rounded-2xl px-3 py-2 shadow-md backdrop-blur-xs">
         <div className="w-7 h-7 rounded-lg bg-[#FDF0EC] text-[#D94E28] flex items-center justify-center shrink-0">
           <Zap className="w-4 h-4 fill-current" />
         </div>
         <div className="text-left">
-          <div className="text-[11px] font-bold text-[#1C1917]">Produk Digital</div>
-          <div className="text-[9px] text-[#57534E]">Auto-Kirim ke WA</div>
+          <div className="text-[11px] font-bold text-[#1C1917]">{b.b1Title}</div>
+          <div className="text-[9px] text-[#57534E]">{b.b1Sub}</div>
         </div>
       </div>
 
@@ -97,8 +180,8 @@ export function Hero3DDevice() {
           <MessageCircle className="w-4 h-4" />
         </div>
         <div className="text-left">
-          <div className="text-[11px] font-bold text-[#1C1917]">Order Direct Chat</div>
-          <div className="text-[9px] text-emerald-600 font-semibold">0% Komisi</div>
+          <div className="text-[11px] font-bold text-[#1C1917]">{b.b2Title}</div>
+          <div className="text-[9px] text-emerald-600 font-semibold">{b.b2Sub}</div>
         </div>
       </div>
 
@@ -108,8 +191,8 @@ export function Hero3DDevice() {
           <Store className="w-4 h-4" />
         </div>
         <div className="text-left">
-          <div className="text-[11px] font-bold text-[#1C1917]">Katalog Showroom</div>
-          <div className="text-[9px] text-[#57534E]">Mobil &amp; Properti</div>
+          <div className="text-[11px] font-bold text-[#1C1917]">{b.b3Title}</div>
+          <div className="text-[9px] text-[#57534E]">{b.b3Sub}</div>
         </div>
       </div>
 
@@ -119,8 +202,8 @@ export function Hero3DDevice() {
           <ShoppingBag className="w-4 h-4" />
         </div>
         <div className="text-left">
-          <div className="text-[11px] font-bold text-[#1C1917]">Keranjang Kuning</div>
-          <div className="text-[9px] text-amber-600 font-semibold">+TikTok &amp; Shopee</div>
+          <div className="text-[11px] font-bold text-[#1C1917]">{b.b4Title}</div>
+          <div className="text-[9px] text-amber-600 font-semibold">{b.b4Sub}</div>
         </div>
       </div>
 
@@ -138,7 +221,7 @@ export function Hero3DDevice() {
           </div>
 
           {/* Screen Content - Single Source of Truth via TemplateRenderer */}
-          <div className="w-full h-full bg-[#FAF8F5] rounded-[2.1rem] overflow-y-auto no-scrollbar relative shadow-inner">
+          <div className="w-full flex-1 bg-white rounded-[2.2rem] overflow-hidden overflow-y-auto custom-scrollbar flex flex-col relative pointer-events-none">
             <TemplateRenderer
               store={DEMO_STORE}
               products={DEMO_PRODUCTS}
