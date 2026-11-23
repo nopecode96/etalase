@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" fill="none">
+  <defs>
+    <linearGradient id="icon-bg" x1="16" y1="12" x2="112" y2="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#E15326" />
+      <stop offset="55%" stop-color="#D94E28" />
+      <stop offset="100%" stop-color="#B33814" />
+    </linearGradient>
+    <linearGradient id="icon-highlight" x1="64" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.32" />
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.04" />
+    </linearGradient>
+    <linearGradient id="icon-shelf" x1="28" y1="24" x2="100" y2="104" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#FFF2ED" />
+    </linearGradient>
+    <filter id="icon-shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="2.5" stdDeviation="2.5" flood-color="#4A1304" flood-opacity="0.32" />
+    </filter>
+  </defs>
+
+  <rect x="0" y="0" width="128" height="128" rx="36" fill="url(#icon-bg)" />
+  <rect x="1" y="1" width="126" height="126" rx="35" stroke="url(#icon-highlight)" stroke-width="2" fill="none" />
+
+  <g filter="url(#icon-shadow)">
+    <!-- The Vitrine E Glyph -->
+    <path
+      d="M34,24 H64 C68.4,24 72,27.6 72,32 C72,36.4 68.4,40 64,40 H46 C43.8,40 42,41.8 42,44 V52 C42,54.2 43.8,56 46,56 H76 C80.4,56 84,59.6 84,64 C84,68.4 80.4,72 76,72 H46 C43.8,72 42,73.8 42,76 V84 C42,86.2 43.8,88 46,88 H92 C96.4,88 100,91.6 100,96 C100,100.4 96.4,104 92,104 H34 C29.6,104 26,100.4 26,96 V32 C26,27.6 29.6,24 34,24 Z"
+      fill="url(#icon-shelf)"
+    />
+
+    <!-- The Curation Sparkle -->
+    <path
+      d="M94,20 C94,27.5 98.5,32 106,32 C98.5,32 94,36.5 94,44 C94,36.5 89.5,32 82,32 C89.5,32 94,27.5 94,20 Z"
+      fill="#FFFFFF"
+    />
+    <circle cx="94" cy="32" r="2.2" fill="#FFEAD9" />
+  </g>
+</svg>

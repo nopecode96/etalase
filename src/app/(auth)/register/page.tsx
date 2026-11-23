@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { Sparkles, ArrowRight, CheckCircle2, ShieldCheck } from "lucide-react";
+import { EtalaseLogo } from "@/components/brand/EtalaseLogo";
 
 function GoogleIcon() {
   return (
@@ -76,14 +77,7 @@ function RegisterCard() {
     <div className="w-full max-w-md bg-white rounded-3xl border border-[#E7E5E4] shadow-sm p-8 sm:p-10 text-center space-y-6">
       {/* Logo etalase.online di tengah atas */}
       <div className="flex justify-center">
-        <Link href="/" className="inline-flex items-center gap-2 group">
-          <div className="w-10 h-10 rounded-2xl bg-[#D94E28] flex items-center justify-center text-white font-black text-xl shadow-xs group-hover:scale-105 transition-transform">
-            E
-          </div>
-          <span className="font-bold text-2xl tracking-tight text-[#1C1917]">
-            etalase<span className="text-[#D94E28]">.online</span>
-          </span>
-        </Link>
+        <EtalaseLogo size="lg" />
       </div>
 
       {/* Judul & Subjudul */}

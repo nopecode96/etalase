@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { EtalaseLogo } from "@/components/brand/EtalaseLogo";
 import { Menu, X, ChevronDown, ArrowRight } from "lucide-react";
 
 export function GlobalHeader() {
@@ -36,14 +37,7 @@ export function GlobalHeader() {
     <header className="sticky top-0 z-50 backdrop-blur-md bg-[#FAF8F5]/90 border-b border-[#E7E5E4] transition-all">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         {/* Kiri: Logo Bersih */}
-        <Link href="/" className="flex items-center gap-2 group shrink-0">
-          <div className="w-8 h-8 rounded-xl bg-[#D94E28] flex items-center justify-center text-white font-black text-base shadow-xs group-hover:scale-105 transition-transform">
-            E
-          </div>
-          <span className="font-bold text-lg tracking-tight text-[#1C1917]">
-            etalase<span className="text-[#D94E28]">.online</span>
-          </span>
-        </Link>
+        <EtalaseLogo size="md" />
 
         {/* Tengah (Desktop lg:): 5 Menu Navigasi Utama */}
         <nav className="hidden lg:flex items-center gap-7 text-xs font-semibold text-[#57534E]">

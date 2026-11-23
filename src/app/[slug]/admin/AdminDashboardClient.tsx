@@ -31,6 +31,7 @@ import {
   actionRequestWithdrawal,
 } from "./actions";
 import { toast } from "sonner";
+import { EtalaseLogoIcon } from "@/components/brand/EtalaseLogo";
 import { PAYMENT_RULES } from "@/lib/constants/pricing";
 import { showServiceResultToast } from "@/components/ui/GlobalToast";
 import {
@@ -231,9 +232,7 @@ export function AdminDashboardClient({
       <header className="bg-white border-b border-slate-200 px-6 py-4 sticky top-0 z-30">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">
-              E
-            </div>
+            <EtalaseLogoIcon size={32} />
             <div>
               <h1 className="font-bold text-slate-900 leading-none">
                 {store.name}

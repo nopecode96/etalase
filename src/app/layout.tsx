@@ -6,6 +6,15 @@ export const metadata: Metadata = {
   title: "etalase.online — Satu Website Etalase untuk Semua Jualan Anda",
   description:
     "Bio link visual, katalog instan, dan checkout chat tanpa potongan komisi untuk kreator, afiliator, sales showroom, dan UMKM di Asia Tenggara.",
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "32x32" },
+    ],
+    apple: [
+      { url: "/apple-icon.svg", type: "image/svg+xml" },
+    ],
+  },
 };
 
 export default function RootLayout({

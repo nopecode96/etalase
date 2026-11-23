@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import { EtalaseLogo } from "@/components/brand/EtalaseLogo";
 import { MessageCircle, Mail, ShieldCheck, Zap } from "lucide-react";
 
 export function GlobalFooter() {
@@ -8,14 +9,7 @@ export function GlobalFooter() {
       <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
         {/* Kolom 1 (Brand & Kontak) */}
         <div className="space-y-4">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-[#D94E28] flex items-center justify-center text-white font-black text-base shadow-xs">
-              E
-            </div>
-            <span className="font-bold text-lg text-[#1C1917] tracking-tight">
-              etalase<span className="text-[#D94E28]">.online</span>
-            </span>
-          </Link>
+          <EtalaseLogo size="md" withTagline={true} />
           <p className="text-[#57534E] text-xs leading-relaxed">
             Satu website etalase untuk semua jualan Anda di Asia Tenggara. Bio link visual, katalog instan, dan checkout chat tanpa potongan komisi.
           </p>

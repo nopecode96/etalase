@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" width="180" height="180" fill="none">
+  <defs>
+    <linearGradient id="apple-bg" x1="20" y1="16" x2="160" y2="164" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#E15326" />
+      <stop offset="55%" stop-color="#D94E28" />
+      <stop offset="100%" stop-color="#B33814" />
+    </linearGradient>
+    <linearGradient id="apple-highlight" x1="90" y1="0" x2="90" y2="90" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.35" />
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.05" />
+    </linearGradient>
+    <linearGradient id="apple-shelf" x1="40" y1="36" x2="140" y2="144" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#FFF2ED" />
+    </linearGradient>
+    <filter id="apple-shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="3.5" stdDeviation="3.5" flood-color="#4A1304" flood-opacity="0.32" />
+    </filter>
+  </defs>
+
+  <rect x="0" y="0" width="180" height="180" rx="46" fill="url(#apple-bg)" />
+  <rect x="1" y="1" width="178" height="178" rx="45" stroke="url(#apple-highlight)" stroke-width="2" fill="none" />
+
+  <g transform="translate(18, 18) scale(1.125)" filter="url(#apple-shadow)">
+    <!-- The Vitrine E Glyph -->
+    <path
+      d="M34,24 H64 C68.4,24 72,27.6 72,32 C72,36.4 68.4,40 64,40 H46 C43.8,40 42,41.8 42,44 V52 C42,54.2 43.8,56 46,56 H76 C80.4,56 84,59.6 84,64 C84,68.4 80.4,72 76,72 H46 C43.8,72 42,73.8 42,76 V84 C42,86.2 43.8,88 46,88 H92 C96.4,88 100,91.6 100,96 C100,100.4 96.4,104 92,104 H34 C29.6,104 26,100.4 26,96 V32 C26,27.6 29.6,24 34,24 Z"
+      fill="url(#apple-shelf)"
+    />
+
+    <!-- The Curation Sparkle -->
+    <path
+      d="M94,20 C94,27.5 98.5,32 106,32 C98.5,32 94,36.5 94,44 C94,36.5 89.5,32 82,32 C89.5,32 94,27.5 94,20 Z"
+      fill="#FFFFFF"
+    />
+    <circle cx="94" cy="32" r="2.2" fill="#FFEAD9" />
+  </g>
+</svg>

@@ -3,6 +3,7 @@
 import React, { Suspense, useState, useEffect, useTransition } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { EtalaseLogo } from "@/components/brand/EtalaseLogo";
 import {
   Check,
   AlertCircle,
@@ -127,14 +128,9 @@ function OnboardingContent() {
     <div className="w-full max-w-xl bg-white rounded-3xl border border-[#E7E5E4] shadow-sm p-6 sm:p-10 space-y-8">
       {/* Brand Header */}
       <div className="text-center space-y-2">
-        <Link href="/" className="inline-flex items-center gap-2 group mb-2">
-          <div className="w-9 h-9 rounded-xl bg-[#D94E28] flex items-center justify-center text-white font-black text-lg shadow-xs group-hover:scale-105 transition-transform">
-            E
-          </div>
-          <span className="font-bold text-xl tracking-tight text-[#1C1917]">
-            etalase<span className="text-[#D94E28]">.online</span>
-          </span>
-        </Link>
+        <div className="flex justify-center mb-2">
+          <EtalaseLogo size="lg" />
+        </div>
 
         <div className="inline-flex items-center gap-1.5 bg-[#FDF0EC] border border-[#FADCD3] text-[#D94E28] px-3 py-1 rounded-full text-xs font-semibold">
           <Sparkles className="w-3.5 h-3.5" />
