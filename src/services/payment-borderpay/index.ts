@@ -10,6 +10,7 @@ export interface CreateInvoiceParams {
   customerWhatsapp: string;
   customerEmail?: string;
   description: string;
+  feeBorneBy?: "customer" | "merchant";
 }
 
 export interface BorderpayInvoiceResult {
@@ -39,7 +40,8 @@ export async function createBorderpayInvoice(
           order_id: params.orderCode,
           amount: params.amount,
           currency: params.currency || "IDR",
-          payment_type: "qris",
+          payment_type: "qris", // Strictly locked to QRIS only
+          fee_borne_by: params.feeBorneBy || "customer",
           customer_details: {
             first_name: params.customerName,
             phone: params.customerWhatsapp,

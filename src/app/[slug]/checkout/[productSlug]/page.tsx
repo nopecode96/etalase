@@ -21,6 +21,9 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
           name: "Studio Demo Creative",
           currency: "IDR",
           locale: "id",
+          tier: "FREE",
+          feeBorneBy: "CUSTOMER",
+          chatHandle: "6281234567890",
         }}
         product={{
           id: "demo-p1",
@@ -58,6 +61,9 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
         name: serializedStore.name,
         currency: serializedStore.currency,
         locale: serializedStore.locale,
+        tier: serializedStore.tier,
+        feeBorneBy: serializedStore.feeBorneBy || "CUSTOMER",
+        chatHandle: serializedStore.chatHandle,
       }}
       product={{
         id: serializedProduct.id,

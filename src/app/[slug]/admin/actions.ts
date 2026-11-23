@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { getCurrentUser, requireStoreOwner } from "@/lib/auth/session";
 import { prisma } from "@/lib/db/prisma";
+import { FeeBearer } from "@prisma/client";
+import { calculateWithdrawalFee } from "@/services/payment/fee-calculator";
 import { createProduct, deleteProduct, CreateProductInput } from "@/services/product-catalog";
 import { updateStoreProfile, UpdateStoreProfileInput } from "@/services/store-profile";
 import { fail, ok, ServiceResult } from "@/lib/core/response";
@@ -174,5 +176,111 @@ export async function actionSaveBlocks(
     return ok({ success: true });
   } catch (err: unknown) {
     return fail("INTERNAL_ERROR", err instanceof Error ? err.message : "Gagal menyimpan blok");
+  }
+}
+
+export async function actionUpdateFeeBearer(
+  slug: string,
+  feeBorneBy: FeeBearer | "CUSTOMER" | "MERCHANT"
+): Promise<ServiceResult<unknown>> {
+  try {
+    const user = await getCurrentUser();
+    const store = await prisma.store.findUnique({
+      where: { slug },
+      select: { id: true, ownerId: true, isDemo: true },
+    });
+
+    if (!store) {
+      if (slug === "demo") {
+        return ok({ message: "Pengaturan biaya demo diperbarui" });
+      }
+      return fail("NOT_FOUND", "Toko tidak ditemukan");
+    }
+
+    if (!store.isDemo) {
+      if (!user || (user.id !== store.ownerId && (user as any).role !== "SUPER_ADMIN")) {
+        return fail("UNAUTHORIZED", "Akses ditolak");
+      }
+    }
+
+    const updated = await prisma.store.update({
+      where: { id: store.id },
+      data: {
+        feeBorneBy: feeBorneBy === "MERCHANT" ? FeeBearer.MERCHANT : FeeBearer.CUSTOMER,
+      },
+    });
+
+    revalidatePath(`/${slug}/admin`);
+    revalidatePath(`/${slug}`);
+    return ok(updated);
+  } catch (err: unknown) {
+    return fail("INTERNAL_ERROR", err instanceof Error ? err.message : "Gagal memperbarui penanggung biaya");
+  }
+}
+
+export async function actionRequestWithdrawal(
+  slug: string,
+  requestedAmount: number,
+  destination: string
+): Promise<ServiceResult<unknown>> {
+  try {
+    const user = await getCurrentUser();
+    const store = await prisma.store.findUnique({
+      where: { slug },
+      select: { id: true, ownerId: true, isDemo: true, tier: true, walletBalance: true },
+    });
+
+    if (!store) {
+      if (slug === "demo") {
+        return ok({ message: "Permintaan penarikan demo berhasil disimulasikan" });
+      }
+      return fail("NOT_FOUND", "Toko tidak ditemukan");
+    }
+
+    if (!store.isDemo) {
+      if (!user || (user.id !== store.ownerId && (user as any).role !== "SUPER_ADMIN")) {
+        return fail("UNAUTHORIZED", "Akses ditolak");
+      }
+    }
+
+    const balance = Number(store.walletBalance || 0);
+    if (!store.isDemo && balance < requestedAmount) {
+      return fail("INVALID_INPUT", "Saldo dompet tidak mencukupi untuk penarikan ini.");
+    }
+
+    // Calculate withdrawal fee and check monthly quota
+    let feeCalc;
+    try {
+      feeCalc = await calculateWithdrawalFee(store.id, store.tier, requestedAmount);
+    } catch (err: unknown) {
+      return fail("INVALID_INPUT", err instanceof Error ? err.message : "Validasi penarikan gagal.");
+    }
+
+    const withdrawal = await prisma.withdrawal.create({
+      data: {
+        storeId: store.id,
+        amount: requestedAmount,
+        feeCharged: feeCalc.fee,
+        netAmount: feeCalc.netAmount,
+        currency: "IDR",
+        destination,
+        status: "PENDING",
+      },
+    });
+
+    // Deduct from wallet balance if not demo
+    if (!store.isDemo) {
+      await prisma.store.update({
+        where: { id: store.id },
+        data: {
+          walletBalance: { decrement: requestedAmount },
+        },
+      });
+    }
+
+    revalidatePath(`/${slug}/admin`);
+    return ok(withdrawal, "SAVED", `Penarikan saldo sebesar Rp ${requestedAmount.toLocaleString("id-ID")} berhasil diajukan.`);
+  } catch (err: unknown) {
+    return fail("INTERNAL_ERROR", err instanceof Error ? err.message : "Gagal mengajukan penarikan");
   }
 }

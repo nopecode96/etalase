@@ -1,5 +1,6 @@
 import { prisma, serializePlain } from "@/lib/db/prisma";
 import { getFeeRateForTier } from "@/lib/constants/pricing";
+import { calculateQrisCheckout } from "@/services/payment/fee-calculator";
 import { ok, fail, withErrorHandler, ServiceResult } from "@/lib/core/response";
 import { createBorderpayInvoice } from "../payment-borderpay";
 import { emitN8nEvent } from "@/lib/n8n/dispatcher";
@@ -33,12 +34,26 @@ export async function createCheckoutOrder(
     }
 
     const product = store.products[0];
-    const amount = Number(product.price);
+    const basePrice = Number(product.price);
 
-    // Platform fee calculation (FREE: 4.5%, PRO: 2%, DFY: 2%)
-    const feeRate = getFeeRateForTier(store.tier);
-    const platformFee = Math.round(amount * feeRate);
-    const netAmount = amount - platformFee;
+    // 1. Margin Guard: Anti-Rugi BorderPay & Convenience Fee Calculation
+    let feeCalculation;
+    try {
+      feeCalculation = calculateQrisCheckout(
+        basePrice,
+        store.tier,
+        store.feeBorneBy || "CUSTOMER"
+      );
+    } catch (err: unknown) {
+      return fail(
+        "INVALID_INPUT",
+        err instanceof Error ? err.message : "Nominal tidak memenuhi syarat minimal QRIS."
+      );
+    }
+
+    const platformFee = feeCalculation.platformFee;
+    const netAmount = feeCalculation.netToMerchant;
+    const totalPayByCustomer = feeCalculation.totalPayByCustomer;
 
     const timestamp = Date.now().toString().slice(-6);
     const randomSuffix = Math.floor(1000 + Math.random() * 9000);
@@ -52,12 +67,13 @@ export async function createCheckoutOrder(
     if (paymentProvider === "BORDERPAY_QRIS") {
       const invoiceRes = await createBorderpayInvoice({
         orderCode,
-        amount,
+        amount: totalPayByCustomer,
         currency: store.currency,
         customerName: input.buyerName,
         customerWhatsapp: input.buyerWhatsapp,
         customerEmail: input.buyerEmail,
         description: `${product.title} - ${store.name}`,
+        feeBorneBy: feeCalculation.borderpayFeeBearerParam,
       });
 
       if (invoiceRes.success && invoiceRes.data) {
@@ -77,7 +93,7 @@ export async function createCheckoutOrder(
         buyerEmail: input.buyerEmail,
         shippingAddress: input.shippingAddress,
         currency: store.currency,
-        amount,
+        amount: totalPayByCustomer,
         platformFee,
         netAmount,
         paymentProvider,
@@ -96,7 +112,7 @@ export async function createCheckoutOrder(
       storeTier: store.tier,
       buyerName: order.buyerName,
       buyerWhatsapp: order.buyerWhatsapp,
-      amount,
+      amount: totalPayByCustomer,
       currency: order.currency,
       paymentUrl,
     });

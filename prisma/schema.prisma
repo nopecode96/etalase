@@ -57,6 +57,11 @@ enum PaymentProvider {
   PAYPAL
 }
 
+enum FeeBearer {
+  CUSTOMER
+  MERCHANT
+}
+
 enum OrderStatus {
   PENDING
   PAID
@@ -148,6 +153,7 @@ model Store {
   tiktokPixelId   String?
   gaMeasurementId String?
   paypalEmail     String?
+  feeBorneBy      FeeBearer   @default(CUSTOMER) // Default ditanggung pembeli (Convenience Fee)
   walletBalance   Decimal     @default(0) @db.Decimal(14, 2)
   affiliateCommission Decimal? @default(10) @db.Decimal(5, 2) // Default 10%
 
@@ -315,6 +321,8 @@ model Withdrawal {
   storeId       String
   store         Store    @relation(fields: [storeId], references: [id])
   amount        Decimal  @db.Decimal(14, 2)
+  feeCharged    Decimal  @default(0) @db.Decimal(14, 2)
+  netAmount     Decimal  @default(0) @db.Decimal(14, 2)
   currency      String   @default("IDR")
   destination   String
   status        String   @default("PENDING") // PENDING | APPROVED | REJECTED

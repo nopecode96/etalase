@@ -2,9 +2,10 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, ShieldCheck, Zap, QrCode, CheckCircle2, Loader2, MessageSquare } from "lucide-react";
+import { ArrowLeft, ShieldCheck, Zap, QrCode, CheckCircle2, Loader2, MessageSquare, AlertCircle } from "lucide-react";
 import { actionSubmitOrder } from "./actions";
 import { formatCurrency } from "@/lib/core/formatters";
+import { PAYMENT_RULES } from "@/lib/constants/pricing";
 import { showServiceResultToast } from "@/components/ui/GlobalToast";
 
 interface CheckoutClientProps {
@@ -13,6 +14,9 @@ interface CheckoutClientProps {
     name: string;
     currency: string;
     locale: string;
+    tier?: string;
+    feeBorneBy?: "CUSTOMER" | "MERCHANT";
+    chatHandle?: string | null;
   };
   product: {
     id: string;
@@ -38,6 +42,16 @@ export function CheckoutClient({ store, product }: CheckoutClientProps) {
     qrString?: string;
     amount: number;
   } | null>(null);
+
+  const tierKey = store.tier === "PRO" ? "PRO" : store.tier === "DFY_BUSINESS" ? "DFY" : "FREE";
+  const rules = PAYMENT_RULES[tierKey];
+  const isBelowMinQris = product.price < rules.minQrisAmountIdr;
+
+  const isCustomerBorne = store.feeBorneBy !== "MERCHANT";
+  const convenienceFee = isCustomerBorne
+    ? Math.ceil((product.price * rules.directCheckoutFeePercent) / 100)
+    : 0;
+  const totalAmountToPay = product.price + convenienceFee;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -250,22 +264,72 @@ export function CheckoutClient({ store, product }: CheckoutClientProps) {
                 </div>
               </div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold py-3.5 px-4 rounded-xl text-sm transition shadow-lg shadow-blue-500/20 mt-6"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Memproses Invoice...</span>
-                  </>
+              {/* Rincian Transaksi & Convenience Fee */}
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2 text-xs">
+                <div className="flex justify-between text-slate-600">
+                  <span>Harga Produk</span>
+                  <span>{formatCurrency(product.price, store.currency as any, store.locale as any)}</span>
+                </div>
+                {isCustomerBorne ? (
+                  <div className="flex justify-between text-slate-600">
+                    <span>Biaya Layanan QRIS ({rules.directCheckoutFeePercent}%)</span>
+                    <span>+{formatCurrency(convenienceFee, store.currency as any, store.locale as any)}</span>
+                  </div>
                 ) : (
-                  <>
-                    <span>Bayar Sekarang &bull; {formatCurrency(product.price, store.currency as any, store.locale as any)}</span>
-                  </>
+                  <div className="flex justify-between text-emerald-700 font-medium">
+                    <span>Biaya Layanan QRIS</span>
+                    <span>Ditanggung Penjual (Gratis)</span>
+                  </div>
                 )}
-              </button>
+                <div className="pt-2 border-t border-slate-200 flex justify-between font-bold text-sm text-slate-900">
+                  <span>Total Tagihan</span>
+                  <span className="text-blue-600">
+                    {formatCurrency(totalAmountToPay, store.currency as any, store.locale as any)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Pagar Pengaman Margin: Batas Minimal QRIS */}
+              {isBelowMinQris && paymentProvider === "BORDERPAY_QRIS" ? (
+                <div className="space-y-3 pt-2">
+                  <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl text-xs text-amber-900 space-y-1">
+                    <div className="font-bold flex items-center gap-1.5 text-amber-800">
+                      <AlertCircle className="w-4 h-4 shrink-0" />
+                      <span>Batas Minimal QRIS ({formatCurrency(rules.minQrisAmountIdr, "IDR", "id")})</span>
+                    </div>
+                    <p className="leading-relaxed text-[11px] text-amber-700">
+                      Nominal produk ini di bawah batas minimal pembayaran QRIS otomatis. Silakan pesan langsung melalui WhatsApp penjual tanpa biaya tambahan (0% komisi).
+                    </p>
+                  </div>
+
+                  <a
+                    href={`https://wa.me/${store.chatHandle || "6281234567890"}?text=Halo%20${encodeURIComponent(store.name)},%20saya%20tertarik%20membeli%20${encodeURIComponent(product.title)}%20seharga%20${encodeURIComponent(formatCurrency(product.price, store.currency as any, store.locale as any))}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-xl text-sm transition shadow-lg shadow-emerald-600/20"
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                    <span>Pesan via WhatsApp (0% Komisi)</span>
+                  </a>
+                </div>
+              ) : (
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold py-3.5 px-4 rounded-xl text-sm transition shadow-lg shadow-blue-500/20 mt-6"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Memproses Invoice...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Bayar Sekarang &bull; {formatCurrency(totalAmountToPay, store.currency as any, store.locale as any)}</span>
+                    </>
+                  )}
+                </button>
+              )}
             </form>
           </div>
         )}

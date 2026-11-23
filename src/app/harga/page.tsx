@@ -73,17 +73,25 @@ const COMPARISON_DATA: ComparisonCategory[] = [
       },
       {
         feature: "Biaya Transaksi QRIS & PayPal",
-        detail: "Direct checkout otomatis tanpa konfirmasi manual",
-        free: <span className="text-xs font-semibold text-[#57534E]">4,5%</span>,
-        pro: <span className="text-xs font-bold text-[#D94E28]">2% (Hemat 55%)</span>,
-        dfy: <span className="text-xs font-bold text-[#D94E28]">2% (Hemat 55%)</span>,
+        detail: "Direct checkout otomatis tanpa konfirmasi manual. Opsi fleksibel: biaya transaksi bisa diatur ditanggung Pembeli atau Penjual.",
+        free: <span className="text-xs font-semibold text-[#57534E]">4,5% (min. Rp 15rb)</span>,
+        pro: <span className="text-xs font-bold text-[#D94E28]">2% (min. Rp 25rb)</span>,
+        dfy: <span className="text-xs font-bold text-[#D94E28]">2% (min. Rp 25rb)</span>,
       },
       {
         feature: "Biaya Penarikan Saldo (Payout)",
-        detail: "Penarikan hasil penjualan ke rekening bank / e-wallet",
-        free: <span className="text-xs font-medium text-[#57534E]">Rp 5.000 / penarikan</span>,
-        pro: <span className="text-xs font-bold text-emerald-700">GRATIS</span>,
-        dfy: <span className="text-xs font-bold text-emerald-700">GRATIS</span>,
+        detail: "Penarikan hasil penjualan ke rekening bank / e-wallet mana saja di Indonesia",
+        free: <span className="text-xs font-medium text-[#57534E]">Rp 5.000 / tarik (min. Rp 50rb)</span>,
+        pro: (
+          <span className="text-xs font-bold text-emerald-700">
+            GRATIS 4x / bulan <span className="font-normal text-stone-500">(selanjutnya Rp 2.500 &bull; min. Rp 50rb)</span>
+          </span>
+        ),
+        dfy: (
+          <span className="text-xs font-bold text-emerald-700">
+            GRATIS 4x / bulan <span className="font-normal text-stone-500">(selanjutnya Rp 2.500 &bull; min. Rp 50rb)</span>
+          </span>
+        ),
       },
       {
         feature: "Kirim File & Struk Otomatis ke WA",
@@ -234,11 +242,11 @@ export function HargaContent() {
                 </div>
                 <div className="flex items-start gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                  <span><strong>Biaya Transaksi QRIS 4,5%</strong></span>
+                  <span><strong>Biaya Transaksi QRIS 4,5%</strong> (min. transaksi Rp 15rb)</span>
                 </div>
                 <div className="flex items-start gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                  <span>Biaya Penarikan Saldo Rp 5.000</span>
+                  <span>Biaya Penarikan Saldo Rp 5.000 (min. tarik Rp 50rb)</span>
                 </div>
                 <div className="flex items-start gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
@@ -307,7 +315,11 @@ export function HargaContent() {
                 </div>
                 <div className="flex items-start gap-2.5 font-medium">
                   <CheckCircle2 className="w-4 h-4 text-[#D94E28] shrink-0 mt-0.5" />
-                  <span><strong>Biaya QRIS Hanya 2% &amp; Penarikan Saldo GRATIS</strong></span>
+                  <span><strong>Biaya Transaksi QRIS Hanya 2%</strong> (min. transaksi Rp 25rb)</span>
+                </div>
+                <div className="flex items-start gap-2.5 font-medium">
+                  <CheckCircle2 className="w-4 h-4 text-[#D94E28] shrink-0 mt-0.5" />
+                  <span><strong>Penarikan Saldo GRATIS 4x / bulan</strong> (selanjutnya Rp 2.500 &bull; min. tarik Rp 50rb)</span>
                 </div>
                 <div className="flex items-start gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-[#D94E28] shrink-0 mt-0.5" />
