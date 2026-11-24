@@ -9,14 +9,45 @@ export async function POST(req: NextRequest) {
     const update = await req.json();
 
     const message = update.message || update.edited_message;
-    if (!message || !message.text) {
+    if (!message) {
       return NextResponse.json({ ok: true });
     }
 
     const chatId = String(message.chat.id);
-    const text = message.text.trim();
     const from = message.from;
     const config = await getTelegramConfig();
+    const isGroup = message.chat.type === "group" || message.chat.type === "supergroup";
+
+    // Handle bot being added to a group: auto-post group chat ID
+    if (message.new_chat_members || message.group_chat_created || message.supergroup_chat_created) {
+      const groupAlert = [
+        `👋 <b>Bot etalase.online Berhasil Terhubung ke Grup Ini!</b>`,
+        ``,
+        `🆔 <b>Mabes Group Chat ID:</b> <code>${chatId}</code>`,
+        ``,
+        `💡 <i>Salin angka Chat ID di atas dan masukkan ke menu <b>Platform Settings &gt; Telegram Mabes Group Chat ID</b> di Mabes Console (<code>/mabes/settings</code>) untuk mengaktifkan notifikasi operasional platform.</i>`,
+      ].join("\n");
+      await sendTelegramMessage(chatId, groupAlert, { parseMode: "HTML" });
+      return NextResponse.json({ ok: true });
+    }
+
+    const text = (message.text || "").trim();
+    if (!text) {
+      return NextResponse.json({ ok: true });
+    }
+
+    // Handle /id, /myid, /chatid commands
+    if (text === "/id" || text === "/myid" || text === "/chatid") {
+      const idMsg = [
+        `🆔 <b>${isGroup ? "ID Grup Telegram Ini" : "Telegram User ID Anda"}:</b>`,
+        `<code>${chatId}</code>`,
+        ``,
+        `💡 <i>Salin angka di atas dan tempelkan ke kolom <b>Telegram Mabes Group Chat ID</b> di menu Platform Settings Mabes (<code>/mabes/settings</code>).</i>`,
+      ].join("\n");
+
+      await sendTelegramMessage(chatId, idMsg, { parseMode: "HTML" });
+      return NextResponse.json({ ok: true });
+    }
 
     // 1. Handle /start command
     if (text.startsWith("/start")) {
@@ -84,63 +115,70 @@ export async function POST(req: NextRequest) {
           });
 
           const successMsg = [
-            `🎉 *Selamat! Toko Berhasil Terhubung!*`,
+            `🎉 <b>Selamat! Toko Berhasil Terhubung!</b>`,
             ``,
-            `Toko *${store.name}* (\`${store.slug}.etalase.online\`) kini telah resmi terhubung ke akun Telegram ini.`,
+            `Toko <b>${store.name}</b> (<code>${store.slug}.etalase.online</code>) kini telah resmi terhubung ke akun Telegram ini.`,
             ``,
             `Anda akan menerima notifikasi instan langsung di chat ini setiap kali:`,
             `✅ Ada pesanan baru dari konsumen`,
             `✅ Pembayaran QRIS Borderpay atau PayPal sukses`,
             `✅ Status penarikan saldo toko diproses`,
             ``,
-            `📦 [Buka Dashboard Admin](https://${store.slug}.etalase.online/admin)`,
+            `📦 <a href="https://${store.slug}.etalase.online/admin">Buka Dashboard Admin</a>`,
           ].join("\n");
 
-          await sendTelegramMessage(chatId, successMsg);
+          await sendTelegramMessage(chatId, successMsg, { parseMode: "HTML" });
           return NextResponse.json({ ok: true });
         } else {
           const notFoundMsg = [
-            `⚠️ *Token Toko Tidak Ditemukan*`,
+            `⚠️ <b>Token Toko Tidak Ditemukan</b>`,
             ``,
             `Tautan aktivasi tidak valid atau telah kedaluwarsa.`,
-            `Silakan buka kembali Admin Console Toko Anda di menu *Settings > Integrations*, lalu klik tombol *Connect Telegram (1-Click)*.`,
+            `Silakan buka kembali Admin Console Toko Anda di menu <b>Settings &gt; Integrations</b>, lalu klik tombol <b>Connect Telegram (1-Click)</b>.`,
           ].join("\n");
 
-          await sendTelegramMessage(chatId, notFoundMsg);
+          await sendTelegramMessage(chatId, notFoundMsg, { parseMode: "HTML" });
           return NextResponse.json({ ok: true });
         }
       }
 
       // B. General /start greeting
       const greetingMsg = [
-        `👋 *Halo! Selamat Datang di Bot Resmi etalase.online*`,
+        `👋 <b>Halo! Selamat Datang di Bot Resmi etalase.online</b>`,
         ``,
         `Platform SaaS pembuatan etalase digital, menu visual F&B, dan link-in-bio instan untuk UMKM & Kreator Asia Tenggara.`,
         ``,
-        `🌐 *Website Utama:* https://etalase.online`,
-        `🏢 *Bantuan & Support:* ${config.supportLink}`,
+        `🆔 <b>Chat ID Anda / Grup Ini:</b> <code>${chatId}</code>`,
+        `🌐 <b>Website Utama:</b> https://etalase.online`,
+        `🏢 <b>Bantuan & Support:</b> ${config.supportLink}`,
         ``,
-        `*Bagi Pemilik Toko:*`,
-        `Untuk menghubungkan toko Anda ke bot ini agar menerima push notifikasi pesanan masuk, buka menu *Settings > Integrations* di Dashboard Admin Toko Anda lalu klik *Connect Telegram (1-Click)*.`,
+        `<b>Bagi Pemilik Toko:</b>`,
+        `Untuk menghubungkan toko Anda ke bot ini agar menerima push notifikasi pesanan masuk, buka menu <b>Settings &gt; Integrations</b> di Dashboard Admin Toko Anda lalu klik <b>Connect Telegram (1-Click)</b>.`,
+        ``,
+        `<b>Bagi Admin Mabes:</b>`,
+        `Gunakan Chat ID <code>${chatId}</code> di menu Platform Settings (<code>/mabes/settings</code>) untuk menerima realtime alert pesanan & permohonan penarikan dana.`,
       ].join("\n");
 
-      await sendTelegramMessage(chatId, greetingMsg);
+      await sendTelegramMessage(chatId, greetingMsg, { parseMode: "HTML" });
       return NextResponse.json({ ok: true });
     }
 
     // 2. Handle /help command
     if (text === "/help") {
       const helpMsg = [
-        `ℹ️ *Bantuan etalase.online Bot*`,
+        `ℹ️ <b>Bantuan etalase.online Bot</b>`,
+        ``,
+        `🆔 <b>Chat ID Anda / Grup Ini:</b> <code>${chatId}</code>`,
         ``,
         `Perintah yang tersedia:`,
-        `• \`/start\` — Menampilkan informasi selamat datang & status bot`,
-        `• \`/help\` — Menampilkan panduan penggunaan ini`,
+        `• <code>/start</code> — Menampilkan informasi selamat datang & status bot`,
+        `• <code>/id</code> — Menampilkan ID Chat ini untuk konfigurasi Mabes`,
+        `• <code>/help</code> — Menampilkan panduan penggunaan ini`,
         ``,
         `Jika Anda membutuhkan bantuan teknis, hubungi Customer Care kami di ${config.supportLink}.`,
       ].join("\n");
 
-      await sendTelegramMessage(chatId, helpMsg);
+      await sendTelegramMessage(chatId, helpMsg, { parseMode: "HTML" });
       return NextResponse.json({ ok: true });
     }
 

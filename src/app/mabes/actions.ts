@@ -16,6 +16,7 @@ import {
   registerTelegramWebhook,
   sendTelegramMessage,
   notifyTenantNewOrder,
+  escapeHtml,
 } from "@/lib/services/telegram-service";
 import { ServiceResult, ok, fail } from "@/lib/core/response";
 import { emitN8nEvent } from "@/lib/n8n/dispatcher";
@@ -750,20 +751,33 @@ export async function actionSendTestTelegramAlert(): Promise<ServiceResult<any>>
       );
     }
 
+    const trimmedChatId = config.mabesChatId.trim();
+
+    // Friendly validation if user entered bot username instead of chat ID
+    if (
+      trimmedChatId.toLowerCase().includes("bot") &&
+      !trimmedChatId.startsWith("-100")
+    ) {
+      return fail(
+        "INVALID_INPUT",
+        `Chat ID '${trimmedChatId}' tidak valid. Username bot (@${config.botUsername}) tidak dapat menerima pesan dari dirinya sendiri. Masukkan Chat ID numerik (User ID atau Group ID, misal: -100xxxxxxxxx). Buka bot di Telegram (@${config.botUsername}) lalu ketik /id untuk melihat Chat ID Anda.`
+      );
+    }
+
     const message = [
-      `🔔 *[Mabes Alert Test]*`,
+      `🔔 <b>[Mabes Alert Test]</b>`,
       ``,
-      `• *Platform:* \`etalase.online\``,
-      `• *Bot:* @${config.botUsername || "etalaseonline_bot"}`,
-      `• *Operator:* \`${ctx.user.email}\``,
-      `• *Timestamp:* ${new Date().toLocaleString("id-ID")}`,
+      `• <b>Platform:</b> <code>etalase.online</code>`,
+      `• <b>Bot:</b> @${config.botUsername || "etalaseonline_bot"}`,
+      `• <b>Operator:</b> <code>${escapeHtml(ctx.user.email)}</code>`,
+      `• <b>Timestamp:</b> ${new Date().toLocaleString("id-ID")}`,
       ``,
       `✅ Integrasi bot Telegram Mabes berhasil terhubung dan aktif!`,
     ].join("\n");
 
     const res = await sendTelegramMessage(config.mabesChatId, message, {
       eventTag: "telegram.test_alert",
-      parseMode: "Markdown",
+      parseMode: "HTML",
     });
 
     if (!res.success) {

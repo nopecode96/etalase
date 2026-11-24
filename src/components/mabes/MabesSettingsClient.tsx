@@ -280,16 +280,37 @@ export function MabesSettingsClient({ initialSettings }: MabesSettingsClientProp
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
           <div>
-            <label className="block font-semibold text-slate-300 mb-1">
-              Telegram Mabes Group Chat ID
-            </label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="font-semibold text-slate-300">
+                Telegram Mabes Group Chat ID
+              </label>
+              <span className="text-[10px] text-slate-400 font-mono">
+                Contoh: -1002345678901 atau 123456789
+              </span>
+            </div>
             <input
               type="text"
               value={settings.telegram_mabes_chat_id || ""}
               onChange={(e) => handleChange("telegram_mabes_chat_id", e.target.value)}
               placeholder="-1002345678901"
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white font-mono focus:outline-none focus:border-sky-500"
+              className={`w-full px-3 py-2 bg-slate-950 border rounded-lg text-white font-mono focus:outline-none transition ${
+                (settings.telegram_mabes_chat_id || "").toLowerCase().includes("bot")
+                  ? "border-amber-500 focus:border-amber-400"
+                  : "border-slate-800 focus:border-sky-500"
+              }`}
             />
+            {(settings.telegram_mabes_chat_id || "").toLowerCase().includes("bot") ? (
+              <p className="text-[11px] text-amber-400 mt-1.5 flex items-start gap-1 leading-snug">
+                <span>⚠️</span>
+                <span>
+                  <strong>Perhatian:</strong> Nilai saat ini berupa username bot (<code>{settings.telegram_mabes_chat_id}</code>). Bot tidak bisa mengirim pesan ke dirinya sendiri. Masukkan angka ID pengguna atau ID grup Mabes. Ketik <code>/id</code> ke bot di Telegram untuk mengetahui ID Chat Anda.
+                </span>
+              </p>
+            ) : (
+              <p className="text-[11px] text-slate-400 mt-1.5 leading-snug">
+                Ketik <code>/id</code> ke bot Telegram resmi atau tambahkan bot ke grup Mabes untuk mendapatkan ID Chat numerik.
+              </p>
+            )}
           </div>
 
           <div>
@@ -303,6 +324,9 @@ export function MabesSettingsClient({ initialSettings }: MabesSettingsClientProp
               placeholder="123456789:ABCdefGHIjklMNOpqrSTUvwxyz"
               className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white font-mono focus:outline-none focus:border-sky-500"
             />
+            <p className="text-[11px] text-slate-400 mt-1.5 leading-snug">
+              Token resmi dari <code>@BotFather</code>. Webhook otomatis didaftarkan saat disimpan.
+            </p>
           </div>
         </div>
 

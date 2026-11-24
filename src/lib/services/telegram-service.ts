@@ -229,14 +229,26 @@ export async function registerTelegramWebhook(
 }
 
 /**
- * 4. Generic Message Sender with dynamic configuration & Markdown support
+ * Helper to escape HTML characters for safe Telegram HTML parse_mode
+ */
+export function escapeHtml(str: string | number | null | undefined): string {
+  if (str === null || str === undefined) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+/**
+ * 4. Generic Message Sender with dynamic configuration & resilient HTML parse_mode
+ * Automatically falls back to plain text if Telegram rejects parsing entities.
  */
 export async function sendTelegramMessage(
   chatId: string,
   text: string,
   options?: {
     customBotToken?: string;
-    parseMode?: "Markdown" | "HTML";
+    parseMode?: "HTML" | "Markdown" | "NONE";
     replyMarkup?: any;
     eventTag?: string;
   }
@@ -249,23 +261,66 @@ export async function sendTelegramMessage(
       return { success: false, error: "Missing bot token or destination chat ID." };
     }
 
+    const trimmedChatId = chatId.trim();
+
+    // Guard: Prevent sending message to bot username
+    if (
+      trimmedChatId.toLowerCase().includes("bot") &&
+      !trimmedChatId.startsWith("-100")
+    ) {
+      const err = `Invalid Chat ID: '${trimmedChatId}' appears to be a bot username. Telegram bots cannot message themselves. Please use a numerical User ID (e.g. 123456789) or Group Chat ID (e.g. -1001234567890).`;
+      prisma.automationLog
+        .create({
+          data: {
+            event: options?.eventTag || "telegram.send_message",
+            channel: "TELEGRAM",
+            status: "FAILED",
+            payload: { chatId: trimmedChatId, eventTag: options?.eventTag },
+            error: err,
+          },
+        })
+        .catch(() => {});
+      return { success: false, error: err };
+    }
+
+    const parseMode = options?.parseMode === "NONE" ? undefined : options?.parseMode || "HTML";
+
     const payload: any = {
-      chat_id: chatId,
+      chat_id: trimmedChatId,
       text,
-      parse_mode: options?.parseMode || "Markdown",
     };
+
+    if (parseMode) {
+      payload.parse_mode = parseMode;
+    }
 
     if (options?.replyMarkup) {
       payload.reply_markup = options.replyMarkup;
     }
 
-    const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+    let res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
 
-    const resJson = await res.json();
+    let resJson = await res.json();
+
+    // Automatic fallback: If Telegram fails with entity parsing error, retry once as plain text
+    if (!res.ok && resJson?.description && resJson.description.includes("can't parse entities")) {
+      console.warn(`[telegram-service] Telegram entity parsing failed, retrying as plain text without parse_mode: ${resJson.description}`);
+      const plainPayload = {
+        ...payload,
+        parse_mode: undefined,
+        text: text.replace(/<[^>]+>/g, ""), // strip HTML tags for plain text fallback
+      };
+      res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(plainPayload),
+      });
+      resJson = await res.json();
+    }
 
     // Log automation event
     prisma.automationLog
@@ -274,7 +329,7 @@ export async function sendTelegramMessage(
           event: options?.eventTag || "telegram.send_message",
           channel: "TELEGRAM",
           status: res.ok ? "SUCCESS" : "FAILED",
-          payload: { chatId, eventTag: options?.eventTag },
+          payload: { chatId: trimmedChatId, eventTag: options?.eventTag },
           response: res.ok ? "Message sent" : undefined,
           error: res.ok ? undefined : resJson?.description,
         },
@@ -306,21 +361,21 @@ export async function notifyMabesNewTenant(data: {
   if (!config.mabesChatId) return;
 
   const msg = [
-    `🏪 *[Mabes Alert] Toko Baru Terdaftar!*`,
+    `🏪 <b>[Mabes Alert] Toko Baru Terdaftar!</b>`,
     ``,
-    `• *Nama Toko:* ${data.storeName}`,
-    `• *Subdomain:* \`${data.storeSlug}.etalase.online\``,
-    `• *Email Merchant:* \`${data.ownerEmail}\``,
-    `• *Tier:* *${data.tier}*`,
-    `• *WhatsApp:* \`${data.chatHandle || "N/A"}\``,
-    `• *Waktu:* ${new Date().toLocaleString("id-ID")}`,
+    `• <b>Nama Toko:</b> ${escapeHtml(data.storeName)}`,
+    `• <b>Subdomain:</b> <code>${escapeHtml(data.storeSlug)}.etalase.online</code>`,
+    `• <b>Email Merchant:</b> <code>${escapeHtml(data.ownerEmail)}</code>`,
+    `• <b>Tier:</b> <b>${escapeHtml(data.tier)}</b>`,
+    `• <b>WhatsApp:</b> <code>${escapeHtml(data.chatHandle || "N/A")}</code>`,
+    `• <b>Waktu:</b> ${new Date().toLocaleString("id-ID")}`,
     ``,
-    `🔗 [Buka di Tenant Console](https://mabes.etalase.online/mabes/tenants)`,
+    `🔗 <a href="https://mabes.etalase.online/mabes/tenants">Buka di Tenant Console</a>`,
   ].join("\n");
 
   sendTelegramMessage(config.mabesChatId, msg, {
     eventTag: "mabes.new_tenant",
-    parseMode: "Markdown",
+    parseMode: "HTML",
   }).catch(() => {});
 }
 
@@ -341,24 +396,24 @@ export async function notifyMabesUpgradePayment(data: {
   if (!config.mabesChatId) return;
 
   const msg = [
-    `💳 *[Mabes Alert] Pesanan Upgrade Paket Masuk!*`,
+    `💳 <b>[Mabes Alert] Pesanan Upgrade Paket Masuk!</b>`,
     ``,
-    `• *No. Invoice:* *#${data.orderNumber}*`,
-    `• *Toko:* ${data.storeName} (\`${data.storeSlug}\`)`,
-    `• *Paket:* *${data.planCode} (${data.billingCycle})*`,
-    `• *Nominal:* *Rp ${Number(data.amount).toLocaleString("id-ID")}*`,
-    `• *Metode:* *${data.paymentMethod}*`,
-    data.proofUrl ? `• *Bukti Transfer:* [Lihat Gambar Bukti](${data.proofUrl})` : ``,
-    `• *Waktu:* ${new Date().toLocaleString("id-ID")}`,
+    `• <b>No. Invoice:</b> <b>#${escapeHtml(data.orderNumber)}</b>`,
+    `• <b>Toko:</b> ${escapeHtml(data.storeName)} (<code>${escapeHtml(data.storeSlug)}</code>)`,
+    `• <b>Paket:</b> <b>${escapeHtml(data.planCode)} (${escapeHtml(data.billingCycle)})</b>`,
+    `• <b>Nominal:</b> <b>Rp ${Number(data.amount).toLocaleString("id-ID")}</b>`,
+    `• <b>Metode:</b> <b>${escapeHtml(data.paymentMethod)}</b>`,
+    data.proofUrl ? `• <b>Bukti Transfer:</b> <a href="${data.proofUrl}">Lihat Gambar Bukti</a>` : ``,
+    `• <b>Waktu:</b> ${new Date().toLocaleString("id-ID")}`,
     ``,
-    `⚡ [Verifikasi & Aktivasi Segera](https://mabes.etalase.online/mabes/billing)`,
+    `⚡ <a href="https://mabes.etalase.online/mabes/billing">Verifikasi & Aktivasi Segera</a>`,
   ]
     .filter(Boolean)
     .join("\n");
 
   sendTelegramMessage(config.mabesChatId, msg, {
     eventTag: "mabes.plan_upgrade",
-    parseMode: "Markdown",
+    parseMode: "HTML",
   }).catch(() => {});
 }
 
@@ -376,20 +431,20 @@ export async function notifyMabesWithdrawalRequest(data: {
   if (!config.mabesChatId) return;
 
   const msg = [
-    `💸 *[Mabes Alert] Permohonan Penarikan Dana (Payout)!*`,
+    `💸 <b>[Mabes Alert] Permohonan Penarikan Dana (Payout)!</b>`,
     ``,
-    `• *Toko:* ${data.storeName} (\`${data.storeSlug}\`)`,
-    `• *Nominal Penarikan:* *Rp ${Number(data.amount).toLocaleString("id-ID")}*`,
-    `• *Rekening Tujuan:* \`${data.destination}\``,
-    `• *Nominal Bersih Disalurkan:* *Rp ${Number(data.netAmount).toLocaleString("id-ID")}*`,
-    `• *Waktu:* ${new Date().toLocaleString("id-ID")}`,
+    `• <b>Toko:</b> ${escapeHtml(data.storeName)} (<code>${escapeHtml(data.storeSlug)}</code>)`,
+    `• <b>Nominal Penarikan:</b> <b>Rp ${Number(data.amount).toLocaleString("id-ID")}</b>`,
+    `• <b>Rekening Tujuan:</b> <code>${escapeHtml(data.destination)}</code>`,
+    `• <b>Nominal Bersih Disalurkan:</b> <b>Rp ${Number(data.netAmount).toLocaleString("id-ID")}</b>`,
+    `• <b>Waktu:</b> ${new Date().toLocaleString("id-ID")}`,
     ``,
-    `⚡ [Proses Pencairan di Mabes](https://mabes.etalase.online/mabes/payouts)`,
+    `⚡ <a href="https://mabes.etalase.online/mabes/payouts">Proses Pencairan di Mabes</a>`,
   ].join("\n");
 
   sendTelegramMessage(config.mabesChatId, msg, {
     eventTag: "mabes.withdrawal_request",
-    parseMode: "Markdown",
+    parseMode: "HTML",
   }).catch(() => {});
 }
 
@@ -428,16 +483,16 @@ export async function notifyTenantNewOrder(
     }
 
     const msg = [
-      `🛍️ *Pesanan Baru Masuk di Toko Anda!*`,
+      `🛍️ <b>Pesanan Baru Masuk di Toko Anda!</b>`,
       ``,
-      `• *No. Pesanan:* *#${data.orderCode}*`,
-      `• *Produk:* ${data.productTitle}`,
-      `• *Total Pembayaran:* *Rp ${Number(data.amount).toLocaleString("id-ID")}*`,
-      `• *Nama Pembeli:* ${data.buyerName}`,
-      `• *WhatsApp:* \`${data.buyerWhatsapp}\``,
-      `• *Metode:* *${data.paymentMethod || "QRIS / Chat"}*`,
+      `• <b>No. Pesanan:</b> <b>#${escapeHtml(data.orderCode)}</b>`,
+      `• <b>Produk:</b> ${escapeHtml(data.productTitle)}`,
+      `• <b>Total Pembayaran:</b> <b>Rp ${Number(data.amount).toLocaleString("id-ID")}</b>`,
+      `• <b>Nama Pembeli:</b> ${escapeHtml(data.buyerName)}`,
+      `• <b>WhatsApp:</b> <code>${escapeHtml(data.buyerWhatsapp)}</code>`,
+      `• <b>Metode:</b> <b>${escapeHtml(data.paymentMethod || "QRIS / Chat")}</b>`,
       ``,
-      `📦 [Buka Dashboard Pesanan Toko](https://${store.slug}.etalase.online/admin/orders)`,
+      `📦 <a href="https://${store.slug}.etalase.online/admin/orders">Buka Dashboard Pesanan Toko</a>`,
     ].join("\n");
 
     // Use custom bot token if tenant provided their own, otherwise platform bot
@@ -446,7 +501,7 @@ export async function notifyTenantNewOrder(
     sendTelegramMessage(integration.chatId, msg, {
       customBotToken: customToken,
       eventTag: "tenant.new_order",
-      parseMode: "Markdown",
+      parseMode: "HTML",
     }).catch(() => {});
   } catch (err) {
     console.warn("notifyTenantNewOrder error:", err);
