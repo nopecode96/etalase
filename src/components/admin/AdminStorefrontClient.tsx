@@ -236,7 +236,7 @@ export function AdminStorefrontClient({ store, tier }: AdminStorefrontClientProp
   };
 
   return (
-    <div className="space-y-10 animate-fade-in max-w-5xl">
+    <div className="space-y-10 animate-fade-in w-full">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#E7E5E4]">
         <div>

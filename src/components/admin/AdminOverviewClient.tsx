@@ -87,7 +87,7 @@ export function AdminOverviewClient({
   const progressPercent = Math.round((completedCount / checklistItems.length) * 100);
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="space-y-8 animate-fade-in w-full">
       {/* 1. Header Greeting & Quick Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>

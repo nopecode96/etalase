@@ -230,7 +230,7 @@ export function AdminDashboardClient({
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
       {/* Top Navigation */}
       <header className="bg-white border-b border-slate-200 px-6 py-4 sticky top-0 z-30">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
+        <div className="w-full flex items-center justify-between">
           <div className="flex items-center gap-3">
             <EtalaseLogoIcon size={32} />
             <div>
@@ -265,7 +265,7 @@ export function AdminDashboardClient({
 
       {/* Main Tabs Navigation */}
       <div className="bg-white border-b border-slate-200">
-        <div className="max-w-6xl mx-auto px-6 flex gap-8">
+        <div className="w-full px-6 flex gap-8">
           <button
             onClick={() => setActiveTab("products")}
             className={`py-3.5 text-sm font-semibold border-b-2 transition flex items-center gap-2 ${
@@ -325,7 +325,7 @@ export function AdminDashboardClient({
       </div>
 
       {/* Body Content */}
-      <main className="max-w-6xl mx-auto px-6 py-8 flex-1 w-full">
+      <main className="w-full px-6 py-8 flex-1">
         {activeTab === "products" && (
           <div>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
@@ -542,7 +542,7 @@ export function AdminDashboardClient({
         )}
 
         {activeTab === "finance" && (
-          <div className="space-y-8 max-w-3xl">
+          <div className="space-y-8 w-full">
             {/* Kartu 1: Penanggung Biaya Transaksi QRIS */}
             <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xs">
               <div className="flex items-center gap-3 mb-2">

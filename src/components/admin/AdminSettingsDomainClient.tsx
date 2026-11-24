@@ -60,7 +60,7 @@ export function AdminSettingsDomainClient({
   };
 
   return (
-    <div className="space-y-8 animate-fade-in max-w-3xl">
+    <div className="space-y-8 animate-fade-in w-full">
       <div className="pb-6 border-b border-[#E7E5E4]">
         <h1 className="text-2xl font-bold tracking-tight text-[#1C1917]">
           Custom Domain

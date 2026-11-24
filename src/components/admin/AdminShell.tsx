@@ -139,8 +139,8 @@ export function AdminShell({ store, user, children }: AdminShellProps) {
           </div>
         </header>
 
-        {/* 3. Main Content Canvas (No Horizontal Tabs) */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-6xl w-full mx-auto pb-16">
+        {/* 3. Main Content Canvas (Full Width Responsive) */}
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 w-full pb-16">
           {children}
         </main>
       </div>

@@ -27,7 +27,7 @@ export default async function MabesAdminPage() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
       <header className="border-b border-slate-800 bg-slate-900/60 px-6 py-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
+        <div className="w-full flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">
               M
@@ -59,7 +59,7 @@ export default async function MabesAdminPage() {
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-6 py-8 flex-1 w-full">
+      <main className="w-full px-6 py-8 flex-1">
         {/* KPI Row (Filtered isDemo: false) */}
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-8">
           <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">

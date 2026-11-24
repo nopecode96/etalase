@@ -126,7 +126,7 @@ export function AdminStorefrontThemeClient({ store, tier }: AdminStorefrontTheme
   };
 
   return (
-    <div className="space-y-8 animate-fade-in max-w-4xl">
+    <div className="space-y-8 animate-fade-in w-full">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-[#1C1917]">

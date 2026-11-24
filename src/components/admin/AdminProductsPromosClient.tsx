@@ -84,7 +84,7 @@ export function AdminProductsPromosClient({ store }: AdminProductsPromosClientPr
   };
 
   return (
-    <div className="space-y-8 animate-fade-in max-w-5xl">
+    <div className="space-y-8 animate-fade-in w-full">
       {/* Header */}
       <div className="pb-6 border-b border-[#E7E5E4]">
         <div className="flex items-center gap-2">
