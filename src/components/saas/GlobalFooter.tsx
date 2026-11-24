@@ -346,9 +346,18 @@ export function GlobalFooter() {
                 href="https://t.me/etalaseonline_bot"
                 target="_blank"
                 rel="noreferrer"
-                className="text-sky-600 hover:text-sky-700 transition font-medium inline-flex items-center gap-1"
+                className="text-sky-600 hover:text-sky-700 transition font-medium inline-flex items-center gap-2"
+                title="Chat Customer Service: Rani • EtalaseOnline CS"
               >
-                <span>CS: @etalaseonline_bot</span>
+                <div className="relative w-4 h-4 rounded-full overflow-hidden border border-sky-300 shrink-0">
+                  <img
+                    src="/images/rani-cs.png"
+                    alt="Rani CS"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <span>Rani • EtalaseOnline CS</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               </a>
             </li>
             <li>

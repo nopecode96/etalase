@@ -480,10 +480,17 @@ export function BantuanClient({ locale }: { locale: SupportedLocale }) {
                 href="https://t.me/etalaseonline_bot"
                 target="_blank"
                 rel="noreferrer"
-                className="bg-sky-600 hover:bg-sky-500 text-white font-semibold px-6 py-3 rounded-xl text-xs sm:text-sm transition shadow-sm inline-flex items-center gap-2"
+                className="bg-sky-600 hover:bg-sky-500 text-white font-semibold px-6 py-3 rounded-xl text-xs sm:text-sm transition shadow-sm inline-flex items-center gap-2.5"
+                title="Chat Customer Support (Rani • EtalaseOnline CS)"
               >
-                <Send className="w-4 h-4" />
-                <span>Chat CS Telegram (@etalaseonline_bot)</span>
+                <div className="w-5 h-5 rounded-full overflow-hidden border border-white/40 shrink-0">
+                  <img
+                    src="/images/rani-cs.png"
+                    alt="Rani CS"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <span>Chat CS: Rani • EtalaseOnline CS</span>
               </a>
 
               <Link

@@ -377,12 +377,22 @@ export function AdminSidebar({
               href="https://t.me/etalaseonline_bot"
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-1.5 text-sky-700 hover:text-sky-800 font-semibold transition"
+              className="inline-flex items-center gap-2 text-sky-700 hover:text-sky-800 font-semibold transition truncate min-w-0"
+              title="Chat Customer Support (Rani • EtalaseOnline CS)"
             >
-              <Send className="w-3.5 h-3.5 text-sky-600" />
-              <span>Bantuan CS Telegram</span>
+              <div className="w-4 h-4 rounded-full overflow-hidden border border-sky-300 shrink-0">
+                <img
+                  src="/images/rani-cs.png"
+                  alt="Rani CS"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <span className="truncate">Rani • EtalaseOnline CS</span>
             </a>
-            <span className="text-[10px] text-sky-600 font-mono">@etalaseonline_bot</span>
+            <span className="inline-flex items-center gap-1 text-[10px] text-emerald-600 font-semibold shrink-0 ml-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Online
+            </span>
           </div>
         )}
 
@@ -518,10 +528,17 @@ export function AdminSidebar({
                 href="https://t.me/etalaseonline_bot"
                 target="_blank"
                 rel="noreferrer"
-                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-sky-50 border border-sky-200 text-sky-700 font-semibold text-xs hover:bg-sky-100 transition"
+                className="w-full flex items-center justify-center gap-2.5 py-2.5 rounded-xl bg-sky-50 border border-sky-200 text-sky-700 font-semibold text-xs hover:bg-sky-100 transition"
+                title="Chat Customer Support (Rani • EtalaseOnline CS)"
               >
-                <Send className="w-3.5 h-3.5 text-sky-600" />
-                <span>CS Telegram: @etalaseonline_bot</span>
+                <div className="w-4 h-4 rounded-full overflow-hidden border border-sky-300 shrink-0">
+                  <img
+                    src="/images/rani-cs.png"
+                    alt="Rani CS"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <span>Chat CS: Rani • EtalaseOnline CS</span>
               </a>
             </div>
           </div>

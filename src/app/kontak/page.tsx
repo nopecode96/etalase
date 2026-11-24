@@ -96,7 +96,7 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
       hoursTitle: "Waktu Operasional Tim Bantuan:",
       hours1: "Senin - Sabtu: 08:00 - 21:00 WIB",
       hours2: "Minggu & Hari Libur: 09:00 - 17:00 WIB",
-      telegramCsBtn: "Chat Customer Service Telegram (@etalaseonline_bot)",
+      telegramCsBtn: "Chat CS: Rani • EtalaseOnline CS",
       helpDeskBtn: "Email Dukungan ke support@etalase.online",
       helpCenterBtn: "Kunjungi Pusat Bantuan & Dokumentasi",
       card2Badge: "Korespondensi Resmi",
@@ -123,7 +123,7 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
       hoursTitle: "Support Operational Hours (GMT+7):",
       hours1: "Monday - Saturday: 08:00 - 21:00 WIB",
       hours2: "Sunday & Holidays: 09:00 - 17:00 WIB",
-      telegramCsBtn: "Chat Customer Service on Telegram (@etalaseonline_bot)",
+      telegramCsBtn: "Chat CS: Rani • EtalaseOnline CS",
       helpDeskBtn: "Email Support at support@etalase.online",
       helpCenterBtn: "Visit Help Center & Documentation",
       card2Badge: "Official Correspondence",
@@ -150,7 +150,7 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
       hoursTitle: "Waktu Operasi Bantuan:",
       hours1: "Isnin - Sabtu: 08:00 - 21:00 WIB",
       hours2: "Ahad & Cuti Umum: 09:00 - 17:00 WIB",
-      telegramCsBtn: "Sembang Khidmat Pelanggan Telegram (@etalaseonline_bot)",
+      telegramCsBtn: "Sembang CS: Rani • EtalaseOnline CS",
       helpDeskBtn: "Hantar E-mel ke support@etalase.online",
       helpCenterBtn: "Lawati Pusat Bantuan & Dokumentasi",
       card2Badge: "Surat-Menyurat Rasmi",
@@ -176,7 +176,7 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
       hoursTitle: "เวลาทำการของทีมสนับสนุน:",
       hours1: "จันทร์ - เสาร์: 08:00 - 21:00 น. (GMT+7)",
       hours2: "อาทิตย์และวันหยุด: 09:00 - 17:00 น. (GMT+7)",
-      telegramCsBtn: "แชทกับฝ่ายบริการลูกค้า Telegram (@etalaseonline_bot)",
+      telegramCsBtn: "แชท CS: Rani • EtalaseOnline CS",
       helpDeskBtn: "ส่งอีเมลถึง support@etalase.online",
       helpCenterBtn: "ไปที่ศูนย์ช่วยเหลือและคู่มือการใช้งาน",
       card2Badge: "การติดต่ออย่างเป็นทางการ",
@@ -202,7 +202,7 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
       hoursTitle: "Thời Gian Hỗ Trợ Trực Tuyến:",
       hours1: "Thứ Hai - Thứ Bảy: 08:00 - 21:00 (GMT+7)",
       hours2: "Chủ Nhật & Ngày Lễ: 09:00 - 17:00 (GMT+7)",
-      telegramCsBtn: "Trò chuyện CSKH Telegram (@etalaseonline_bot)",
+      telegramCsBtn: "Trò chuyện CS: Rani • EtalaseOnline CS",
       helpDeskBtn: "Gửi email đến support@etalase.online",
       helpCenterBtn: "Truy cập Trung tâm Trợ giúp & Tài liệu",
       card2Badge: "Thư tín chính thức",
@@ -334,9 +334,15 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
                   href="https://t.me/etalaseonline_bot"
                   target="_blank"
                   rel="noreferrer"
-                  className="w-full bg-sky-600 hover:bg-sky-500 text-white py-3.5 px-4 rounded-xl font-bold text-xs sm:text-sm shadow-sm transition flex items-center justify-center gap-2 cursor-pointer text-center"
+                  className="w-full bg-sky-600 hover:bg-sky-500 text-white py-3.5 px-4 rounded-xl font-bold text-xs sm:text-sm shadow-sm transition flex items-center justify-center gap-2.5 cursor-pointer text-center"
                 >
-                  <Send className="w-4 h-4 shrink-0" />
+                  <div className="w-5 h-5 rounded-full overflow-hidden border border-white/40 shrink-0">
+                    <img
+                      src="/images/rani-cs.png"
+                      alt="Rani CS"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                   <span>{copy.telegramCsBtn}</span>
                 </a>
 
