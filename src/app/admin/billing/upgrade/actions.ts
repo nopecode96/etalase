@@ -4,27 +4,31 @@ import { requireTenantContext } from "@/lib/auth/tenant-guard";
 import { prisma, serializePlain } from "@/lib/db/prisma";
 import { ServiceResult, ok, fail } from "@/lib/core/response";
 import { emitN8nEvent } from "@/lib/n8n/dispatcher";
+import { createBorderpayInvoice } from "@/services/payment-borderpay";
+import {
+  createPaypalOrder,
+  capturePaypalOrder,
+  getPlanUsdPrice,
+} from "@/services/payment-paypal";
 
 export interface CreatePlanOrderInput {
   planCode: "PRO" | "DFY";
   billingCycle: "MONTHLY" | "YEARLY" | "ONE_TIME";
-}
-
-export interface SubmitPaymentProofInput {
-  orderId: string;
-  proofUrl: string;
-  notes?: string;
+  paymentProvider: "BORDERPAY_QRIS" | "PAYPAL";
+  returnUrl?: string;
+  cancelUrl?: string;
 }
 
 /**
  * 1. Create a fresh upgrade invoice tied strictly to the verified tenant store.
+ * Supports Borderpay QRIS and PayPal (Credit Card).
  */
 export async function actionCreatePlanOrder(
   input: CreatePlanOrderInput
 ): Promise<ServiceResult<any>> {
   try {
     const ctx = await requireTenantContext();
-    const { planCode, billingCycle } = input;
+    const { planCode, billingCycle, paymentProvider = "BORDERPAY_QRIS" } = input;
 
     let amount = 49000;
     let cycle = billingCycle;
@@ -46,6 +50,56 @@ export async function actionCreatePlanOrder(
     const randomSuffix = Math.floor(1000 + Math.random() * 9000);
     const orderNumber = `INV-UPG-${dateStr}-${randomSuffix}`;
 
+    let paymentUrl = "";
+    let qrString = "";
+    let paypalOrderId = "";
+    let paypalApproveUrl = "";
+    let amountUsd = getPlanUsdPrice(planCode, cycle);
+
+    if (paymentProvider === "PAYPAL") {
+      // Create PayPal Order in USD (Credit Card only)
+      const returnUrl =
+        input.returnUrl ||
+        `https://etalase.online/admin/billing/upgrade?status=paypal_success&orderNumber=${orderNumber}`;
+      const cancelUrl =
+        input.cancelUrl ||
+        `https://etalase.online/admin/billing/upgrade?status=cancelled`;
+
+      const paypalRes = await createPaypalOrder({
+        orderCode: orderNumber,
+        amountUsd,
+        description: `${planCode === "DFY" ? "Terima Beres (Done-For-You)" : `PRO Plan (${cycle})`} - ${ctx.store.name}`,
+        returnUrl,
+        cancelUrl,
+        customId: orderNumber,
+      });
+
+      if (!paypalRes.success || !paypalRes.data) {
+        return fail("PAYMENT_FAILED", "Failed to initialize PayPal Credit Card session.");
+      }
+
+      paypalOrderId = paypalRes.data.orderId;
+      paypalApproveUrl = paypalRes.data.approveUrl;
+      paymentUrl = paypalApproveUrl;
+    } else {
+      // Borderpay QRIS invoice (IDR)
+      const invoiceRes = await createBorderpayInvoice({
+        orderCode: orderNumber,
+        amount,
+        currency: "IDR",
+        customerName: ctx.user.name || ctx.store.name,
+        customerWhatsapp: ctx.store.whatsapp || "6281234567890",
+        customerEmail: ctx.user.email || undefined,
+        description: `${planCode === "DFY" ? "Terima Beres (Done-For-You)" : `PRO Plan (${cycle})`} - ${ctx.store.name}`,
+        feeBorneBy: "merchant", // 0% extra fee for tenant plan upgrade
+      });
+
+      if (invoiceRes.success && invoiceRes.data) {
+        paymentUrl = invoiceRes.data.paymentUrl;
+        qrString = invoiceRes.data.qrString || "";
+      }
+    }
+
     const order = await prisma.planOrder.create({
       data: {
         orderNumber,
@@ -53,13 +107,28 @@ export async function actionCreatePlanOrder(
         planCode,
         billingCycle: cycle,
         amount,
-        currency: "IDR",
+        currency: paymentProvider === "PAYPAL" ? "USD" : "IDR",
         status: "PENDING",
-        paymentMethod: "QRIS",
+        paymentMethod: paymentProvider,
+        notes: JSON.stringify({
+          paymentUrl,
+          qrString,
+          paypalOrderId,
+          paypalApproveUrl,
+          amountUsd,
+        }),
       },
     });
 
-    return ok(serializePlain(order));
+    return ok({
+      order: serializePlain(order),
+      paymentProvider,
+      paymentUrl,
+      qrString,
+      paypalOrderId,
+      paypalApproveUrl,
+      amountUsd,
+    });
   } catch (err: any) {
     console.error("actionCreatePlanOrder error:", err);
     return fail("INTERNAL_ERROR", err.message || "Failed to create upgrade order invoice.");
@@ -67,72 +136,180 @@ export async function actionCreatePlanOrder(
 }
 
 /**
- * 2. Submit payment proof receipt for review.
- * Strictly checks compound ownership { id: orderId, storeId: ctx.storeId }
+ * 2. Capture and confirm an approved PayPal payment.
+ * Automatically activates the tenant tier immediately.
  */
-export async function actionSubmitPaymentProof(
-  input: SubmitPaymentProofInput
-): Promise<ServiceResult<any>> {
+export async function actionCapturePaypalPlanOrder(input: {
+  paypalOrderId: string;
+  orderNumber: string;
+}): Promise<ServiceResult<any>> {
   try {
     const ctx = await requireTenantContext();
+    const { paypalOrderId, orderNumber } = input;
 
-    if (!input.orderId || !input.proofUrl) {
-      return fail("INVALID_INPUT", "Order ID and payment proof image are required.");
-    }
-
-    const existing = await prisma.planOrder.findFirst({
+    const planOrder = await prisma.planOrder.findFirst({
       where: {
-        id: input.orderId,
+        orderNumber,
         storeId: ctx.storeId,
       },
+      include: { store: true },
     });
 
-    if (!existing) {
-      return fail("NOT_FOUND", "Upgrade order not found or unauthorized.");
+    if (!planOrder) {
+      return fail("NOT_FOUND", "Plan upgrade order not found or unauthorized.");
     }
 
-    if (existing.status === "APPROVED") {
-      return fail("INVALID_INPUT", "This upgrade order has already been verified and activated.");
+    if (planOrder.status === "APPROVED") {
+      return ok({ status: "APPROVED", tier: planOrder.planCode });
     }
 
-    const updated = await prisma.planOrder.update({
-      where: { id: existing.id },
-      data: {
-        proofUrl: input.proofUrl,
-        notes: input.notes?.trim() || null,
-        status: "UNDER_REVIEW",
-        paidAt: new Date(),
-      },
-    });
+    // Capture payment with PayPal REST API
+    const captureRes = await capturePaypalOrder(paypalOrderId);
+    if (!captureRes.success && captureRes.error !== "ORDER_ALREADY_CAPTURED") {
+      return fail("PAYMENT_FAILED", "Payment capture failed on PayPal.");
+    }
 
-    // Fire-and-forget push notification to Mabes Super Admin / Telegram flow
+    const newTier = planOrder.planCode === "DFY" ? "DFY_BUSINESS" : "PRO";
+
+    const [updatedOrder] = await prisma.$transaction([
+      prisma.planOrder.update({
+        where: { id: planOrder.id },
+        data: {
+          status: "APPROVED",
+          paymentMethod: "PAYPAL",
+          paidAt: new Date(),
+          approvedAt: new Date(),
+          adminNotes: `Captured via PayPal Order ID ${paypalOrderId}`,
+        },
+      }),
+      prisma.store.update({
+        where: { id: ctx.storeId },
+        data: { tier: newTier },
+      }),
+    ]);
+
+    // Dispatch notification
     try {
       emitN8nEvent("tier.upgraded", {
-        orderNumber: updated.orderNumber,
+        orderNumber: planOrder.orderNumber,
         storeId: ctx.storeId,
         storeName: ctx.store.name,
         storeSlug: ctx.store.slug,
         userEmail: ctx.user.email,
-        planCode: updated.planCode,
-        billingCycle: updated.billingCycle,
-        amount: Number(updated.amount),
-        proofUrl: updated.proofUrl,
-        notes: updated.notes,
-        submittedAt: new Date().toISOString(),
+        planCode: planOrder.planCode,
+        billingCycle: planOrder.billingCycle,
+        amount: Number(planOrder.amount),
+        paidVia: "PAYPAL_CREDIT_CARD",
+        paypalOrderId,
       });
-    } catch (evtErr) {
-      console.warn("Failed to dispatch n8n notification event for plan order:", evtErr);
+    } catch (e) {
+      console.warn("n8n notification error:", e);
     }
 
-    return ok(serializePlain(updated));
+    return ok({ status: "APPROVED", tier: newTier, order: serializePlain(updatedOrder) });
   } catch (err: any) {
-    console.error("actionSubmitPaymentProof error:", err);
-    return fail("INTERNAL_ERROR", err.message || "Failed to submit payment confirmation.");
+    console.error("actionCapturePaypalPlanOrder error:", err);
+    return fail("INTERNAL_ERROR", err.message || "Failed to capture PayPal payment.");
   }
 }
 
 /**
- * 3. Retrieve the latest pending or under review order for the active tenant.
+ * 3. Polling check for PlanOrder status (useful for real-time QRIS & webhook updates).
+ */
+export async function actionCheckPlanOrderStatus(
+  orderId: string
+): Promise<ServiceResult<{ status: string; planCode: string; tier: string }>> {
+  try {
+    const ctx = await requireTenantContext();
+
+    const order = await prisma.planOrder.findFirst({
+      where: {
+        id: orderId,
+        storeId: ctx.storeId,
+      },
+      include: { store: true },
+    });
+
+    if (!order) {
+      return fail("NOT_FOUND", "Order not found.");
+    }
+
+    return ok({
+      status: order.status,
+      planCode: order.planCode,
+      tier: order.store.tier,
+    });
+  } catch (err: any) {
+    console.error("actionCheckPlanOrderStatus error:", err);
+    return fail("INTERNAL_ERROR", err.message || "Failed to check order status.");
+  }
+}
+
+/**
+ * 4. Sandbox simulator for Borderpay QRIS instant testing.
+ */
+export async function actionSimulateBorderpaySuccess(
+  orderId: string
+): Promise<ServiceResult<any>> {
+  try {
+    const ctx = await requireTenantContext();
+
+    const planOrder = await prisma.planOrder.findFirst({
+      where: {
+        id: orderId,
+        storeId: ctx.storeId,
+      },
+      include: { store: true },
+    });
+
+    if (!planOrder) {
+      return fail("NOT_FOUND", "Order not found or unauthorized.");
+    }
+
+    const newTier = planOrder.planCode === "DFY" ? "DFY_BUSINESS" : "PRO";
+
+    const [updatedOrder] = await prisma.$transaction([
+      prisma.planOrder.update({
+        where: { id: planOrder.id },
+        data: {
+          status: "APPROVED",
+          paymentMethod: "BORDERPAY_QRIS",
+          paidAt: new Date(),
+          approvedAt: new Date(),
+          adminNotes: "Auto-approved via Borderpay Sandbox Simulator",
+        },
+      }),
+      prisma.store.update({
+        where: { id: ctx.storeId },
+        data: { tier: newTier },
+      }),
+    ]);
+
+    try {
+      emitN8nEvent("tier.upgraded", {
+        orderNumber: planOrder.orderNumber,
+        storeId: ctx.storeId,
+        storeName: ctx.store.name,
+        storeSlug: ctx.store.slug,
+        userEmail: ctx.user.email,
+        planCode: planOrder.planCode,
+        billingCycle: planOrder.billingCycle,
+        amount: Number(planOrder.amount),
+        paidVia: "BORDERPAY_QRIS_SIMULATOR",
+      });
+    } catch (e) {
+      console.warn("n8n notification error:", e);
+    }
+
+    return ok({ status: "APPROVED", tier: newTier, order: serializePlain(updatedOrder) });
+  } catch (err: any) {
+    console.error("actionSimulateBorderpaySuccess error:", err);
+    return fail("INTERNAL_ERROR", err.message || "Failed to simulate Borderpay payment.");
+  }
+}
+
+/**
+ * 5. Retrieve active order.
  */
 export async function actionGetActivePlanOrder(): Promise<ServiceResult<any>> {
   try {

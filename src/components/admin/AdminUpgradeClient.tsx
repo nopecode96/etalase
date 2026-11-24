@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React, { useState, useEffect, useTransition } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import {
   Sparkles,
   ArrowLeft,
@@ -10,23 +11,23 @@ import {
   Clock,
   ShieldCheck,
   QrCode,
-  Building2,
+  CreditCard,
   Copy,
   Check,
-  UploadCloud,
   Loader2,
   Zap,
   Star,
   ExternalLink,
-  ChevronRight,
-  Headphones,
-  Check as CheckIcon,
+  RefreshCw,
+  AlertCircle,
+  Lock,
 } from "lucide-react";
-import { ImageUploadDropzone } from "@/components/admin/ImageUploadDropzone";
 import { showToast } from "@/components/ui/GlobalToast";
 import {
   actionCreatePlanOrder,
-  actionSubmitPaymentProof,
+  actionCapturePaypalPlanOrder,
+  actionCheckPlanOrderStatus,
+  actionSimulateBorderpaySuccess,
 } from "@/app/admin/billing/upgrade/actions";
 
 interface AdminUpgradeClientProps {
@@ -37,6 +38,9 @@ interface AdminUpgradeClientProps {
   initialCycle?: string;
   returnTo?: string;
   existingOrder?: any;
+  paypalStatus?: string;
+  paypalToken?: string;
+  paypalOrderNumber?: string;
 }
 
 export function AdminUpgradeClient({
@@ -47,8 +51,13 @@ export function AdminUpgradeClient({
   initialCycle = "yearly",
   returnTo = "/admin",
   existingOrder = null,
+  paypalStatus,
+  paypalToken,
+  paypalOrderNumber,
 }: AdminUpgradeClientProps) {
-  // Plan selection
+  const router = useRouter();
+
+  // Plan Selection
   const [selectedPlan, setSelectedPlan] = useState<"PRO" | "DFY">(
     initialPlan.toLowerCase() === "dfy" ? "DFY" : "PRO"
   );
@@ -56,14 +65,75 @@ export function AdminUpgradeClient({
     initialCycle.toLowerCase() === "monthly" ? "MONTHLY" : "YEARLY"
   );
 
-  // Active Order / Checkout State
+  // Payment Method Selection: strictly Borderpay QRIS or PayPal (Credit Card)
+  const [paymentProvider, setPaymentProvider] = useState<"BORDERPAY_QRIS" | "PAYPAL">("BORDERPAY_QRIS");
+
+  // Active Invoice & Gateway Session State
   const [activeOrder, setActiveOrder] = useState<any | null>(existingOrder);
-  const [proofUrl, setProofUrl] = useState<string>(existingOrder?.proofUrl || "");
-  const [notes, setNotes] = useState<string>(existingOrder?.notes || "");
+  const [qrString, setQrString] = useState<string>("");
+  const [paymentUrl, setPaymentUrl] = useState<string>("");
+  const [paypalApproveUrl, setPaypalApproveUrl] = useState<string>("");
+  const [paypalOrderId, setPaypalOrderId] = useState<string>("");
+  const [amountUsd, setAmountUsd] = useState<number>(29.99);
+
+  // Status & Verification state
+  const [isApproved, setIsApproved] = useState<boolean>(existingOrder?.status === "APPROVED");
+  const [isVerifying, setIsVerifying] = useState<boolean>(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
-  const [isCreatingOrder, startCreateTransition] = useTransition();
-  const [isSubmittingProof, startProofTransition] = useTransition();
+  const [isPendingAction, startTransition] = useTransition();
+
+  // Parse notes from existing order if present
+  useEffect(() => {
+    if (existingOrder?.notes) {
+      try {
+        const parsed = JSON.parse(existingOrder.notes);
+        if (parsed.qrString) setQrString(parsed.qrString);
+        if (parsed.paymentUrl) setPaymentUrl(parsed.paymentUrl);
+        if (parsed.paypalApproveUrl) setPaypalApproveUrl(parsed.paypalApproveUrl);
+        if (parsed.paypalOrderId) setPaypalOrderId(parsed.paypalOrderId);
+        if (parsed.amountUsd) setAmountUsd(parsed.amountUsd);
+      } catch {}
+    }
+    if (existingOrder?.paymentMethod === "PAYPAL") {
+      setPaymentProvider("PAYPAL");
+    }
+  }, [existingOrder]);
+
+  // Handle return from PayPal Checkout
+  useEffect(() => {
+    if (paypalStatus === "paypal_success" && paypalToken && paypalOrderNumber) {
+      setIsVerifying(true);
+      actionCapturePaypalPlanOrder({
+        paypalOrderId: paypalToken,
+        orderNumber: paypalOrderNumber,
+      }).then((res) => {
+        setIsVerifying(false);
+        if (res.success) {
+          setIsApproved(true);
+          showToast("PayPal Credit Card payment approved! Store upgraded to PRO.", "success");
+        } else {
+          showToast(res.error || "Failed to finalize PayPal capture.", "error");
+        }
+      });
+    }
+  }, [paypalStatus, paypalToken, paypalOrderNumber]);
+
+  // Auto-polling for QRIS / Webhook updates when invoice is active and pending
+  useEffect(() => {
+    if (!activeOrder?.id || isApproved) return;
+
+    const interval = setInterval(async () => {
+      const res = await actionCheckPlanOrderStatus(activeOrder.id);
+      if (res.success && res.data?.status === "APPROVED") {
+        setIsApproved(true);
+        showToast("Payment successfully verified! Your store is now PRO.", "success");
+        clearInterval(interval);
+      }
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [activeOrder?.id, isApproved]);
 
   const handleCopy = (text: string, fieldId: string) => {
     navigator.clipboard.writeText(text);
@@ -72,58 +142,63 @@ export function AdminUpgradeClient({
     setTimeout(() => setCopiedField(null), 2000);
   };
 
-  const calculateAmount = () => {
+  const calculateAmountIdr = () => {
     if (selectedPlan === "DFY") return 899000;
     return billingCycle === "YEARLY" ? 468000 : 49000;
   };
 
-  const handleSelectPlanAndProceed = () => {
-    startCreateTransition(async () => {
+  const calculateAmountUsd = () => {
+    if (selectedPlan === "DFY") return 57.99;
+    return billingCycle === "YEARLY" ? 29.99 : 3.20;
+  };
+
+  const handleProceedPayment = () => {
+    startTransition(async () => {
       const res = await actionCreatePlanOrder({
         planCode: selectedPlan,
         billingCycle: selectedPlan === "DFY" ? "ONE_TIME" : billingCycle,
+        paymentProvider,
       });
 
       if (res.success && res.data) {
-        setActiveOrder(res.data);
-        showToast("Invoice generated! Please complete payment below.", "success");
+        const d = res.data;
+        setActiveOrder(d.order);
+        if (d.qrString) setQrString(d.qrString);
+        if (d.paymentUrl) setPaymentUrl(d.paymentUrl);
+        if (d.paypalApproveUrl) setPaypalApproveUrl(d.paypalApproveUrl);
+        if (d.paypalOrderId) setPaypalOrderId(d.paypalOrderId);
+        if (d.amountUsd) setAmountUsd(d.amountUsd);
+
+        if (paymentProvider === "PAYPAL" && d.paypalApproveUrl) {
+          showToast("Redirecting to PayPal secure Credit Card checkout...", "success");
+          window.location.href = d.paypalApproveUrl;
+        } else {
+          showToast("Dynamic Borderpay QRIS generated! Please scan to pay.", "success");
+        }
       } else {
-        const errorMsg = !res.success ? res.error : "Failed to generate invoice";
+        const errorMsg = !res.success ? res.error : "Failed to generate payment session.";
         showToast(errorMsg, "error");
       }
     });
   };
 
-  const handleSubmitProof = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSimulateSandbox = () => {
     if (!activeOrder?.id) return;
-    if (!proofUrl) {
-      showToast("Please upload your payment receipt screenshot first.", "error");
-      return;
-    }
-
-    startProofTransition(async () => {
-      const res = await actionSubmitPaymentProof({
-        orderId: activeOrder.id,
-        proofUrl,
-        notes,
-      });
-
-      if (res.success && res.data) {
-        setActiveOrder(res.data);
-        showToast("Payment confirmation submitted! Under review by Mabes.", "success");
+    startTransition(async () => {
+      const res = await actionSimulateBorderpaySuccess(activeOrder.id);
+      if (res.success) {
+        setIsApproved(true);
+        showToast("Sandbox payment simulated successfully! Store upgraded to PRO.", "success");
       } else {
-        const errorMsg = !res.success ? res.error : "Failed to submit payment confirmation";
-        showToast(errorMsg, "error");
+        showToast(res.error || "Simulation failed", "error");
       }
     });
   };
 
-  // 1. UNDER REVIEW STATE (Customer has already paid and submitted receipt)
-  if (activeOrder && activeOrder.status === "UNDER_REVIEW") {
+  // 1. SUCCESS / CELEBRATION STATE (Payment Verified Automatically)
+  if (isApproved) {
     return (
       <div className="w-full space-y-8 animate-in fade-in duration-300">
-        {/* Header Navigation */}
         <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-[#E7E5E4]">
           <Link
             href={returnTo}
@@ -134,91 +209,83 @@ export function AdminUpgradeClient({
           </Link>
           <div className="flex items-center gap-2">
             <span className="text-xs text-stone-500">{store.name} ({store.slug}.etalase.online)</span>
-            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800">
-              Payment Under Review
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">
+              Active Tier: PRO
             </span>
           </div>
         </div>
 
-        {/* Status Hero Card */}
-        <div className="max-w-2xl mx-auto bg-white rounded-3xl border border-[#E7E5E4] p-8 shadow-sm text-center space-y-6">
-          <div className="w-16 h-16 rounded-3xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto shadow-inner">
-            <Clock className="w-8 h-8 animate-pulse" />
+        <div className="max-w-xl mx-auto bg-white rounded-3xl border border-[#E7E5E4] p-8 sm:p-10 shadow-sm text-center space-y-6">
+          <div className="w-20 h-20 rounded-3xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto shadow-inner">
+            <CheckCircle2 className="w-10 h-10" />
           </div>
 
           <div className="space-y-2">
-            <h1 className="text-2xl font-bold text-[#1C1917]">
-              Payment Confirmation Under Review
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Instant Verification Complete</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-[#1C1917]">
+              Welcome to etalase PRO!
             </h1>
-            <p className="text-sm text-[#57534E] max-w-lg mx-auto">
-              Thank you! Your payment proof for invoice{" "}
-              <strong className="text-stone-900 font-mono">{activeOrder.orderNumber}</strong>{" "}
-              has been securely received and dispatched to our Mabes operations team.
+            <p className="text-sm text-[#57534E] max-w-md mx-auto">
+              Your payment has been automatically verified and settled. All Pro features are now unlocked for your store.
             </p>
           </div>
 
-          {/* Invoice Summary Box */}
           <div className="bg-[#FAF8F5] rounded-2xl p-5 border border-[#E7E5E4] text-left text-xs space-y-3">
             <div className="flex justify-between items-center pb-2 border-b border-[#E7E5E4]">
-              <span className="text-[#78716C]">Plan</span>
-              <span className="font-bold text-[#1C1917]">
-                {activeOrder.planCode === "DFY" ? "Terima Beres (Done-For-You)" : `PRO Plan (${activeOrder.billingCycle})`}
-              </span>
+              <span className="text-[#78716C]">Store Domain</span>
+              <span className="font-bold text-[#1C1917]">{store.slug}.etalase.online</span>
             </div>
             <div className="flex justify-between items-center pb-2 border-b border-[#E7E5E4]">
-              <span className="text-[#78716C]">Total Amount</span>
-              <span className="font-bold text-base text-[#D94E28]">
-                Rp {Number(activeOrder.amount).toLocaleString("id-ID")}
+              <span className="text-[#78716C]">Unlocked Benefits</span>
+              <span className="font-bold text-emerald-700">4 Templates + Custom Domain + 2% QRIS</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-[#78716C]">Payment Verification</span>
+              <span className="font-bold text-emerald-700 flex items-center gap-1">
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>Verified via {activeOrder?.paymentMethod === "PAYPAL" ? "PayPal Credit Card" : "Borderpay QRIS"}</span>
               </span>
             </div>
-            <div className="flex justify-between items-center pb-2 border-b border-[#E7E5E4]">
-              <span className="text-[#78716C]">Status</span>
-              <span className="inline-flex items-center gap-1 font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full text-[11px]">
-                <Clock className="w-3 h-3" />
-                Under Verification
-              </span>
-            </div>
-            {activeOrder.proofUrl && (
-              <div className="pt-2">
-                <span className="text-[#78716C] block mb-2">Uploaded Receipt Preview:</span>
-                <div className="relative w-32 h-32 rounded-xl overflow-hidden border border-[#E7E5E4] bg-stone-100">
-                  <Image
-                    src={activeOrder.proofUrl}
-                    alt="Payment receipt proof"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              </div>
-            )}
           </div>
 
-          <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-100 text-emerald-800 text-xs flex items-center gap-3 text-left">
-            <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0" />
-            <span>
-              Verifications usually take <strong>5–15 minutes</strong> during active business hours. Your store features (Custom Domain, 2% QRIS, Premium Themes) will activate automatically upon approval.
-            </span>
-          </div>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-            <Link
-              href={returnTo}
-              className="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#D94E28] hover:bg-[#B83E1D] text-white text-xs font-bold transition shadow-xs"
-            >
-              Back to Dashboard
-            </Link>
+          <div className="pt-2">
             <button
               type="button"
-              onClick={() => setActiveOrder(null)}
-              className="w-full sm:w-auto px-5 py-3 rounded-xl border border-[#E7E5E4] bg-white hover:bg-stone-50 text-xs font-semibold text-stone-700 transition"
+              onClick={() => {
+                router.push(returnTo);
+                router.refresh();
+              }}
+              className="w-full py-4 px-6 rounded-xl bg-[#D94E28] hover:bg-[#B83E1D] text-white text-sm font-bold transition shadow-xs"
             >
-              Submit Another Receipt or Change Plan
+              Go to Store Admin Console
             </button>
           </div>
         </div>
       </div>
     );
   }
+
+  // 2. VERIFYING PAYPAL CAPTURE LOADER
+  if (isVerifying) {
+    return (
+      <div className="w-full min-h-[60vh] flex flex-col items-center justify-center space-y-4">
+        <Loader2 className="w-10 h-10 animate-spin text-[#D94E28]" />
+        <h2 className="text-lg font-bold text-[#1C1917]">Finalizing PayPal Credit Card Payment...</h2>
+        <p className="text-xs text-[#57534E]">Please wait while we confirm your transaction and upgrade your plan.</p>
+      </div>
+    );
+  }
+
+  const qrisDisplayUrl = qrString
+    ? `https://api.qrserver.com/v1/create-qr-code/?size=350x350&data=${encodeURIComponent(qrString)}`
+    : paymentUrl
+    ? `https://api.qrserver.com/v1/create-qr-code/?size=350x350&data=${encodeURIComponent(paymentUrl)}`
+    : `https://api.qrserver.com/v1/create-qr-code/?size=350x350&data=${encodeURIComponent(
+        `00020101021226590014ID.LINKAJA.WWW01189360091100000000005204581253033605802ID5914ETALASEONLINE6007BANDUNG61054011562070703A016304${activeOrder?.orderNumber?.slice(-4) || "8888"}`
+      )}`;
 
   return (
     <div className="w-full space-y-8 animate-in fade-in duration-300">
@@ -253,7 +320,7 @@ export function AdminUpgradeClient({
         </div>
       </div>
 
-      {/* Main Grid: Left Options / Right Invoice */}
+      {/* Main Grid: Left Plan Selection / Right Payment Methods */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Left Column (7 cols): Plan Selector Cards */}
         <div className="lg:col-span-7 space-y-6">
@@ -273,6 +340,7 @@ export function AdminUpgradeClient({
               onClick={() => {
                 setSelectedPlan("PRO");
                 setBillingCycle("YEARLY");
+                setActiveOrder(null);
               }}
               className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
                 selectedPlan === "PRO" && billingCycle === "YEARLY"
@@ -290,6 +358,7 @@ export function AdminUpgradeClient({
               onClick={() => {
                 setSelectedPlan("PRO");
                 setBillingCycle("MONTHLY");
+                setActiveOrder(null);
               }}
               className={`px-4 py-2 rounded-xl text-xs font-bold transition ${
                 selectedPlan === "PRO" && billingCycle === "MONTHLY"
@@ -308,6 +377,7 @@ export function AdminUpgradeClient({
               onClick={() => {
                 setSelectedPlan("PRO");
                 setBillingCycle("YEARLY");
+                setActiveOrder(null);
               }}
               className={`p-6 rounded-3xl border-2 transition cursor-pointer relative ${
                 selectedPlan === "PRO" && billingCycle === "YEARLY"
@@ -325,34 +395,38 @@ export function AdminUpgradeClient({
                   <p className="text-xs text-[#57534E]">Full access to all Pro features with 20% discount.</p>
                 </div>
                 <div className="text-right">
-                  <div className="text-lg sm:text-xl font-extrabold text-[#D94E28]">Rp 39.000<span className="text-xs font-normal text-stone-500">/mo</span></div>
-                  <div className="text-[11px] text-[#78716C]">Billed Rp 468.000 / year</div>
+                  <div className="text-lg sm:text-xl font-extrabold text-[#D94E28]">
+                    Rp 39.000<span className="text-xs font-normal text-stone-500">/mo</span>
+                  </div>
+                  <div className="text-[11px] text-[#78716C]">
+                    Billed Rp 468.000 / year &bull; $29.99 USD
+                  </div>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-3 border-t border-[#E7E5E4] text-xs text-[#1C1917]">
                 <div className="flex items-center gap-2">
-                  <CheckIcon className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
                   <span>All 4 Template Archetypes</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckIcon className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
                   <span>Custom Branded Domain + SSL</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckIcon className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
                   <span>Low 2% QRIS Fee (min. 25k)</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckIcon className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
                   <span>Meta Pixel & GA4 Integration</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckIcon className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
                   <span>4x Free Withdrawals/month</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckIcon className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
                   <span>Remove etalase.online Badge</span>
                 </div>
               </div>
@@ -363,6 +437,7 @@ export function AdminUpgradeClient({
               onClick={() => {
                 setSelectedPlan("PRO");
                 setBillingCycle("MONTHLY");
+                setActiveOrder(null);
               }}
               className={`p-6 rounded-3xl border-2 transition cursor-pointer ${
                 selectedPlan === "PRO" && billingCycle === "MONTHLY"
@@ -376,8 +451,10 @@ export function AdminUpgradeClient({
                   <p className="text-xs text-[#57534E]">Pay month-to-month, cancel anytime.</p>
                 </div>
                 <div className="text-right">
-                  <div className="text-lg sm:text-xl font-extrabold text-[#1C1917]">Rp 49.000<span className="text-xs font-normal text-stone-500">/mo</span></div>
-                  <div className="text-[11px] text-[#78716C]">Billed monthly</div>
+                  <div className="text-lg sm:text-xl font-extrabold text-[#1C1917]">
+                    Rp 49.000<span className="text-xs font-normal text-stone-500">/mo</span>
+                  </div>
+                  <div className="text-[11px] text-[#78716C]">Billed monthly &bull; $3.20 USD</div>
                 </div>
               </div>
             </div>
@@ -387,6 +464,7 @@ export function AdminUpgradeClient({
               onClick={() => {
                 setSelectedPlan("DFY");
                 setBillingCycle("YEARLY");
+                setActiveOrder(null);
               }}
               className={`p-6 rounded-3xl border-2 transition cursor-pointer ${
                 selectedPlan === "DFY"
@@ -405,25 +483,25 @@ export function AdminUpgradeClient({
                 </div>
                 <div className="text-right">
                   <div className="text-lg sm:text-xl font-extrabold text-purple-900">Rp 899.000</div>
-                  <div className="text-[11px] text-[#78716C]">One-time payment</div>
+                  <div className="text-[11px] text-[#78716C]">One-time payment &bull; $57.99 USD</div>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-3 border-t border-[#E7E5E4] text-xs text-[#1C1917]">
                 <div className="flex items-center gap-2">
-                  <CheckIcon className="w-4 h-4 text-purple-600 shrink-0" />
+                  <Check className="w-4 h-4 text-purple-600 shrink-0" />
                   <span>1 Full Year of PRO Plan included</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckIcon className="w-4 h-4 text-purple-600 shrink-0" />
+                  <Check className="w-4 h-4 text-purple-600 shrink-0" />
                   <span>Custom Banner & Canva Graphics</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckIcon className="w-4 h-4 text-purple-600 shrink-0" />
+                  <Check className="w-4 h-4 text-purple-600 shrink-0" />
                   <span>Catalog & Initial Product Upload</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckIcon className="w-4 h-4 text-purple-600 shrink-0" />
+                  <Check className="w-4 h-4 text-purple-600 shrink-0" />
                   <span>Custom Domain DNS Setup Assistance</span>
                 </div>
               </div>
@@ -431,13 +509,13 @@ export function AdminUpgradeClient({
           </div>
         </div>
 
-        {/* Right Column (5 cols): Invoice Summary & Payment Step */}
+        {/* Right Column (5 cols): Automated Payment & Invoice Methods */}
         <div className="lg:col-span-5 space-y-6">
           <div className="bg-white rounded-3xl border border-[#E7E5E4] p-6 sm:p-7 shadow-sm space-y-6">
             <div className="flex items-center justify-between pb-4 border-b border-[#E7E5E4]">
               <div className="space-y-0.5">
                 <h3 className="text-base font-bold text-[#1C1917]">2. Payment & Invoice</h3>
-                <p className="text-[11px] text-[#78716C]">Instant QRIS settlement</p>
+                <p className="text-[11px] text-[#78716C]">Automated instant settlement</p>
               </div>
               <span className="text-xs font-mono font-bold text-[#D94E28] bg-[#FDF0EC] px-2.5 py-1 rounded-lg">
                 {activeOrder ? activeOrder.orderNumber : "INVOICE"}
@@ -459,128 +537,248 @@ export function AdminUpgradeClient({
               <div className="flex justify-between items-center pt-3 border-t border-[#E7E5E4]">
                 <span className="text-sm font-bold text-[#1C1917]">Total Amount Due</span>
                 <div className="text-right">
-                  <span className="text-xl font-extrabold text-[#D94E28]">
-                    Rp {calculateAmount().toLocaleString("id-ID")}
-                  </span>
+                  <div className="text-xl font-extrabold text-[#D94E28]">
+                    {paymentProvider === "PAYPAL"
+                      ? `$${calculateAmountUsd().toFixed(2)} USD`
+                      : `Rp ${calculateAmountIdr().toLocaleString("id-ID")}`}
+                  </div>
+                  {paymentProvider === "PAYPAL" && (
+                    <div className="text-[10px] text-stone-500">
+                      Approx. Rp {calculateAmountIdr().toLocaleString("id-ID")}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
 
-            {/* Generate or Show Invoice Flow */}
+            {/* Payment Method Selector: STRICTLY Borderpay QRIS & PayPal (Credit Card Only) */}
+            <div className="space-y-2 pt-1">
+              <label className="block text-xs font-bold text-[#1C1917]">
+                Select Payment Channel
+              </label>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Channel 1: Borderpay QRIS */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPaymentProvider("BORDERPAY_QRIS");
+                    if (activeOrder?.paymentMethod === "PAYPAL") {
+                      setActiveOrder(null);
+                    }
+                  }}
+                  className={`p-3.5 rounded-2xl border text-left transition relative flex flex-col justify-between cursor-pointer ${
+                    paymentProvider === "BORDERPAY_QRIS"
+                      ? "border-[#D94E28] bg-[#FDF0EC]/60 ring-2 ring-[#D94E28]/10"
+                      : "border-[#E7E5E4] hover:bg-stone-50"
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="w-8 h-8 rounded-xl bg-white border border-[#E7E5E4] flex items-center justify-center text-[#D94E28]">
+                      <QrCode className="w-4 h-4" />
+                    </div>
+                    <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-md border border-emerald-200">
+                      Zero Fee
+                    </span>
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-[#1C1917]">Borderpay QRIS</div>
+                    <div className="text-[10px] text-[#78716C] mt-0.5">
+                      BCA, Mandiri, BRI, GoPay, OVO, ShopeePay
+                    </div>
+                  </div>
+                </button>
+
+                {/* Channel 2: PayPal (Credit Card Only) */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPaymentProvider("PAYPAL");
+                    if (activeOrder?.paymentMethod === "BORDERPAY_QRIS") {
+                      setActiveOrder(null);
+                    }
+                  }}
+                  className={`p-3.5 rounded-2xl border text-left transition relative flex flex-col justify-between cursor-pointer ${
+                    paymentProvider === "PAYPAL"
+                      ? "border-blue-600 bg-blue-50/50 ring-2 ring-blue-600/10"
+                      : "border-[#E7E5E4] hover:bg-stone-50"
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="w-8 h-8 rounded-xl bg-white border border-[#E7E5E4] flex items-center justify-center text-blue-600">
+                      <CreditCard className="w-4 h-4" />
+                    </div>
+                    <span className="text-[9px] font-bold uppercase tracking-wider text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded-md border border-blue-200">
+                      Card Only
+                    </span>
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-[#1C1917]">Credit Card (PayPal)</div>
+                    <div className="text-[10px] text-[#78716C] mt-0.5">
+                      Visa, Mastercard, Amex, JCB
+                    </div>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            {/* Generate or Active Invoice Payment Flow */}
             {!activeOrder ? (
               <button
                 type="button"
-                onClick={handleSelectPlanAndProceed}
-                disabled={isCreatingOrder}
-                className="w-full py-3.5 px-4 rounded-xl bg-[#D94E28] hover:bg-[#B83E1D] text-white font-bold text-xs shadow-xs flex items-center justify-center gap-2 transition disabled:opacity-50 cursor-pointer"
+                onClick={handleProceedPayment}
+                disabled={isPendingAction}
+                className={`w-full py-3.5 px-4 rounded-xl text-white font-bold text-xs shadow-xs flex items-center justify-center gap-2 transition disabled:opacity-50 cursor-pointer ${
+                  paymentProvider === "PAYPAL"
+                    ? "bg-[#0070BA] hover:bg-[#003087]"
+                    : "bg-[#D94E28] hover:bg-[#B83E1D]"
+                }`}
               >
-                {isCreatingOrder ? (
+                {isPendingAction ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
+                ) : paymentProvider === "PAYPAL" ? (
+                  <CreditCard className="w-4 h-4" />
                 ) : (
                   <Zap className="w-4 h-4 fill-white" />
                 )}
-                <span>Proceed to Payment</span>
+                <span>
+                  {paymentProvider === "PAYPAL"
+                    ? `Proceed to Credit Card Checkout ($${calculateAmountUsd().toFixed(2)} USD)`
+                    : `Generate Borderpay QRIS (Rp ${calculateAmountIdr().toLocaleString("id-ID")})`}
+                </span>
               </button>
-            ) : (
-              /* Active Order Payment Instructions */
-              <div className="space-y-6 pt-2">
-                {/* QRIS & Bank Transfer Details */}
-                <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#E7E5E4] space-y-4">
-                  <div className="flex items-center justify-between">
+            ) : paymentProvider === "BORDERPAY_QRIS" ? (
+              /* ACTIVE BORDERPAY QRIS VIEW */
+              <div className="space-y-5 pt-2">
+                <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#E7E5E4] space-y-4 text-center">
+                  <div className="flex items-center justify-between text-left">
                     <div className="flex items-center gap-2">
                       <QrCode className="w-4 h-4 text-[#D94E28]" />
-                      <span className="text-xs font-bold text-[#1C1917]">Official Payment Gateway</span>
+                      <span className="text-xs font-bold text-[#1C1917]">Borderpay Dynamic QRIS</span>
                     </div>
                     <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                      Zero Processing Fee
+                      Real-Time Auto Detect
                     </span>
                   </div>
 
-                  {/* QRIS / BCA Account Box */}
-                  <div className="bg-white rounded-xl p-3 border border-[#E7E5E4] space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[11px] text-[#78716C]">Bank Central Asia (BCA)</span>
-                      <button
-                        type="button"
-                        onClick={() => handleCopy("8730928172", "bca")}
-                        className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#D94E28] hover:underline"
-                      >
-                        {copiedField === "bca" ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
-                        <span>{copiedField === "bca" ? "Copied" : "Copy"}</span>
-                      </button>
+                  {/* QRIS Code Image Box */}
+                  <div className="bg-white rounded-2xl p-4 border border-[#E7E5E4] inline-block shadow-xs mx-auto">
+                    <div className="relative w-48 h-48 mx-auto">
+                      <Image
+                        src={qrisDisplayUrl}
+                        alt="Borderpay QRIS Code"
+                        fill
+                        unoptimized
+                        className="object-contain"
+                      />
                     </div>
-                    <div className="font-mono text-sm font-bold text-[#1C1917]">
-                      8730928172
-                    </div>
-                    <div className="text-[10px] text-[#78716C]">
-                      A.N. PT RAFA KREASINDO TEKNOLOGI
+                    <div className="text-[11px] font-mono font-bold text-stone-800 mt-2">
+                      Rp {Number(activeOrder.amount).toLocaleString("id-ID")}
                     </div>
                   </div>
 
-                  {/* QRIS Barcode Option */}
-                  <div className="bg-white rounded-xl p-3 border border-[#E7E5E4] flex items-center justify-between">
-                    <div>
-                      <div className="text-[11px] font-bold text-[#1C1917]">Instant QRIS All SEA</div>
-                      <div className="text-[10px] text-[#78716C]">BCA, Mandiri, GoPay, OVO, ShopeePay</div>
+                  {/* Real-time Status Indicator */}
+                  <div className="p-3 bg-white rounded-xl border border-amber-200 text-xs flex items-center justify-center gap-2 text-amber-800">
+                    <div className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
                     </div>
-                    <a
-                      href="https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=00020101021226670016ID.CO.BORDERPAY011893600000000000000002158730928172000010303UMI51440014ID.LINKAJA.WWW02158730928172000010303UMI5204581253033605802ID5927PT%20RAFA%20KREASINDO%20TEKNOLOGI6007BANDUNG61054011562070703A016304"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-[11px] font-bold text-[#D94E28] hover:underline"
-                    >
-                      <ExternalLink className="w-3.5 h-3.5" />
-                      <span>View QR Code</span>
-                    </a>
+                    <span className="font-medium text-[11px]">
+                      Awaiting payment... System auto-verifies within 2 seconds
+                    </span>
+                  </div>
+
+                  {/* Step Instructions */}
+                  <div className="text-left text-[11px] text-[#57534E] space-y-1.5 pt-1">
+                    <div className="font-bold text-stone-800 mb-1">Cara Bayar:</div>
+                    <p>1. Buka aplikasi BCA Mobile, Livin Mandiri, GoPay, OVO, atau ShopeePay.</p>
+                    <p>2. Pindai kode QRIS di atas dan konfirmasi pembayaran <strong>Rp {Number(activeOrder.amount).toLocaleString("id-ID")}</strong>.</p>
+                    <p>3. Status akun akan otomatis aktif tanpa perlu kirim bukti struk transfer.</p>
                   </div>
                 </div>
 
-                {/* Proof of Payment Upload Form */}
-                <form onSubmit={handleSubmitProof} className="space-y-4">
-                  <div className="space-y-1">
-                    <label className="block text-xs font-bold text-[#1C1917]">
-                      Upload Payment Receipt (Screenshot) *
-                    </label>
-                    <p className="text-[11px] text-[#78716C]">
-                      Upload JPG, PNG, or WebP screenshot of your transfer.
-                    </p>
-                  </div>
-
-                  <ImageUploadDropzone
-                    value={proofUrl}
-                    onChange={(url) => setProofUrl(url)}
-                    folder="payment"
-                    label="Payment Receipt"
-                    helperText="Drag and drop your transfer receipt here"
-                    aspectRatio="square"
-                  />
-
-                  <div>
-                    <label className="block text-xs font-bold text-[#1C1917] mb-1">
-                      Additional Notes (Optional)
-                    </label>
-                    <input
-                      type="text"
-                      value={notes}
-                      onChange={(e) => setNotes(e.target.value)}
-                      placeholder="e.g. Transferred from BCA a.n. Budi"
-                      className="w-full px-3 py-2 text-xs rounded-xl border border-[#E7E5E4] bg-white focus:outline-none focus:ring-2 focus:ring-[#D94E28]/20 focus:border-[#D94E28]"
-                    />
-                  </div>
+                {/* External payment link or Simulation */}
+                <div className="space-y-2">
+                  {paymentUrl && (
+                    <a
+                      href={paymentUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full py-3 px-4 rounded-xl border border-[#E7E5E4] bg-white hover:bg-stone-50 text-xs font-semibold text-stone-700 flex items-center justify-center gap-2 transition"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span>Open Direct Checkout Page</span>
+                    </a>
+                  )}
 
                   <button
-                    type="submit"
-                    disabled={isSubmittingProof || !proofUrl}
-                    className="w-full py-3.5 px-4 rounded-xl bg-[#D94E28] hover:bg-[#B83E1D] text-white font-bold text-xs shadow-xs flex items-center justify-center gap-2 transition disabled:opacity-50 cursor-pointer"
+                    type="button"
+                    onClick={handleSimulateSandbox}
+                    disabled={isPendingAction}
+                    className="w-full py-2.5 px-4 rounded-xl border border-dashed border-emerald-300 bg-emerald-50/60 hover:bg-emerald-100/60 text-emerald-800 text-[11px] font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer"
                   >
-                    {isSubmittingProof ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                    {isPendingAction ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
                     ) : (
-                      <UploadCloud className="w-4 h-4" />
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                     )}
-                    <span>Submit Payment Confirmation</span>
+                    <span>Simulate Instant Settlement (Sandbox Demo)</span>
                   </button>
-                </form>
+
+                  <button
+                    type="button"
+                    onClick={() => setActiveOrder(null)}
+                    className="w-full text-center text-[11px] text-[#78716C] hover:text-[#1C1917] transition pt-1 cursor-pointer"
+                  >
+                    Change plan or payment method
+                  </button>
+                </div>
+              </div>
+            ) : (
+              /* ACTIVE PAYPAL (CREDIT CARD) VIEW */
+              <div className="space-y-5 pt-2">
+                <div className="p-4 rounded-2xl bg-blue-50/40 border border-blue-100 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <CreditCard className="w-4 h-4 text-blue-600" />
+                      <span className="text-xs font-bold text-[#1C1917]">Credit Card via PayPal</span>
+                    </div>
+                    <span className="text-[10px] font-bold text-blue-700 bg-blue-100/60 px-2 py-0.5 rounded-full">
+                      Global Gateway
+                    </span>
+                  </div>
+
+                  <div className="bg-white rounded-xl p-4 border border-blue-200/60 space-y-2">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="text-stone-500">Order Reference:</span>
+                      <span className="font-mono font-bold text-stone-800">{activeOrder.orderNumber}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="text-stone-500">Billed in USD:</span>
+                      <span className="text-base font-extrabold text-blue-700">${amountUsd.toFixed(2)} USD</span>
+                    </div>
+                    <div className="pt-2 border-t border-stone-100 text-[11px] text-stone-500 flex items-center gap-1.5">
+                      <Lock className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                      <span>Supports Visa, Mastercard, American Express, JCB.</span>
+                    </div>
+                  </div>
+
+                  <a
+                    href={paypalApproveUrl || `https://sandbox.paypal.com`}
+                    className="w-full py-3.5 px-4 rounded-xl bg-[#0070BA] hover:bg-[#003087] text-white font-bold text-xs shadow-xs flex items-center justify-center gap-2 transition"
+                  >
+                    <CreditCard className="w-4 h-4" />
+                    <span>Pay ${amountUsd.toFixed(2)} USD with Credit Card</span>
+                  </a>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveOrder(null)}
+                  className="w-full text-center text-[11px] text-[#78716C] hover:text-[#1C1917] transition cursor-pointer"
+                >
+                  Change plan or payment method
+                </button>
               </div>
             )}
           </div>

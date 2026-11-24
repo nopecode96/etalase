@@ -13,6 +13,9 @@ interface UpgradePageProps {
     plan?: string;
     cycle?: string;
     returnTo?: string;
+    status?: string;
+    token?: string;
+    orderNumber?: string;
   };
 }
 
@@ -41,6 +44,9 @@ export default async function UpgradePage({ searchParams }: UpgradePageProps) {
       initialCycle={searchParams?.cycle || "yearly"}
       returnTo={searchParams?.returnTo || "/admin"}
       existingOrder={activeOrder ? serializePlain(activeOrder) : null}
+      paypalStatus={searchParams?.status}
+      paypalToken={searchParams?.token}
+      paypalOrderNumber={searchParams?.orderNumber}
     />
   );
 }

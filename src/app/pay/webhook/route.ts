@@ -40,6 +40,50 @@ export async function POST(req: NextRequest) {
       transaction_status === "settlement";
 
     if (isPaid) {
+      // 1. Check if this is an Admin Plan Upgrade (PlanOrder)
+      if (typeof order_id === "string" && (order_id.startsWith("INV-UPG-") || order_id.startsWith("UPG-"))) {
+        const planOrder = await prisma.planOrder.findUnique({
+          where: { orderNumber: order_id },
+          include: { store: true },
+        });
+
+        if (planOrder && planOrder.status !== "APPROVED") {
+          await prisma.$transaction([
+            prisma.planOrder.update({
+              where: { id: planOrder.id },
+              data: {
+                status: "APPROVED",
+                paymentMethod: "BORDERPAY_QRIS",
+                paidAt: new Date(),
+                approvedAt: new Date(),
+                adminNotes: `Auto-verified via Borderpay QRIS Webhook (${payment_reference || "SETTLED"})`,
+              },
+            }),
+            prisma.store.update({
+              where: { id: planOrder.storeId },
+              data: {
+                tier: planOrder.planCode === "DFY" ? "DFY_BUSINESS" : "PRO",
+              },
+            }),
+          ]);
+
+          logger.info(`PlanOrder ${planOrder.orderNumber} upgraded to ${planOrder.planCode} via Borderpay Webhook`, "BorderpayWebhook");
+
+          await emitN8nEvent("tier.upgraded", {
+            orderNumber: planOrder.orderNumber,
+            storeId: planOrder.storeId,
+            storeSlug: planOrder.store.slug,
+            planCode: planOrder.planCode,
+            billingCycle: planOrder.billingCycle,
+            amount: Number(planOrder.amount),
+            paidVia: "BORDERPAY_QRIS",
+          });
+
+          return NextResponse.json({ success: true, type: "plan_upgrade", received: true });
+        }
+      }
+
+      // 2. Standard Storefront Customer Order
       const order = await prisma.order.findUnique({
         where: { orderCode: String(order_id) },
         include: { store: true, product: true },
