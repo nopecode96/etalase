@@ -273,7 +273,7 @@ export function GlobalFooter() {
               </Link>
             </li>
             <li>
-              <Link href={getLocalizedHref("/fitur#chat")} className="hover:text-[#1C1917] transition">
+              <Link href={getLocalizedHref("/fitur#chat-order")} className="hover:text-[#1C1917] transition">
                 {t.links.chatOrder}
               </Link>
             </li>
@@ -290,17 +290,17 @@ export function GlobalFooter() {
           <h4 className="font-bold text-[#1C1917] text-xs uppercase tracking-wider">{t.colFeatures}</h4>
           <ul className="space-y-2.5">
             <li>
-              <Link href={getLocalizedHref("/fitur")} className="hover:text-[#1C1917] transition">
+              <Link href={getLocalizedHref("/fitur#chat-order")} className="hover:text-[#1C1917] transition">
                 {t.links.waDelivery}
               </Link>
             </li>
             <li>
-              <Link href={getLocalizedHref("/fitur")} className="hover:text-[#1C1917] transition">
+              <Link href={getLocalizedHref("/fitur#fintech")} className="hover:text-[#1C1917] transition">
                 {t.links.qris}
               </Link>
             </li>
             <li>
-              <Link href={getLocalizedHref("/harga")} className="hover:text-[#1C1917] transition">
+              <Link href={getLocalizedHref("/fitur#domain")} className="hover:text-[#1C1917] transition">
                 {t.links.customDomain}
               </Link>
             </li>

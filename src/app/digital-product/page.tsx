@@ -8,5 +8,5 @@ interface RedirectProps {
 
 export default function DigitalProductPage({ searchParams }: RedirectProps) {
   const lang = searchParams?.lang;
-  redirect(lang && lang !== "id" ? `/${lang}/fitur` : "/fitur");
+  redirect(lang && lang !== "id" ? `/${lang}/fitur#digital` : "/fitur#digital");
 }

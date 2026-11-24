@@ -8,5 +8,5 @@ interface RedirectProps {
 
 export default function ConsultationPage({ searchParams }: RedirectProps) {
   const lang = searchParams?.lang;
-  redirect(lang && lang !== "id" ? `/${lang}/fitur` : "/fitur");
+  redirect(lang && lang !== "id" ? `/${lang}/fitur#booking` : "/fitur#booking");
 }

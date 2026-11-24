@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { GlobalHeader } from "@/components/saas/GlobalHeader";
 import { GlobalFooter } from "@/components/saas/GlobalFooter";
@@ -890,6 +890,56 @@ export function FiturClient({ locale }: { locale: SupportedLocale }) {
   const featureItems = currentLocaleData.items;
 
   const [activeTab, setActiveTab] = useState<string>("digital");
+  const detailRef = useRef<HTMLDivElement>(null);
+
+  // Helper to map URL hash or alias to actual tab id
+  const resolveTabId = useCallback((hashString: string) => {
+    const clean = hashString.replace(/^#/, "").toLowerCase().trim();
+    if (!clean) return null;
+    if (clean === "chat" || clean === "whatsapp" || clean === "wa") return "chat-order";
+    if (clean === "qris" || clean === "payment" || clean === "bayar") return "fintech";
+    if (clean === "customdomain" || clean === "custom-domain") return "domain";
+    if (clean === "qr" || clean === "qrcode" || clean === "cetak") return "standee";
+    if (clean === "ebook" || clean === "file") return "digital";
+    if (clean === "showroom" || clean === "mobil" || clean === "properti") return "katalog";
+    if (clean === "keranjang-kuning" || clean === "tiktok") return "affiliate";
+    if (clean === "jadwal" || clean === "konsultasi") return "booking";
+    if (clean === "webinar" || clean === "tiket") return "event";
+
+    const match = featureItems.find((f) => f.id === clean);
+    return match ? match.id : null;
+  }, [featureItems]);
+
+  // Sync state with URL hash on mount & on popstate / hashchange
+  useEffect(() => {
+    const handleHashSync = () => {
+      if (typeof window !== "undefined" && window.location.hash) {
+        const resolved = resolveTabId(window.location.hash);
+        if (resolved) {
+          setActiveTab(resolved);
+        }
+      }
+    };
+
+    handleHashSync();
+    window.addEventListener("hashchange", handleHashSync);
+    window.addEventListener("popstate", handleHashSync);
+    return () => {
+      window.removeEventListener("hashchange", handleHashSync);
+      window.removeEventListener("popstate", handleHashSync);
+    };
+  }, [resolveTabId]);
+
+  const handleSelectTab = (tabId: string, shouldScrollMobile: boolean = false) => {
+    setActiveTab(tabId);
+    if (typeof window !== "undefined") {
+      history.replaceState(null, "", `#${tabId}`);
+      if (shouldScrollMobile && window.innerWidth < 1024 && detailRef.current) {
+        detailRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+  };
+
   const currentItem = featureItems.find((f) => f.id === activeTab) || featureItems[0];
 
   const getLocalizedHref = (basePath: string) => {
@@ -917,6 +967,13 @@ export function FiturClient({ locale }: { locale: SupportedLocale }) {
 
       {/* Split-Panel Interactive Showcase */}
       <section className="pb-24 px-4 sm:px-6 max-w-6xl mx-auto w-full">
+        {/* Hidden SEO Anchors for direct search engine crawler discovery */}
+        <div className="sr-only" aria-hidden="true">
+          {featureItems.map((item) => (
+            <div key={item.id} id={item.id} className="scroll-mt-24" />
+          ))}
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Sidebar Navigasi Kiri */}
           <div className="lg:col-span-5 space-y-6">
@@ -932,9 +989,14 @@ export function FiturClient({ locale }: { locale: SupportedLocale }) {
                     const Icon = item.icon;
                     const isSelected = activeTab === item.id;
                     return (
-                      <button
+                      <a
                         key={item.id}
-                        onClick={() => setActiveTab(item.id)}
+                        id={`tab-link-${item.id}`}
+                        href={`#${item.id}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleSelectTab(item.id, true);
+                        }}
                         className={`w-full text-left p-3.5 rounded-2xl border transition-all flex items-center justify-between cursor-pointer ${
                           isSelected
                             ? "bg-white border-[#D94E28] shadow-sm text-[#1C1917] ring-1 ring-[#D94E28]/15"
@@ -961,7 +1023,7 @@ export function FiturClient({ locale }: { locale: SupportedLocale }) {
                             isSelected ? "text-[#D94E28] translate-x-1" : "text-stone-300"
                           }`}
                         />
-                      </button>
+                      </a>
                     );
                   })}
               </div>
@@ -979,9 +1041,14 @@ export function FiturClient({ locale }: { locale: SupportedLocale }) {
                     const Icon = item.icon;
                     const isSelected = activeTab === item.id;
                     return (
-                      <button
+                      <a
                         key={item.id}
-                        onClick={() => setActiveTab(item.id)}
+                        id={`tab-link-${item.id}`}
+                        href={`#${item.id}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleSelectTab(item.id, true);
+                        }}
                         className={`w-full text-left p-3.5 rounded-2xl border transition-all flex items-center justify-between cursor-pointer ${
                           isSelected
                             ? "bg-white border-[#D94E28] shadow-sm text-[#1C1917] ring-1 ring-[#D94E28]/15"
@@ -1008,7 +1075,7 @@ export function FiturClient({ locale }: { locale: SupportedLocale }) {
                             isSelected ? "text-[#D94E28] translate-x-1" : "text-stone-300"
                           }`}
                         />
-                      </button>
+                      </a>
                     );
                   })}
               </div>
@@ -1016,7 +1083,11 @@ export function FiturClient({ locale }: { locale: SupportedLocale }) {
           </div>
 
           {/* Panel Detail Kanan */}
-          <div className="lg:col-span-7 bg-white border border-[#E7E5E4] rounded-3xl p-6 sm:p-10 shadow-xs space-y-6">
+          <div
+            ref={detailRef}
+            id={`detail-${currentItem.id}`}
+            className="lg:col-span-7 bg-white border border-[#E7E5E4] rounded-3xl p-6 sm:p-10 shadow-xs space-y-6 scroll-mt-24 transition-all duration-300"
+          >
             <div>
               <span className="text-xs font-bold uppercase tracking-wider text-[#D94E28] bg-[#FDF0EC] border border-[#FADCD3] px-3 py-1 rounded-full">
                 {currentItem.badge}
