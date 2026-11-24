@@ -7,6 +7,7 @@ import { FeeBearer, PlanTier } from "@prisma/client";
 import { slugify } from "@/lib/core/formatters";
 import { calculateWithdrawalFee } from "@/services/payment/fee-calculator";
 import { PAYMENT_RULES } from "@/lib/constants/pricing";
+import { notifyMabesWithdrawalRequest } from "@/lib/services/telegram-service";
 
 type ActionResult<T = unknown> = {
   success: boolean;
@@ -533,6 +534,15 @@ export async function actionRequestWithdrawal(input: {
         },
       }),
     ]);
+
+    // Fire-and-forget: notify Mabes group of payout request
+    notifyMabesWithdrawalRequest({
+      storeName: store.name,
+      storeSlug: store.slug,
+      amount: input.amount,
+      netAmount: feeResult.netAmount,
+      destination: `${input.bankName.toUpperCase()} - ${input.accountNumber} (${input.accountHolder})`,
+    }).catch(() => {});
 
     revalidatePath("/admin/orders");
     revalidatePath("/admin/orders/payouts");

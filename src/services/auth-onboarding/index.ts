@@ -2,6 +2,7 @@ import { prisma, serializePlain } from "@/lib/db/prisma";
 import { RESERVED_SLUGS } from "@/lib/config/constants";
 import { ok, fail, withErrorHandler, ServiceResult } from "@/lib/core/response";
 import { emitN8nEvent } from "@/lib/n8n/dispatcher";
+import { notifyMabesNewTenant } from "@/lib/services/telegram-service";
 import { slugify } from "@/lib/core/formatters";
 
 export interface OnboardingInput {
@@ -95,6 +96,22 @@ export async function createInitialStore(
       currency: newStore.currency,
       templateId: newStore.templateId,
     });
+
+    // Fire-and-forget: notify Mabes group via Telegram
+    prisma.user
+      .findUnique({ where: { id: userId }, select: { email: true } })
+      .then((owner) => {
+        if (owner?.email) {
+          notifyMabesNewTenant({
+            storeName: newStore.name,
+            storeSlug: newStore.slug,
+            ownerEmail: owner.email,
+            tier: newStore.tier,
+            chatHandle: newStore.chatHandle,
+          }).catch(() => {});
+        }
+      })
+      .catch(() => {});
 
     return ok(serializePlain(newStore), "CREATED");
   });

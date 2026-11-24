@@ -13,7 +13,7 @@ import {
   HelpCircle,
   ShieldAlert,
 } from "lucide-react";
-import { actionUpdatePlatformSettings } from "@/app/mabes/actions";
+import { actionUpdatePlatformSettings, actionSendTestTelegramAlert } from "@/app/mabes/actions";
 import { showToast } from "@/components/ui/GlobalToast";
 
 interface MabesSettingsClientProps {
@@ -23,9 +23,21 @@ interface MabesSettingsClientProps {
 export function MabesSettingsClient({ initialSettings }: MabesSettingsClientProps) {
   const [settings, setSettings] = useState<Record<string, string>>(initialSettings);
   const [isPending, startTransition] = useTransition();
+  const [isTestPending, startTestTransition] = useTransition();
 
   const handleChange = (key: string, value: string) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleSendTestAlert = () => {
+    startTestTransition(async () => {
+      const res = await actionSendTestTelegramAlert();
+      if (res.success) {
+        showToast(res.message || "Test alert delivered to Mabes Telegram group!", "success");
+      } else {
+        showToast(res.error || "Failed to send test alert.", "error");
+      }
+    });
   };
 
   const handleSave = (e: React.FormEvent) => {
@@ -33,7 +45,7 @@ export function MabesSettingsClient({ initialSettings }: MabesSettingsClientProp
     startTransition(async () => {
       const res = await actionUpdatePlatformSettings(settings);
       if (res.success) {
-        showToast("Platform configurations saved and updated successfully!", "success");
+        showToast(res.message || "Platform configurations saved and updated successfully!", "success");
       } else {
         showToast(res.error || "Failed to update platform settings.", "error");
       }
@@ -292,6 +304,34 @@ export function MabesSettingsClient({ initialSettings }: MabesSettingsClientProp
               className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white font-mono focus:outline-none focus:border-sky-500"
             />
           </div>
+        </div>
+
+        <div className="pt-3 border-t border-slate-800/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="text-[11px] text-slate-400">
+            <span>Webhook destination: </span>
+            <code className="text-sky-300 font-mono bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800">
+              /api/telegram/webhook
+            </code>
+          </div>
+
+          <button
+            type="button"
+            disabled={isTestPending || !settings.telegram_mabes_bot_token || !settings.telegram_mabes_chat_id}
+            onClick={handleSendTestAlert}
+            className="px-3.5 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg font-semibold text-xs flex items-center gap-1.5 shadow-sm transition disabled:opacity-40 shrink-0"
+          >
+            {isTestPending ? (
+              <>
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                <span>Sending Test Alert...</span>
+              </>
+            ) : (
+              <>
+                <Send className="w-3.5 h-3.5" />
+                <span>Send Test Alert to Mabes Group</span>
+              </>
+            )}
+          </button>
         </div>
       </div>
 

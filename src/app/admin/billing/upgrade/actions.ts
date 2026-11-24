@@ -4,6 +4,7 @@ import { requireTenantContext } from "@/lib/auth/tenant-guard";
 import { prisma, serializePlain } from "@/lib/db/prisma";
 import { ServiceResult, ok, fail } from "@/lib/core/response";
 import { emitN8nEvent } from "@/lib/n8n/dispatcher";
+import { notifyMabesUpgradePayment } from "@/lib/services/telegram-service";
 import { createBorderpayInvoice } from "@/services/payment-borderpay";
 import {
   createPaypalOrder,
@@ -119,6 +120,17 @@ export async function actionCreatePlanOrder(
         }),
       },
     });
+
+    // Fire-and-forget: notify Mabes group of new plan upgrade order
+    notifyMabesUpgradePayment({
+      orderNumber,
+      storeName: ctx.store.name,
+      storeSlug: ctx.store.slug,
+      planCode,
+      billingCycle: cycle,
+      amount,
+      paymentMethod: paymentProvider,
+    }).catch(() => {});
 
     return ok({
       order: serializePlain(order),

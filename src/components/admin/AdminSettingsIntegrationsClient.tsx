@@ -17,11 +17,13 @@ import { showToast } from "@/components/ui/GlobalToast";
 interface AdminSettingsIntegrationsClientProps {
   store: any;
   tier: "FREE" | "PRO" | "DFY";
+  platformBotUsername?: string;
 }
 
 export function AdminSettingsIntegrationsClient({
   store,
   tier,
+  platformBotUsername = "etalaseonline_bot",
 }: AdminSettingsIntegrationsClientProps) {
   const [isPending, startTransition] = useTransition();
 
@@ -93,7 +95,43 @@ export function AdminSettingsIntegrationsClient({
           </div>
         </div>
 
-        <form onSubmit={handleSave} className="space-y-4 pt-2">
+        {/* 1-Click Telegram Connect (Recommended) */}
+        <div className="p-5 rounded-2xl bg-gradient-to-r from-sky-50 to-indigo-50/40 border border-sky-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-sky-950 uppercase tracking-wide">
+                1-Click Instant Connect (Recommended)
+              </span>
+              <span className="text-[10px] font-bold bg-sky-200/60 text-sky-800 px-1.5 py-0.5 rounded">
+                Official Bot
+              </span>
+            </div>
+            <p className="text-xs text-stone-600 leading-relaxed max-w-lg">
+              {isConnected
+                ? `Toko Anda terhubung dengan akun Telegram ${telegramConfig?.telegramUser || "Aktif"} (Chat ID: ${chatId}). Anda akan menerima notifikasi setiap ada order.`
+                : `Klik tombol di sebelah kanan untuk langsung membuka Bot Telegram resmi (@${platformBotUsername}) dan otomatis menautkan toko Anda tanpa perlu repot buat bot sendiri.`}
+            </p>
+          </div>
+
+          <a
+            href={`https://t.me/${platformBotUsername}?start=bind_${store.id}`}
+            target="_blank"
+            rel="noreferrer"
+            className="px-4 py-2.5 bg-sky-600 hover:bg-sky-500 text-white rounded-xl font-bold text-xs flex items-center gap-2 shadow-xs transition shrink-0"
+          >
+            <Send className="w-4 h-4" />
+            <span>{isConnected ? "Re-link Telegram" : "Connect Telegram (1-Click)"}</span>
+            <ExternalLink className="w-3.5 h-3.5" />
+          </a>
+        </div>
+
+        {/* Advanced Manual Custom Bot Option */}
+        <div className="pt-2 border-t border-[#E7E5E4] space-y-4">
+          <span className="text-xs font-bold text-[#1C1917] block">
+            Or Use Custom Dedicated Bot (Advanced)
+          </span>
+
+          <form onSubmit={handleSave} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <label className="block text-xs font-bold text-[#1C1917]">
@@ -137,6 +175,7 @@ export function AdminSettingsIntegrationsClient({
             </button>
           </div>
         </form>
+      </div>
 
         {/* Telegram 4-step setup guide */}
         <div className="p-5 bg-[#FAF8F5] border border-[#E7E5E4] rounded-2xl space-y-3">

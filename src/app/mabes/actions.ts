@@ -11,6 +11,12 @@ import {
   MABES_COOKIE_NAME,
   SESSION_DURATION_SEC,
 } from "@/lib/auth/mabes-guard";
+import {
+  getTelegramConfig,
+  registerTelegramWebhook,
+  sendTelegramMessage,
+  notifyTenantNewOrder,
+} from "@/lib/services/telegram-service";
 import { ServiceResult, ok, fail } from "@/lib/core/response";
 import { emitN8nEvent } from "@/lib/n8n/dispatcher";
 
@@ -494,6 +500,7 @@ export async function actionDeleteMabesStaff(
 
 /**
  * 10. Update Platform Global Settings (Rafa Kreasindo Teknologi)
+ * Auto-registers Telegram webhook if Bot Token is provided/updated.
  */
 export async function actionUpdatePlatformSettings(
   settings: Record<string, string>
@@ -509,9 +516,26 @@ export async function actionUpdatePlatformSettings(
       });
     }
 
+    // Auto-register Telegram Webhook if token is present
+    const botToken = settings.telegram_mabes_bot_token || settings.telegramBotToken;
+    let webhookResult = null;
+    let message = "Platform configuration saved successfully.";
+
+    if (botToken && botToken.trim()) {
+      webhookResult = await registerTelegramWebhook(botToken.trim());
+      if (webhookResult.success) {
+        message = `Platform configuration saved! Telegram webhook registered to ${webhookResult.webhookUrl}${
+          webhookResult.botUsername ? ` (Bot: @${webhookResult.botUsername})` : ""
+        }.`;
+      } else {
+        message = `Platform settings saved. Note on Telegram Webhook: ${webhookResult.description}`;
+      }
+    }
+
     revalidatePath("/mabes");
     revalidatePath("/mabes/settings");
-    return ok({ updated: true }, "SAVED");
+    revalidatePath("/mabes/automations");
+    return ok({ updated: true, webhook: webhookResult }, "SAVED", message);
   } catch (err: any) {
     console.error("actionUpdatePlatformSettings error:", err);
     return fail("INTERNAL_ERROR", err.message || "Failed to update platform settings.");
@@ -588,8 +612,18 @@ export async function actionReconcileOrder(
         buyerWhatsapp: order.buyerWhatsapp,
         buyerName: order.buyerName,
       });
+
+      // Fire-and-forget: notify tenant on Telegram if connected
+      notifyTenantNewOrder(order.storeId, {
+        orderCode: order.orderCode,
+        productTitle: order.product.title,
+        amount: Number(order.amount),
+        buyerName: order.buyerName,
+        buyerWhatsapp: order.buyerWhatsapp,
+        paymentMethod: order.paymentProvider,
+      }).catch(() => {});
     } catch (e) {
-      console.warn("n8n order.paid dispatch error:", e);
+      console.warn("n8n/telegram order.paid dispatch error:", e);
     }
 
     revalidatePath("/mabes");
@@ -707,58 +741,42 @@ export async function actionTriggerTestEvent(
 export async function actionSendTestTelegramAlert(): Promise<ServiceResult<any>> {
   try {
     const ctx = await requireMabesContext();
+    const config = await getTelegramConfig();
 
-    const [botTokenSetting, chatIdSetting] = await Promise.all([
-      prisma.platformSetting.findUnique({ where: { key: "telegram_mabes_bot_token" } }),
-      prisma.platformSetting.findUnique({ where: { key: "telegram_mabes_chat_id" } }),
-    ]);
-
-    const token = botTokenSetting?.value;
-    const chatId = chatIdSetting?.value;
-
-    if (!token || !chatId) {
-      await prisma.automationLog.create({
-        data: {
-          event: "telegram.test_alert",
-          channel: "TELEGRAM",
-          status: "FAILED",
-          error: "Telegram bot token or Chat ID is missing in Platform Settings.",
-        },
-      });
-      return fail("INVALID_INPUT", "Configure telegram_mabes_bot_token and telegram_mabes_chat_id in Platform Settings first.");
+    if (!config.botToken || !config.mabesChatId) {
+      return fail(
+        "INVALID_INPUT",
+        "Configure telegram_mabes_bot_token and telegram_mabes_chat_id in Platform Settings first."
+      );
     }
 
-    const message = `🔔 *[Mabes Alert Test]*\n\nPlatform: etalase.online\nTriggered by: ${ctx.user.email}\nTimestamp: ${new Date().toLocaleString("id-ID")}\n\n✅ Automation dispatcher connected successfully.`;
+    const message = [
+      `🔔 *[Mabes Alert Test]*`,
+      ``,
+      `• *Platform:* \`etalase.online\``,
+      `• *Bot:* @${config.botUsername || "etalaseonline_bot"}`,
+      `• *Operator:* \`${ctx.user.email}\``,
+      `• *Timestamp:* ${new Date().toLocaleString("id-ID")}`,
+      ``,
+      `✅ Integrasi bot Telegram Mabes berhasil terhubung dan aktif!`,
+    ].join("\n");
 
-    const telegramRes = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: message,
-        parse_mode: "Markdown",
-      }),
+    const res = await sendTelegramMessage(config.mabesChatId, message, {
+      eventTag: "telegram.test_alert",
+      parseMode: "Markdown",
     });
 
-    const resJson = await telegramRes.json();
-
-    await prisma.automationLog.create({
-      data: {
-        event: "telegram.test_alert",
-        channel: "TELEGRAM",
-        status: telegramRes.ok ? "SUCCESS" : "FAILED",
-        payload: { chatId, sender: ctx.user.email },
-        response: JSON.stringify(resJson),
-        error: telegramRes.ok ? null : resJson?.description,
-      },
-    });
-
-    if (!telegramRes.ok) {
-      return fail("INTERNAL_ERROR", resJson?.description || "Telegram API rejected message.");
+    if (!res.success) {
+      return fail("INTERNAL_ERROR", res.error || "Failed to send Telegram test message.");
     }
 
     revalidatePath("/mabes/automations");
-    return ok({ sent: true }, "SAVED");
+    revalidatePath("/mabes/settings");
+    return ok(
+      { sent: true, botUsername: config.botUsername },
+      "SAVED",
+      "Test alert successfully delivered to Mabes Telegram group!"
+    );
   } catch (err: any) {
     console.error("actionSendTestTelegramAlert error:", err);
     return fail("INTERNAL_ERROR", err.message || "Failed to send test alert.");
