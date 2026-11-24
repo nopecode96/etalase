@@ -80,7 +80,7 @@ export const PRICING_LOCALES: Record<SupportedLocale, PricingPageData> = {
         "Produk & Tautan Tanpa Batas (Unlimited)",
         "4 Arketipe Template Desain Lengkap",
         "Katalog Foto & Spesifikasi Unit Lengkap",
-        "QRIS Instan BorderPay (Fee Standar 4.5% min Rp 3.000)",
+        "QRIS Otomatis 4.5% (min Rp 3.000) — atau 0% via Jalur Chat/WhatsApp",
         "Auto-Delivery Berkas Digital ke WhatsApp Pembeli",
         "Watermark PDF Anti-Bajak Otomatis",
         "Standee QR Kasir Siap Cetak (A5/Akrilik)",
@@ -100,8 +100,8 @@ export const PRICING_LOCALES: Record<SupportedLocale, PricingPageData> = {
         "Semua fitur di Paket Gratis",
         "Custom Domain Pribadi (.com, .id, dll.) + SSL Gratis",
         "Hapus Seluruh Branding etalase.online",
-        "Fee Transaksi QRIS Murah: Hanya 2% (min Rp 3.000)",
-        "Fitur 'Convenience Fee': Biaya bisa ditanggung Pembeli",
+        "Fee QRIS Hemat: Hanya 2% (min Rp 3.000) — hemat 56% vs paket FREE",
+        "Convenience Fee: Alihkan biaya ke pembeli → Toko dapat 100% harga penuh",
         "Pencairan Saldo (Payout): GRATIS 4x tiap bulan",
         "Integrasi Meta Pixel (CAPI) & Google Analytics 4",
         "Kode Promo & Diskon Bertingkat",
@@ -1160,6 +1160,9 @@ export function HargaClient({
               </div>
 
               <div className="pt-2">
+                {billingCycle === "yearly" && (
+                  <div className="text-xs text-[#57534E] line-through mb-0.5">{copy.proTier.monthlyPrice}</div>
+                )}
                 <span className="text-4xl font-extrabold text-[#D94E28]">
                   {billingCycle === "yearly" ? copy.proTier.yearlyPrice : copy.proTier.monthlyPrice}
                 </span>

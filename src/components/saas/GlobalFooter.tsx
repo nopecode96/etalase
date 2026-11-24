@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { EtalaseLogo } from "@/components/brand/EtalaseLogo";
-import { Mail, ShieldCheck, Zap, Building } from "lucide-react";
+import { Mail, ShieldCheck, Zap, Building, MapPin } from "lucide-react";
 import { SupportedLocale } from "@/lib/config/constants";
 
 export function GlobalFooter() {
@@ -230,7 +230,7 @@ export function GlobalFooter() {
           <div className="pt-2 space-y-2 text-xs">
             <div className="flex items-center gap-2 text-[#57534E]">
               <Building className="w-4 h-4 text-[#D94E28] shrink-0" />
-              <span>{t.managedBy}: <strong className="text-[#1C1917]">Rafa Kreasindo Teknologi</strong></span>
+              <span>{t.managedBy}: <strong className="text-[#1C1917]">PT Rafa Kreasindo Teknologi</strong></span>
             </div>
             <a
               href="mailto:halo@etalase.online"
@@ -239,6 +239,10 @@ export function GlobalFooter() {
               <Mail className="w-4 h-4 text-[#D94E28] shrink-0" />
               <span>Email Resmi: halo@etalase.online</span>
             </a>
+            <div className="flex items-start gap-2 text-[#57534E]">
+              <MapPin className="w-4 h-4 text-[#D94E28] shrink-0 mt-0.5" />
+              <span>Jl. Nias Dalam No. 14, Bandung, Jawa Barat 40115</span>
+            </div>
           </div>
 
           <div className="pt-2 flex flex-wrap gap-2 text-[11px]">
@@ -249,6 +253,18 @@ export function GlobalFooter() {
             <span className="inline-flex items-center gap-1.5 bg-[#FAF8F5] border border-[#E7E5E4] px-2.5 py-1 rounded-lg text-[#1C1917]">
               <Zap className="w-3.5 h-3.5 text-[#D94E28]" />
               {t.trust2}
+            </span>
+          </div>
+
+          {/* Payment Badges */}
+          <div className="pt-1 flex flex-wrap items-center gap-2 text-[11px]">
+            <span className="inline-flex items-center gap-1.5 bg-[#FAF8F5] border border-[#E7E5E4] px-2.5 py-1 rounded-lg text-[#1C1917] font-semibold">
+              <span className="text-[10px] font-bold text-red-600">QRIS</span>
+              <span className="text-[#57534E] font-normal text-[10px]">via PJP BI</span>
+            </span>
+            <span className="inline-flex items-center gap-1.5 bg-[#FAF8F5] border border-[#E7E5E4] px-2.5 py-1 rounded-lg text-[#1C1917] font-semibold">
+              <span className="text-[10px] font-bold text-sky-600">PayPal</span>
+              <span className="text-[#57534E] font-normal text-[10px]">Internasional</span>
             </span>
           </div>
         </div>
@@ -366,12 +382,17 @@ export function GlobalFooter() {
               </Link>
             </li>
             <li>
-              <Link href={getLocalizedHref("/bantuan")} className="hover:text-[#1C1917] transition">
+              <Link href={getLocalizedHref("/syarat")} className="hover:text-[#1C1917] transition">
                 {t.links.terms}
               </Link>
             </li>
             <li>
-              <Link href={getLocalizedHref("/bantuan")} className="hover:text-[#1C1917] transition">
+              <Link href={getLocalizedHref("/refund")} className="hover:text-[#1C1917] transition">
+                Kebijakan Pengembalian & Refund
+              </Link>
+            </li>
+            <li>
+              <Link href={getLocalizedHref("/privasi")} className="hover:text-[#1C1917] transition">
                 {t.links.privacy}
               </Link>
             </li>
@@ -381,7 +402,7 @@ export function GlobalFooter() {
 
       <div className="max-w-6xl mx-auto pt-6 border-t border-[#E7E5E4] flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-[#57534E]">
         <div>
-          &copy; {currentYear} Rafa Kreasindo Teknologi. {t.rights}
+          &copy; {currentYear} PT Rafa Kreasindo Teknologi. {t.rights}
         </div>
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2 font-medium">
