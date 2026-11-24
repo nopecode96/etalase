@@ -1,10 +1,17 @@
-export interface SocialLinks {
-  tiktok?: string;
-  instagram?: string;
-  whatsapp?: string;
-  youtube?: string;
-  website?: string;
-}
+import { SocialLinkItem, SocialPlatform } from "@/lib/utils/social-channels";
+
+export type { SocialLinkItem, SocialPlatform };
+
+export type SocialLinks =
+  | SocialLinkItem[]
+  | {
+      tiktok?: string;
+      instagram?: string;
+      whatsapp?: string;
+      youtube?: string;
+      website?: string;
+      [key: string]: string | undefined;
+    };
 
 export interface AppearanceConfig {
   bgType?: "preset" | "solid" | "gradient" | "pattern" | "image";

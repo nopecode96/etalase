@@ -85,11 +85,7 @@ export const VisualMenuGrid: React.FC<StoreTemplateProps> = ({
 
         {/* Baris Ikon Media Sosial */}
         <SocialLinksBar
-          links={store.appearanceConfig?.socialLinks || {
-            instagram: "https://instagram.com/kopisenja",
-            whatsapp: `https://wa.me/${store.chatHandle || "6281234567891"}`,
-            website: `https://${store.slug}.etalase.online`,
-          }}
+          links={store.appearanceConfig?.socialLinks}
           accentColor={accent}
         />
       </div>

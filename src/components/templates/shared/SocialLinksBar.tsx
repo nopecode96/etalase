@@ -1,85 +1,45 @@
 import React from "react";
-import { SocialLinks } from "../types";
+import {
+  parseSocialLinks,
+  normalizeSocialUrl,
+  SUPPORTED_PLATFORMS,
+} from "@/lib/utils/social-channels";
+import { SocialIcon } from "@/components/ui/SocialIcons";
 
 export function SocialLinksBar({
   links,
   accentColor,
 }: {
-  links?: SocialLinks | null;
+  links?: any;
   accentColor?: string;
 }) {
-  if (!links) return null;
+  const parsedItems = parseSocialLinks(links);
 
-  const activeLinks = [
-    {
-      key: "tiktok",
-      url: links.tiktok,
-      label: "TikTok",
-      icon: (
-        <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-          <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .58.04.86.12V9.41a6.33 6.33 0 0 0-.86-.06 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.71a8.21 8.21 0 0 0 4.77 1.52V6.78a4.85 4.85 0 0 1-1-.09z" />
-        </svg>
-      ),
-    },
-    {
-      key: "instagram",
-      url: links.instagram,
-      label: "Instagram",
-      icon: (
-        <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
-        </svg>
-      ),
-    },
-    {
-      key: "whatsapp",
-      url: links.whatsapp,
-      label: "WhatsApp",
-      icon: (
-        <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-          <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.592 2.654-.696c1.006.577 1.956.88 2.806.88h.005c3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.773-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.06-2.146-.541-1.859-.77-3.045-2.66-3.137-2.784-.092-.122-.751-.998-.751-1.902 0-.904.473-1.349.642-1.534.169-.186.368-.232.492-.232.124 0 .248.002.355.008.113.007.264-.043.413.315.155.37.527 1.285.574 1.378.047.094.079.203.016.326-.063.125-.094.204-.188.312-.093.109-.196.243-.28.326-.093.094-.191.196-.082.383.109.187.484.798 1.037 1.29 0.713.636 1.314.833 1.501.927.188.093.298.078.407-.047.11-.125.469-.546.594-.733.125-.187.25-.156.421-.093.172.063 1.088.513 1.275.607.188.094.313.14.359.219.047.078.047.452-.097.857zM12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2.05 22l4.985-1.308A9.957 9.957 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2z" />
-        </svg>
-      ),
-    },
-    {
-      key: "youtube",
-      url: links.youtube,
-      label: "YouTube",
-      icon: (
-        <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-          <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-        </svg>
-      ),
-    },
-    {
-      key: "website",
-      url: links.website,
-      label: "Website",
-      icon: (
-        <svg className="w-4 h-4 fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="10" />
-          <line x1="2" y1="12" x2="22" y2="12" />
-          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-        </svg>
-      ),
-    },
-  ].filter((item) => Boolean(item.url));
+  const activeLinks = parsedItems
+    .map((item) => ({
+      id: item.id,
+      platform: item.platform,
+      url: normalizeSocialUrl(item.platform, item.handleOrUrl),
+      label: SUPPORTED_PLATFORMS[item.platform]?.name || item.platform,
+    }))
+    .filter((item) => Boolean(item.url));
 
   if (activeLinks.length === 0) return null;
 
   return (
-    <div className="flex items-center justify-center gap-2.5 my-3">
+    <div className="flex items-center justify-center gap-2.5 my-3 flex-wrap">
       {activeLinks.map((item) => (
         <a
-          key={item.key}
+          key={item.id}
           href={item.url}
           target="_blank"
-          rel="noreferrer"
+          rel="noopener noreferrer"
           aria-label={item.label}
+          title={item.label}
           className="w-8 h-8 rounded-full bg-white/90 border border-black/10 text-stone-700 hover:text-stone-900 shadow-2xs hover:scale-105 transition-all flex items-center justify-center backdrop-blur-xs"
           style={accentColor ? { color: accentColor } : undefined}
         >
-          {item.icon}
+          <SocialIcon platform={item.platform} className="w-4 h-4" />
         </a>
       ))}
     </div>

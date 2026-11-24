@@ -25,7 +25,7 @@ export async function actionUpdateStorefront(input: {
   avatarUrl?: string;
   bannerUrl?: string;
   accentColor?: string;
-  socialLinks?: Record<string, string>;
+  socialLinks?: any;
 }): Promise<ActionResult> {
   try {
     const ctx = await requireTenantContext(input.storeId);
@@ -45,10 +45,27 @@ export async function actionUpdateStorefront(input: {
         ? (store as any).appearanceConfig
         : {};
 
+    let finalSocialLinks: any = currentAppearance.socialLinks || [];
+    if (input.socialLinks !== undefined) {
+      if (Array.isArray(input.socialLinks)) {
+        finalSocialLinks = input.socialLinks
+          .filter((item: any) => item && typeof item === "object" && item.handleOrUrl && String(item.handleOrUrl).trim())
+          .slice(0, 8)
+          .map((item: any, idx: number) => ({
+            id: item.id || `social-${idx}-${Date.now()}`,
+            platform: item.platform,
+            handleOrUrl: String(item.handleOrUrl).trim(),
+            sortOrder: idx,
+          }));
+      } else if (typeof input.socialLinks === "object") {
+        finalSocialLinks = input.socialLinks;
+      }
+    }
+
     const updatedAppearance = {
       ...currentAppearance,
       accentColor: input.accentColor || currentAppearance.accentColor || "#D94E28",
-      socialLinks: input.socialLinks || currentAppearance.socialLinks || {},
+      socialLinks: finalSocialLinks,
     };
 
     const updated = await prisma.store.update({
@@ -63,6 +80,7 @@ export async function actionUpdateStorefront(input: {
     });
 
     revalidatePath("/admin");
+    revalidatePath(`/${store.slug}`);
     revalidatePath("/admin/storefront");
     revalidatePath("/admin/storefront/theme");
     revalidatePath(`/${store.slug}`);

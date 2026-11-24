@@ -107,12 +107,13 @@ export function AppearanceClient({
   const [accentColor, setAccentColor] = useState<string>(
     store.appearanceConfig?.accentColor || "#D94E28"
   );
+  const rawSocial = store.appearanceConfig?.socialLinks as any;
   const [socialLinks, setSocialLinks] = useState({
-    tiktok: store.appearanceConfig?.socialLinks?.tiktok || "",
-    instagram: store.appearanceConfig?.socialLinks?.instagram || "",
-    whatsapp: store.appearanceConfig?.socialLinks?.whatsapp || "",
-    youtube: store.appearanceConfig?.socialLinks?.youtube || "",
-    website: store.appearanceConfig?.socialLinks?.website || "",
+    tiktok: rawSocial?.tiktok || "",
+    instagram: rawSocial?.instagram || "",
+    whatsapp: rawSocial?.whatsapp || "",
+    youtube: rawSocial?.youtube || "",
+    website: rawSocial?.website || "",
   });
 
   // Reorderable Blocks State

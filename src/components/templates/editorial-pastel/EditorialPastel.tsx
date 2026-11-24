@@ -108,11 +108,7 @@ export const EditorialPastel: React.FC<StoreTemplateProps> = ({
 
         {/* Baris Ikon Media Sosial */}
         <SocialLinksBar
-          links={store.appearanceConfig?.socialLinks || {
-            tiktok: "https://tiktok.com/@aisyahlook",
-            instagram: "https://instagram.com/aisyahlook",
-            whatsapp: `https://wa.me/${store.chatHandle || "6281234567893"}`,
-          }}
+          links={store.appearanceConfig?.socialLinks}
           accentColor={accent}
         />
       </div>

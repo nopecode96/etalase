@@ -79,11 +79,7 @@ export const ShowroomPro: React.FC<StoreTemplateProps> = ({
 
         {/* Baris Ikon Media Sosial */}
         <SocialLinksBar
-          links={store.appearanceConfig?.socialLinks || {
-            tiktok: "https://tiktok.com/@bastianmobil",
-            instagram: "https://instagram.com/bastianmobil",
-            whatsapp: `https://wa.me/${store.chatHandle || "6281234567892"}`,
-          }}
+          links={store.appearanceConfig?.socialLinks}
           accentColor={accent}
         />
       </div>

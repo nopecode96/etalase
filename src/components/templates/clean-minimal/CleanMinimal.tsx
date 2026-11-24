@@ -74,12 +74,7 @@ export const CleanMinimal: React.FC<StoreTemplateProps> = ({
 
         {/* Baris Ikon Media Sosial */}
         <SocialLinksBar
-          links={store.appearanceConfig?.socialLinks || {
-            tiktok: "https://tiktok.com/@rafacreative",
-            instagram: "https://instagram.com/rafacreative",
-            whatsapp: `https://wa.me/${store.chatHandle || "6281234567890"}`,
-            youtube: "https://youtube.com/@rafacreative",
-          }}
+          links={store.appearanceConfig?.socialLinks}
           accentColor={accent}
         />
       </div>

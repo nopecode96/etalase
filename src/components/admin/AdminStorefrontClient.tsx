@@ -31,6 +31,8 @@ import {
 } from "@/app/admin/actions";
 import { showToast } from "@/components/ui/GlobalToast";
 import { ImageUploadDropzone } from "@/components/admin/ImageUploadDropzone";
+import { SocialChannelsBuilder } from "@/components/admin/SocialChannelsBuilder";
+import { SocialLinkItem, parseSocialLinks } from "@/lib/utils/social-channels";
 
 interface AdminStorefrontClientProps {
   store: any;
@@ -92,9 +94,9 @@ export function AdminStorefrontClient({ store, tier }: AdminStorefrontClientProp
 
   const appearance = typeof store.appearanceConfig === "object" ? store.appearanceConfig : {};
   const [accentColor, setAccentColor] = useState(appearance?.accentColor || "#D94E28");
-  const [instagram, setInstagram] = useState(appearance?.socialLinks?.instagram || "");
-  const [tiktok, setTiktok] = useState(appearance?.socialLinks?.tiktok || "");
-  const [youtube, setYoutube] = useState(appearance?.socialLinks?.youtube || "");
+  const [socialChannels, setSocialChannels] = useState<SocialLinkItem[]>(() =>
+    parseSocialLinks(appearance?.socialLinks)
+  );
 
   // Upgrade Modal State
   const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
@@ -142,11 +144,7 @@ export function AdminStorefrontClient({ store, tier }: AdminStorefrontClientProp
         avatarUrl,
         bannerUrl,
         accentColor,
-        socialLinks: {
-          instagram,
-          tiktok,
-          youtube,
-        },
+        socialLinks: socialChannels,
       });
 
       if (res.success) {
@@ -422,43 +420,13 @@ export function AdminStorefrontClient({ store, tier }: AdminStorefrontClientProp
           </div>
         </div>
 
-        {/* Social Media Links */}
-        <div className="pt-4 border-t border-[#E7E5E4] space-y-3">
-          <label className="block text-xs font-bold text-[#1C1917]">
-            Social Media Links
-          </label>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div>
-              <span className="text-[11px] text-[#78716C] mb-1 block">Instagram Handle</span>
-              <input
-                type="text"
-                value={instagram}
-                onChange={(e) => setInstagram(e.target.value)}
-                placeholder="@username"
-                className="w-full px-3 py-1.5 text-xs rounded-xl border border-[#E7E5E4]"
-              />
-            </div>
-            <div>
-              <span className="text-[11px] text-[#78716C] mb-1 block">TikTok Handle</span>
-              <input
-                type="text"
-                value={tiktok}
-                onChange={(e) => setTiktok(e.target.value)}
-                placeholder="@username"
-                className="w-full px-3 py-1.5 text-xs rounded-xl border border-[#E7E5E4]"
-              />
-            </div>
-            <div>
-              <span className="text-[11px] text-[#78716C] mb-1 block">YouTube Channel</span>
-              <input
-                type="text"
-                value={youtube}
-                onChange={(e) => setYoutube(e.target.value)}
-                placeholder="@channel"
-                className="w-full px-3 py-1.5 text-xs rounded-xl border border-[#E7E5E4]"
-              />
-            </div>
-          </div>
+        {/* Dynamic Social Media Channels Builder */}
+        <div className="pt-4 border-t border-[#E7E5E4]">
+          <SocialChannelsBuilder
+            channels={socialChannels}
+            onChange={setSocialChannels}
+            maxChannels={8}
+          />
         </div>
 
         {/* Save Appearance Button */}
