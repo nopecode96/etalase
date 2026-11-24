@@ -123,6 +123,25 @@ export function AdminSettingsProfileClient({ store }: AdminSettingsProfileClient
               <option value="PHP">PHP (₱) — Philippine Peso</option>
             </select>
           </div>
+
+          {/* Operational Country Badge (Multi-Country Ready) */}
+          <div className="space-y-1.5 md:col-span-2 p-3.5 rounded-2xl bg-[#FAF8F5] border border-[#E7E5E4] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm">🇮🇩</span>
+                <span className="text-xs font-bold text-[#1C1917]">Negara Operasional: Indonesia (ID)</span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  Aktif (Direct QRIS &amp; Payout)
+                </span>
+              </div>
+              <p className="text-[11px] text-[#78716C] mt-0.5">
+                Pencairan dana dan checkout QRIS terhubung penuh ke sistem perbankan nasional.
+              </p>
+            </div>
+            <div className="text-[10px] text-stone-500 bg-white px-2.5 py-1 rounded-xl border border-stone-200 shrink-0">
+              🌍 Ekspansi Global (SG, MY, TH, VN, INTL) Siap Diaktifkan dari Mabes
+            </div>
+          </div>
         </div>
 
         {/* Short Bio */}

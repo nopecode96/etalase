@@ -159,6 +159,15 @@ model Store {
   walletBalance   Decimal     @default(0) @db.Decimal(14, 2)
   affiliateCommission Decimal? @default(10) @db.Decimal(5, 2) // Default 10%
 
+  // Multi-Country & Payout Master Reference
+  countryCode             String            @default("ID")
+  country                 SupportedCountry  @relation(fields: [countryCode], references: [code])
+  payoutBankId            String?
+  payoutBankName          String?
+  payoutAccountNumber     String?
+  payoutAccountHolder     String?
+  hasCompletedOnboarding  Boolean           @default(false)
+
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 
@@ -437,3 +446,37 @@ model DfyProject {
 
   @@index([stage])
 }
+
+// --- MASTER NEGARA MULTI-CURRENCY & PAYOUT ENGINE ---
+model SupportedCountry {
+  code            String          @id // "ID", "SG", "MY", "TH", "VN", "INTL"
+  name            String          // "Indonesia", "Singapore", "Malaysia", "Thailand", "Vietnam", "International"
+  flagEmoji       String
+  currencyCode    String          // "IDR", "SGD", "MYR", "THB", "VND", "USD"
+  currencySymbol  String          // "Rp", "$", "RM", "฿", "₫", "$"
+  defaultLocale   String          // "id", "en", "ms", "th", "vi"
+  isActive        Boolean         @default(false) // Saat ini hanya "ID" yang true
+  sortOrder       Int             @default(0)
+
+  banks           SupportedBank[]
+  stores          Store[]
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+}
+
+// --- MASTER BANK & E-WALLET MULTI-NEGARA ---
+model SupportedBank {
+  id              String           @id @default(cuid())
+  countryCode     String
+  country         SupportedCountry @relation(fields: [countryCode], references: [code], onDelete: Cascade)
+
+  code            String           // "BCA", "BRI", "MANDIRI", "DBS", "MAYBANK", dll.
+  name            String           // "Bank Central Asia (BCA)", dll.
+  type            String           @default("BANK") // "BANK" | "EWALLET"
+  isActive        Boolean          @default(true)
+  sortOrder       Int              @default(0)
+
+  @@unique([countryCode, code])
+  @@index([countryCode])
+}
+

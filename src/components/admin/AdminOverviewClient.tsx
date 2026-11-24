@@ -19,6 +19,7 @@ import {
   Clock,
   ArrowRight,
 } from "lucide-react";
+import { StoreSetupChecklist } from "./StoreSetupChecklist";
 
 interface AdminOverviewClientProps {
   store: any;
@@ -218,69 +219,8 @@ export function AdminOverviewClient({
         </div>
       </div>
 
-      {/* 3. Onboarding Checklist Card */}
-      {completedCount < checklistItems.length && (
-        <div className="bg-white rounded-3xl border border-[#E7E5E4] shadow-xs p-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-5 border-b border-[#E7E5E4]">
-            <div>
-              <h2 className="text-base font-bold text-[#1C1917]">
-                Store Launch Checklist
-              </h2>
-              <p className="text-xs text-[#57534E] mt-0.5">
-                Complete these 4 simple steps to maximize conversion and start receiving orders.
-              </p>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="text-right">
-                <span className="text-xs font-bold text-[#D94E28]">
-                  {completedCount} of {checklistItems.length} completed
-                </span>
-              </div>
-              <div className="w-24 bg-stone-100 rounded-full h-2 overflow-hidden border border-stone-200">
-                <div
-                  className="bg-[#D94E28] h-full transition-all duration-500"
-                  style={{ width: `${progressPercent}%` }}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
-            {checklistItems.map((item, idx) => (
-              <Link
-                key={idx}
-                href={item.href}
-                className={`p-3.5 rounded-2xl border transition flex items-start justify-between group ${
-                  item.completed
-                    ? "bg-[#FAF8F5]/60 border-[#E7E5E4]/80 opacity-80"
-                    : "bg-white border-[#E7E5E4] hover:border-[#D94E28]/50 hover:shadow-2xs"
-                }`}
-              >
-                <div className="flex items-start gap-3">
-                  {item.completed ? (
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
-                  ) : (
-                    <Circle className="w-5 h-5 text-stone-300 shrink-0 mt-0.5 group-hover:text-[#D94E28]" />
-                  )}
-                  <div>
-                    <p
-                      className={`text-xs font-bold ${
-                        item.completed ? "text-[#57534E] line-through" : "text-[#1C1917]"
-                      }`}
-                    >
-                      {item.title}
-                    </p>
-                    <p className="text-[11px] text-[#78716C] mt-0.5">
-                      {item.desc}
-                    </p>
-                  </div>
-                </div>
-                <ArrowRight className="w-4 h-4 text-stone-400 group-hover:text-[#D94E28] transition-transform group-hover:translate-x-0.5 shrink-0 mt-1" />
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* 3. Database-Driven Store Setup Checklist */}
+      <StoreSetupChecklist store={store} />
 
       {/* 4. Bottom Grid: Recent Orders & Top Products */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
