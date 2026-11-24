@@ -30,6 +30,7 @@ import {
   actionDeleteStoreBlock,
 } from "@/app/admin/actions";
 import { showToast } from "@/components/ui/GlobalToast";
+import { ImageUploadDropzone } from "@/components/admin/ImageUploadDropzone";
 
 interface AdminStorefrontClientProps {
   store: any;
@@ -349,62 +350,26 @@ export function AdminStorefrontClient({ store, tier }: AdminStorefrontClientProp
           <p className="text-xs text-[#57534E] mt-0.5">
             Set your brand cover, avatar photo, accent colors, and official social handles.
           </p>
-        </div>
+        </div>        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Avatar / Logo Upload Dropzone */}
+          <ImageUploadDropzone
+            label="Store Avatar / Logo"
+            value={avatarUrl}
+            onChange={setAvatarUrl}
+            folder="avatar"
+            aspectRatio="square"
+            helperText="Square 1:1 format recommended (400x400px)"
+          />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Avatar URL */}
-          <div className="space-y-2">
-            <label className="block text-xs font-bold text-[#1C1917]">
-              Store Avatar / Logo Image URL
-            </label>
-            <div className="flex gap-3 items-center">
-              {avatarUrl ? (
-                <img
-                  src={avatarUrl}
-                  alt="Avatar Preview"
-                  className="w-12 h-12 rounded-2xl object-cover border border-[#E7E5E4] shrink-0"
-                />
-              ) : (
-                <div className="w-12 h-12 rounded-2xl bg-stone-100 border border-[#E7E5E4] flex items-center justify-center text-xs text-stone-400 font-bold shrink-0">
-                  Logo
-                </div>
-              )}
-              <input
-                type="url"
-                value={avatarUrl}
-                onChange={(e) => setAvatarUrl(e.target.value)}
-                placeholder="https://example.com/logo.jpg"
-                className="flex-1 px-3.5 py-2 text-xs rounded-xl border border-[#E7E5E4] bg-white focus:outline-none focus:ring-2 focus:ring-[#D94E28]/20 focus:border-[#D94E28]"
-              />
-            </div>
-          </div>
-
-          {/* Banner URL */}
-          <div className="space-y-2">
-            <label className="block text-xs font-bold text-[#1C1917]">
-              Cover Banner Image URL
-            </label>
-            <div className="flex gap-3 items-center">
-              {bannerUrl ? (
-                <img
-                  src={bannerUrl}
-                  alt="Banner Preview"
-                  className="w-16 h-12 rounded-2xl object-cover border border-[#E7E5E4] shrink-0"
-                />
-              ) : (
-                <div className="w-16 h-12 rounded-2xl bg-stone-100 border border-[#E7E5E4] flex items-center justify-center text-xs text-stone-400 font-bold shrink-0">
-                  Banner
-                </div>
-              )}
-              <input
-                type="url"
-                value={bannerUrl}
-                onChange={(e) => setBannerUrl(e.target.value)}
-                placeholder="https://example.com/banner.jpg"
-                className="flex-1 px-3.5 py-2 text-xs rounded-xl border border-[#E7E5E4] bg-white focus:outline-none focus:ring-2 focus:ring-[#D94E28]/20 focus:border-[#D94E28]"
-              />
-            </div>
-          </div>
+          {/* Banner Upload Dropzone */}
+          <ImageUploadDropzone
+            label="Cover Banner Image"
+            value={bannerUrl}
+            onChange={setBannerUrl}
+            folder="banner"
+            aspectRatio="banner"
+            helperText="Landscape 16:9 or 3:1 recommended (1200x400px)"
+          />
 
           {/* Accent Color */}
           <div className="space-y-2">

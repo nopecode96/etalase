@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { actionSaveProduct, actionDeleteProduct } from "@/app/admin/actions";
 import { showToast } from "@/components/ui/GlobalToast";
+import { ImageUploadDropzone } from "@/components/admin/ImageUploadDropzone";
 
 interface AdminProductsClientProps {
   store: any;
@@ -444,19 +445,15 @@ export function AdminProductsClient({ store, tier, rules }: AdminProductsClientP
                 </select>
               </div>
 
-              {/* Image URL */}
-              <div>
-                <label className="block text-xs font-bold text-[#1C1917] mb-1">
-                  Product Image URL
-                </label>
-                <input
-                  type="url"
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                  placeholder="https://images.unsplash.com/..."
-                  className="w-full px-3.5 py-2 text-xs rounded-xl border border-[#E7E5E4] bg-white"
-                />
-              </div>
+              {/* Product Image Upload Dropzone */}
+              <ImageUploadDropzone
+                label="Product Photo / Image"
+                value={imageUrl}
+                onChange={setImageUrl}
+                folder="product"
+                aspectRatio="product"
+                helperText="Square 800x800px or 4:3 product photo recommended"
+              />
 
               {/* Pricing Grid */}
               <div className="grid grid-cols-2 gap-3">

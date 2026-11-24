@@ -24,6 +24,7 @@ import {
   actionDeleteStoreBlock,
 } from "@/app/admin/actions";
 import { showToast } from "@/components/ui/GlobalToast";
+import { ImageUploadDropzone } from "@/components/admin/ImageUploadDropzone";
 
 interface AdminStorefrontBlocksClientProps {
   store: any;
@@ -301,19 +302,14 @@ export function AdminStorefrontBlocksClient({ store }: AdminStorefrontBlocksClie
               </div>
 
               {blockType === "IMAGE_BANNER" && (
-                <div>
-                  <label className="block text-xs font-bold text-[#1C1917] mb-1">
-                    Image Banner URL (Canva / Unsplash) *
-                  </label>
-                  <input
-                    type="url"
-                    required
-                    value={imageUrl}
-                    onChange={(e) => setImageUrl(e.target.value)}
-                    placeholder="https://images.unsplash.com/..."
-                    className="w-full px-3 py-2 text-xs rounded-xl border border-[#E7E5E4]"
-                  />
-                </div>
+                <ImageUploadDropzone
+                  label="Image Banner / Canva Poster"
+                  value={imageUrl}
+                  onChange={setImageUrl}
+                  folder="block"
+                  aspectRatio="banner"
+                  helperText="Upload Canva poster or banner graphic (Max 5MB)"
+                />
               )}
 
               <div>
