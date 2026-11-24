@@ -9,6 +9,7 @@ const envSchema = z.object({
   DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
 
   AUTH_SECRET: z.string().default("default_auth_secret_must_change_in_production_min_32_chars"),
+  AUTH_URL: z.string().optional().default("https://etalase.online"),
   GOOGLE_API_KEY: z.string().optional().default(""),
   AUTH_GOOGLE_ID: z.string().optional().default(""),
   AUTH_GOOGLE_SECRET: z.string().optional().default(""),

@@ -108,13 +108,53 @@ function LoginCard({ locale, callbackUrl: propCallbackUrl }: LoginClientProps) {
   // Default to English as required
   const t = LOGIN_TRANSLATIONS[locale] || LOGIN_TRANSLATIONS.en;
 
-  const handleGoogleSignIn = async () => {
+  const handleGoogleSignIn = () => {
     setLoading(true);
-    try {
-      await signIn("google", { callbackUrl });
-    } catch {
-      window.location.href = callbackUrl;
+    const width = 500;
+    const height = 620;
+    const left = Math.max(0, window.screenX + (window.outerWidth - width) / 2);
+    const top = Math.max(0, window.screenY + (window.outerHeight - height) / 2);
+
+    const popupUrl = `/auth/popup-start?callbackUrl=${encodeURIComponent(callbackUrl)}`;
+    const popup = window.open(
+      popupUrl,
+      "EtalaseGoogleAuth",
+      `width=${width},height=${height},left=${left},top=${top},status=no,menubar=no,toolbar=no,scrollbars=yes,resizable=yes`
+    );
+
+    if (!popup) {
+      window.location.href = popupUrl;
+      return;
     }
+
+    const onMessage = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return;
+      if (event.data?.type === "ETALASE_AUTH_SUCCESS") {
+        cleanup();
+        window.location.href = event.data.url || callbackUrl;
+      }
+    };
+    window.addEventListener("message", onMessage);
+
+    const timer = setInterval(async () => {
+      if (popup.closed) {
+        cleanup();
+        try {
+          const res = await fetch("/api/auth/session");
+          const session = await res.json();
+          if (session?.user) {
+            window.location.href = callbackUrl;
+            return;
+          }
+        } catch {}
+        setLoading(false);
+      }
+    }, 600);
+
+    const cleanup = () => {
+      clearInterval(timer);
+      window.removeEventListener("message", onMessage);
+    };
   };
 
   const registerHref =

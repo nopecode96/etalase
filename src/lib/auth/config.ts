@@ -19,7 +19,32 @@ export const authConfig: NextAuthConfig = {
       allowDangerousEmailAccountLinking: true,
     }),
 
-    // 2. Internal Monitoring Credentials for Mabes (mabes.etalase.online) - Email & Password ONLY
+    // 2. Demo Merchant Credentials for Testing & Sandbox Fallback
+    Credentials({
+      id: "tenant-demo",
+      name: "Tenant Demo Merchant",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        name: { label: "Name", type: "text" },
+      },
+      async authorize(credentials) {
+        const email = String(credentials?.email || "demo.merchant@etalase.online").trim().toLowerCase();
+        let user = await prisma.user.findUnique({ where: { email } });
+        if (!user) {
+          user = await prisma.user.create({
+            data: {
+              email,
+              name: String(credentials?.name || "Demo Merchant"),
+              role: "USER",
+              image: "/favicon.svg",
+            },
+          });
+        }
+        return user;
+      },
+    }),
+
+    // 3. Internal Monitoring Credentials for Mabes (mabes.etalase.online) - Email & Password ONLY
     Credentials({
       id: "mabes-credentials",
       name: "Mabes Super Admin",

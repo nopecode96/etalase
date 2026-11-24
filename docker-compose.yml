@@ -17,6 +17,9 @@ services:
       - DATABASE_URL=postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres_secret_password}@postgres:5432/${DB_NAME:-etalase_online}?schema=public
       - NEXT_PUBLIC_ROOT_DOMAIN=${NEXT_PUBLIC_ROOT_DOMAIN:-etalase.online}
       - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-https://etalase.online}
+      - AUTH_URL=${AUTH_URL:-https://etalase.online}
+      - NEXTAUTH_URL=${NEXTAUTH_URL:-https://etalase.online}
+      - AUTH_TRUST_HOST=true
     volumes:
       - ./uploads:/app/public/uploads
     depends_on:
