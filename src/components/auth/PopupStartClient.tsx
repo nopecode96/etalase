@@ -132,10 +132,10 @@ export function PopupStartClient({
                 <span>Google OAuth Setup Mode</span>
               </div>
               <h2 className="text-base font-bold text-[#1C1917] pt-1">
-                Google Client ID Belum Dikonfigurasi
+                Google Client ID Not Configured
               </h2>
               <p className="text-xs text-[#57534E] leading-relaxed">
-                Untuk mencegah error 400 dari Google, Anda dapat langsung masuk dengan <strong>Akun Uji Coba (Demo Merchant)</strong> atau memasukkan Google Client ID resmi ke file <code className="font-mono bg-stone-100 px-1 py-0.5 rounded text-[11px]">.env</code>.
+                To prevent Google 400 errors, you can sign in directly with a <strong>Sandbox Demo Account</strong> or insert your official Google OAuth Client ID into the <code className="font-mono bg-stone-100 px-1 py-0.5 rounded text-[11px]">.env</code> file.
               </p>
             </div>
 
@@ -151,7 +151,7 @@ export function PopupStartClient({
               ) : (
                 <Sparkles className="w-4 h-4" />
               )}
-              <span>Masuk dengan Akun Uji Coba (1-Click)</span>
+              <span>Continue with Sandbox Demo (1-Click)</span>
             </button>
 
             {/* Setup Instructions Accordion */}
@@ -163,7 +163,7 @@ export function PopupStartClient({
               >
                 <span className="flex items-center gap-1.5">
                   <HelpCircle className="w-3.5 h-3.5 text-[#D94E28]" />
-                  <span>Cara Pasang Google OAuth Resmi</span>
+                  <span>How to Setup Official Google OAuth</span>
                 </span>
                 <ChevronDown
                   className={`w-4 h-4 text-[#78716C] transition-transform ${
@@ -174,13 +174,13 @@ export function PopupStartClient({
 
               {showGuide && (
                 <div className="p-3.5 pt-0 text-[11px] text-[#57534E] space-y-2 border-t border-[#E7E5E4] bg-white">
-                  <p>1. Buka <strong>Google Cloud Console</strong> &rarr; Credentials.</p>
-                  <p>2. Buat <strong>OAuth 2.0 Client ID</strong> (Web Application).</p>
-                  <p>3. Masukkan <strong>Authorized redirect URIs</strong>:</p>
+                  <p>1. Open <strong>Google Cloud Console</strong> &rarr; Credentials.</p>
+                  <p>2. Create an <strong>OAuth 2.0 Client ID</strong> (Web Application).</p>
+                  <p>3. Add <strong>Authorized redirect URIs</strong>:</p>
                   <code className="block bg-stone-100 p-1.5 rounded font-mono text-[10px] break-all text-[#D94E28]">
                     https://etalase.online/api/auth/callback/google
                   </code>
-                  <p>4. Simpan ke <code className="font-mono text-stone-800">.env</code>:</p>
+                  <p>4. Save into <code className="font-mono text-stone-800">.env</code>:</p>
                   <pre className="bg-stone-900 text-stone-100 p-2 rounded text-[10px] font-mono overflow-x-auto">
 {`AUTH_GOOGLE_ID="your-client-id"
 AUTH_GOOGLE_SECRET="your-client-secret"`}
