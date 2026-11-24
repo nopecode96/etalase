@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useTransition } from "react";
+import Link from "next/link";
 import {
   Settings,
   Globe,
@@ -229,12 +230,12 @@ export function AdminSettingsClient({ store, tier }: AdminSettingsClientProps) {
               <p className="text-[#57534E]">
                 Connect your own domain (e.g. <strong>store.yourbrand.com</strong>) to build brand credibility and strengthen SEO rank.
               </p>
-              <a
-                href="/pricing"
+              <Link
+                href="/admin/billing/upgrade?plan=pro&returnTo=/admin/settings"
                 className="px-4 py-2 rounded-xl bg-[#D94E28] hover:bg-[#B83E1D] text-white font-bold text-xs shrink-0 transition"
               >
                 Upgrade to PRO
-              </a>
+              </Link>
             </div>
           ) : (
             <div className="space-y-4">

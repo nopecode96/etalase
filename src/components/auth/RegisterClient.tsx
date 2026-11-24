@@ -4,7 +4,7 @@ import React, { Suspense, useState, useEffect } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { CheckCircle2, ShieldCheck } from "lucide-react";
+import { CheckCircle2, ShieldCheck, Sparkles } from "lucide-react";
 import { EtalaseLogo } from "@/components/brand/EtalaseLogo";
 import { SupportedLocale } from "@/lib/config/constants";
 
@@ -104,12 +104,16 @@ export const REGISTER_TRANSLATIONS: Record<SupportedLocale, RegisterTranslation>
 interface RegisterClientProps {
   locale: SupportedLocale;
   initialSlug?: string;
+  initialPlan?: string;
 }
 
-function RegisterCard({ locale, initialSlug = "" }: RegisterClientProps) {
+function RegisterCard({ locale, initialSlug = "", initialPlan = "" }: RegisterClientProps) {
   const searchParams = useSearchParams();
   const slugParam = searchParams.get("slug") || initialSlug;
+  const planParam = searchParams.get("plan") || searchParams.get("tier") || initialPlan;
+
   const [slug, setSlug] = useState(slugParam);
+  const [plan, setPlan] = useState(planParam);
   const [loading, setLoading] = useState(false);
 
   const t = REGISTER_TRANSLATIONS[locale] || REGISTER_TRANSLATIONS.id;
@@ -127,9 +131,24 @@ function RegisterCard({ locale, initialSlug = "" }: RegisterClientProps) {
     }
   }, [slugParam]);
 
+  useEffect(() => {
+    if (planParam) {
+      const cleanPlan = planParam.trim().toLowerCase();
+      setPlan(cleanPlan);
+      try {
+        sessionStorage.setItem("selected_plan", cleanPlan);
+        document.cookie = `selected_plan=${encodeURIComponent(cleanPlan)}; path=/; max-age=3600; SameSite=Lax`;
+      } catch {
+        // Safe fallback
+      }
+    }
+  }, [planParam]);
+
   const handleGoogleConnect = () => {
     setLoading(true);
     const targetSlug = slug ? slug.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-") : "";
+    const targetPlan = plan ? plan.trim().toLowerCase() : "";
+
     if (targetSlug) {
       try {
         sessionStorage.setItem("claimed_slug", targetSlug);
@@ -139,9 +158,21 @@ function RegisterCard({ locale, initialSlug = "" }: RegisterClientProps) {
       }
     }
 
-    const callbackUrl = targetSlug
-      ? `/onboarding?slug=${encodeURIComponent(targetSlug)}`
-      : "/onboarding";
+    if (targetPlan) {
+      try {
+        sessionStorage.setItem("selected_plan", targetPlan);
+        document.cookie = `selected_plan=${encodeURIComponent(targetPlan)}; path=/; max-age=3600; SameSite=Lax`;
+      } catch {
+        // Storage fallback
+      }
+    }
+
+    const queryParams = new URLSearchParams();
+    if (targetSlug) queryParams.set("slug", targetSlug);
+    if (targetPlan) queryParams.set("plan", targetPlan);
+
+    const queryString = queryParams.toString();
+    const callbackUrl = queryString ? `/onboarding?${queryString}` : "/onboarding";
 
     const width = 500;
     const height = 620;
@@ -223,6 +254,19 @@ function RegisterCard({ locale, initialSlug = "" }: RegisterClientProps) {
           <CheckCircle2 className="w-4 h-4 text-[#D94E28] shrink-0" />
           <span className="truncate">
             {t.slugBadgeLabel} <strong>{slug}.etalase.online</strong>
+          </span>
+        </div>
+      ) : null}
+
+      {/* Badge Konfirmasi Plan (?plan=pro / ?plan=dfy) */}
+      {plan ? (
+        <div className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 text-amber-900 px-3.5 py-2 rounded-2xl text-xs font-semibold w-full justify-center">
+          <Sparkles className="w-4 h-4 text-[#D94E28] shrink-0" />
+          <span>
+            Selected Upgrade:{" "}
+            <strong>
+              {plan.toUpperCase() === "DFY" ? "Terima Beres (DFY)" : "PRO Plan (Rp 49.000/mo)"}
+            </strong>
           </span>
         </div>
       ) : null}

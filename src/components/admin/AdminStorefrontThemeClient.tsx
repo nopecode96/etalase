@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useTransition } from "react";
+import Link from "next/link";
 import {
   Palette,
   Sparkles,
@@ -324,12 +325,12 @@ export function AdminStorefrontThemeClient({ store, tier }: AdminStorefrontTheme
             </div>
 
             <div className="flex flex-col gap-2 pt-2">
-              <a
-                href="/pricing"
-                className="w-full py-2.5 rounded-xl bg-[#D94E28] hover:bg-[#B83E1D] text-white text-xs font-bold shadow-xs transition"
+              <Link
+                href="/admin/billing/upgrade?plan=pro&returnTo=/admin/storefront/theme"
+                className="w-full text-center py-2.5 rounded-xl bg-[#D94E28] hover:bg-[#B83E1D] text-white text-xs font-bold shadow-xs transition"
               >
                 Upgrade to PRO (Rp 49.000/mo)
-              </a>
+              </Link>
               <button
                 type="button"
                 onClick={() => setUpgradeModalOpen(false)}

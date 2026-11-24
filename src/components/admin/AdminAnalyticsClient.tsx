@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useTransition } from "react";
+import Link from "next/link";
 import {
   BarChart3,
   TrendingUp,
@@ -229,13 +230,13 @@ export function AdminAnalyticsClient({ store, tier }: AdminAnalyticsClientProps)
               </p>
             </div>
 
-            <a
-              href="/pricing"
+            <Link
+              href="/admin/billing/upgrade?plan=pro&returnTo=/admin/analytics"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#D94E28] hover:bg-[#B83E1D] text-white text-xs font-bold shadow-xs transition"
             >
               <span>Upgrade to PRO (Rp 49.000/mo)</span>
               <ExternalLink className="w-3.5 h-3.5" />
-            </a>
+            </Link>
           </div>
         ) : (
           /* PRO / DFY Pixel Input Form */

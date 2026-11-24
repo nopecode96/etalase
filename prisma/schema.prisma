@@ -168,6 +168,7 @@ model Store {
   vouchers        Voucher[]
   withdrawals     Withdrawal[]
   affiliates      AffiliateReferral[]
+  planOrders      PlanOrder[]
 }
 
 model BioBlock {
@@ -364,4 +365,30 @@ model PostTranslation {
 
   @@unique([postId, locale])
   @@index([locale, isPublished])
+}
+
+// --- TENANT PLAN SUBSCRIPTIONS & UPGRADES ---
+model PlanOrder {
+  id             String    @id @default(cuid())
+  orderNumber    String    @unique // e.g. UPGRADE-202611-XXXX
+  storeId        String
+  store          Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  planCode       String    // "PRO" | "DFY"
+  billingCycle   String    // "MONTHLY" | "YEARLY" | "ONE_TIME"
+  amount         Decimal   @db.Decimal(14, 2)
+  currency       String    @default("IDR")
+  status         String    @default("PENDING") // PENDING | UNDER_REVIEW | APPROVED | REJECTED
+
+  paymentMethod  String    @default("QRIS")
+  proofUrl       String?
+  notes          String?
+  adminNotes     String?
+  paidAt         DateTime?
+  approvedAt     DateTime?
+
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([storeId, status])
 }

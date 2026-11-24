@@ -16,7 +16,7 @@ import { showToast } from "@/components/ui/GlobalToast";
 interface ImageUploadDropzoneProps {
   value: string;
   onChange: (url: string) => void;
-  folder: "avatar" | "banner" | "product" | "block";
+  folder: "avatar" | "banner" | "product" | "block" | "payment";
   label?: string;
   helperText?: string;
   aspectRatio?: "square" | "banner" | "product";

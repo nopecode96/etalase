@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useTransition } from "react";
+import Link from "next/link";
 import {
   Globe,
   Lock,
@@ -97,13 +98,13 @@ export function AdminSettingsDomainClient({
           </p>
 
           <div className="pt-2">
-            <a
-              href="/pricing"
+            <Link
+              href="/admin/billing/upgrade?plan=pro&returnTo=/admin/settings/domain"
               className="inline-flex items-center gap-2 bg-[#D94E28] hover:bg-[#B83E1D] text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-xs transition"
             >
               <Sparkles className="w-4 h-4" />
-              <span>Upgrade to PRO (Rp 99.000/mo)</span>
-            </a>
+              <span>Upgrade to PRO (Rp 49.000/mo)</span>
+            </Link>
           </div>
         </div>
       ) : (

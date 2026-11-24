@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import { HargaClient } from "@/components/pricing/HargaClient";
 import { SupportedLocale, SUPPORTED_LOCALES } from "@/lib/config/constants";
 import { generateLocalizedMetadata } from "@/lib/seo/metadata-helper";
+import { getCurrentUser } from "@/lib/auth/session";
 
 interface HargaPageProps {
   searchParams?: {
@@ -44,12 +45,13 @@ export async function generateMetadata({
   });
 }
 
-export default function HargaPage({ searchParams }: HargaPageProps) {
+export default async function HargaPage({ searchParams }: HargaPageProps) {
+  const user = await getCurrentUser();
   const rawLang = searchParams?.lang;
   const locale: SupportedLocale =
     rawLang && (SUPPORTED_LOCALES as readonly string[]).includes(rawLang)
       ? (rawLang as SupportedLocale)
       : "id";
 
-  return <HargaClient locale={locale} />;
+  return <HargaClient locale={locale} isAuthenticated={Boolean(user)} />;
 }

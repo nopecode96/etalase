@@ -347,18 +347,25 @@ export function AdminSidebar({
           })}
         </nav>
 
-        {/* Footer: Upgrade Box (if Free & Expanded) */}
-        {!isCollapsed && isFree && (
+        {/* Footer: Upgrade Box / Billing Quick Access */}
+        {!isCollapsed && (
           <div className="p-3 m-3 rounded-2xl bg-gradient-to-br from-[#FDF0EC] to-[#FAF8F5] border border-[#FADCD3]">
-            <div className="flex items-center gap-1.5 text-xs font-bold text-[#D94E28]">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Unlock PRO (2% QRIS)</span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-[#D94E28]">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>{isFree ? "Unlock PRO (2% QRIS)" : `${store.tier} Plan Active`}</span>
+              </div>
+              {!isFree && (
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                  Active
+                </span>
+              )}
             </div>
             <Link
-              href="/pricing"
+              href="/admin/billing/upgrade"
               className="mt-2 block w-full text-center text-xs font-bold text-white bg-[#D94E28] hover:bg-[#B83E1D] py-1.5 rounded-xl transition shadow-xs"
             >
-              Upgrade Plan
+              {isFree ? "Upgrade Plan" : "Manage Subscription"}
             </Link>
           </div>
         )}
@@ -473,7 +480,15 @@ export function AdminSidebar({
               })}
             </nav>
 
-            <div className="p-4 border-t border-[#E7E5E4]">
+            <div className="p-4 border-t border-[#E7E5E4] space-y-2">
+              <Link
+                href="/admin/billing/upgrade"
+                onClick={onCloseMobile}
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[#D94E28] text-white font-semibold text-xs hover:bg-[#B83E1D] transition shadow-xs"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>{isFree ? "Upgrade to PRO (2% QRIS)" : "Manage Subscription"}</span>
+              </Link>
               <a
                 href={liveStoreUrl}
                 target="_blank"

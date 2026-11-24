@@ -1,5 +1,11 @@
 import HargaPage from "../harga/page";
 
-export default function PricingPage() {
-  return <HargaPage />;
+interface PricingPageProps {
+  searchParams?: {
+    lang?: string;
+  };
+}
+
+export default async function PricingPage({ searchParams }: PricingPageProps) {
+  return <HargaPage searchParams={searchParams} />;
 }

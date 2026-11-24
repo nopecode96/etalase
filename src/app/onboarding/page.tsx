@@ -46,9 +46,24 @@ function OnboardingContent() {
   const [countryCode, setCountryCode] = useState("+62");
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [category, setCategory] = useState("Kreator Digital");
+  const [selectedPlan, setSelectedPlan] = useState("");
 
-  // Read ?slug=... on mount or fallback to sessionStorage / cookies
+  // Read ?slug=... and ?plan=... on mount or fallback to sessionStorage / cookies
   useEffect(() => {
+    let initialPlan = searchParams.get("plan") || searchParams.get("tier") || "";
+    if (!initialPlan) {
+      try {
+        initialPlan = sessionStorage.getItem("selected_plan") || "";
+        if (!initialPlan) {
+          const match = document.cookie.match(/(?:^|; )selected_plan=([^;]*)/);
+          if (match) initialPlan = decodeURIComponent(match[1]);
+        }
+      } catch {}
+    }
+    if (initialPlan) {
+      setSelectedPlan(initialPlan.trim().toLowerCase());
+    }
+
     let initialSlug = searchParams.get("slug") || "";
 
     if (!initialSlug) {
@@ -118,8 +133,20 @@ function OnboardingContent() {
       showServiceResultToast(res);
 
       if (res.success && res.data) {
-        const createdSlug = (res.data as { slug: string }).slug;
-        router.push(`/${createdSlug}/admin`);
+        try {
+          sessionStorage.removeItem("claimed_slug");
+          sessionStorage.removeItem("selected_plan");
+          document.cookie = "claimed_slug=; path=/; max-age=0;";
+          document.cookie = "selected_plan=; path=/; max-age=0;";
+        } catch {}
+
+        const plan = selectedPlan || (searchParams.get("plan") || searchParams.get("tier") || "").toLowerCase();
+
+        if (plan === "pro" || plan === "dfy") {
+          router.push(`/admin/billing/upgrade?plan=${plan}`);
+        } else {
+          router.push("/admin");
+        }
       }
     });
   };
@@ -132,10 +159,22 @@ function OnboardingContent() {
           <EtalaseLogo size="lg" />
         </div>
 
-        <div className="inline-flex items-center gap-1.5 bg-[#FDF0EC] border border-[#FADCD3] text-[#D94E28] px-3 py-1 rounded-full text-xs font-semibold">
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>Setup Kilat 30 Detik</span>
-        </div>
+        {selectedPlan ? (
+          <div className="inline-flex items-center gap-1.5 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 text-amber-900 px-3 py-1 rounded-full text-xs font-semibold">
+            <Sparkles className="w-3.5 h-3.5 text-[#D94E28]" />
+            <span>
+              Target Upgrade:{" "}
+              <strong>
+                {selectedPlan.toUpperCase() === "DFY" ? "Terima Beres (DFY)" : "PRO Plan (Rp 49.000/mo)"}
+              </strong>
+            </span>
+          </div>
+        ) : (
+          <div className="inline-flex items-center gap-1.5 bg-[#FDF0EC] border border-[#FADCD3] text-[#D94E28] px-3 py-1 rounded-full text-xs font-semibold">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Setup Kilat 30 Detik</span>
+          </div>
+        )}
 
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1C1917]">
           Buka Etalase Online Anda

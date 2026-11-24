@@ -6,6 +6,8 @@ interface RegisterPageProps {
   searchParams?: {
     lang?: string;
     slug?: string;
+    plan?: string;
+    tier?: string;
   };
 }
 
@@ -68,6 +70,7 @@ export default function RegisterPage({ searchParams }: RegisterPageProps) {
       : "id";
 
   const slug = searchParams?.slug || "";
+  const plan = searchParams?.plan || searchParams?.tier || "";
 
-  return <RegisterClient locale={locale} initialSlug={slug} />;
+  return <RegisterClient locale={locale} initialSlug={slug} initialPlan={plan} />;
 }

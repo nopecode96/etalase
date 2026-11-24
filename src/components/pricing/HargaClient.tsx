@@ -1031,7 +1031,13 @@ export const PRICING_LOCALES: Record<SupportedLocale, PricingPageData> = {
   },
 };
 
-export function HargaClient({ locale }: { locale: SupportedLocale }) {
+export function HargaClient({
+  locale,
+  isAuthenticated = false,
+}: {
+  locale: SupportedLocale;
+  isAuthenticated?: boolean;
+}) {
   const copy = PRICING_LOCALES[locale] || PRICING_LOCALES.id;
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("yearly");
 
@@ -1039,6 +1045,14 @@ export function HargaClient({ locale }: { locale: SupportedLocale }) {
     if (locale === "id") return basePath;
     return `/${locale}${basePath}`;
   };
+
+  const proHref = isAuthenticated
+    ? `/admin/billing/upgrade?plan=pro&cycle=${billingCycle}`
+    : getLocalizedHref(`/register?plan=pro&cycle=${billingCycle}`);
+
+  const dfyHref = isAuthenticated
+    ? "/admin/billing/upgrade?plan=dfy"
+    : getLocalizedHref("/register?plan=dfy");
 
   return (
     <div className="flex flex-col min-h-screen bg-[#FAF8F5] text-[#1C1917] selection:bg-[#D94E28] selection:text-white">
@@ -1168,7 +1182,7 @@ export function HargaClient({ locale }: { locale: SupportedLocale }) {
             </div>
 
             <Link
-              href={getLocalizedHref("/register?tier=pro")}
+              href={proHref}
               className="w-full text-center py-3.5 rounded-xl text-xs font-bold text-white bg-[#D94E28] hover:bg-[#B83E1D] shadow-xs transition cursor-pointer"
             >
               {copy.proTier.buttonText}
@@ -1204,7 +1218,7 @@ export function HargaClient({ locale }: { locale: SupportedLocale }) {
             </div>
 
             <Link
-              href={getLocalizedHref("/kontak?service=dfy")}
+              href={dfyHref}
               className="w-full text-center py-3.5 rounded-xl text-xs font-bold text-purple-900 bg-purple-50 hover:bg-purple-100 border border-purple-200 transition cursor-pointer"
             >
               {copy.dfyTier.buttonText}
