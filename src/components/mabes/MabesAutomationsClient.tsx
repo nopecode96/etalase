@@ -20,6 +20,7 @@ import {
 import {
   actionTriggerTestEvent,
   actionSendTestTelegramAlert,
+  actionGetTelegramWebhookStatus,
 } from "@/app/mabes/actions";
 import { showToast } from "@/components/ui/GlobalToast";
 import { formatDate } from "@/lib/core/formatters";
@@ -79,6 +80,32 @@ export function MabesAutomationsClient({
   const [selectedEvent, setSelectedEvent] = useState<string>("order.paid");
   const [isPending, startTransition] = useTransition();
   const [isTelegramPending, startTelegramTransition] = useTransition();
+  const [isCheckingWebhook, startCheckingWebhook] = useTransition();
+  const [webhookStatus, setWebhookStatus] = useState<any>(null);
+
+  const isChatIdInvalid = Boolean(
+    telegramChatId &&
+      ((telegramChatId.toLowerCase().includes("bot") && !telegramChatId.startsWith("-100")) ||
+        !/^[-0-9]+$/.test(telegramChatId))
+  );
+  const isChatIdConfigured = Boolean(telegramChatId && !isChatIdInvalid);
+
+  const handleCheckWebhook = () => {
+    startCheckingWebhook(async () => {
+      const res = await actionGetTelegramWebhookStatus();
+      if (res.success && res.data) {
+        setWebhookStatus(res.data);
+        if (res.data.success) {
+          showToast("Webhook info retrieved from Telegram API!", "success");
+        } else {
+          showToast(res.data.description || "Webhook status alert.", "info");
+        }
+      } else {
+        const err = !res.success ? res.error : "Failed to check webhook status.";
+        showToast(err, "error");
+      }
+    });
+  };
 
   const handleDispatchTest = (e: React.FormEvent) => {
     e.preventDefault();
@@ -301,32 +328,96 @@ export function MabesAutomationsClient({
               Sends an immediate test message through your configured Telegram Bot to verify that operations staff receives instant mobile notifications when upgrades and payouts occur.
             </p>
 
-            <div className="p-3 rounded-lg bg-slate-950 border border-slate-800 text-[11px] space-y-1 font-mono">
-              <span className="text-slate-400 block text-[10px] uppercase">Target Chat ID</span>
-              <span className="text-white font-semibold">
+            <div className="p-3 rounded-lg bg-slate-950 border border-slate-800 text-[11px] space-y-1.5 font-mono">
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400 block text-[10px] uppercase">Target Chat ID</span>
+                {isChatIdConfigured ? (
+                  <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    CONFIGURED
+                  </span>
+                ) : isChatIdInvalid ? (
+                  <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                    INVALID CHAT ID
+                  </span>
+                ) : (
+                  <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                    NOT CONFIGURED
+                  </span>
+                )}
+              </div>
+              <span className={`font-semibold block ${isChatIdInvalid ? "text-rose-400" : "text-white"}`}>
                 {telegramChatId || "Not configured"}
               </span>
+              {isChatIdInvalid && (
+                <p className="text-[10px] text-rose-400 font-sans leading-tight">
+                  Chat ID cannot be a bot username. Use numeric user ID or group ID (e.g. -100xxxxxxxxxx).
+                </p>
+              )}
             </div>
+
+            {/* Webhook Diagnostic Card */}
+            {webhookStatus && (
+              <div className="p-3 rounded-lg bg-slate-950/80 border border-slate-800 text-[11px] space-y-1 font-mono">
+                <div className="flex items-center justify-between text-[10px] uppercase text-slate-400">
+                  <span>Webhook Info</span>
+                  <span className={webhookStatus.success ? "text-emerald-400 font-bold" : "text-rose-400 font-bold"}>
+                    {webhookStatus.success ? "ACTIVE" : "ERROR"}
+                  </span>
+                </div>
+                <div className="truncate text-slate-300">
+                  <span className="text-slate-500">URL:</span> {webhookStatus.url || "None"}
+                </div>
+                <div className="text-slate-300">
+                  <span className="text-slate-500">Pending:</span> {webhookStatus.pendingUpdateCount ?? 0}
+                </div>
+                {webhookStatus.lastErrorMessage && (
+                  <div className="text-rose-400 font-sans text-[10px] leading-tight">
+                    Err: {webhookStatus.lastErrorMessage} ({webhookStatus.lastErrorDate})
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
-          <button
-            type="button"
-            disabled={isTelegramPending || !hasTelegramToken}
-            onClick={handleTestTelegram}
-            className="w-full py-2.5 px-4 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-2 shadow-sm transition disabled:opacity-50"
-          >
-            {isTelegramPending ? (
-              <>
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                Sending Ping...
-              </>
-            ) : (
-              <>
-                <Send className="w-3.5 h-3.5" />
-                Send Instant Test Ping
-              </>
-            )}
-          </button>
+          <div className="space-y-2 pt-2">
+            <button
+              type="button"
+              disabled={isTelegramPending || !hasTelegramToken || !isChatIdConfigured}
+              onClick={handleTestTelegram}
+              className="w-full py-2.5 px-4 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-2 shadow-sm transition disabled:opacity-50"
+            >
+              {isTelegramPending ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  Sending Ping...
+                </>
+              ) : (
+                <>
+                  <Send className="w-3.5 h-3.5" />
+                  Send Instant Test Ping
+                </>
+              )}
+            </button>
+
+            <button
+              type="button"
+              disabled={isCheckingWebhook || !hasTelegramToken}
+              onClick={handleCheckWebhook}
+              className="w-full py-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-2 border border-slate-700/80 transition disabled:opacity-50"
+            >
+              {isCheckingWebhook ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  Checking Webhook...
+                </>
+              ) : (
+                <>
+                  <Activity className="w-3.5 h-3.5 text-emerald-400" />
+                  Check Webhook Status
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
 

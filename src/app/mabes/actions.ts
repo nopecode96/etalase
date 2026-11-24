@@ -14,6 +14,7 @@ import {
 import {
   getTelegramConfig,
   registerTelegramWebhook,
+  getTelegramWebhookStatus,
   sendTelegramMessage,
   notifyTenantNewOrder,
   escapeHtml,
@@ -744,23 +745,17 @@ export async function actionSendTestTelegramAlert(): Promise<ServiceResult<any>>
     const ctx = await requireMabesContext();
     const config = await getTelegramConfig();
 
-    if (!config.botToken || !config.mabesChatId) {
+    if (!config.botToken) {
       return fail(
         "INVALID_INPUT",
-        "Configure telegram_mabes_bot_token and telegram_mabes_chat_id in Platform Settings first."
+        "Configure telegram_mabes_bot_token in Platform Settings first."
       );
     }
 
-    const trimmedChatId = config.mabesChatId.trim();
-
-    // Friendly validation if user entered bot username instead of chat ID
-    if (
-      trimmedChatId.toLowerCase().includes("bot") &&
-      !trimmedChatId.startsWith("-100")
-    ) {
+    if (!config.mabesChatId || !/^[-0-9]+$/.test(config.mabesChatId.trim())) {
       return fail(
         "INVALID_INPUT",
-        `Chat ID '${trimmedChatId}' tidak valid. Username bot (@${config.botUsername}) tidak dapat menerima pesan dari dirinya sendiri. Masukkan Chat ID numerik (User ID atau Group ID, misal: -100xxxxxxxxx). Buka bot di Telegram (@${config.botUsername}) lalu ketik /id untuk melihat Chat ID Anda.`
+        "Invalid Mabes Group Chat ID. Please enter the numeric group ID (e.g. -100xxxxxxxxxx) in Mabes Platform Settings."
       );
     }
 
@@ -794,6 +789,20 @@ export async function actionSendTestTelegramAlert(): Promise<ServiceResult<any>>
   } catch (err: any) {
     console.error("actionSendTestTelegramAlert error:", err);
     return fail("INTERNAL_ERROR", err.message || "Failed to send test alert.");
+  }
+}
+
+/**
+ * 16. Get Telegram Webhook Diagnostic Info
+ */
+export async function actionGetTelegramWebhookStatus(): Promise<ServiceResult<any>> {
+  try {
+    await requireMabesContext();
+    const status = await getTelegramWebhookStatus();
+    return ok(status);
+  } catch (err: any) {
+    console.error("actionGetTelegramWebhookStatus error:", err);
+    return fail("INTERNAL_ERROR", err.message || "Failed to retrieve webhook status.");
   }
 }
 

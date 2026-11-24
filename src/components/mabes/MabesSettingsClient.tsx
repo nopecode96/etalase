@@ -12,8 +12,13 @@ import {
   CheckCircle2,
   HelpCircle,
   ShieldAlert,
+  Activity,
 } from "lucide-react";
-import { actionUpdatePlatformSettings, actionSendTestTelegramAlert } from "@/app/mabes/actions";
+import {
+  actionUpdatePlatformSettings,
+  actionSendTestTelegramAlert,
+  actionGetTelegramWebhookStatus,
+} from "@/app/mabes/actions";
 import { showToast } from "@/components/ui/GlobalToast";
 
 interface MabesSettingsClientProps {
@@ -24,9 +29,28 @@ export function MabesSettingsClient({ initialSettings }: MabesSettingsClientProp
   const [settings, setSettings] = useState<Record<string, string>>(initialSettings);
   const [isPending, startTransition] = useTransition();
   const [isTestPending, startTestTransition] = useTransition();
+  const [isCheckingWebhook, startCheckingWebhook] = useTransition();
+  const [webhookStatus, setWebhookStatus] = useState<any>(null);
 
   const handleChange = (key: string, value: string) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleCheckWebhook = () => {
+    startCheckingWebhook(async () => {
+      const res = await actionGetTelegramWebhookStatus();
+      if (res.success && res.data) {
+        setWebhookStatus(res.data);
+        if (res.data.success) {
+          showToast("Webhook info retrieved from Telegram API!", "success");
+        } else {
+          showToast(res.data.description || "Webhook status alert.", "info");
+        }
+      } else {
+        const err = !res.success ? res.error : "Failed to check webhook status.";
+        showToast(err, "error");
+      }
+    });
   };
 
   const handleSendTestAlert = () => {
@@ -330,6 +354,45 @@ export function MabesSettingsClient({ initialSettings }: MabesSettingsClientProp
           </div>
         </div>
 
+        {/* Webhook Diagnostic Details Card if fetched */}
+        {webhookStatus && (
+          <div className="p-3.5 rounded-lg bg-slate-950/80 border border-slate-800 text-xs font-mono space-y-1.5 animate-in fade-in">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                Telegram Webhook Diagnostics (getWebhookInfo)
+              </span>
+              <span
+                className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                  webhookStatus.success
+                    ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                    : "bg-rose-500/10 text-rose-400 border border-rose-500/20"
+                }`}
+              >
+                {webhookStatus.success ? "ACTIVE" : "ERROR"}
+              </span>
+            </div>
+            <div className="text-slate-300 truncate">
+              <span className="text-slate-500">Registered URL:</span>{" "}
+              {webhookStatus.url || "None"}
+            </div>
+            <div className="flex flex-wrap gap-4 text-slate-400 text-[11px]">
+              <div>
+                <span className="text-slate-500">Pending Updates:</span>{" "}
+                <span className="text-white font-semibold">{webhookStatus.pendingUpdateCount ?? 0}</span>
+              </div>
+              <div>
+                <span className="text-slate-500">Max Connections:</span>{" "}
+                <span className="text-white font-semibold">{webhookStatus.maxConnections ?? 40}</span>
+              </div>
+            </div>
+            {webhookStatus.lastErrorMessage && (
+              <div className="text-[11px] text-rose-400 font-sans pt-1 border-t border-slate-800/60 leading-tight">
+                <strong>Last Telegram Error:</strong> {webhookStatus.lastErrorMessage} ({webhookStatus.lastErrorDate})
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="pt-3 border-t border-slate-800/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div className="text-[11px] text-slate-400">
             <span>Webhook destination: </span>
@@ -338,24 +401,45 @@ export function MabesSettingsClient({ initialSettings }: MabesSettingsClientProp
             </code>
           </div>
 
-          <button
-            type="button"
-            disabled={isTestPending || !settings.telegram_mabes_bot_token || !settings.telegram_mabes_chat_id}
-            onClick={handleSendTestAlert}
-            className="px-3.5 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg font-semibold text-xs flex items-center gap-1.5 shadow-sm transition disabled:opacity-40 shrink-0"
-          >
-            {isTestPending ? (
-              <>
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                <span>Sending Test Alert...</span>
-              </>
-            ) : (
-              <>
-                <Send className="w-3.5 h-3.5" />
-                <span>Send Test Alert to Mabes Group</span>
-              </>
-            )}
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              disabled={isCheckingWebhook || !settings.telegram_mabes_bot_token}
+              onClick={handleCheckWebhook}
+              className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg font-semibold text-xs flex items-center gap-1.5 border border-slate-700/80 transition disabled:opacity-40"
+            >
+              {isCheckingWebhook ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <span>Checking...</span>
+                </>
+              ) : (
+                <>
+                  <Activity className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Check Webhook Status</span>
+                </>
+              )}
+            </button>
+
+            <button
+              type="button"
+              disabled={isTestPending || !settings.telegram_mabes_bot_token || !settings.telegram_mabes_chat_id}
+              onClick={handleSendTestAlert}
+              className="px-3.5 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg font-semibold text-xs flex items-center gap-1.5 shadow-sm transition disabled:opacity-40 shrink-0"
+            >
+              {isTestPending ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <span>Sending Test Alert...</span>
+                </>
+              ) : (
+                <>
+                  <Send className="w-3.5 h-3.5" />
+                  <span>Send Test Alert to Mabes Group</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
 

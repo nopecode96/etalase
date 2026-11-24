@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
-import { getTelegramConfig, sendTelegramMessage } from "@/lib/services/telegram-service";
+import {
+  getTelegramConfig,
+  sendTelegramMessage,
+  sendChatAction,
+  escapeHtml,
+} from "@/lib/services/telegram-service";
+import { generateRaniCsReply } from "@/lib/services/telegram-ai-cs";
 
 export const dynamic = "force-dynamic";
 
@@ -17,9 +23,20 @@ export async function POST(req: NextRequest) {
     const from = message.from;
     const config = await getTelegramConfig();
     const isGroup = message.chat.type === "group" || message.chat.type === "supergroup";
+    const senderName = from?.first_name || "Kak";
+    const userHandle = from?.username;
+
+    // Helper: Build direct Telegram link to private chat with the user
+    const userTelegramUrl = userHandle
+      ? `https://t.me/${userHandle}`
+      : `tg://user?id=${chatId}`;
 
     // Handle bot being added to a group: auto-post group chat ID
-    if (message.new_chat_members || message.group_chat_created || message.supergroup_chat_created) {
+    if (
+      message.new_chat_members ||
+      message.group_chat_created ||
+      message.supergroup_chat_created
+    ) {
       const groupAlert = [
         `👋 <b>Bot etalase.online Berhasil Terhubung ke Grup Ini!</b>`,
         ``,
@@ -42,14 +59,14 @@ export async function POST(req: NextRequest) {
         `🆔 <b>${isGroup ? "ID Grup Telegram Ini" : "Telegram User ID Anda"}:</b>`,
         `<code>${chatId}</code>`,
         ``,
-        `💡 <i>Salin angka di atas dan tempelkan ke kolom <b>Telegram Mabes Group Chat ID</b> di menu Platform Settings Mabes (<code>/mabes/settings</code>).</i>`,
+        `💡 <i>Salin angka di atas dan tempelkan ke kolom <b>Telegram Mabes Group Chat ID</b> di menu Platform Settings Mabes (<code>/mabes/settings</code>) untuk menerima notifikasi operasional realtime.</i>`,
       ].join("\n");
 
       await sendTelegramMessage(chatId, idMsg, { parseMode: "HTML" });
       return NextResponse.json({ ok: true });
     }
 
-    // 1. Handle /start command
+    // 1. Handle /start command and sub-actions
     if (text.startsWith("/start")) {
       const parts = text.split(" ");
       const param = parts.length > 1 ? parts[1].trim() : "";
@@ -79,9 +96,7 @@ export async function POST(req: NextRequest) {
               ? (store.appearanceConfig as any)
               : {};
 
-          const telegramUserName = from?.username
-            ? `@${from.username}`
-            : from?.first_name || "Merchant";
+          const telegramUserName = userHandle ? `@${userHandle}` : senderName;
 
           await prisma.store.update({
             where: { id: store.id },
@@ -117,7 +132,7 @@ export async function POST(req: NextRequest) {
           const successMsg = [
             `🎉 <b>Selamat! Toko Berhasil Terhubung!</b>`,
             ``,
-            `Toko <b>${store.name}</b> (<code>${store.slug}.etalase.online</code>) kini telah resmi terhubung ke akun Telegram ini.`,
+            `Toko <b>${escapeHtml(store.name)}</b> (<code>${store.slug}.etalase.online</code>) kini telah resmi terhubung ke akun Telegram ini.`,
             ``,
             `Anda akan menerima notifikasi instan langsung di chat ini setiap kali:`,
             `✅ Ada pesanan baru dari konsumen`,
@@ -142,24 +157,73 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      // B. General /start greeting
-      const greetingMsg = [
-        `👋 <b>Halo! Selamat Datang di Bot Resmi etalase.online</b>`,
+      // Send typing indicator for Rani's greeting
+      await sendChatAction(chatId, "typing");
+
+      // B. Sub-route: /start support, /start ask_pricing, /start dfy_consult, /start tenant_<slug>
+      if (
+        param === "support" ||
+        param === "ask_pricing" ||
+        param === "dfy_consult" ||
+        param.startsWith("tenant_")
+      ) {
+        const replyResult = await generateRaniCsReply({
+          userMessage: `/start ${param}`,
+          userName: senderName,
+          userChatId: chatId,
+          userHandle,
+        });
+
+        await sendTelegramMessage(chatId, replyResult.reply, { parseMode: "HTML" });
+
+        // If consulting DFY or requesting support escalation, notify Mabes Private Group
+        if (replyResult.shouldEscalate && config.mabesChatId) {
+          const mabesEscalationMsg = [
+            `🚨 <b>MABES ALERT: Calon Klien Konsultasi / Butuh Bantuan</b>`,
+            ``,
+            `👤 <b>Dari:</b> ${escapeHtml(senderName)} ${userHandle ? `(@${userHandle})` : `(ID: <code>${chatId}</code>)`}`,
+            `📌 <b>Kategori:</b> <code>${replyResult.escalationCategory || "GENERAL"}</code>`,
+            `📝 <b>Alasan:</b> ${replyResult.escalationReason || "Memerlukan konsultasi tim Mabes."}`,
+            `💬 <b>Parameter:</b> <code>/start ${param}</code>`,
+          ].join("\n");
+
+          await sendTelegramMessage(config.mabesChatId, mabesEscalationMsg, {
+            parseMode: "HTML",
+            replyMarkup: {
+              inline_keyboard: [
+                [
+                  {
+                    text: `💬 Balas Japri @${userHandle || senderName}`,
+                    url: userTelegramUrl,
+                  },
+                ],
+              ],
+            },
+            eventTag: "mabes.escalation_alert",
+          });
+        }
+
+        return NextResponse.json({ ok: true });
+      }
+
+      // C. General /start Greeting from Rani
+      const raniWelcomeMsg = [
+        `👋 <b>Halo Kak ${escapeHtml(senderName)}! Selamat Datang di Bot Resmi etalase.online ✨</b>`,
         ``,
-        `Platform SaaS pembuatan etalase digital, menu visual F&B, dan link-in-bio instan untuk UMKM & Kreator Asia Tenggara.`,
+        `Kenalkan, saya <b>Rani</b>, Customer Success & Product Specialist dari <b>etalase.online</b> (PT Rafa Kreasindo Teknologi). Senang sekali bisa menyapa Kakak! 😊`,
         ``,
-        `🆔 <b>Chat ID Anda / Grup Ini:</b> <code>${chatId}</code>`,
-        `🌐 <b>Website Utama:</b> https://etalase.online`,
-        `🏢 <b>Bantuan & Support:</b> ${config.supportLink}`,
+        `Ada yang bisa Rani bantu hari ini? Kakak bisa langsung tanya apa saja atau gunakan opsi di bawah ini:`,
         ``,
-        `<b>Bagi Pemilik Toko:</b>`,
-        `Untuk menghubungkan toko Anda ke bot ini agar menerima push notifikasi pesanan masuk, buka menu <b>Settings &gt; Integrations</b> di Dashboard Admin Toko Anda lalu klik <b>Connect Telegram (1-Click)</b>.`,
+        `• 💡 <b>Tanya Paket & Harga:</b> Ketik <i>"Berapa harga paket PRO?"</i>`,
+        `• 🌟 <b>Paket Terima Beres:</b> Ketik <i>"Mau paket Terima Beres DFY"</i>`,
+        `• 💳 <b>Metode Pembayaran:</b> Ketik <i>"Cara bayar QRIS dan PayPal"</i>`,
+        `• 🌐 <b>Custom Domain:</b> Ketik <i>"Cara pasang domain sendiri"</i>`,
+        `• 🆔 <b>Cek ID Chat:</b> Ketik <code>/id</code>`,
         ``,
-        `<b>Bagi Admin Mabes:</b>`,
-        `Gunakan Chat ID <code>${chatId}</code> di menu Platform Settings (<code>/mabes/settings</code>) untuk menerima realtime alert pesanan & permohonan penarikan dana.`,
+        `💬 <i>Silakan langsung ketik pertanyaan Kakak di kolom chat ini ya! Rani siap bantu 24/7.</i>`,
       ].join("\n");
 
-      await sendTelegramMessage(chatId, greetingMsg, { parseMode: "HTML" });
+      await sendTelegramMessage(chatId, raniWelcomeMsg, { parseMode: "HTML" });
       return NextResponse.json({ ok: true });
     }
 
@@ -170,15 +234,87 @@ export async function POST(req: NextRequest) {
         ``,
         `🆔 <b>Chat ID Anda / Grup Ini:</b> <code>${chatId}</code>`,
         ``,
-        `Perintah yang tersedia:`,
-        `• <code>/start</code> — Menampilkan informasi selamat datang & status bot`,
-        `• <code>/id</code> — Menampilkan ID Chat ini untuk konfigurasi Mabes`,
+        `Perintah & Bantuan yang tersedia:`,
+        `• <code>/start</code> — Sapaan & ringkasan bot resmi`,
+        `• <code>/id</code> — Cek ID Chat ini untuk konfigurasi Mabes`,
         `• <code>/help</code> — Menampilkan panduan penggunaan ini`,
         ``,
-        `Jika Anda membutuhkan bantuan teknis, hubungi Customer Care kami di ${config.supportLink}.`,
+        `🤖 <b>Tanya Rani AI CS 24/7:</b> Langsung ketik pertanyaan bebas Anda seputar etalase.online di ruang obrolan ini.`,
+        `🏢 <b>Website:</b> https://etalase.online`,
+        `💬 <b>Portal Bantuan:</b> https://etalase.online/bantuan`,
       ].join("\n");
 
       await sendTelegramMessage(chatId, helpMsg, { parseMode: "HTML" });
+      return NextResponse.json({ ok: true });
+    }
+
+    // 3. Handle Natural Language / Free-Text Message in Private Chat (AI CS "Rani")
+    if (!isGroup) {
+      // Send Telegram typing action indicator
+      await sendChatAction(chatId, "typing");
+
+      // Generate conversational AI reply from Rani (Gemini 2.5 Flash with fallback)
+      const replyResult = await generateRaniCsReply({
+        userMessage: text,
+        userName: senderName,
+        userChatId: chatId,
+        userHandle,
+      });
+
+      // Deliver Rani's response to the user
+      await sendTelegramMessage(chatId, replyResult.reply, { parseMode: "HTML" });
+
+      // Record in AutomationLog
+      await prisma.automationLog
+        .create({
+          data: {
+            event: "telegram.ai_cs_reply",
+            channel: "TELEGRAM",
+            status: "SUCCESS",
+            payload: {
+              chatId,
+              userHandle,
+              userMessage: text,
+              escalated: replyResult.shouldEscalate,
+              escalationCategory: replyResult.escalationCategory,
+            },
+            response: replyResult.reply.substring(0, 500),
+          },
+        })
+        .catch(() => {});
+
+      // If Rani detects escalation condition (Human Agent, Payout issue, or DFY consult)
+      // forward alert to Mabes Private Group if configured
+      if (replyResult.shouldEscalate && config.mabesChatId) {
+        const mabesEscalationMsg = [
+          `🚨 <b>ESKALASI CS MABES: Butuh Penanganan Operator</b>`,
+          ``,
+          `👤 <b>User:</b> ${escapeHtml(senderName)} ${userHandle ? `(@${userHandle})` : `(ID: <code>${chatId}</code>)`}`,
+          `📌 <b>Kategori:</b> <code>${replyResult.escalationCategory || "GENERAL"}</code>`,
+          `📝 <b>Alasan:</b> ${replyResult.escalationReason || "Pengguna meminta penanganan staf manusia."}`,
+          ``,
+          `💬 <b>Pesan User:</b>`,
+          `<i>"${escapeHtml(text)}"</i>`,
+          ``,
+          `💡 <i>Klik tombol di bawah untuk langsung membuka chat japri Telegram dengan user ini.</i>`,
+        ].join("\n");
+
+        await sendTelegramMessage(config.mabesChatId, mabesEscalationMsg, {
+          parseMode: "HTML",
+          replyMarkup: {
+            inline_keyboard: [
+              [
+                {
+                  text: `💬 Balas Japri @${userHandle || senderName}`,
+                  url: userTelegramUrl,
+                },
+              ],
+            ],
+          },
+          eventTag: "mabes.escalation_alert",
+        });
+      }
+
       return NextResponse.json({ ok: true });
     }
 

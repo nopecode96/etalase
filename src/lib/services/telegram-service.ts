@@ -47,12 +47,20 @@ export async function getTelegramConfig(): Promise<TelegramConfig> {
       ""
     ).trim();
 
-    const mabesChatId = (
+    let mabesChatId = (
       map.get("telegram_mabes_chat_id") ||
       map.get("telegramMabesChatId") ||
       process.env.TELEGRAM_MABES_CHAT_ID ||
       ""
     ).trim();
+
+    // Sanitize: If someone typed bot username or invalid string without digits, treat as empty
+    if (
+      (mabesChatId.toLowerCase().includes("bot") && !mabesChatId.startsWith("-100")) ||
+      (mabesChatId && !/^[-0-9]+$/.test(mabesChatId))
+    ) {
+      mabesChatId = "";
+    }
 
     const supportLink = (
       map.get("support_telegram") ||
@@ -225,6 +233,90 @@ export async function registerTelegramWebhook(
       description: err.message || "Network error registering webhook.",
       webhookUrl,
     };
+  }
+}
+
+/**
+ * Diagnostic helper to inspect active webhook configuration from Telegram API
+ */
+export async function getTelegramWebhookStatus(token?: string): Promise<{
+  success: boolean;
+  url?: string;
+  hasCustomCertificate?: boolean;
+  pendingUpdateCount?: number;
+  lastErrorDate?: string | null;
+  lastErrorMessage?: string | null;
+  maxConnections?: number;
+  allowedUpdates?: string[];
+  description?: string;
+}> {
+  try {
+    const config = await getTelegramConfig();
+    const activeToken = token ? token.trim() : config.botToken;
+
+    if (!activeToken) {
+      return {
+        success: false,
+        description: "No Telegram Bot Token configured in Platform Settings.",
+      };
+    }
+
+    const res = await fetch(`https://api.telegram.org/bot${activeToken}/getWebhookInfo`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      cache: "no-store",
+    });
+
+    const data = await res.json();
+    if (data.ok && data.result) {
+      return {
+        success: true,
+        url: data.result.url || "",
+        hasCustomCertificate: data.result.has_custom_certificate || false,
+        pendingUpdateCount: data.result.pending_update_count || 0,
+        lastErrorDate: data.result.last_error_date
+          ? new Date(data.result.last_error_date * 1000).toLocaleString("id-ID")
+          : null,
+        lastErrorMessage: data.result.last_error_message || null,
+        maxConnections: data.result.max_connections || 40,
+        allowedUpdates: data.result.allowed_updates || [],
+        description: data.description,
+      };
+    }
+
+    return {
+      success: false,
+      description: data.description || "Failed to retrieve webhook info from Telegram.",
+    };
+  } catch (err: any) {
+    return {
+      success: false,
+      description: err.message || "Network error checking webhook status.",
+    };
+  }
+}
+
+/**
+ * Sends chat typing indicator to Telegram chat
+ */
+export async function sendChatAction(
+  chatId: string,
+  action: "typing" | "upload_photo" | "record_video" = "typing",
+  customBotToken?: string
+): Promise<boolean> {
+  try {
+    const config = await getTelegramConfig();
+    const token = customBotToken || config.botToken;
+    if (!token || !chatId) return false;
+
+    await fetch(`https://api.telegram.org/bot${token}/sendChatAction`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: chatId.trim(), action }),
+    });
+    return true;
+  } catch {
+    return false;
   }
 }
 
