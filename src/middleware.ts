@@ -67,14 +67,45 @@ export default async function middleware(req: NextRequest) {
       return NextResponse.next();
     }
 
-    // Handle tenant admin routes: [slug].etalase.online/admin/... -> /admin/...?slug=[slug]
-    if (path.startsWith("/admin")) {
-      const targetUrl = new URL(path, req.url);
-      targetUrl.searchParams.set("slug", slug);
-      return NextResponse.rewrite(targetUrl);
+    // Determine port and protocol for central domain redirects
+    const rawHost = req.headers.get("host") || "";
+    const port = rawHost.includes(":") ? `:${rawHost.split(":")[1]}` : "";
+    const isLocal = host.endsWith(".localhost") || host === "localhost" || host === "127.0.0.1";
+    const protocol = isLocal ? "http" : "https";
+    const centralHost = isLocal ? `localhost${port}` : rootDomain;
+
+    // A. Subdomain /login redirect to central /login (preserving query params & Google OAuth callback)
+    if (path === "/login" || path.startsWith("/login/")) {
+      const centralLoginUrl = new URL(`${protocol}://${centralHost}/login`);
+      centralLoginUrl.searchParams.set("from_subdomain", slug);
+      url.searchParams.forEach((val, key) => {
+        centralLoginUrl.searchParams.set(key, val);
+      });
+      return NextResponse.redirect(centralLoginUrl, 307);
     }
 
-    // Rewrite to dynamic tenant storefront or admin: /[slug] or /[slug]/admin
+    // B. Subdomain /register redirect to central /register with slug pre-filled
+    if (path === "/register" || path.startsWith("/register/")) {
+      const centralRegisterUrl = new URL(`${protocol}://${centralHost}/register`);
+      centralRegisterUrl.searchParams.set("slug", slug);
+      url.searchParams.forEach((val, key) => {
+        if (key !== "slug") {
+          centralRegisterUrl.searchParams.set(key, val);
+        }
+      });
+      return NextResponse.redirect(centralRegisterUrl, 307);
+    }
+
+    // C. Subdomain /admin redirect to central /admin where tenant session is verified
+    if (path === "/admin" || path.startsWith("/admin/")) {
+      const centralAdminUrl = new URL(`${protocol}://${centralHost}${path}`);
+      url.searchParams.forEach((val, key) => {
+        centralAdminUrl.searchParams.set(key, val);
+      });
+      return NextResponse.redirect(centralAdminUrl, 307);
+    }
+
+    // D. Public storefront rewrite to dynamic tenant storefront /[slug]
     return NextResponse.rewrite(new URL(`/${slug}${path}`, req.url));
   }
 

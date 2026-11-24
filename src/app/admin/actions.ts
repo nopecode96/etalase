@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getCurrentUser } from "@/lib/auth/session";
+import { requireTenantContext } from "@/lib/auth/tenant-guard";
 import { prisma, serializePlain } from "@/lib/db/prisma";
 import { FeeBearer, PlanTier } from "@prisma/client";
 import { slugify } from "@/lib/core/formatters";
@@ -15,35 +15,11 @@ type ActionResult<T = unknown> = {
 };
 
 /**
- * Validates that current session owns the given storeId.
- */
-async function assertStoreOwnership(storeId: string) {
-  const user = await getCurrentUser();
-  const store = await prisma.store.findUnique({
-    where: { id: storeId },
-    select: { id: true, ownerId: true, tier: true, slug: true, isDemo: true, walletBalance: true },
-  });
-
-  if (!store) {
-    throw new Error("Store not found");
-  }
-
-  // In non-demo stores with active user, ensure ownerId matches (or user is super admin)
-  if (user && user.id) {
-    const isSuperAdmin = (user as any).role === "SUPER_ADMIN";
-    if (store.ownerId !== user.id && !isSuperAdmin && !store.isDemo) {
-      throw new Error("Unauthorized store access");
-    }
-  }
-
-  return { store, user };
-}
-
-/**
  * 1. Storefront & Appearance Customizer
+ * STRICT MULTI-TENANT ISOLATION: storeId is verified against active session.
  */
 export async function actionUpdateStorefront(input: {
-  storeId: string;
+  storeId?: string;
   templateId?: string;
   displayMode?: string;
   avatarUrl?: string;
@@ -52,13 +28,15 @@ export async function actionUpdateStorefront(input: {
   socialLinks?: Record<string, string>;
 }): Promise<ActionResult> {
   try {
-    const { store } = await assertStoreOwnership(input.storeId);
+    const ctx = await requireTenantContext(input.storeId);
+    const store = ctx.store;
+    const verifiedStoreId = ctx.storeId;
 
     // Gate premium templates for FREE tier
     if (input.templateId && input.templateId !== "clean-minimal" && store.tier === PlanTier.FREE) {
       return {
         success: false,
-        error: "Premium templates (Visual Menu Grid, Showroom Pro, Editorial Pastel) require a PRO plan. Please upgrade to unlock.",
+        error: "Premium templates require a PRO plan. Please upgrade to unlock.",
       };
     }
 
@@ -74,7 +52,7 @@ export async function actionUpdateStorefront(input: {
     };
 
     const updated = await prisma.store.update({
-      where: { id: input.storeId },
+      where: { id: verifiedStoreId },
       data: {
         templateId: input.templateId || undefined,
         displayMode: input.displayMode || undefined,
@@ -86,6 +64,7 @@ export async function actionUpdateStorefront(input: {
 
     revalidatePath("/admin");
     revalidatePath("/admin/storefront");
+    revalidatePath("/admin/storefront/theme");
     revalidatePath(`/${store.slug}`);
     return { success: true, data: serializePlain(updated) };
   } catch (err: any) {
@@ -95,10 +74,11 @@ export async function actionUpdateStorefront(input: {
 
 /**
  * 2. Store Blocks (Vertical Content & Banner Blocks)
+ * STRICT MULTI-TENANT ISOLATION: Blocks are created and mutated strictly within ctx.storeId.
  */
 export async function actionCreateStoreBlock(input: {
-  storeId: string;
-  type: string; // IMAGE_BANNER | FEATURED_PRODUCT | PRODUCT_GRID | LINK_BUTTON | TEXT_QUOTE
+  storeId?: string;
+  type: string;
   title?: string;
   subtitle?: string;
   imageUrl?: string;
@@ -107,22 +87,35 @@ export async function actionCreateStoreBlock(input: {
   badgeText?: string;
 }): Promise<ActionResult> {
   try {
-    const { store } = await assertStoreOwnership(input.storeId);
+    const ctx = await requireTenantContext(input.storeId);
+    const verifiedStoreId = ctx.storeId;
 
-    // Count existing blocks to set sortOrder
+    // Count existing blocks in this tenant's store
     const blockCount = await prisma.storeBlock.count({
-      where: { storeId: input.storeId },
+      where: { storeId: verifiedStoreId },
     });
+
+    // If productId is provided, verify it belongs to this tenant
+    let verifiedProductId: string | null = null;
+    if (input.productId) {
+      const product = await prisma.product.findFirst({
+        where: { id: input.productId, storeId: verifiedStoreId },
+        select: { id: true },
+      });
+      if (product) {
+        verifiedProductId = product.id;
+      }
+    }
 
     const newBlock = await prisma.storeBlock.create({
       data: {
-        storeId: input.storeId,
+        storeId: verifiedStoreId,
         type: input.type,
         title: input.title?.trim() || null,
         subtitle: input.subtitle?.trim() || null,
         imageUrl: input.imageUrl?.trim() || null,
         targetUrl: input.targetUrl?.trim() || null,
-        productId: input.productId || null,
+        productId: verifiedProductId,
         badgeText: input.badgeText?.trim() || null,
         sortOrder: blockCount,
         isActive: true,
@@ -130,7 +123,8 @@ export async function actionCreateStoreBlock(input: {
     });
 
     revalidatePath("/admin/storefront");
-    revalidatePath(`/${store.slug}`);
+    revalidatePath("/admin/storefront/blocks");
+    revalidatePath(`/${ctx.store.slug}`);
     return { success: true, data: serializePlain(newBlock) };
   } catch (err: any) {
     return { success: false, error: err.message || "Failed to create block" };
@@ -139,7 +133,7 @@ export async function actionCreateStoreBlock(input: {
 
 export async function actionUpdateStoreBlock(input: {
   blockId: string;
-  storeId: string;
+  storeId?: string;
   title?: string;
   subtitle?: string;
   imageUrl?: string;
@@ -148,10 +142,21 @@ export async function actionUpdateStoreBlock(input: {
   isActive?: boolean;
 }): Promise<ActionResult> {
   try {
-    const { store } = await assertStoreOwnership(input.storeId);
+    const ctx = await requireTenantContext(input.storeId);
+    const verifiedStoreId = ctx.storeId;
+
+    // Strict ownership verification: block MUST belong to this tenant
+    const existing = await prisma.storeBlock.findFirst({
+      where: { id: input.blockId, storeId: verifiedStoreId },
+      select: { id: true },
+    });
+
+    if (!existing) {
+      return { success: false, error: "Store block not found or access denied." };
+    }
 
     const updated = await prisma.storeBlock.update({
-      where: { id: input.blockId, storeId: input.storeId },
+      where: { id: existing.id },
       data: {
         title: input.title !== undefined ? input.title.trim() : undefined,
         subtitle: input.subtitle !== undefined ? input.subtitle.trim() : undefined,
@@ -163,7 +168,8 @@ export async function actionUpdateStoreBlock(input: {
     });
 
     revalidatePath("/admin/storefront");
-    revalidatePath(`/${store.slug}`);
+    revalidatePath("/admin/storefront/blocks");
+    revalidatePath(`/${ctx.store.slug}`);
     return { success: true, data: serializePlain(updated) };
   } catch (err: any) {
     return { success: false, error: err.message || "Failed to update block" };
@@ -171,23 +177,34 @@ export async function actionUpdateStoreBlock(input: {
 }
 
 export async function actionReorderStoreBlocks(input: {
-  storeId: string;
+  storeId?: string;
   blockIds: string[];
 }): Promise<ActionResult> {
   try {
-    const { store } = await assertStoreOwnership(input.storeId);
+    const ctx = await requireTenantContext(input.storeId);
+    const verifiedStoreId = ctx.storeId;
+
+    // Verify all requested blocks strictly belong to this tenant
+    const tenantBlocks = await prisma.storeBlock.findMany({
+      where: { id: { in: input.blockIds }, storeId: verifiedStoreId },
+      select: { id: true },
+    });
+
+    const tenantBlockIdSet = new Set(tenantBlocks.map((b) => b.id));
+    const validBlockIds = input.blockIds.filter((id) => tenantBlockIdSet.has(id));
 
     await prisma.$transaction(
-      input.blockIds.map((id, index) =>
+      validBlockIds.map((id, index) =>
         prisma.storeBlock.update({
-          where: { id, storeId: input.storeId },
+          where: { id },
           data: { sortOrder: index },
         })
       )
     );
 
     revalidatePath("/admin/storefront");
-    revalidatePath(`/${store.slug}`);
+    revalidatePath("/admin/storefront/blocks");
+    revalidatePath(`/${ctx.store.slug}`);
     return { success: true };
   } catch (err: any) {
     return { success: false, error: err.message || "Failed to reorder blocks" };
@@ -196,17 +213,28 @@ export async function actionReorderStoreBlocks(input: {
 
 export async function actionDeleteStoreBlock(input: {
   blockId: string;
-  storeId: string;
+  storeId?: string;
 }): Promise<ActionResult> {
   try {
-    const { store } = await assertStoreOwnership(input.storeId);
+    const ctx = await requireTenantContext(input.storeId);
+    const verifiedStoreId = ctx.storeId;
+
+    const existing = await prisma.storeBlock.findFirst({
+      where: { id: input.blockId, storeId: verifiedStoreId },
+      select: { id: true },
+    });
+
+    if (!existing) {
+      return { success: false, error: "Store block not found or access denied." };
+    }
 
     await prisma.storeBlock.delete({
-      where: { id: input.blockId, storeId: input.storeId },
+      where: { id: existing.id },
     });
 
     revalidatePath("/admin/storefront");
-    revalidatePath(`/${store.slug}`);
+    revalidatePath("/admin/storefront/blocks");
+    revalidatePath(`/${ctx.store.slug}`);
     return { success: true };
   } catch (err: any) {
     return { success: false, error: err.message || "Failed to delete block" };
@@ -215,9 +243,10 @@ export async function actionDeleteStoreBlock(input: {
 
 /**
  * 3. Products & Simple Promo Management
+ * STRICT MULTI-TENANT ISOLATION: Products are created, updated, and deleted strictly within ctx.storeId.
  */
 export async function actionSaveProduct(input: {
-  storeId: string;
+  storeId?: string;
   productId?: string;
   title: string;
   slug?: string;
@@ -238,7 +267,8 @@ export async function actionSaveProduct(input: {
   promoDurationNote?: string | null;
 }): Promise<ActionResult> {
   try {
-    const { store } = await assertStoreOwnership(input.storeId);
+    const ctx = await requireTenantContext(input.storeId);
+    const verifiedStoreId = ctx.storeId;
 
     if (!input.title || input.title.trim().length === 0) {
       return { success: false, error: "Product title is required." };
@@ -255,16 +285,16 @@ export async function actionSaveProduct(input: {
     if (!input.productId) {
       let counter = 1;
       while (true) {
-        const existing = await prisma.product.findUnique({
-          where: { storeId_slug: { storeId: input.storeId, slug: finalSlug } },
+        const existingSlug = await prisma.product.findUnique({
+          where: { storeId_slug: { storeId: verifiedStoreId, slug: finalSlug } },
           select: { id: true },
         });
-        if (!existing) break;
+        if (!existingSlug) break;
         finalSlug = `${baseSlug}-${counter++}`;
       }
     }
 
-    // Handle promo price: if active promo, price can use promoPrice while compareAtPrice retains original price
+    // Handle promo price: if active promo, price uses promoPrice while compareAtPrice retains original price
     let effectivePrice = input.price;
     let effectiveCompare = input.compareAtPrice;
 
@@ -275,8 +305,18 @@ export async function actionSaveProduct(input: {
 
     let result;
     if (input.productId) {
+      // Compound check: verify product belongs to this tenant
+      const existingProduct = await prisma.product.findFirst({
+        where: { id: input.productId, storeId: verifiedStoreId },
+        select: { id: true },
+      });
+
+      if (!existingProduct) {
+        return { success: false, error: "Product not found or access denied." };
+      }
+
       result = await prisma.product.update({
-        where: { id: input.productId, storeId: input.storeId },
+        where: { id: existingProduct.id },
         data: {
           title: input.title.trim(),
           slug: finalSlug,
@@ -297,7 +337,7 @@ export async function actionSaveProduct(input: {
     } else {
       result = await prisma.product.create({
         data: {
-          storeId: input.storeId,
+          storeId: verifiedStoreId,
           title: input.title.trim(),
           slug: finalSlug,
           description: input.description,
@@ -317,8 +357,9 @@ export async function actionSaveProduct(input: {
     }
 
     revalidatePath("/admin/products");
+    revalidatePath("/admin/products/promos");
     revalidatePath("/admin");
-    revalidatePath(`/${store.slug}`);
+    revalidatePath(`/${ctx.store.slug}`);
     return { success: true, data: serializePlain(result) };
   } catch (err: any) {
     return { success: false, error: err.message || "Failed to save product" };
@@ -327,18 +368,29 @@ export async function actionSaveProduct(input: {
 
 export async function actionDeleteProduct(input: {
   productId: string;
-  storeId: string;
+  storeId?: string;
 }): Promise<ActionResult> {
   try {
-    const { store } = await assertStoreOwnership(input.storeId);
+    const ctx = await requireTenantContext(input.storeId);
+    const verifiedStoreId = ctx.storeId;
+
+    const existingProduct = await prisma.product.findFirst({
+      where: { id: input.productId, storeId: verifiedStoreId },
+      select: { id: true },
+    });
+
+    if (!existingProduct) {
+      return { success: false, error: "Product not found or access denied." };
+    }
 
     await prisma.product.delete({
-      where: { id: input.productId, storeId: input.storeId },
+      where: { id: existingProduct.id },
     });
 
     revalidatePath("/admin/products");
+    revalidatePath("/admin/products/promos");
     revalidatePath("/admin");
-    revalidatePath(`/${store.slug}`);
+    revalidatePath(`/${ctx.store.slug}`);
     return { success: true };
   } catch (err: any) {
     return { success: false, error: err.message || "Failed to delete product" };
@@ -347,22 +399,25 @@ export async function actionDeleteProduct(input: {
 
 /**
  * 4. Orders, Fee Bearer & Wallet Payouts
+ * STRICT MULTI-TENANT ISOLATION: Wallet, orders, and payouts are bound strictly to ctx.storeId.
  */
 export async function actionUpdateFeeBearer(input: {
-  storeId: string;
+  storeId?: string;
   feeBorneBy: "CUSTOMER" | "MERCHANT";
 }): Promise<ActionResult> {
   try {
-    const { store } = await assertStoreOwnership(input.storeId);
+    const ctx = await requireTenantContext(input.storeId);
+    const verifiedStoreId = ctx.storeId;
 
     const updated = await prisma.store.update({
-      where: { id: input.storeId },
+      where: { id: verifiedStoreId },
       data: {
         feeBorneBy: input.feeBorneBy === "MERCHANT" ? FeeBearer.MERCHANT : FeeBearer.CUSTOMER,
       },
     });
 
     revalidatePath("/admin/orders");
+    revalidatePath("/admin/orders/payouts");
     revalidatePath("/admin");
     return { success: true, data: serializePlain(updated) };
   } catch (err: any) {
@@ -372,14 +427,24 @@ export async function actionUpdateFeeBearer(input: {
 
 export async function actionUpdateOrderStatus(input: {
   orderId: string;
-  storeId: string;
+  storeId?: string;
   status: "PENDING" | "PAID" | "COMPLETED" | "FAILED";
 }): Promise<ActionResult> {
   try {
-    const { store } = await assertStoreOwnership(input.storeId);
+    const ctx = await requireTenantContext(input.storeId);
+    const verifiedStoreId = ctx.storeId;
+
+    const existingOrder = await prisma.order.findFirst({
+      where: { id: input.orderId, storeId: verifiedStoreId },
+      select: { id: true },
+    });
+
+    if (!existingOrder) {
+      return { success: false, error: "Order not found or access denied." };
+    }
 
     const updated = await prisma.order.update({
-      where: { id: input.orderId, storeId: input.storeId },
+      where: { id: existingOrder.id },
       data: {
         status: input.status as any,
       },
@@ -394,18 +459,18 @@ export async function actionUpdateOrderStatus(input: {
 }
 
 export async function actionRequestWithdrawal(input: {
-  storeId: string;
+  storeId?: string;
   amount: number;
   bankName: string;
   accountNumber: string;
   accountHolder: string;
 }): Promise<ActionResult> {
   try {
-    const { store } = await assertStoreOwnership(input.storeId);
+    const ctx = await requireTenantContext(input.storeId);
+    const store = ctx.store;
+    const verifiedStoreId = ctx.storeId;
 
-    const tierKey =
-      store.tier === PlanTier.PRO ? "PRO" : store.tier === PlanTier.DFY_BUSINESS ? "DFY" : "FREE";
-    const rules = PAYMENT_RULES[tierKey];
+    const rules = ctx.rules;
 
     // Minimum withdrawal validation (Rp 50.000)
     if (input.amount < rules.minWithdrawalAmountIdr) {
@@ -428,13 +493,13 @@ export async function actionRequestWithdrawal(input: {
     }
 
     // Calculate fee
-    const feeResult = await calculateWithdrawalFee(store.id, store.tier, input.amount);
+    const feeResult = await calculateWithdrawalFee(verifiedStoreId, store.tier, input.amount);
 
     // Create withdrawal record and deduct wallet balance
     const [withdrawal] = await prisma.$transaction([
       prisma.withdrawal.create({
         data: {
-          storeId: store.id,
+          storeId: verifiedStoreId,
           amount: input.amount,
           feeCharged: feeResult.fee,
           netAmount: feeResult.netAmount,
@@ -444,7 +509,7 @@ export async function actionRequestWithdrawal(input: {
         },
       }),
       prisma.store.update({
-        where: { id: store.id },
+        where: { id: verifiedStoreId },
         data: {
           walletBalance: { decrement: input.amount },
         },
@@ -452,6 +517,7 @@ export async function actionRequestWithdrawal(input: {
     ]);
 
     revalidatePath("/admin/orders");
+    revalidatePath("/admin/orders/payouts");
     revalidatePath("/admin");
     return { success: true, data: serializePlain(withdrawal) };
   } catch (err: any) {
@@ -461,15 +527,18 @@ export async function actionRequestWithdrawal(input: {
 
 /**
  * 5. Analytics & Marketing Pixels
+ * STRICT MULTI-TENANT ISOLATION: Pixels and analytics are updated strictly on ctx.storeId.
  */
 export async function actionUpdatePixels(input: {
-  storeId: string;
+  storeId?: string;
   metaPixelId?: string;
   tiktokPixelId?: string;
   gaMeasurementId?: string;
 }): Promise<ActionResult> {
   try {
-    const { store } = await assertStoreOwnership(input.storeId);
+    const ctx = await requireTenantContext(input.storeId);
+    const store = ctx.store;
+    const verifiedStoreId = ctx.storeId;
 
     if (store.tier === PlanTier.FREE) {
       return {
@@ -479,7 +548,7 @@ export async function actionUpdatePixels(input: {
     }
 
     const updated = await prisma.store.update({
-      where: { id: input.storeId },
+      where: { id: verifiedStoreId },
       data: {
         metaPixelId: input.metaPixelId?.trim() || null,
         tiktokPixelId: input.tiktokPixelId?.trim() || null,
@@ -496,10 +565,11 @@ export async function actionUpdatePixels(input: {
 }
 
 /**
- * 6. Store Settings & Custom Domain & Telegram Integration
+ * 6. Store Settings, Custom Domain & Telegram Integration
+ * STRICT MULTI-TENANT ISOLATION: Settings & integrations are saved strictly to ctx.storeId.
  */
 export async function actionUpdateStoreSettings(input: {
-  storeId: string;
+  storeId?: string;
   name?: string;
   bio?: string;
   chatHandle?: string;
@@ -508,7 +578,9 @@ export async function actionUpdateStoreSettings(input: {
   customDomain?: string;
 }): Promise<ActionResult> {
   try {
-    const { store } = await assertStoreOwnership(input.storeId);
+    const ctx = await requireTenantContext(input.storeId);
+    const store = ctx.store;
+    const verifiedStoreId = ctx.storeId;
 
     // Custom domain gating for FREE tier
     if (input.customDomain && input.customDomain.trim() && store.tier === PlanTier.FREE) {
@@ -523,7 +595,7 @@ export async function actionUpdateStoreSettings(input: {
       : null;
 
     const updated = await prisma.store.update({
-      where: { id: input.storeId },
+      where: { id: verifiedStoreId },
       data: {
         name: input.name !== undefined ? input.name.trim() : undefined,
         bio: input.bio !== undefined ? input.bio.trim() : undefined,
@@ -536,6 +608,8 @@ export async function actionUpdateStoreSettings(input: {
     });
 
     revalidatePath("/admin/settings");
+    revalidatePath("/admin/settings/profile");
+    revalidatePath("/admin/settings/domain");
     revalidatePath("/admin");
     revalidatePath(`/${store.slug}`);
     return { success: true, data: serializePlain(updated) };
@@ -545,12 +619,14 @@ export async function actionUpdateStoreSettings(input: {
 }
 
 export async function actionUpdateTelegramIntegration(input: {
-  storeId: string;
+  storeId?: string;
   telegramToken: string;
   telegramChatId: string;
 }): Promise<ActionResult> {
   try {
-    const { store } = await assertStoreOwnership(input.storeId);
+    const ctx = await requireTenantContext(input.storeId);
+    const store = ctx.store;
+    const verifiedStoreId = ctx.storeId;
 
     const currentAppearance =
       typeof store === "object" && (store as any).appearanceConfig
@@ -568,13 +644,14 @@ export async function actionUpdateTelegramIntegration(input: {
     };
 
     const updated = await prisma.store.update({
-      where: { id: input.storeId },
+      where: { id: verifiedStoreId },
       data: {
         appearanceConfig: updatedAppearance,
       },
     });
 
     revalidatePath("/admin/settings");
+    revalidatePath("/admin/settings/integrations");
     return { success: true, data: serializePlain(updated) };
   } catch (err: any) {
     return { success: false, error: err.message || "Failed to save Telegram integration" };

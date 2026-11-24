@@ -1,5 +1,6 @@
 export const RESERVED_SLUGS = [
   "mabes",
+  "super-admin",
   "flow",
   "n8n",
   "admin",
@@ -11,6 +12,10 @@ export const RESERVED_SLUGS = [
   "register",
   "onboarding",
   "billing",
+  "dev",
+  "staging",
+  "system",
+  "root",
   "cdn",
   "static",
   "assets",
