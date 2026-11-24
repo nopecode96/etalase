@@ -171,6 +171,7 @@ model Store {
   withdrawals     Withdrawal[]
   affiliates      AffiliateReferral[]
   planOrders      PlanOrder[]
+  dfyProject      DfyProject?
 }
 
 model BioBlock {
@@ -403,4 +404,36 @@ model PlatformSetting {
   group     String   @default("GENERAL") // GENERAL | BILLING | TELEGRAM | PRICING
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// --- AUTOMATION & INTEGRATION EVENT AUDIT LOGS ---
+model AutomationLog {
+  id        String   @id @default(cuid())
+  event     String   // e.g. "order.paid", "tier.upgraded", "telegram.alert", "test.dispatch"
+  channel   String   // "N8N" | "TELEGRAM" | "BORDERPAY" | "PAYPAL" | "SYSTEM"
+  status    String   // "SUCCESS" | "FAILED" | "PENDING"
+  payload   Json?
+  response  String?  @db.Text
+  error     String?  @db.Text
+  createdAt DateTime @default(now())
+
+  @@index([event, status])
+  @@index([createdAt])
+}
+
+// --- TERIMA BERES (DFY) PROJECT MANAGEMENT ---
+model DfyProject {
+  id           String      @id @default(cuid())
+  storeId      String      @unique
+  store        Store       @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  planOrderId  String?
+  stage        String      @default("NEW") // NEW | ASSETS_PENDING | BUILDING | REVIEW | COMPLETED
+  assignedTo   String?
+  notes        String?     @db.Text
+  assetsUrl    String?
+  completedAt  DateTime?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@index([stage])
 }

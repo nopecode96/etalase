@@ -517,3 +517,346 @@ export async function actionUpdatePlatformSettings(
     return fail("INTERNAL_ERROR", err.message || "Failed to update platform settings.");
   }
 }
+
+/**
+ * 11. Reconcile Customer Order (Manual Gateway Resolution)
+ */
+export async function actionReconcileOrder(
+  orderId: string,
+  reference: string
+): Promise<ServiceResult<any>> {
+  try {
+    const ctx = await requireMabesContext();
+
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      include: { store: true, product: true },
+    });
+
+    if (!order) {
+      return fail("NOT_FOUND", "Customer order not found.");
+    }
+
+    if (order.status === "PAID") {
+      return fail("INVALID_INPUT", "Order is already marked as PAID.");
+    }
+
+    const [updatedOrder] = await prisma.$transaction([
+      prisma.order.update({
+        where: { id: orderId },
+        data: {
+          status: "PAID",
+          paymentRef: reference || `MANUAL-${Date.now()}`,
+          buyerNotes: order.buyerNotes
+            ? `${order.buyerNotes} | Reconciled by ${ctx.user.email}`
+            : `Reconciled by ${ctx.user.email}`,
+        },
+      }),
+      prisma.store.update({
+        where: { id: order.storeId },
+        data: {
+          walletBalance: {
+            increment: order.netAmount,
+          },
+        },
+      }),
+      prisma.automationLog.create({
+        data: {
+          event: "order.reconciled",
+          channel: "BORDERPAY",
+          status: "SUCCESS",
+          payload: {
+            orderCode: order.orderCode,
+            storeId: order.storeId,
+            amount: Number(order.amount),
+            netAmount: Number(order.netAmount),
+            reconciledBy: ctx.user.email,
+            reference,
+          },
+        },
+      }),
+    ]);
+
+    try {
+      emitN8nEvent("order.paid", {
+        orderId: order.id,
+        orderCode: order.orderCode,
+        storeId: order.storeId,
+        storeSlug: order.store.slug,
+        productTitle: order.product.title,
+        amount: Number(order.amount),
+        buyerWhatsapp: order.buyerWhatsapp,
+        buyerName: order.buyerName,
+      });
+    } catch (e) {
+      console.warn("n8n order.paid dispatch error:", e);
+    }
+
+    revalidatePath("/mabes");
+    revalidatePath("/mabes/orders");
+    return ok(serializePlain(updatedOrder), "SAVED");
+  } catch (err: any) {
+    console.error("actionReconcileOrder error:", err);
+    return fail("INTERNAL_ERROR", err.message || "Failed to reconcile order.");
+  }
+}
+
+/**
+ * 12. Update Terima Beres (DFY) Project Stage
+ */
+export async function actionUpdateDfyStage(formData: {
+  storeId: string;
+  stage: string;
+  notes?: string;
+  assignedTo?: string;
+  assetsUrl?: string;
+}): Promise<ServiceResult<any>> {
+  try {
+    const ctx = await requireMabesContext();
+    const { storeId, stage, notes, assignedTo, assetsUrl } = formData;
+
+    const isCompleted = stage === "COMPLETED";
+
+    const project = await prisma.dfyProject.upsert({
+      where: { storeId },
+      update: {
+        stage,
+        notes,
+        assignedTo: assignedTo || ctx.user.email,
+        assetsUrl,
+        completedAt: isCompleted ? new Date() : undefined,
+      },
+      create: {
+        storeId,
+        stage,
+        notes,
+        assignedTo: assignedTo || ctx.user.email,
+        assetsUrl,
+        completedAt: isCompleted ? new Date() : undefined,
+      },
+      include: {
+        store: true,
+      },
+    });
+
+    await prisma.automationLog.create({
+      data: {
+        event: "dfy.stage_updated",
+        channel: "SYSTEM",
+        status: "SUCCESS",
+        payload: {
+          storeSlug: project.store.slug,
+          stage,
+          assignedTo: project.assignedTo,
+          updatedBy: ctx.user.email,
+        },
+      },
+    });
+
+    revalidatePath("/mabes");
+    revalidatePath("/mabes/dfy");
+    return ok(serializePlain(project), "SAVED");
+  } catch (err: any) {
+    console.error("actionUpdateDfyStage error:", err);
+    return fail("INTERNAL_ERROR", err.message || "Failed to update DFY stage.");
+  }
+}
+
+/**
+ * 13. Trigger Test Automation Event (n8n Microservice Tester)
+ */
+export async function actionTriggerTestEvent(
+  event: any,
+  payload: Record<string, any>
+): Promise<ServiceResult<any>> {
+  try {
+    const ctx = await requireMabesContext();
+
+    await emitN8nEvent(event, {
+      ...payload,
+      triggeredBy: ctx.user.email,
+      isTest: true,
+      timestamp: new Date().toISOString(),
+    });
+
+    const log = await prisma.automationLog.create({
+      data: {
+        event,
+        channel: "N8N",
+        status: "SUCCESS",
+        payload: {
+          ...payload,
+          triggeredBy: ctx.user.email,
+          test: true,
+        },
+        response: "Dispatched to n8n fire-and-forget queue",
+      },
+    });
+
+    revalidatePath("/mabes/automations");
+    return ok(serializePlain(log), "SAVED");
+  } catch (err: any) {
+    console.error("actionTriggerTestEvent error:", err);
+    return fail("INTERNAL_ERROR", err.message || "Failed to dispatch test event.");
+  }
+}
+
+/**
+ * 14. Send Test Telegram Alert from Mabes
+ */
+export async function actionSendTestTelegramAlert(): Promise<ServiceResult<any>> {
+  try {
+    const ctx = await requireMabesContext();
+
+    const [botTokenSetting, chatIdSetting] = await Promise.all([
+      prisma.platformSetting.findUnique({ where: { key: "telegram_mabes_bot_token" } }),
+      prisma.platformSetting.findUnique({ where: { key: "telegram_mabes_chat_id" } }),
+    ]);
+
+    const token = botTokenSetting?.value;
+    const chatId = chatIdSetting?.value;
+
+    if (!token || !chatId) {
+      await prisma.automationLog.create({
+        data: {
+          event: "telegram.test_alert",
+          channel: "TELEGRAM",
+          status: "FAILED",
+          error: "Telegram bot token or Chat ID is missing in Platform Settings.",
+        },
+      });
+      return fail("INVALID_INPUT", "Configure telegram_mabes_bot_token and telegram_mabes_chat_id in Platform Settings first.");
+    }
+
+    const message = `🔔 *[Mabes Alert Test]*\n\nPlatform: etalase.online\nTriggered by: ${ctx.user.email}\nTimestamp: ${new Date().toLocaleString("id-ID")}\n\n✅ Automation dispatcher connected successfully.`;
+
+    const telegramRes = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: message,
+        parse_mode: "Markdown",
+      }),
+    });
+
+    const resJson = await telegramRes.json();
+
+    await prisma.automationLog.create({
+      data: {
+        event: "telegram.test_alert",
+        channel: "TELEGRAM",
+        status: telegramRes.ok ? "SUCCESS" : "FAILED",
+        payload: { chatId, sender: ctx.user.email },
+        response: JSON.stringify(resJson),
+        error: telegramRes.ok ? null : resJson?.description,
+      },
+    });
+
+    if (!telegramRes.ok) {
+      return fail("INTERNAL_ERROR", resJson?.description || "Telegram API rejected message.");
+    }
+
+    revalidatePath("/mabes/automations");
+    return ok({ sent: true }, "SAVED");
+  } catch (err: any) {
+    console.error("actionSendTestTelegramAlert error:", err);
+    return fail("INTERNAL_ERROR", err.message || "Failed to send test alert.");
+  }
+}
+
+/**
+ * 15. Toggle Post Publication Status
+ */
+export async function actionTogglePostPublish(
+  postId: string,
+  isPublished: boolean
+): Promise<ServiceResult<any>> {
+  try {
+    await requireMabesContext();
+
+    const updated = await prisma.post.update({
+      where: { id: postId },
+      data: {
+        isPublished,
+        publishedAt: isPublished ? new Date() : null,
+      },
+    });
+
+    revalidatePath("/mabes/blog");
+    return ok(serializePlain(updated), "UPDATED");
+  } catch (err: any) {
+    console.error("actionTogglePostPublish error:", err);
+    return fail("INTERNAL_ERROR", err.message || "Failed to update publication status.");
+  }
+}
+
+/**
+ * 16. Create or Update Blog Post
+ */
+export async function actionSaveBlogPost(data: {
+  id?: string;
+  slug: string;
+  category: string;
+  authorName: string;
+  coverImage?: string;
+  isPublished: boolean;
+  title: string;
+  excerpt: string;
+  content: string;
+  locale?: string;
+}): Promise<ServiceResult<any>> {
+  try {
+    await requireMabesContext();
+
+    const { id, slug, category, authorName, coverImage, isPublished, title, excerpt, content, locale = "id" } = data;
+
+    let post;
+    if (id) {
+      post = await prisma.post.update({
+        where: { id },
+        data: {
+          slug,
+          category,
+          authorName,
+          coverImage,
+          isPublished,
+          publishedAt: isPublished ? new Date() : undefined,
+          translations: {
+            upsert: {
+              where: { postId_locale: { postId: id, locale } },
+              update: { title, excerpt, content, isPublished },
+              create: { title, excerpt, content, locale, isPublished },
+            },
+          },
+        },
+      });
+    } else {
+      post = await prisma.post.create({
+        data: {
+          slug,
+          category,
+          authorName,
+          coverImage,
+          isPublished,
+          publishedAt: isPublished ? new Date() : null,
+          translations: {
+            create: {
+              title,
+              excerpt,
+              content,
+              locale,
+              isPublished,
+            },
+          },
+        },
+      });
+    }
+
+    revalidatePath("/mabes/blog");
+    return ok(serializePlain(post), "SAVED");
+  } catch (err: any) {
+    console.error("actionSaveBlogPost error:", err);
+    return fail("INTERNAL_ERROR", err.message || "Failed to save blog post.");
+  }
+}
