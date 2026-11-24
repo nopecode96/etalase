@@ -31,7 +31,22 @@ export default async function middleware(req: NextRequest) {
 
   // 1. Mabes (Super Admin) Routing: mabes.etalase.online or mabes.localhost
   if (host === `mabes.${rootDomain}` || host === "mabes.localhost") {
-    return NextResponse.rewrite(new URL(`/mabes${path}`, req.url));
+    // Avoid double-prepending /mabes if path already starts with /mabes
+    const targetPath = path.startsWith("/mabes")
+      ? path
+      : path === "/"
+      ? "/mabes"
+      : `/mabes${path}`;
+
+    // Auth guard for Mabes subdomain
+    if (targetPath !== "/mabes/login") {
+      const mabesSession = req.cookies.get("mabes_session")?.value;
+      if (!mabesSession) {
+        return NextResponse.redirect(new URL("/mabes/login", req.url));
+      }
+    }
+
+    return NextResponse.rewrite(new URL(targetPath, req.url));
   }
 
   // 2. Main Portal: etalase.online, www.etalase.online, localhost, 127.0.0.1

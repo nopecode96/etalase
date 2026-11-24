@@ -67,6 +67,7 @@ export async function actionMabesLogin(formData: {
       sameSite: "lax",
       maxAge: SESSION_DURATION_SEC,
       path: "/",
+      domain: isProd ? ".etalase.online" : undefined,
     });
 
     return ok({ redirectUrl: "/mabes" });
@@ -80,10 +81,12 @@ export async function actionMabesLogin(formData: {
  * Mabes Logout Action
  */
 export async function actionMabesLogout() {
+  const isProd = process.env.NODE_ENV === "production";
   cookies().set(MABES_COOKIE_NAME, "", {
     httpOnly: true,
     maxAge: 0,
     path: "/",
+    domain: isProd ? ".etalase.online" : undefined,
   });
   redirect("/mabes/login");
 }
