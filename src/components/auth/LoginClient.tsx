@@ -102,7 +102,7 @@ interface LoginClientProps {
 
 function LoginCard({ locale, callbackUrl: propCallbackUrl }: LoginClientProps) {
   const searchParams = useSearchParams();
-  const callbackUrl = propCallbackUrl || searchParams.get("callbackUrl") || "/onboarding";
+  const callbackUrl = propCallbackUrl || searchParams.get("callbackUrl") || "/admin";
   const [loading, setLoading] = useState(false);
 
   // Default to English as required

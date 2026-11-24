@@ -71,7 +71,7 @@ export default function LoginPage({ searchParams }: LoginPageProps) {
       ? (rawLang as SupportedLocale)
       : "en";
 
-  const callbackUrl = searchParams?.callbackUrl || "/onboarding";
+  const callbackUrl = searchParams?.callbackUrl || "/admin";
 
   return <LoginClient locale={locale} callbackUrl={callbackUrl} />;
 }

@@ -9,7 +9,7 @@ interface PopupStartPageProps {
 }
 
 export default function PopupStartPage({ searchParams }: PopupStartPageProps) {
-  const callbackUrl = searchParams?.callbackUrl || "/onboarding";
+  const callbackUrl = searchParams?.callbackUrl || "/admin";
 
   const isGoogleConfigured = Boolean(
     env.AUTH_GOOGLE_ID &&
