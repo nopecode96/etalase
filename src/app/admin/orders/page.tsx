@@ -16,8 +16,6 @@ export default async function AdminOrdersPage({ searchParams }: AdminPageProps) 
       store={context.store}
       tier={context.tier}
       rules={context.rules}
-      monthlyWithdrawalsCount={context.monthlyWithdrawalsCount}
-      remainingFreeWithdrawals={context.remainingFreeWithdrawals}
     />
   );
 }

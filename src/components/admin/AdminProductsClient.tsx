@@ -219,7 +219,7 @@ export function AdminProductsClient({ store, tier, rules }: AdminProductsClientP
         </button>
       </div>
 
-      {/* Filter & Search Bar */}
+      {/* Filter & Search Bar - Clean without horizontal tab strips */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         {/* Search Input */}
         <div className="relative flex-1 max-w-md">
@@ -233,28 +233,22 @@ export function AdminProductsClient({ store, tier, rules }: AdminProductsClientP
           />
         </div>
 
-        {/* Tab Filters */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
-          {[
-            { id: "ALL", label: "All Items" },
-            { id: "ACTIVE", label: "Active" },
-            { id: "FEATURED", label: "Featured" },
-            { id: "DIGITAL", label: "Digital" },
-            { id: "PHYSICAL", label: "Physical" },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setSelectedFilter(tab.id as any)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition whitespace-nowrap ${
-                selectedFilter === tab.id
-                  ? "bg-[#1C1917] text-white"
-                  : "bg-white border border-[#E7E5E4] text-[#57534E] hover:text-[#1C1917]"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+        {/* Clean Dropdown Filter (No Horizontal Tabs) */}
+        <div className="flex items-center gap-2">
+          <label className="text-xs font-semibold text-[#78716C] whitespace-nowrap">
+            Filter Status:
+          </label>
+          <select
+            value={selectedFilter}
+            onChange={(e) => setSelectedFilter(e.target.value as any)}
+            className="px-3 py-1.5 rounded-xl border border-[#E7E5E4] bg-white text-xs font-semibold text-[#1C1917] focus:outline-none focus:ring-2 focus:ring-[#D94E28]/20"
+          >
+            <option value="ALL">All Items</option>
+            <option value="ACTIVE">Active Only</option>
+            <option value="FEATURED">Featured Only</option>
+            <option value="DIGITAL">Digital Products</option>
+            <option value="PHYSICAL">Physical Goods</option>
+          </select>
         </div>
       </div>
 
