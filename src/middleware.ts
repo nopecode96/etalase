@@ -41,6 +41,14 @@ export default async function middleware(req: NextRequest) {
     host === "localhost" ||
     host === "127.0.0.1"
   ) {
+    // Mabes route authentication guard
+    if (path.startsWith("/mabes") && path !== "/mabes/login") {
+      const mabesSession = req.cookies.get("mabes_session")?.value;
+      if (!mabesSession) {
+        return NextResponse.redirect(new URL("/mabes/login", req.url));
+      }
+    }
+
     // Check if path starts with localized prefix: /(id|en|ms|th|vi)(/.*)?
     const localeMatch = path.match(/^\/(id|en|ms|th|vi)(\/.*)?$/);
     if (localeMatch) {
@@ -103,6 +111,15 @@ export default async function middleware(req: NextRequest) {
         centralAdminUrl.searchParams.set(key, val);
       });
       return NextResponse.redirect(centralAdminUrl, 307);
+    }
+
+    // D. Subdomain /mabes redirect to central /mabes
+    if (path === "/mabes" || path.startsWith("/mabes/")) {
+      const centralMabesUrl = new URL(`${protocol}://${centralHost}${path}`);
+      url.searchParams.forEach((val, key) => {
+        centralMabesUrl.searchParams.set(key, val);
+      });
+      return NextResponse.redirect(centralMabesUrl, 307);
     }
 
     // D. Public storefront rewrite to dynamic tenant storefront /[slug]

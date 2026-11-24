@@ -11,6 +11,7 @@ datasource db {
 enum UserRole {
   USER
   SUPER_ADMIN
+  ADMIN_MABES
 }
 
 enum PlanTier {
@@ -78,6 +79,7 @@ model User {
   emailVerified DateTime?
   image         String?
   role          UserRole  @default(USER)
+  passwordHash  String?
   preferredLang String    @default("id")
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -391,4 +393,14 @@ model PlanOrder {
   updatedAt      DateTime  @updatedAt
 
   @@index([storeId, status])
+}
+
+// --- PLATFORM SETTINGS (RAFA KREASINDO TEKNOLOGI) ---
+model PlatformSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String   @db.Text
+  group     String   @default("GENERAL") // GENERAL | BILLING | TELEGRAM | PRICING
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
