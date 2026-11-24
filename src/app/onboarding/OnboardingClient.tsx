@@ -47,6 +47,7 @@ export function OnboardingClient() {
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [category, setCategory] = useState("Kreator Digital");
   const [selectedPlan, setSelectedPlan] = useState("");
+  const [selectedCycle, setSelectedCycle] = useState("yearly");
 
   // Read ?slug=... and ?plan=... on mount or fallback to sessionStorage / cookies
   useEffect(() => {
@@ -62,6 +63,16 @@ export function OnboardingClient() {
     }
     if (initialPlan) {
       setSelectedPlan(initialPlan.trim().toLowerCase());
+    }
+
+    let initialCycle = searchParams.get("cycle") || "";
+    if (!initialCycle) {
+      try {
+        initialCycle = sessionStorage.getItem("selected_cycle") || "";
+      } catch {}
+    }
+    if (initialCycle) {
+      setSelectedCycle(initialCycle.trim().toLowerCase());
     }
 
     let initialSlug = searchParams.get("slug") || "";
@@ -136,14 +147,20 @@ export function OnboardingClient() {
         try {
           sessionStorage.removeItem("claimed_slug");
           sessionStorage.removeItem("selected_plan");
+          sessionStorage.removeItem("selected_cycle");
           document.cookie = "claimed_slug=; path=/; max-age=0;";
           document.cookie = "selected_plan=; path=/; max-age=0;";
+          document.cookie = "selected_cycle=; path=/; max-age=0;";
         } catch {}
 
         const plan = selectedPlan || (searchParams.get("plan") || searchParams.get("tier") || "").toLowerCase();
+        const cycle = selectedCycle || (searchParams.get("cycle") || "").toLowerCase();
 
         if (plan === "pro" || plan === "dfy") {
-          router.push(`/admin/billing/upgrade?plan=${plan}`);
+          const query = new URLSearchParams();
+          query.set("plan", plan);
+          if (cycle) query.set("cycle", cycle);
+          router.push(`/admin/billing/upgrade?${query.toString()}`);
         } else {
           router.push("/admin");
         }
@@ -160,13 +177,14 @@ export function OnboardingClient() {
         </div>
 
         {selectedPlan ? (
-          <div className="inline-flex items-center gap-1.5 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 text-amber-900 px-3 py-1 rounded-full text-xs font-semibold">
+          <div className="inline-flex items-center gap-1.5 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 text-amber-900 px-3.5 py-1.5 rounded-full text-xs font-semibold">
             <Sparkles className="w-3.5 h-3.5 text-[#D94E28]" />
             <span>
-              Target Upgrade:{" "}
+              Paket Berbayar:{" "}
               <strong>
-                {selectedPlan.toUpperCase() === "DFY" ? "Terima Beres (DFY)" : "PRO Plan (Rp 49.000/mo)"}
-              </strong>
+                {selectedPlan.toUpperCase() === "DFY" ? "Terima Beres (DFY)" : `PRO Plan (${selectedCycle === "monthly" ? "Bulanan" : "Tahunan Hemat 20%"})`}
+              </strong>{" "}
+              &bull; Selesaikan data toko, lalu lanjut bayar
             </span>
           </div>
         ) : (
@@ -320,6 +338,11 @@ export function OnboardingClient() {
                 <Loader2 className="w-4 h-4 animate-spin" />
                 <span>Menyiapkan Etalase Anda...</span>
               </>
+            ) : selectedPlan === "pro" || selectedPlan === "dfy" ? (
+              <>
+                <span>Lanjut ke Pembayaran ({selectedPlan.toUpperCase() === "DFY" ? "Terima Beres" : "Paket PRO"})</span>
+                <ArrowRight className="w-4 h-4" />
+              </>
             ) : (
               <>
                 <span>Buka Toko & Masuk Dashboard</span>
@@ -329,7 +352,13 @@ export function OnboardingClient() {
           </button>
 
           <div className="text-center text-[11px] text-[#57534E] pt-3 font-medium">
-            Paket Gratis Selamanya &bull; 0% Komisi Order Chat &bull; Template Default Clean Minimal
+            {selectedPlan === "pro" || selectedPlan === "dfy" ? (
+              <span className="text-[#D94E28] font-semibold">
+                Pembayaran otomatis &amp; instan via Borderpay QRIS &amp; PayPal (Credit Card)
+              </span>
+            ) : (
+              "Paket Gratis Selamanya • 0% Komisi Order Chat • Template Default Clean Minimal"
+            )}
           </div>
         </div>
       </form>

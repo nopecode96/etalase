@@ -111,6 +111,7 @@ function RegisterCard({ locale, initialSlug = "", initialPlan = "" }: RegisterCl
   const searchParams = useSearchParams();
   const slugParam = searchParams.get("slug") || initialSlug;
   const planParam = searchParams.get("plan") || searchParams.get("tier") || initialPlan;
+  const cycleParam = searchParams.get("cycle");
 
   const [slug, setSlug] = useState(slugParam);
   const [plan, setPlan] = useState(planParam);
@@ -138,16 +139,20 @@ function RegisterCard({ locale, initialSlug = "", initialPlan = "" }: RegisterCl
       try {
         sessionStorage.setItem("selected_plan", cleanPlan);
         document.cookie = `selected_plan=${encodeURIComponent(cleanPlan)}; path=/; max-age=3600; SameSite=Lax`;
+        if (cycleParam) {
+          sessionStorage.setItem("selected_cycle", cycleParam.trim().toLowerCase());
+        }
       } catch {
         // Safe fallback
       }
     }
-  }, [planParam]);
+  }, [planParam, cycleParam]);
 
   const handleGoogleConnect = () => {
     setLoading(true);
     const targetSlug = slug ? slug.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-") : "";
     const targetPlan = plan ? plan.trim().toLowerCase() : "";
+    const targetCycle = cycleParam ? cycleParam.trim().toLowerCase() : "";
 
     if (targetSlug) {
       try {
@@ -162,6 +167,9 @@ function RegisterCard({ locale, initialSlug = "", initialPlan = "" }: RegisterCl
       try {
         sessionStorage.setItem("selected_plan", targetPlan);
         document.cookie = `selected_plan=${encodeURIComponent(targetPlan)}; path=/; max-age=3600; SameSite=Lax`;
+        if (targetCycle) {
+          sessionStorage.setItem("selected_cycle", targetCycle);
+        }
       } catch {
         // Storage fallback
       }
@@ -170,6 +178,7 @@ function RegisterCard({ locale, initialSlug = "", initialPlan = "" }: RegisterCl
     const queryParams = new URLSearchParams();
     if (targetSlug) queryParams.set("slug", targetSlug);
     if (targetPlan) queryParams.set("plan", targetPlan);
+    if (targetCycle) queryParams.set("cycle", targetCycle);
 
     const queryString = queryParams.toString();
     const callbackUrl = queryString ? `/onboarding?${queryString}` : "/onboarding";
