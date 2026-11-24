@@ -57,7 +57,7 @@ export async function getTelegramConfig(): Promise<TelegramConfig> {
     const supportLink = (
       map.get("support_telegram") ||
       map.get("supportLink") ||
-      "https://t.me/rafakreasindo"
+      "https://t.me/etalaseonline_bot"
     ).trim();
 
     let botUsername = (
@@ -98,7 +98,7 @@ export async function getTelegramConfig(): Promise<TelegramConfig> {
       botToken: (process.env.TELEGRAM_BOT_TOKEN || "").trim(),
       mabesChatId: (process.env.TELEGRAM_MABES_CHAT_ID || "").trim(),
       botUsername: (process.env.TELEGRAM_BOT_USERNAME || "etalaseonline_bot").trim(),
-      supportLink: "https://t.me/rafakreasindo",
+      supportLink: "https://t.me/etalaseonline_bot",
     };
   }
 }

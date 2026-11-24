@@ -370,6 +370,22 @@ export function AdminSidebar({
           </div>
         )}
 
+        {/* Customer Care Direct Link */}
+        {!isCollapsed && (
+          <div className="px-3 py-2 border-t border-[#E7E5E4] flex items-center justify-between text-[11px] bg-sky-50/50">
+            <a
+              href="https://t.me/etalaseonline_bot"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 text-sky-700 hover:text-sky-800 font-semibold transition"
+            >
+              <Send className="w-3.5 h-3.5 text-sky-600" />
+              <span>Bantuan CS Telegram</span>
+            </a>
+            <span className="text-[10px] text-sky-600 font-mono">@etalaseonline_bot</span>
+          </div>
+        )}
+
         {/* User Card */}
         <div className="p-3 border-t border-[#E7E5E4] bg-[#FAF8F5]/60 flex items-center justify-between text-xs text-[#57534E]">
           {!isCollapsed ? (
@@ -497,6 +513,15 @@ export function AdminSidebar({
               >
                 <span>View Live Storefront</span>
                 <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+              <a
+                href="https://t.me/etalaseonline_bot"
+                target="_blank"
+                rel="noreferrer"
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-sky-50 border border-sky-200 text-sky-700 font-semibold text-xs hover:bg-sky-100 transition"
+              >
+                <Send className="w-3.5 h-3.5 text-sky-600" />
+                <span>CS Telegram: @etalaseonline_bot</span>
               </a>
             </div>
           </div>

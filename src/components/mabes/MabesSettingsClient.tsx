@@ -103,7 +103,7 @@ export function MabesSettingsClient({ initialSettings }: MabesSettingsClientProp
               type="text"
               value={settings.support_telegram || ""}
               onChange={(e) => handleChange("support_telegram", e.target.value)}
-              placeholder="https://t.me/rafakreasindo"
+              placeholder="https://t.me/etalaseonline_bot"
               className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 font-medium font-mono"
             />
           </div>

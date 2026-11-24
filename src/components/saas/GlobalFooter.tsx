@@ -342,6 +342,16 @@ export function GlobalFooter() {
               </Link>
             </li>
             <li>
+              <a
+                href="https://t.me/etalaseonline_bot"
+                target="_blank"
+                rel="noreferrer"
+                className="text-sky-600 hover:text-sky-700 transition font-medium inline-flex items-center gap-1"
+              >
+                <span>CS: @etalaseonline_bot</span>
+              </a>
+            </li>
+            <li>
               <Link href={getLocalizedHref("/harga")} className="hover:text-[#1C1917] transition">
                 {t.links.pricing}
               </Link>

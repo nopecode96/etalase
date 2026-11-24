@@ -14,6 +14,7 @@ import {
   Globe,
   MessageCircle,
   Mail,
+  Send,
 } from "lucide-react";
 import { SupportedLocale } from "@/lib/config/constants";
 
@@ -474,10 +475,20 @@ export function BantuanClient({ locale }: { locale: SupportedLocale }) {
             <p className="text-xs sm:text-sm text-[#57534E] max-w-md mx-auto leading-relaxed">
               {t.ctaDesc}
             </p>
-            <div className="pt-2">
+            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <a
+                href="https://t.me/etalaseonline_bot"
+                target="_blank"
+                rel="noreferrer"
+                className="bg-sky-600 hover:bg-sky-500 text-white font-semibold px-6 py-3 rounded-xl text-xs sm:text-sm transition shadow-sm inline-flex items-center gap-2"
+              >
+                <Send className="w-4 h-4" />
+                <span>Chat CS Telegram (@etalaseonline_bot)</span>
+              </a>
+
               <Link
                 href={getLocalizedHref("/kontak")}
-                className="bg-[#D94E28] hover:bg-[#B83E1D] text-white font-semibold px-6 py-3 rounded-xl text-xs sm:text-sm transition shadow-xs inline-flex items-center gap-2"
+                className="bg-[#FAF8F5] hover:bg-stone-100 text-[#1C1917] border border-[#E7E5E4] font-semibold px-6 py-3 rounded-xl text-xs sm:text-sm transition inline-flex items-center gap-2"
               >
                 <Mail className="w-4 h-4" />
                 <span>{t.ctaBtn}</span>

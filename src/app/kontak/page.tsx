@@ -14,6 +14,7 @@ import {
   Headphones,
   FileText,
   LifeBuoy,
+  Send,
 } from "lucide-react";
 import {
   generateLocalizedMetadata,
@@ -95,7 +96,8 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
       hoursTitle: "Waktu Operasional Tim Bantuan:",
       hours1: "Senin - Sabtu: 08:00 - 21:00 WIB",
       hours2: "Minggu & Hari Libur: 09:00 - 17:00 WIB",
-      helpDeskBtn: "Kirim Tiket Bantuan ke support@etalase.online",
+      telegramCsBtn: "Chat Customer Service Telegram (@etalaseonline_bot)",
+      helpDeskBtn: "Email Dukungan ke support@etalase.online",
       helpCenterBtn: "Kunjungi Pusat Bantuan & Dokumentasi",
       card2Badge: "Korespondensi Resmi",
       card2Title: "Korespondensi Resmi Per Divisi",
@@ -121,7 +123,8 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
       hoursTitle: "Support Operational Hours (GMT+7):",
       hours1: "Monday - Saturday: 08:00 - 21:00 WIB",
       hours2: "Sunday & Holidays: 09:00 - 17:00 WIB",
-      helpDeskBtn: "Submit Support Ticket to support@etalase.online",
+      telegramCsBtn: "Chat Customer Service on Telegram (@etalaseonline_bot)",
+      helpDeskBtn: "Email Support at support@etalase.online",
       helpCenterBtn: "Visit Help Center & Documentation",
       card2Badge: "Official Correspondence",
       card2Title: "Departmental Corporate Correspondence",
@@ -147,7 +150,8 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
       hoursTitle: "Waktu Operasi Bantuan:",
       hours1: "Isnin - Sabtu: 08:00 - 21:00 WIB",
       hours2: "Ahad & Cuti Umum: 09:00 - 17:00 WIB",
-      helpDeskBtn: "Hantar Tiket ke support@etalase.online",
+      telegramCsBtn: "Sembang Khidmat Pelanggan Telegram (@etalaseonline_bot)",
+      helpDeskBtn: "Hantar E-mel ke support@etalase.online",
       helpCenterBtn: "Lawati Pusat Bantuan & Dokumentasi",
       card2Badge: "Surat-Menyurat Rasmi",
       card2Title: "Surat-Menyurat Mengikut Bahagian",
@@ -172,7 +176,8 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
       hoursTitle: "เวลาทำการของทีมสนับสนุน:",
       hours1: "จันทร์ - เสาร์: 08:00 - 21:00 น. (GMT+7)",
       hours2: "อาทิตย์และวันหยุด: 09:00 - 17:00 น. (GMT+7)",
-      helpDeskBtn: "ส่งข้อความถึง support@etalase.online",
+      telegramCsBtn: "แชทกับฝ่ายบริการลูกค้า Telegram (@etalaseonline_bot)",
+      helpDeskBtn: "ส่งอีเมลถึง support@etalase.online",
       helpCenterBtn: "ไปที่ศูนย์ช่วยเหลือและคู่มือการใช้งาน",
       card2Badge: "การติดต่ออย่างเป็นทางการ",
       card2Title: "การติดต่อแยกตามแผนกงาน",
@@ -197,7 +202,8 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
       hoursTitle: "Thời Gian Hỗ Trợ Trực Tuyến:",
       hours1: "Thứ Hai - Thứ Bảy: 08:00 - 21:00 (GMT+7)",
       hours2: "Chủ Nhật & Ngày Lễ: 09:00 - 17:00 (GMT+7)",
-      helpDeskBtn: "Gửi yêu cầu đến support@etalase.online",
+      telegramCsBtn: "Trò chuyện CSKH Telegram (@etalaseonline_bot)",
+      helpDeskBtn: "Gửi email đến support@etalase.online",
       helpCenterBtn: "Truy cập Trung tâm Trợ giúp & Tài liệu",
       card2Badge: "Thư tín chính thức",
       card2Title: "Hòm Thư Liên Hệ Theo Bộ Phận",
@@ -323,18 +329,28 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
                 </div>
               </div>
 
-              <div className="space-y-3 pt-2">
+              <div className="space-y-2.5 pt-2">
+                <a
+                  href="https://t.me/etalaseonline_bot"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-full bg-sky-600 hover:bg-sky-500 text-white py-3.5 px-4 rounded-xl font-bold text-xs sm:text-sm shadow-sm transition flex items-center justify-center gap-2 cursor-pointer text-center"
+                >
+                  <Send className="w-4 h-4 shrink-0" />
+                  <span>{copy.telegramCsBtn}</span>
+                </a>
+
                 <a
                   href="mailto:support@etalase.online?subject=Bantuan%20Akun%20etalase.online"
-                  className="w-full bg-[#D94E28] hover:bg-[#B83E1D] text-white py-3.5 px-4 rounded-xl font-bold text-xs sm:text-sm shadow-xs transition flex items-center justify-center gap-2 cursor-pointer text-center"
+                  className="w-full bg-[#FAF8F5] hover:bg-stone-100 text-[#1C1917] border border-[#E7E5E4] py-2.5 px-4 rounded-xl font-medium text-xs transition flex items-center justify-center gap-2 cursor-pointer text-center"
                 >
-                  <Headphones className="w-4 h-4 shrink-0" />
+                  <Mail className="w-3.5 h-3.5 text-[#57534E]" />
                   <span>{copy.helpDeskBtn}</span>
                 </a>
 
                 <Link
                   href={getLocalizedHref("/bantuan")}
-                  className="w-full bg-[#FAF8F5] hover:bg-stone-100 text-[#1C1917] border border-[#E7E5E4] py-3 rounded-xl font-semibold text-xs transition flex items-center justify-center gap-1.5"
+                  className="w-full bg-[#FAF8F5] hover:bg-stone-100 text-[#1C1917] border border-[#E7E5E4] py-2.5 rounded-xl font-semibold text-xs transition flex items-center justify-center gap-1.5"
                 >
                   <LifeBuoy className="w-4 h-4 text-[#D94E28]" />
                   <span>{copy.helpCenterBtn}</span>

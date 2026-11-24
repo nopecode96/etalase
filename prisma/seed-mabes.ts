@@ -31,7 +31,7 @@ export async function seedMabes() {
   const defaultSettings = [
     { key: "company_name", value: "PT Rafa Kreasindo Teknologi", group: "GENERAL" },
     { key: "platform_name", value: "etalase.online", group: "GENERAL" },
-    { key: "support_telegram", value: "https://t.me/rafakreasindo", group: "GENERAL" },
+    { key: "support_telegram", value: "https://t.me/etalaseonline_bot", group: "GENERAL" },
     { key: "telegram_mabes_chat_id", value: "-1002345678901", group: "TELEGRAM" },
     { key: "telegram_mabes_bot_token", value: "", group: "TELEGRAM" },
     { key: "pro_monthly_idr", value: "49000", group: "PRICING" },
