@@ -30,6 +30,8 @@ const envSchema = z.object({
   PAYPAL_CLIENT_ID: z.string().optional().default(""),
   PAYPAL_CLIENT_SECRET: z.string().optional().default(""),
   PAYPAL_MODE: z.enum(["sandbox", "live"]).default("sandbox"),
+  PAYPAL_WEBHOOK_URL: z.string().default("https://etalase.online/paypal/webhook"),
+  PAYPAL_SANDBOX_EMAIL: z.string().optional().default(""),
 
   FONNTE_TOKEN: z.string().optional().default(""),
 
@@ -63,5 +65,22 @@ export function getActiveBorderpayConfig() {
     webhookKey: isLive ? env.BORDERPAY_LIVE_WEBHOOK_KEY : env.BORDERPAY_TEST_WEBHOOK_KEY,
     webhookUrl: env.BORDERPAY_WEBHOOK_URL,
     apiBaseUrl: isLive ? "https://api.borderpay.id/v1" : "https://sandbox-api.borderpay.id/v1",
+  };
+}
+
+/**
+ * Returns active PayPal credentials & gateway URLs based on PAYPAL_MODE ("sandbox" | "live")
+ */
+export function getActivePaypalConfig() {
+  const isSandbox = env.PAYPAL_MODE === "sandbox";
+  return {
+    isSandbox,
+    clientId: env.PAYPAL_CLIENT_ID,
+    clientSecret: env.PAYPAL_CLIENT_SECRET,
+    mode: env.PAYPAL_MODE,
+    webhookUrl: env.PAYPAL_WEBHOOK_URL,
+    sandboxEmail: env.PAYPAL_SANDBOX_EMAIL,
+    apiBaseUrl: isSandbox ? "https://api-m.sandbox.paypal.com" : "https://api-m.paypal.com",
+    webBaseUrl: isSandbox ? "https://sandbox.paypal.com" : "https://www.paypal.com",
   };
 }
