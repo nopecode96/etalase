@@ -28,3 +28,13 @@ export function showServiceResultToast(result: ServiceResult<unknown>) {
     toast.error(result.error || "Terjadi kesalahan!");
   }
 }
+
+export function showToast(message: string, type: "success" | "error" | "info" = "success") {
+  if (type === "success") {
+    toast.success(message);
+  } else if (type === "error") {
+    toast.error(message);
+  } else {
+    toast.info(message);
+  }
+}

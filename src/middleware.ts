@@ -67,6 +67,13 @@ export default async function middleware(req: NextRequest) {
       return NextResponse.next();
     }
 
+    // Handle tenant admin routes: [slug].etalase.online/admin/... -> /admin/...?slug=[slug]
+    if (path.startsWith("/admin")) {
+      const targetUrl = new URL(path, req.url);
+      targetUrl.searchParams.set("slug", slug);
+      return NextResponse.rewrite(targetUrl);
+    }
+
     // Rewrite to dynamic tenant storefront or admin: /[slug] or /[slug]/admin
     return NextResponse.rewrite(new URL(`/${slug}${path}`, req.url));
   }
