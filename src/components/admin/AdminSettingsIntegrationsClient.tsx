@@ -108,8 +108,8 @@ export function AdminSettingsIntegrationsClient({
             </div>
             <p className="text-xs text-stone-600 leading-relaxed max-w-lg">
               {isConnected
-                ? `Toko Anda terhubung dengan akun Telegram ${telegramConfig?.telegramUser || "Aktif"} (Chat ID: ${chatId}). Anda akan menerima notifikasi setiap ada order.`
-                : `Klik tombol di sebelah kanan untuk langsung membuka Bot Telegram resmi (@${platformBotUsername}) dan otomatis menautkan toko Anda tanpa perlu repot buat bot sendiri.`}
+                ? `Your store is connected to Telegram ${telegramConfig?.telegramUser || "Active"} (Chat ID: ${chatId}). You will receive instant notifications for every new paid order.`
+                : `Click the button on the right to open our official Telegram Bot (@${platformBotUsername}) and automatically link your store in 1 click—no manual bot setup required.`}
             </p>
           </div>
 

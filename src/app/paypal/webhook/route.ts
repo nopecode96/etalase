@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db/prisma";
 import { emitN8nEvent } from "@/lib/n8n/dispatcher";
 import { logger } from "@/lib/core/logger";
 import { sendMetaCapiEvent } from "@/lib/services/tracking-capi";
+import { notifyTenantNewOrder } from "@/lib/services/telegram-service";
 
 export const dynamic = "force-dynamic";
 
@@ -140,6 +141,16 @@ export async function POST(req: NextRequest) {
           locale: order.store.locale,
           paymentProvider: "PAYPAL",
         });
+
+        // Fire-and-forget: Notify tenant on Telegram if linked
+        notifyTenantNewOrder(order.storeId, {
+          orderCode: order.orderCode,
+          productTitle: order.product.title,
+          amount: Number(order.amount),
+          buyerName: order.buyerName,
+          buyerWhatsapp: order.buyerWhatsapp,
+          paymentMethod: "PAYPAL",
+        }).catch(() => {});
 
         if (order.store.tier !== "FREE" && order.store.metaPixelId && order.store.metaCapiToken) {
           await sendMetaCapiEvent({
