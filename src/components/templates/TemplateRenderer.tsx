@@ -41,6 +41,10 @@ export const TemplateRenderer: React.FC<StoreTemplateProps> = ({
     containerStyle.backgroundAttachment = "fixed";
   }
 
+  const activeBlocks = (blocks.length > 0 ? blocks : store.blocks || []).filter(
+    (b) => b.isActive !== false
+  );
+
   return (
     <div className="w-full min-h-full transition-colors duration-300" style={containerStyle}>
       <TemplateComponent
@@ -50,6 +54,100 @@ export const TemplateRenderer: React.FC<StoreTemplateProps> = ({
         isPreview={isPreview}
         isMockup={isMockup}
       />
+
+      {activeBlocks.length > 0 && (
+        <section className="max-w-xl mx-auto px-4 pb-10 space-y-3">
+          {activeBlocks.map((block) => {
+            const href = isMockup ? "#" : block.targetUrl || undefined;
+            if (block.type === "IMAGE_BANNER" && block.imageUrl) {
+              const inner = (
+                <div className="rounded-2xl overflow-hidden border border-black/10 bg-white shadow-xs group">
+                  <img
+                    src={block.imageUrl}
+                    alt={block.title || "Promo Banner"}
+                    className="w-full h-auto object-cover group-hover:scale-[1.01] transition-transform"
+                  />
+                  {(block.title || block.subtitle) && (
+                    <div className="p-3.5 text-left">
+                      {block.badgeText && (
+                        <span className="inline-block text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-[#FDF0EC] text-[#D94E28] mb-1">
+                          {block.badgeText}
+                        </span>
+                      )}
+                      {block.title && (
+                        <div className="text-sm font-bold text-stone-900">{block.title}</div>
+                      )}
+                      {block.subtitle && (
+                        <div className="text-xs text-stone-500 mt-0.5">{block.subtitle}</div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+              return href ? (
+                <a
+                  key={block.id}
+                  href={href}
+                  target={isMockup ? undefined : "_blank"}
+                  rel="noopener noreferrer"
+                  className="block"
+                >
+                  {inner}
+                </a>
+              ) : (
+                <div key={block.id}>{inner}</div>
+              );
+            }
+
+            if (block.type === "TEXT_QUOTE") {
+              return (
+                <div
+                  key={block.id}
+                  className="rounded-2xl border border-black/10 bg-white/95 backdrop-blur-xs p-4 text-left shadow-2xs"
+                >
+                  {block.badgeText && (
+                    <span className="inline-block text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 mb-1.5">
+                      {block.badgeText}
+                    </span>
+                  )}
+                  {block.title && (
+                    <div className="text-sm font-bold text-stone-900">{block.title}</div>
+                  )}
+                  {block.subtitle && (
+                    <p className="text-xs text-stone-600 mt-1 leading-relaxed">{block.subtitle}</p>
+                  )}
+                </div>
+              );
+            }
+
+            // LINK_BUTTON or default action card
+            return (
+              <a
+                key={block.id}
+                href={href || "#"}
+                target={href && !isMockup ? "_blank" : undefined}
+                rel="noopener noreferrer"
+                className="flex items-center justify-between gap-3 rounded-2xl border border-black/10 bg-white/95 hover:bg-white p-4 shadow-2xs transition"
+              >
+                <div className="min-w-0 text-left">
+                  {block.badgeText && (
+                    <span className="inline-block text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-[#FDF0EC] text-[#D94E28] mb-1">
+                      {block.badgeText}
+                    </span>
+                  )}
+                  <div className="text-sm font-bold text-stone-900 truncate">
+                    {block.title || "Lihat Tautan"}
+                  </div>
+                  {block.subtitle && (
+                    <div className="text-xs text-stone-500 truncate mt-0.5">{block.subtitle}</div>
+                  )}
+                </div>
+                <span className="text-xs font-bold text-[#D94E28] shrink-0">Buka →</span>
+              </a>
+            );
+          })}
+        </section>
+      )}
     </div>
   );
 };
