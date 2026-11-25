@@ -27,10 +27,11 @@ export function AdminSettingsDomainClient({
   tier,
 }: AdminSettingsDomainClientProps) {
   const [isPending, startTransition] = useTransition();
-  const [domain, setDomain] = useState(store.customDomain || "");
+  const [domain, setDomain] = useState(store?.customDomain || "");
   const [copiedTarget, setCopiedTarget] = useState(false);
 
   const isFree = tier === "FREE";
+  const storeSlug = store?.slug || "toko";
 
   const handleCopyTarget = () => {
     navigator.clipboard.writeText("cname.etalase.online");
@@ -48,7 +49,7 @@ export function AdminSettingsDomainClient({
 
     startTransition(async () => {
       const res = await actionUpdateStoreSettings({
-        storeId: store.id,
+        storeId: store?.id,
         customDomain: domain,
       });
 
@@ -69,7 +70,7 @@ export function AdminSettingsDomainClient({
         <p className="text-xs sm:text-sm text-[#57534E] mt-1">
           Connect your custom domain name (e.g.{" "}
           <code className="text-[#D94E28] font-mono">yourbrand.com</code>) to replace the default{" "}
-          <code className="font-mono">{store.slug}.etalase.online</code> subdomain.
+          <code className="font-mono">{storeSlug}.etalase.online</code> subdomain.
         </p>
       </div>
 
@@ -92,7 +93,7 @@ export function AdminSettingsDomainClient({
           <p className="text-xs sm:text-sm text-[#57534E] leading-relaxed">
             Free accounts operate on our high-speed subdomain (
             <span className="font-mono text-[#1C1917] font-semibold">
-              {store.slug}.etalase.online
+              {storeSlug}.etalase.online
             </span>
             ). Upgrade to PRO or DFY to unlock custom domain mapping with free automated SSL certificates, zero marketplace branding, and instant DNS routing.
           </p>

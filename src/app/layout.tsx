@@ -86,8 +86,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id">
-      <body className="antialiased min-h-screen bg-[#FAF8F5] text-[#1C1917]">
+    <html lang="id" suppressHydrationWarning>
+      <body className="antialiased min-h-screen bg-[#FAF8F5] text-[#1C1917]" suppressHydrationWarning>
         {children}
         <GlobalToast />
       </body>
