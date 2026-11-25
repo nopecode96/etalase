@@ -1,3 +1,4 @@
+import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { prisma, serializePlain } from "@/lib/db/prisma";
 import { TemplateRenderer } from "@/components/templates/TemplateRenderer";
@@ -5,6 +6,94 @@ import { TemplateRenderer } from "@/components/templates/TemplateRenderer";
 interface StorePageProps {
   params: {
     slug: string;
+  };
+}
+
+export async function generateMetadata({ params }: StorePageProps): Promise<Metadata> {
+  const { slug } = params;
+  const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN || "etalase.online";
+  const baseAppUrl = process.env.NEXT_PUBLIC_APP_URL || `https://${rootDomain}`;
+
+  const toAbsoluteUrl = (url?: string | null) => {
+    if (!url) return `${baseAppUrl}/og-image.png`;
+    if (url.startsWith("http://") || url.startsWith("https://")) return url;
+    return `${baseAppUrl}${url.startsWith("/") ? "" : "/"}${url}`;
+  };
+
+  if (slug === "demo") {
+    const demoUrl = `https://demo.${rootDomain}`;
+    const demoImg = toAbsoluteUrl("/images/demo/banner-creator.jpg");
+    return {
+      title: "Studio Demo Creative — Contoh Tampilan Toko | etalase.online",
+      description: "Contoh tampilan etalase toko digital, katalog, dan checkout WhatsApp di etalase.online.",
+      alternates: {
+        canonical: demoUrl,
+      },
+      openGraph: {
+        type: "website",
+        url: demoUrl,
+        title: "Studio Demo Creative — Contoh Tampilan Toko",
+        description: "Contoh tampilan etalase toko digital, katalog, dan checkout WhatsApp di etalase.online.",
+        siteName: "Studio Demo Creative",
+        images: [{ url: demoImg, width: 1200, height: 630, alt: "Studio Demo Creative" }],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: "Studio Demo Creative — Contoh Tampilan Toko",
+        description: "Contoh tampilan etalase toko digital, katalog, dan checkout WhatsApp di etalase.online.",
+        images: [demoImg],
+      },
+    };
+  }
+
+  const store = await prisma.store.findUnique({
+    where: { slug },
+    select: {
+      name: true,
+      slug: true,
+      bio: true,
+      avatarUrl: true,
+      bannerUrl: true,
+      customDomain: true,
+      isActive: true,
+    },
+  });
+
+  if (!store || !store.isActive) {
+    return {
+      title: "Toko Tidak Ditemukan | etalase.online",
+      robots: { index: false, follow: false },
+    };
+  }
+
+  const storeUrl = store.customDomain
+    ? `https://${store.customDomain}`
+    : `https://${store.slug}.${rootDomain}`;
+  const title = `${store.name} | etalase.online`;
+  const description =
+    store.bio?.trim() || `Kunjungi etalase resmi ${store.name} di ${store.slug}.${rootDomain}.`;
+  const ogImage = toAbsoluteUrl(store.bannerUrl || store.avatarUrl);
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: storeUrl,
+    },
+    openGraph: {
+      type: "website",
+      url: storeUrl,
+      title: store.name,
+      description,
+      siteName: store.name,
+      images: [{ url: ogImage, width: 1200, height: 630, alt: store.name }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: store.name,
+      description,
+      images: [ogImage],
+    },
   };
 }
 

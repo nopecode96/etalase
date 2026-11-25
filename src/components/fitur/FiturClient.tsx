@@ -972,6 +972,8 @@ export function FiturClient({ locale }: { locale: SupportedLocale }) {
           {featureItems.map((item) => (
             <div key={item.id} id={item.id} className="scroll-mt-24" />
           ))}
+          <div id="whatsapp" className="scroll-mt-24" />
+          <div id="qris" className="scroll-mt-24" />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -1082,69 +1084,79 @@ export function FiturClient({ locale }: { locale: SupportedLocale }) {
             </div>
           </div>
 
-          {/* Panel Detail Kanan */}
+          {/* Panel Detail Kanan - render semua fitur di DOM agar ramah SEO & crawler */}
           <div
             ref={detailRef}
-            id={`detail-${currentItem.id}`}
-            className="lg:col-span-7 bg-white border border-[#E7E5E4] rounded-3xl p-6 sm:p-10 shadow-xs space-y-6 scroll-mt-24 transition-all duration-300"
+            className="lg:col-span-7 bg-white border border-[#E7E5E4] rounded-3xl p-6 sm:p-10 shadow-xs scroll-mt-24 transition-all duration-300"
           >
-            <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-[#D94E28] bg-[#FDF0EC] border border-[#FADCD3] px-3 py-1 rounded-full">
-                {currentItem.badge}
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-bold text-[#1C1917] mt-4 tracking-tight">
-                {currentItem.headline}
-              </h2>
-              <p className="text-[#57534E] text-sm sm:text-base leading-relaxed mt-3">
-                {currentItem.desc}
-              </p>
-            </div>
-
-            {/* Baris "Cocok untuk: ..." */}
-            <div className="p-3.5 bg-[#FAF8F5] border border-[#E7E5E4] rounded-2xl text-xs">
-              <span className="font-bold text-[#1C1917]">{currentLocaleData.suitableFor} </span>
-              <span className="text-[#57534E]">{currentItem.target}</span>
-            </div>
-
-            {/* Visual Hero Image for the Feature */}
-            <div className="w-full h-52 sm:h-64 rounded-2xl overflow-hidden bg-stone-100 border border-[#E7E5E4] relative shadow-2xs">
-              <img
-                src={currentItem.previewImg}
-                alt={currentItem.title}
-                className="w-full h-full object-cover"
-              />
-            </div>
-
-            {/* Manfaat Utama */}
-            <div className="space-y-2 pt-2">
-              <h4 className="font-bold text-xs uppercase tracking-wider text-[#1C1917]">
-                {currentLocaleData.keyAdvantages}
-              </h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-[#57534E]">
-                {currentItem.points.map((pt, pIdx) => (
-                  <div key={pIdx} className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-[#D94E28] shrink-0 mt-0.5" />
-                    <span>{pt}</span>
+            {featureItems.map((item) => {
+              const isSelected = activeTab === item.id;
+              return (
+                <div
+                  key={item.id}
+                  id={`detail-${item.id}`}
+                  className={isSelected ? "space-y-6" : "hidden"}
+                >
+                  <div>
+                    <span className="text-xs font-bold uppercase tracking-wider text-[#D94E28] bg-[#FDF0EC] border border-[#FADCD3] px-3 py-1 rounded-full">
+                      {item.badge}
+                    </span>
+                    <h2 className="text-2xl sm:text-3xl font-bold text-[#1C1917] mt-4 tracking-tight">
+                      {item.headline}
+                    </h2>
+                    <p className="text-[#57534E] text-sm sm:text-base leading-relaxed mt-3">
+                      {item.desc}
+                    </p>
                   </div>
-                ))}
-              </div>
-            </div>
 
-            <div className="pt-4 border-t border-[#E7E5E4] flex flex-col sm:flex-row items-center justify-between gap-3">
-              <Link
-                href={getLocalizedHref("/register")}
-                className="w-full sm:w-auto bg-[#D94E28] hover:bg-[#B83E1D] text-white px-6 py-3 rounded-xl font-bold text-xs sm:text-sm shadow-xs transition flex items-center justify-center gap-1.5"
-              >
-                <span>{currentLocaleData.ctaPrimary}</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link
-                href={getLocalizedHref("/solusi")}
-                className="text-xs font-semibold text-[#57534E] hover:text-[#1C1917]"
-              >
-                {currentLocaleData.ctaSecondary}
-              </Link>
-            </div>
+                  {/* Baris "Cocok untuk: ..." */}
+                  <div className="p-3.5 bg-[#FAF8F5] border border-[#E7E5E4] rounded-2xl text-xs">
+                    <span className="font-bold text-[#1C1917]">{currentLocaleData.suitableFor} </span>
+                    <span className="text-[#57534E]">{item.target}</span>
+                  </div>
+
+                  {/* Visual Hero Image for the Feature */}
+                  <div className="w-full h-52 sm:h-64 rounded-2xl overflow-hidden bg-stone-100 border border-[#E7E5E4] relative shadow-2xs">
+                    <img
+                      src={item.previewImg}
+                      alt={item.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+
+                  {/* Manfaat Utama */}
+                  <div className="space-y-2 pt-2">
+                    <h4 className="font-bold text-xs uppercase tracking-wider text-[#1C1917]">
+                      {currentLocaleData.keyAdvantages}
+                    </h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-[#57534E]">
+                      {item.points.map((pt, pIdx) => (
+                        <div key={pIdx} className="flex items-start gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-[#D94E28] shrink-0 mt-0.5" />
+                          <span>{pt}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-[#E7E5E4] flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <Link
+                      href={getLocalizedHref("/register")}
+                      className="w-full sm:w-auto bg-[#D94E28] hover:bg-[#B83E1D] text-white px-6 py-3 rounded-xl font-bold text-xs sm:text-sm shadow-xs transition flex items-center justify-center gap-1.5"
+                    >
+                      <span>{currentLocaleData.ctaPrimary}</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
+                    <Link
+                      href={getLocalizedHref("/solusi")}
+                      className="text-xs font-semibold text-[#57534E] hover:text-[#1C1917]"
+                    >
+                      {currentLocaleData.ctaSecondary}
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>

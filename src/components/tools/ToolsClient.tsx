@@ -238,11 +238,20 @@ export function ToolsClient({ locale }: { locale: SupportedLocale }) {
     setGeneratedLink(url);
   };
 
-  // Tool 2: Fee Savings Calculator
+  // Tool 2: Fee Savings Calculator (transparent with minimum QRIS fee)
+  const minQrisFee = locale === "id" ? 3000 : 0;
+  const defaultTicket =
+    locale === "id" ? 150000 : Math.max(1, Math.round(t.defaultGmv / 50));
   const [monthlyGmv, setMonthlyGmv] = useState(t.defaultGmv);
+  const [avgTicket, setAvgTicket] = useState(defaultTicket);
+
+  const txCount = Math.max(1, Math.round(monthlyGmv / Math.max(1, avgTicket)));
   const marketplaceFee = monthlyGmv * 0.1; // 10%
-  const etalaseFee = monthlyGmv * 0.02; // 2%
-  const estimatedSavings = marketplaceFee - etalaseFee;
+  const qrisFeePerTx = Math.max(minQrisFee, avgTicket * 0.02); // PRO 2% min Rp 3.000
+  const etalaseQrisFee = txCount * qrisFeePerTx;
+  const isSmallTicketWarning = locale === "id" && avgTicket < 60000;
+  const estimatedSavingsQris = Math.max(0, marketplaceFee - etalaseQrisFee);
+  const estimatedSavingsChat = marketplaceFee; // 0% platform commission via WhatsApp Chat Order
 
   const formatMoney = (val: number) => {
     return `${t.currencyPrefix}${Math.round(val).toLocaleString()}${t.currencySuffix}`;
@@ -365,27 +374,61 @@ export function ToolsClient({ locale }: { locale: SupportedLocale }) {
               </div>
 
               <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <label className="text-xs font-semibold text-[#1C1917]">
-                      {t.gmvLabel}
-                    </label>
-                    <span className="text-sm font-bold text-[#D94E28]">
-                      {formatMoney(monthlyGmv)}
-                    </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <div className="flex justify-between items-center mb-1">
+                      <label className="text-xs font-semibold text-[#1C1917]">
+                        {t.gmvLabel}
+                      </label>
+                      <span className="text-sm font-bold text-[#D94E28]">
+                        {formatMoney(monthlyGmv)}
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min={t.defaultGmv * 0.1}
+                      max={t.defaultGmv * 10}
+                      step={t.defaultGmv * 0.05}
+                      value={monthlyGmv}
+                      onChange={(e) => setMonthlyGmv(Number(e.target.value))}
+                      className="w-full accent-[#D94E28]"
+                    />
                   </div>
-                  <input
-                    type="range"
-                    min={t.defaultGmv * 0.1}
-                    max={t.defaultGmv * 10}
-                    step={t.defaultGmv * 0.05}
-                    value={monthlyGmv}
-                    onChange={(e) => setMonthlyGmv(Number(e.target.value))}
-                    className="w-full accent-[#D94E28]"
-                  />
+
+                  <div>
+                    <div className="flex justify-between items-center mb-1">
+                      <label className="text-xs font-semibold text-[#1C1917]">
+                        {locale === "id"
+                          ? `Rata-rata Harga Produk (${txCount} tx/bln)`
+                          : `Avg. Product Price (${txCount} tx/mo)`}
+                      </label>
+                      <span className="text-sm font-bold text-[#1C1917]">
+                        {formatMoney(avgTicket)}
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min={locale === "id" ? 15000 : Math.max(1, Math.round(defaultTicket * 0.2))}
+                      max={locale === "id" ? 1000000 : defaultTicket * 5}
+                      step={locale === "id" ? 5000 : Math.max(1, Math.round(defaultTicket * 0.1))}
+                      value={avgTicket}
+                      onChange={(e) => setAvgTicket(Number(e.target.value))}
+                      className="w-full accent-[#1C1917]"
+                    />
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                {isSmallTicketWarning && (
+                  <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900 leading-relaxed">
+                    <strong>Catatan Transparan (Produk &lt; Rp 60.000):</strong> Pembayaran QRIS memiliki fee minimum{" "}
+                    <strong>Rp 3.000/transaksi</strong> (setara{" "}
+                    {((qrisFeePerTx / avgTicket) * 100).toFixed(1)}% pada harga {formatMoney(avgTicket)}). Untuk
+                    produk murah, gunakan <strong>Jalur Chat WhatsApp (0% Fee)</strong> atau aktifkan fitur{" "}
+                    <strong>Convenience Fee</strong> agar biaya ditanggung pembeli.
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
                   <div className="p-4 rounded-2xl bg-red-50 border border-red-200 space-y-1">
                     <div className="text-xs text-red-700 font-medium">
                       {t.marketplaceFeeLabel}
@@ -397,10 +440,23 @@ export function ToolsClient({ locale }: { locale: SupportedLocale }) {
 
                   <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200 space-y-1">
                     <div className="text-xs text-stone-600 font-medium">
-                      {t.etalaseFeeLabel}
+                      {locale === "id"
+                        ? "QRIS PRO (2%, min Rp 3.000/tx)"
+                        : t.etalaseFeeLabel}
                     </div>
                     <div className="text-xl font-black text-stone-900">
-                      {formatMoney(etalaseFee)}
+                      {formatMoney(etalaseQrisFee)}
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 space-y-1">
+                    <div className="text-xs text-emerald-800 font-medium">
+                      {locale === "id"
+                        ? "Jalur Chat WhatsApp (0% Fee)"
+                        : "Direct Chat Order (0% Fee)"}
+                    </div>
+                    <div className="text-xl font-black text-emerald-900">
+                      {formatMoney(0)}
                     </div>
                   </div>
                 </div>
@@ -409,8 +465,15 @@ export function ToolsClient({ locale }: { locale: SupportedLocale }) {
                   <div className="text-xs font-bold text-[#D94E28] uppercase tracking-wider">
                     {t.estimatedSavingsLabel}
                   </div>
-                  <div className="text-3xl sm:text-4xl font-black text-[#1C1917]">
-                    {formatMoney(estimatedSavings)}
+                  <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+                    <div className="text-3xl sm:text-4xl font-black text-[#1C1917]">
+                      {formatMoney(estimatedSavingsQris)}
+                    </div>
+                    <span className="text-xs font-semibold text-emerald-800 bg-emerald-100 px-2.5 py-1 rounded-full">
+                      {locale === "id"
+                        ? `Atau hemat ${formatMoney(estimatedSavingsChat)} via Jalur Chat 0%`
+                        : `Or save ${formatMoney(estimatedSavingsChat)} via 0% Chat Order`}
+                    </span>
                   </div>
                   <p className="text-xs text-[#57534E]">
                     {t.savingsNote}

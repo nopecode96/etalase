@@ -360,8 +360,25 @@ export function BantuanClient({ locale }: { locale: SupportedLocale }) {
 
   const categoryIcons = [BookOpen, ShieldCheck, MessageCircle, Globe];
 
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: t.faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.q,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.a,
+      },
+    })),
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-[#FAF8F5] text-[#1C1917]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
       <GlobalHeader />
 
       <main className="flex-1">
@@ -454,11 +471,15 @@ export function BantuanClient({ locale }: { locale: SupportedLocale }) {
                         }`}
                       />
                     </button>
-                    {isOpen && (
-                      <div className="px-5 pb-5 sm:px-6 sm:pb-6 text-xs sm:text-sm text-[#57534E] leading-relaxed border-t border-stone-100 pt-3">
-                        {faq.a}
-                      </div>
-                    )}
+                    <div
+                      className={
+                        isOpen
+                          ? "px-5 pb-5 sm:px-6 sm:pb-6 text-xs sm:text-sm text-[#57534E] leading-relaxed border-t border-stone-100 pt-3 block"
+                          : "hidden"
+                      }
+                    >
+                      {faq.a}
+                    </div>
                   </div>
                 );
               })
