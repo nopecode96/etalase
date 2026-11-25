@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { actionUpdateOrderStatus } from "@/app/admin/actions";
 import { showToast } from "@/components/ui/GlobalToast";
+import { AdminPagination } from "@/components/admin/AdminPagination";
 
 interface AdminOrdersClientProps {
   store: any;
@@ -27,6 +28,8 @@ export function AdminOrdersClient({ store, tier }: AdminOrdersClientProps) {
 
   const [statusFilter, setStatusFilter] = useState<"ALL" | "PENDING" | "PAID" | "COMPLETED">("ALL");
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
 
   const handleUpdateStatus = (orderId: string, status: "PENDING" | "PAID" | "COMPLETED") => {
     startTransition(async () => {
@@ -55,6 +58,13 @@ export function AdminOrdersClient({ store, tier }: AdminOrdersClientProps) {
     if (statusFilter === "ALL") return true;
     return order.status === statusFilter;
   });
+
+  const totalPages = Math.max(1, Math.ceil(filteredOrders.length / pageSize));
+  const safePage = Math.min(currentPage, totalPages);
+  const paginatedOrders = filteredOrders.slice(
+    (safePage - 1) * pageSize,
+    safePage * pageSize
+  );
 
   return (
     <div className="space-y-8 animate-fade-in w-full">
@@ -139,7 +149,7 @@ export function AdminOrdersClient({ store, tier }: AdminOrdersClientProps) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#E7E5E4]">
-                {filteredOrders.map((order) => {
+                {paginatedOrders.map((order) => {
                   const cleanPhone = (order.buyerWhatsapp || "").replace(/[^0-9]/g, "");
                   const waLink = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(
                     `Hello ${order.buyerName}, thank you for your order (${order.orderCode}) at ${store.name}!`
@@ -226,6 +236,12 @@ export function AdminOrdersClient({ store, tier }: AdminOrdersClientProps) {
               </tbody>
             </table>
           </div>
+          <AdminPagination
+            currentPage={safePage}
+            totalItems={filteredOrders.length}
+            pageSize={pageSize}
+            onPageChange={setCurrentPage}
+          />
         </div>
       )}
     </div>

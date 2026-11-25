@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { actionDeleteProduct } from "@/app/admin/actions";
 import { showToast } from "@/components/ui/GlobalToast";
+import { AdminPagination } from "@/components/admin/AdminPagination";
 
 interface AdminProductsClientProps {
   store: any;
@@ -32,6 +33,8 @@ export function AdminProductsClient({ store }: AdminProductsClientProps) {
   const [selectedFilter, setSelectedFilter] = useState<
     "ALL" | "ACTIVE" | "FEATURED" | "DIGITAL" | "PHYSICAL"
   >("ALL");
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
 
   // Handle Delete
   const handleDelete = (productId: string) => {
@@ -65,6 +68,13 @@ export function AdminProductsClient({ store }: AdminProductsClientProps) {
     if (selectedFilter === "PHYSICAL") return p.productType === "PHYSICAL";
     return true;
   });
+
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / pageSize));
+  const safePage = Math.min(currentPage, totalPages);
+  const paginatedProducts = filteredProducts.slice(
+    (safePage - 1) * pageSize,
+    safePage * pageSize
+  );
 
   const currency = store.currency || "IDR";
 
@@ -158,7 +168,7 @@ export function AdminProductsClient({ store }: AdminProductsClientProps) {
       ) : (
         <div className="bg-white rounded-3xl border border-[#E7E5E4] overflow-hidden shadow-xs">
           <div className="divide-y divide-[#E7E5E4]">
-            {filteredProducts.map((product) => {
+            {paginatedProducts.map((product) => {
               const isPromo =
                 Boolean(product.compareAtPrice) &&
                 Number(product.compareAtPrice) > Number(product.price);
@@ -285,6 +295,12 @@ export function AdminProductsClient({ store }: AdminProductsClientProps) {
               );
             })}
           </div>
+          <AdminPagination
+            currentPage={safePage}
+            totalItems={filteredProducts.length}
+            pageSize={pageSize}
+            onPageChange={setCurrentPage}
+          />
         </div>
       )}
     </div>

@@ -61,11 +61,11 @@ export async function requireTenantContext(targetStoreId?: string): Promise<Tena
         },
         orders: {
           orderBy: { createdAt: "desc" },
-          take: 50,
+          take: 200,
         },
         withdrawals: {
           orderBy: { createdAt: "desc" },
-          take: 20,
+          take: 100,
         },
       },
     });
@@ -81,11 +81,11 @@ export async function requireTenantContext(targetStoreId?: string): Promise<Tena
         },
         orders: {
           orderBy: { createdAt: "desc" },
-          take: 50,
+          take: 200,
         },
         withdrawals: {
           orderBy: { createdAt: "desc" },
-          take: 20,
+          take: 100,
         },
       },
     });

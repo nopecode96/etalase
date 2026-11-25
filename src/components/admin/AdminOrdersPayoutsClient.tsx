@@ -24,6 +24,7 @@ import {
   updateStorePayoutBankAction,
 } from "@/lib/actions/payout-actions";
 import { showToast } from "@/components/ui/GlobalToast";
+import { AdminPagination } from "@/components/admin/AdminPagination";
 
 interface AdminOrdersPayoutsClientProps {
   store: any;
@@ -46,6 +47,14 @@ export function AdminOrdersPayoutsClient({
   const [isPending, startTransition] = useTransition();
 
   const [withdrawals, setWithdrawals] = useState<any[]>(store.withdrawals || []);
+  const [withdrawalPage, setWithdrawalPage] = useState(1);
+  const withdrawalPageSize = 10;
+  const withdrawalTotalPages = Math.max(1, Math.ceil(withdrawals.length / withdrawalPageSize));
+  const safeWithdrawalPage = Math.min(withdrawalPage, withdrawalTotalPages);
+  const paginatedWithdrawals = withdrawals.slice(
+    (safeWithdrawalPage - 1) * withdrawalPageSize,
+    safeWithdrawalPage * withdrawalPageSize
+  );
   const [feeBorneBy, setFeeBorneBy] = useState<"CUSTOMER" | "MERCHANT">(
     store.feeBorneBy || "CUSTOMER"
   );
@@ -525,7 +534,8 @@ export function AdminOrdersPayoutsClient({
         {withdrawals.length === 0 ? (
           <p className="text-xs text-[#78716C] py-4">Belum ada riwayat penarikan dana.</p>
         ) : (
-          <div className="overflow-x-auto">
+          <>
+            <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead className="bg-[#FAF8F5] text-[#78716C] font-semibold border-y border-[#E7E5E4]">
                 <tr>
@@ -538,7 +548,7 @@ export function AdminOrdersPayoutsClient({
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#E7E5E4]">
-                {withdrawals.map((w) => (
+                {paginatedWithdrawals.map((w) => (
                   <tr key={w.id}>
                     <td className="py-3 px-4 text-[#78716C]">
                       {new Date(w.createdAt).toLocaleDateString("id-ID", {
@@ -575,6 +585,13 @@ export function AdminOrdersPayoutsClient({
               </tbody>
             </table>
           </div>
+          <AdminPagination
+            currentPage={safeWithdrawalPage}
+            totalItems={withdrawals.length}
+            pageSize={withdrawalPageSize}
+            onPageChange={setWithdrawalPage}
+          />
+        </>
         )}
       </section>
 

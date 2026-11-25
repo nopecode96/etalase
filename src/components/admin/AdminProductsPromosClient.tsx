@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { actionSaveProduct } from "@/app/admin/actions";
 import { showToast } from "@/components/ui/GlobalToast";
+import { AdminPagination } from "@/components/admin/AdminPagination";
 
 interface AdminProductsPromosClientProps {
   store: any;
@@ -25,6 +26,15 @@ interface AdminProductsPromosClientProps {
 export function AdminProductsPromosClient({ store }: AdminProductsPromosClientProps) {
   const [products, setProducts] = useState<any[]>(store.products || []);
   const [isPending, startTransition] = useTransition();
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
+
+  const totalPages = Math.max(1, Math.ceil(products.length / pageSize));
+  const safePage = Math.min(currentPage, totalPages);
+  const paginatedProducts = products.slice(
+    (safePage - 1) * pageSize,
+    safePage * pageSize
+  );
 
   // Active promo items
   const activePromoCount = products.filter(
@@ -190,7 +200,7 @@ export function AdminProductsPromosClient({ store }: AdminProductsPromosClientPr
                   </td>
                 </tr>
               ) : (
-                products.map((product) => {
+                paginatedProducts.map((product) => {
                   const isPromoActive =
                     product.compareAtPrice && Number(product.compareAtPrice) > Number(product.price);
                   const regularPrice = Number(
@@ -276,6 +286,12 @@ export function AdminProductsPromosClient({ store }: AdminProductsPromosClientPr
             </tbody>
           </table>
         </div>
+        <AdminPagination
+          currentPage={safePage}
+          totalItems={products.length}
+          pageSize={pageSize}
+          onPageChange={setCurrentPage}
+        />
       </div>
     </div>
   );
