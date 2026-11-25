@@ -417,7 +417,7 @@ export function AdminUpgradeClient({
                 </div>
                 <div className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Low 2% QRIS Fee (min. 25k)</span>
+                  <span>Low 2% QRIS Fee (min. Rp 3.000)</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -529,7 +529,9 @@ export function AdminUpgradeClient({
               <div className="flex justify-between items-center text-[#57534E]">
                 <span>Selected Package</span>
                 <span className="font-bold text-[#1C1917]">
-                  {selectedPlan === "DFY" ? "Terima Beres (DFY)" : `PRO Plan (${billingCycle})`}
+                  {activeOrder.planCode === "DFY"
+                    ? "Terima Beres (DFY)"
+                    : `PRO Plan (${activeOrder.billingCycle || billingCycle})`}
                 </span>
               </div>
               <div className="flex justify-between items-center text-[#57534E]">
