@@ -529,20 +529,24 @@ export function AdminUpgradeClient({
               <div className="flex justify-between items-center text-[#57534E]">
                 <span>Selected Package</span>
                 <span className="font-bold text-[#1C1917]">
-                  {activeOrder.planCode === "DFY"
+                  {(activeOrder?.planCode || selectedPlan) === "DFY"
                     ? "Terima Beres (DFY)"
-                    : `PRO Plan (${activeOrder.billingCycle || billingCycle})`}
+                    : `PRO Plan (${activeOrder?.billingCycle || billingCycle})`}
                 </span>
               </div>
               <div className="flex justify-between items-center text-[#57534E]">
                 <span>Store</span>
-                <span className="font-medium text-[#1C1917]">{store.slug}.etalase.online</span>
+                <span className="font-medium text-[#1C1917]">{store?.slug || "toko"}.etalase.online</span>
               </div>
               <div className="flex justify-between items-center pt-3 border-t border-[#E7E5E4]">
                 <span className="text-sm font-bold text-[#1C1917]">Total Amount Due</span>
                 <div className="text-right">
                   <div className="text-xl font-extrabold text-[#D94E28]">
-                    {paymentProvider === "PAYPAL"
+                    {activeOrder
+                      ? activeOrder.currency === "USD"
+                        ? `$${Number(amountUsd || calculateAmountUsd()).toFixed(2)} USD`
+                        : `Rp ${Number(activeOrder.amount).toLocaleString("id-ID")}`
+                      : paymentProvider === "PAYPAL"
                       ? `$${calculateAmountUsd().toFixed(2)} USD`
                       : `Rp ${calculateAmountIdr().toLocaleString("id-ID")}`}
                   </div>
