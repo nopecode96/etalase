@@ -19,65 +19,39 @@ export const authConfig: NextAuthConfig = {
       allowDangerousEmailAccountLinking: true,
     }),
 
-    // 2. Demo Merchant Credentials for Testing & Sandbox Fallback
-    Credentials({
-      id: "tenant-demo",
-      name: "Tenant Demo Merchant",
-      credentials: {
-        email: { label: "Email", type: "email" },
-        name: { label: "Name", type: "text" },
-      },
-      async authorize(credentials) {
-        if (isProduction && process.env.ALLOW_DEMO_LOGIN !== "true") {
-          return null;
-        }
-        const email = String(credentials?.email || "demo.merchant@etalase.online").trim().toLowerCase();
-        let user = await prisma.user.findUnique({ where: { email } });
-        if (!user) {
-          user = await prisma.user.create({
-            data: {
-              email,
-              name: String(credentials?.name || "Demo Merchant"),
-              role: "USER",
-              image: "/favicon.svg",
+    // 2. Demo Merchant Credentials ONLY in non-production / explicit sandbox
+    ...(!isProduction || process.env.ALLOW_DEMO_LOGIN === "true"
+      ? [
+          Credentials({
+            id: "tenant-demo",
+            name: "Tenant Demo Merchant",
+            credentials: {
+              email: { label: "Email", type: "email" },
+              name: { label: "Name", type: "text" },
             },
-          });
-        }
-        return user;
-      },
-    }),
-
-    // 3. Internal Monitoring Credentials for Mabes (mabes.etalase.online) - Email & Password ONLY
-    Credentials({
-      id: "mabes-credentials",
-      name: "Mabes Super Admin",
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
-      },
-      async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          return null;
-        }
-
-        const email = String(credentials.email).trim().toLowerCase();
-        const password = String(credentials.password);
-
-        const isMatchEmail = email === env.MABES_ADMIN_EMAIL.toLowerCase();
-        const isMatchPass = password === env.MABES_ADMIN_PASSWORD;
-
-        if (isMatchEmail && isMatchPass) {
-          return {
-            id: "mabes-admin-root",
-            name: "Super Admin Mabes",
-            email: env.MABES_ADMIN_EMAIL,
-            role: "SUPER_ADMIN",
-          };
-        }
-
-        return null;
-      },
-    }),
+            async authorize(credentials) {
+              if (isProduction && process.env.ALLOW_DEMO_LOGIN !== "true") {
+                return null;
+              }
+              const email = String(credentials?.email || "demo.merchant@etalase.online")
+                .trim()
+                .toLowerCase();
+              let user = await prisma.user.findUnique({ where: { email } });
+              if (!user) {
+                user = await prisma.user.create({
+                  data: {
+                    email,
+                    name: String(credentials?.name || "Demo Merchant"),
+                    role: "USER",
+                    image: "/favicon.svg",
+                  },
+                });
+              }
+              return user;
+            },
+          }),
+        ]
+      : []),
   ],
   session: {
     strategy: "jwt",

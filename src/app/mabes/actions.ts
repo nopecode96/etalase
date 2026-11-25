@@ -1,7 +1,7 @@
 "use server";
 
 import bcrypt from "bcryptjs";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { prisma, serializePlain } from "@/lib/db/prisma";
@@ -22,19 +22,47 @@ import {
 import { ServiceResult, ok, fail } from "@/lib/core/response";
 import { emitN8nEvent } from "@/lib/n8n/dispatcher";
 
+const mabesLoginAttempts = new Map<string, { count: number; resetAt: number }>();
+
 /**
- * Mabes Email & Password Login Action
+ * Mabes Email & Password Login Action (with rate limiting & optional IP allowlist)
  */
 export async function actionMabesLogin(formData: {
   email: string;
   password: string;
 }): Promise<ServiceResult<{ redirectUrl: string }>> {
   try {
+    const reqHeaders = headers();
+    const clientIp =
+      reqHeaders.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      reqHeaders.get("x-real-ip") ||
+      "unknown";
+
+    // Optional IP allowlist when MABES_ALLOWED_IPS is configured
+    const allowedIpsRaw = process.env.MABES_ALLOWED_IPS?.trim();
+    if (allowedIpsRaw) {
+      const allowedIps = allowedIpsRaw.split(",").map((ip) => ip.trim()).filter(Boolean);
+      if (allowedIps.length > 0 && !allowedIps.includes(clientIp)) {
+        return fail("FORBIDDEN", "Access denied from this IP address.");
+      }
+    }
+
     const { email, password } = formData;
     const cleanEmail = email?.trim().toLowerCase();
 
     if (!cleanEmail || !password) {
       return fail("INVALID_INPUT", "Email and password are required.");
+    }
+
+    // Rate limit: max 5 failed attempts per 15 minutes per IP+email
+    const rateKey = `${clientIp}:${cleanEmail}`;
+    const now = Date.now();
+    const existingLimit = mabesLoginAttempts.get(rateKey);
+    if (existingLimit && now < existingLimit.resetAt && existingLimit.count >= 5) {
+      return fail(
+        "FORBIDDEN",
+        "Too many failed login attempts. Please wait 15 minutes before trying again."
+      );
     }
 
     const user = await prisma.user.findUnique({
@@ -58,8 +86,15 @@ export async function actionMabesLogin(formData: {
 
     const isMatch = await bcrypt.compare(password, user.passwordHash);
     if (!isMatch) {
+      const entry = mabesLoginAttempts.get(rateKey);
+      if (!entry || now >= entry.resetAt) {
+        mabesLoginAttempts.set(rateKey, { count: 1, resetAt: now + 15 * 60 * 1000 });
+      } else {
+        entry.count += 1;
+      }
       return fail("UNAUTHORIZED", "Invalid email or password.");
     }
+    mabesLoginAttempts.delete(rateKey);
 
     // Generate secure token
     const token = createMabesToken({

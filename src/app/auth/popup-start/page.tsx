@@ -19,15 +19,10 @@ export default function PopupStartPage({ searchParams }: PopupStartPageProps) {
       !env.AUTH_GOOGLE_SECRET.startsWith("AQ.") // Gemini key check
   );
 
-  const allowDemoLogin =
-    process.env.NODE_ENV !== "production" ||
-    process.env.ALLOW_DEMO_LOGIN === "true";
-
   return (
     <PopupStartClient
       callbackUrl={callbackUrl}
       isGoogleConfigured={isGoogleConfigured}
-      allowDemoLogin={allowDemoLogin}
     />
   );
 }
