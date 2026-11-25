@@ -300,7 +300,7 @@ export function AdminAnalyticsClient({ store, tier }: AdminAnalyticsClientProps)
             <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#E7E5E4] space-y-2">
               <div className="flex items-center justify-between gap-2">
                 <label className="block text-xs font-bold text-[#1C1917]">
-                  Meta Conversions API (CAPI) Access Token (Opsional — Server-Side)
+                  Meta Conversions API (CAPI) Access Token (Optional — Server-Side)
                 </label>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
                   Anti-AdBlock
@@ -314,7 +314,7 @@ export function AdminAnalyticsClient({ store, tier }: AdminAnalyticsClientProps)
                 className="w-full px-3.5 py-2 text-xs rounded-xl border border-[#E7E5E4] bg-white font-mono"
               />
               <p className="text-[10px] text-[#78716C]">
-                Isi token dari Meta Events Manager &gt; Settings &gt; Generate access token agar event <strong>Purchase</strong> otomatis terkirim langsung dari server saat pembayaran QRIS/PayPal lunas.
+                Paste your token from Meta Events Manager &gt; Settings &gt; Generate access token so <strong>Purchase</strong> events are automatically sent server-side when QRIS/PayPal payments settle.
               </p>
             </div>
 

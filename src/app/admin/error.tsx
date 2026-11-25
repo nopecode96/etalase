@@ -33,10 +33,10 @@ export default function AdminError({
           <AlertTriangle className="w-6 h-6" />
         </div>
         <h2 className="text-lg font-bold text-[#1C1917]">
-          Halaman Perlu Dimuat Ulang
+          Page Needs Reload
         </h2>
         <p className="text-xs text-[#57534E] leading-relaxed">
-          Terjadi pembaruan sistem atau kendala pemuatan skrip di browser. Silakan muat ulang halaman untuk melanjutkan.
+          A system update or browser script loading issue occurred. Please reload the page to continue.
         </p>
         {error?.message && (
           <p className="text-[11px] font-mono bg-stone-50 border border-stone-200 rounded-xl p-2.5 text-stone-600 break-words">
@@ -50,14 +50,14 @@ export default function AdminError({
             className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#D94E28] hover:bg-[#B83E1D] text-white text-xs font-bold transition cursor-pointer"
           >
             <RefreshCw className="w-3.5 h-3.5" />
-            <span>Muat Ulang Halaman</span>
+            <span>Reload Page</span>
           </button>
           <button
             type="button"
             onClick={() => reset()}
             className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-[#E7E5E4] bg-white hover:bg-stone-50 text-[#1C1917] text-xs font-semibold transition cursor-pointer"
           >
-            Coba Lagi
+            Try Again
           </button>
         </div>
       </div>

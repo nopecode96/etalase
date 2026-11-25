@@ -570,7 +570,7 @@ export function ProductFormClient({
                 <div className="p-4 bg-amber-50/50 border border-amber-200 rounded-2xl space-y-2.5">
                   <div className="flex items-center justify-between gap-2">
                     <label className="block text-xs font-bold text-amber-950">
-                      File Produk Digital / Link Download (Dikirim Otomatis Setelah Bayar)
+                      Digital Product File / Download Link (Auto-Sent After Payment)
                     </label>
                     <label className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white border border-amber-300 text-[11px] font-bold text-amber-900 hover:bg-amber-100/60 cursor-pointer transition shrink-0">
                       {isUploadingDigital ? (
@@ -598,12 +598,12 @@ export function ProductFormClient({
                             const json = await resp.json();
                             if (resp.ok && json.url) {
                               setDigitalFileUrl(json.url);
-                              showToast("File digital berhasil diunggah!", "success");
+                              showToast("Digital file uploaded successfully!", "success");
                             } else {
-                              showToast(json.error || "Gagal mengunggah file", "error");
+                              showToast(json.error || "Failed to upload file", "error");
                             }
                           } catch {
-                            showToast("Terjadi kesalahan saat mengunggah file", "error");
+                            showToast("An error occurred while uploading the file", "error");
                           } finally {
                             setIsUploadingDigital(false);
                           }
@@ -615,11 +615,11 @@ export function ProductFormClient({
                     type="text"
                     value={digitalFileUrl}
                     onChange={(e) => setDigitalFileUrl(e.target.value)}
-                    placeholder="https://drive.google.com/... atau upload file di kanan"
+                    placeholder="https://drive.google.com/... or upload a file on the right"
                     className="w-full px-3.5 py-2 text-xs rounded-xl border border-amber-300 bg-white font-mono text-[#1C1917] outline-none"
                   />
                   <p className="text-[11px] text-amber-800">
-                    Pembeli akan langsung menerima akses file/tautan ini setelah transaksi QRIS atau PayPal berstatus lunas.
+                    Buyers will automatically receive access to this file or link once their QRIS or PayPal payment is settled.
                   </p>
                 </div>
               )}

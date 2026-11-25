@@ -138,10 +138,10 @@ export function AdminStorefrontBlocksClient({ store }: AdminStorefrontBlocksClie
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#E7E5E4]">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-[#1C1917]">
-            Content Blocks (Banner &amp; Link Promo)
+            Content Blocks (Banners &amp; Promo Links)
           </h1>
           <p className="text-xs sm:text-sm text-[#57534E] mt-1">
-            Tambahkan banner promo, tombol tautan (grup WA/sosmed), atau pengumuman toko di etalase Anda.
+            Add promo banners, custom action links (WhatsApp groups, Maps, socials), or store announcements to your storefront.
           </p>
         </div>
 
@@ -160,27 +160,27 @@ export function AdminStorefrontBlocksClient({ store }: AdminStorefrontBlocksClie
         <div className="lg:col-span-7 space-y-3">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#FDF0EC] text-[#D94E28] text-[11px] font-bold">
             <Layers className="w-3.5 h-3.5" />
-            <span>Panduan Singkat: Apa Fungsi Content Blocks?</span>
+            <span>Quick Guide: What Are Content Blocks?</span>
           </div>
           <h2 className="text-base font-bold text-[#1C1917]">
-            Etalase Lebih Menarik dengan Banner Promo, Tombol Link &amp; Info Toko
+            Boost Conversions with Promo Banners, Action Links &amp; Store Announcements
           </h2>
           <p className="text-xs text-[#57534E] leading-relaxed">
-            Berbeda dengan menu <strong>Products</strong> (khusus barang/jasa yang dibeli),{" "}
-            <strong>Content Blocks</strong> dipakai untuk menampilkan informasi tambahan di halaman toko Anda — misalnya:
+            Unlike the <strong>Products</strong> menu (which lists items customers purchase),{" "}
+            <strong>Content Blocks</strong> let you display extra sections on your storefront — such as:
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1 text-[11px]">
             <div className="p-2.5 rounded-xl bg-[#FAF8F5] border border-[#E7E5E4]">
-              <div className="font-bold text-[#1C1917]">1. Banner Poster</div>
-              <div className="text-[#78716C] mt-0.5">Upload poster Canva promo diskon atau event.</div>
+              <div className="font-bold text-[#1C1917]">1. Image Banner</div>
+              <div className="text-[#78716C] mt-0.5">Upload Canva discount posters or event flyers.</div>
             </div>
             <div className="p-2.5 rounded-xl bg-[#FAF8F5] border border-[#E7E5E4]">
-              <div className="font-bold text-[#1C1917]">2. Tombol Link</div>
-              <div className="text-[#78716C] mt-0.5">Arahkan ke Grup WA, portofolio, atau Google Maps.</div>
+              <div className="font-bold text-[#1C1917]">2. Action Link</div>
+              <div className="text-[#78716C] mt-0.5">Link to your WhatsApp group, portfolio, or Google Maps.</div>
             </div>
             <div className="p-2.5 rounded-xl bg-[#FAF8F5] border border-[#E7E5E4]">
-              <div className="font-bold text-[#1C1917]">3. Pengumuman</div>
-              <div className="text-[#78716C] mt-0.5">Tulis jam buka, jadwal kirim, atau testimoni.</div>
+              <div className="font-bold text-[#1C1917]">3. Announcement</div>
+              <div className="text-[#78716C] mt-0.5">Share shipping schedules, opening hours, or testimonials.</div>
             </div>
           </div>
         </div>
@@ -189,19 +189,19 @@ export function AdminStorefrontBlocksClient({ store }: AdminStorefrontBlocksClie
         <div className="lg:col-span-5 flex justify-center">
           <div className="w-full max-w-[240px] rounded-2xl border-2 border-stone-800 bg-[#FAF8F5] p-3 space-y-2 shadow-sm">
             <div className="text-[9px] font-mono text-center text-stone-500 border-b border-stone-200 pb-1">
-              {store?.slug || "toko"}.etalase.online
+              {store?.slug || "store"}.etalase.online
             </div>
             <div className="p-2 rounded-lg bg-white border border-stone-200 text-center">
               <div className="w-6 h-6 rounded-full bg-stone-200 mx-auto mb-1" />
-              <div className="text-[10px] font-bold text-stone-800">Profil &amp; Bio Toko</div>
+              <div className="text-[10px] font-bold text-stone-800">Store Profile &amp; Bio</div>
             </div>
             <div className="p-2 rounded-lg bg-white border border-stone-200">
-              <div className="text-[10px] font-semibold text-stone-700">Katalog Produk Anda</div>
-              <div className="text-[9px] text-stone-400">Item yang dibeli / di-order</div>
+              <div className="text-[10px] font-semibold text-stone-700">Product Catalog</div>
+              <div className="text-[9px] text-stone-400">Items customers can buy</div>
             </div>
             <div className="p-2.5 rounded-lg bg-[#FDF0EC] border-2 border-[#D94E28] text-center">
-              <div className="text-[10px] font-bold text-[#D94E28]">★ Content Blocks Anda</div>
-              <div className="text-[9px] text-[#57534E]">Banner Promo / Link / Info</div>
+              <div className="text-[10px] font-bold text-[#D94E28]">★ Your Content Blocks</div>
+              <div className="text-[9px] text-[#57534E]">Promo Banners / Links / Info</div>
             </div>
           </div>
         </div>
@@ -213,10 +213,10 @@ export function AdminStorefrontBlocksClient({ store }: AdminStorefrontBlocksClie
           <div className="py-10 text-center bg-white rounded-3xl border-2 border-dashed border-[#E7E5E4] p-6 sm:p-8 shadow-xs space-y-6">
             <div>
               <Layers className="w-10 h-10 text-stone-300 mx-auto mb-2" />
-              <h3 className="text-sm font-bold text-[#1C1917]">Belum Ada Content Block</h3>
+              <h3 className="text-sm font-bold text-[#1C1917]">No Content Blocks Yet</h3>
               <p className="text-xs text-[#78716C] mt-1 max-w-md mx-auto">
-                Pilih salah satu contoh siap pakai di bawah ini untuk langsung mencoba, atau klik{" "}
-                <strong>+ Add New Block</strong> di kanan atas.
+                Pick one of the ready-to-use examples below to get started quickly, or click{" "}
+                <strong>+ Add New Block</strong> at the top right.
               </p>
             </div>
 
@@ -226,8 +226,8 @@ export function AdminStorefrontBlocksClient({ store }: AdminStorefrontBlocksClie
                 onClick={() =>
                   openPresetModal({
                     type: "IMAGE_BANNER",
-                    title: "Promo Spesial Akhir Pekan",
-                    subtitle: "Diskon hingga 30% untuk pembelian hari ini",
+                    title: "Weekend Flash Sale",
+                    subtitle: "Up to 30% off on selected items today",
                     targetUrl: "",
                     badgeText: "PROMO",
                   })
@@ -236,12 +236,12 @@ export function AdminStorefrontBlocksClient({ store }: AdminStorefrontBlocksClie
               >
                 <div className="flex items-center gap-2 text-xs font-bold text-[#1C1917]">
                   <ImageIcon className="w-4 h-4 text-[#D94E28]" />
-                  <span>Contoh: Banner Promo</span>
+                  <span>Example: Promo Banner</span>
                 </div>
                 <p className="text-[11px] text-[#57534E]">
-                  Pasang poster Canva diskon atau flash sale yang bisa diklik pembeli.
+                  Display a clickable Canva discount poster or flash sale graphic.
                 </p>
-                <span className="inline-block text-[10px] font-bold text-[#D94E28]">Gunakan Template →</span>
+                <span className="inline-block text-[10px] font-bold text-[#D94E28]">Use Template →</span>
               </button>
 
               <button
@@ -249,22 +249,22 @@ export function AdminStorefrontBlocksClient({ store }: AdminStorefrontBlocksClie
                 onClick={() =>
                   openPresetModal({
                     type: "LINK_BUTTON",
-                    title: "Gabung Grup WhatsApp VIP",
-                    subtitle: "Dapatkan info update produk & promo eksklusif",
+                    title: "Join Our VIP WhatsApp Group",
+                    subtitle: "Get instant stock updates & exclusive member promos",
                     targetUrl: "https://chat.whatsapp.com/",
-                    badgeText: "KOMUNITAS",
+                    badgeText: "COMMUNITY",
                   })
                 }
                 className="p-4 rounded-2xl border border-[#E7E5E4] hover:border-[#D94E28] bg-[#FAF8F5] hover:bg-[#FDF0EC]/40 transition text-left space-y-1.5 cursor-pointer"
               >
                 <div className="flex items-center gap-2 text-xs font-bold text-[#1C1917]">
                   <LinkIcon className="w-4 h-4 text-[#D94E28]" />
-                  <span>Contoh: Tombol Link</span>
+                  <span>Example: Action Link</span>
                 </div>
                 <p className="text-[11px] text-[#57534E]">
-                  Arahkan pengunjung ke Grup WA, portofolio, atau lokasi Google Maps.
+                  Direct visitors to your WhatsApp group, portfolio, or Google Maps.
                 </p>
-                <span className="inline-block text-[10px] font-bold text-[#D94E28]">Gunakan Template →</span>
+                <span className="inline-block text-[10px] font-bold text-[#D94E28]">Use Template →</span>
               </button>
 
               <button
@@ -272,22 +272,22 @@ export function AdminStorefrontBlocksClient({ store }: AdminStorefrontBlocksClie
                 onClick={() =>
                   openPresetModal({
                     type: "TEXT_QUOTE",
-                    title: "Info Pengiriman & Jam Operasional",
-                    subtitle: "Order sebelum jam 15.00 WIB dikirim di hari yang sama. Garansi produk 100%.",
+                    title: "Shipping Schedule & Store Hours",
+                    subtitle: "Orders before 3:00 PM ship the same day. 100% product guarantee.",
                     targetUrl: "",
-                    badgeText: "INFO TOKO",
+                    badgeText: "STORE INFO",
                   })
                 }
                 className="p-4 rounded-2xl border border-[#E7E5E4] hover:border-[#D94E28] bg-[#FAF8F5] hover:bg-[#FDF0EC]/40 transition text-left space-y-1.5 cursor-pointer"
               >
                 <div className="flex items-center gap-2 text-xs font-bold text-[#1C1917]">
                   <Quote className="w-4 h-4 text-[#D94E28]" />
-                  <span>Contoh: Pengumuman</span>
+                  <span>Example: Announcement</span>
                 </div>
                 <p className="text-[11px] text-[#57534E]">
-                  Tampilkan jadwal pengiriman, jam buka toko, atau kutipan testimoni.
+                  Highlight shipping cutoffs, store hours, or a customer testimonial.
                 </p>
-                <span className="inline-block text-[10px] font-bold text-[#D94E28]">Gunakan Template →</span>
+                <span className="inline-block text-[10px] font-bold text-[#D94E28]">Use Template →</span>
               </button>
             </div>
           </div>
