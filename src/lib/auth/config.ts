@@ -28,6 +28,9 @@ export const authConfig: NextAuthConfig = {
         name: { label: "Name", type: "text" },
       },
       async authorize(credentials) {
+        if (isProduction && process.env.ALLOW_DEMO_LOGIN !== "true") {
+          return null;
+        }
         const email = String(credentials?.email || "demo.merchant@etalase.online").trim().toLowerCase();
         let user = await prisma.user.findUnique({ where: { email } });
         if (!user) {

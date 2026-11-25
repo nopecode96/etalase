@@ -35,6 +35,10 @@ export default async function UpgradePage({ searchParams }: UpgradePageProps) {
     orderBy: { createdAt: "desc" },
   });
 
+  const allowSandbox =
+    process.env.NODE_ENV !== "production" ||
+    process.env.ALLOW_PAYMENT_SANDBOX === "true";
+
   return (
     <AdminUpgradeClient
       store={store}
@@ -47,6 +51,7 @@ export default async function UpgradePage({ searchParams }: UpgradePageProps) {
       paypalStatus={searchParams?.status}
       paypalToken={searchParams?.token}
       paypalOrderNumber={searchParams?.orderNumber}
+      allowSandbox={allowSandbox}
     />
   );
 }

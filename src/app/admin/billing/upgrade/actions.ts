@@ -264,6 +264,16 @@ export async function actionSimulateBorderpaySuccess(
   orderId: string
 ): Promise<ServiceResult<any>> {
   try {
+    if (
+      process.env.NODE_ENV === "production" &&
+      process.env.ALLOW_PAYMENT_SANDBOX !== "true"
+    ) {
+      return fail(
+        "FORBIDDEN",
+        "Sandbox payment simulation is disabled in production."
+      );
+    }
+
     const ctx = await requireTenantContext();
 
     const planOrder = await prisma.planOrder.findFirst({

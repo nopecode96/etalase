@@ -40,11 +40,13 @@ function GoogleIcon() {
 interface PopupStartClientProps {
   callbackUrl: string;
   isGoogleConfigured: boolean;
+  allowDemoLogin?: boolean;
 }
 
 export function PopupStartClient({
   callbackUrl,
   isGoogleConfigured,
+  allowDemoLogin = false,
 }: PopupStartClientProps) {
   const [connecting, setConnecting] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
@@ -139,20 +141,28 @@ export function PopupStartClient({
               </p>
             </div>
 
-            {/* 1-Click Sandbox Test Login Button */}
-            <button
-              type="button"
-              onClick={handleDemoLogin}
-              disabled={isPendingDemo}
-              className="w-full py-3 px-4 rounded-xl bg-[#D94E28] hover:bg-[#B83E1D] text-white font-bold text-xs shadow-xs flex items-center justify-center gap-2 transition disabled:opacity-60 cursor-pointer"
-            >
-              {isPendingDemo ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Sparkles className="w-4 h-4" />
-              )}
-              <span>Continue with Sandbox Demo (1-Click)</span>
-            </button>
+            {/* 1-Click Sandbox Test Login Button (Dev/Sandbox Only) */}
+            {allowDemoLogin ? (
+              <button
+                type="button"
+                onClick={handleDemoLogin}
+                disabled={isPendingDemo}
+                className="w-full py-3 px-4 rounded-xl bg-[#D94E28] hover:bg-[#B83E1D] text-white font-bold text-xs shadow-xs flex items-center justify-center gap-2 transition disabled:opacity-60 cursor-pointer"
+              >
+                {isPendingDemo ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Sparkles className="w-4 h-4" />
+                )}
+                <span>Continue with Sandbox Demo (1-Click)</span>
+              </button>
+            ) : (
+              <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-800 font-medium">
+                Login Demo dinonaktifkan di produksi. Harap konfigurasi{" "}
+                <code className="font-mono bg-red-100 px-1 py-0.5 rounded">AUTH_GOOGLE_ID</code> &amp;{" "}
+                <code className="font-mono bg-red-100 px-1 py-0.5 rounded">AUTH_GOOGLE_SECRET</code> pada server.
+              </div>
+            )}
 
             {/* Setup Instructions Accordion */}
             <div className="text-left border border-[#E7E5E4] rounded-2xl overflow-hidden bg-[#FAF8F5]">

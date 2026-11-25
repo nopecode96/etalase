@@ -41,6 +41,7 @@ interface AdminUpgradeClientProps {
   paypalStatus?: string;
   paypalToken?: string;
   paypalOrderNumber?: string;
+  allowSandbox?: boolean;
 }
 
 export function AdminUpgradeClient({
@@ -54,6 +55,7 @@ export function AdminUpgradeClient({
   paypalStatus,
   paypalToken,
   paypalOrderNumber,
+  allowSandbox = false,
 }: AdminUpgradeClientProps) {
   const router = useRouter();
 
@@ -711,19 +713,21 @@ export function AdminUpgradeClient({
                     </a>
                   )}
 
-                  <button
-                    type="button"
-                    onClick={handleSimulateSandbox}
-                    disabled={isPendingAction}
-                    className="w-full py-2.5 px-4 rounded-xl border border-dashed border-emerald-300 bg-emerald-50/60 hover:bg-emerald-100/60 text-emerald-800 text-[11px] font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer"
-                  >
-                    {isPendingAction ? (
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    ) : (
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                    )}
-                    <span>Simulate Instant Settlement (Sandbox Demo)</span>
-                  </button>
+                  {allowSandbox && (
+                    <button
+                      type="button"
+                      onClick={handleSimulateSandbox}
+                      disabled={isPendingAction}
+                      className="w-full py-2.5 px-4 rounded-xl border border-dashed border-emerald-300 bg-emerald-50/60 hover:bg-emerald-100/60 text-emerald-800 text-[11px] font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer"
+                    >
+                      {isPendingAction ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                      )}
+                      <span>Simulate Instant Settlement (Sandbox Demo)</span>
+                    </button>
+                  )}
 
                   <button
                     type="button"
