@@ -257,6 +257,7 @@ export function AdminOverviewClient({
                         {new Date(order.createdAt).toLocaleDateString("en-US", {
                           month: "short",
                           day: "numeric",
+                          timeZone: "Asia/Jakarta",
                         })}
                       </p>
                     </div>

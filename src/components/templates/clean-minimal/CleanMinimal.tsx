@@ -178,18 +178,20 @@ export const CleanMinimal: React.FC<StoreTemplateProps> = ({
           </div>
         )}
 
-        {/* BLOK 3: Clickable Image Banner / Canva Poster */}
-        <div>
-          <a
-            href={isMockup ? "#" : `https://wa.me/${store.chatHandle || "6281234567890"}?text=Halo%20Rafa,%20saya%20mau%20klaim%20bonus%20video`}
-            className={styles.posterBanner}
-          >
-            <img
-              src="/images/demo/banner-poster-creator.jpg"
-              alt="Promo Spesial Canva Poster"
-            />
-          </a>
-        </div>
+        {/* BLOK 3: Clickable Image Banner / Canva Poster (Demo & Mockup Only) */}
+        {(isMockup || store.slug === "demo") && (
+          <div>
+            <a
+              href={isMockup ? "#" : `https://wa.me/${store.chatHandle || "6281234567890"}?text=Halo%20Rafa,%20saya%20mau%20klaim%20bonus%20video`}
+              className={styles.posterBanner}
+            >
+              <img
+                src="/images/demo/banner-poster-creator.jpg"
+                alt="Promo Spesial Canva Poster"
+              />
+            </a>
+          </div>
+        )}
 
         {/* BLOK 4: Visual Grid 2 Kolom */}
         {gridProducts.length > 0 && (

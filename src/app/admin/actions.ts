@@ -278,6 +278,7 @@ export async function actionSaveProduct(input: {
   checkoutMode: "DIRECT_CHECKOUT" | "CHAT_ORDER" | "EXTERNAL_LINK";
   externalPlatform?: string | null;
   externalUrl?: string | null;
+  digitalFileUrl?: string | null;
   chatMessage?: string | null;
   isFeatured?: boolean;
   isActive?: boolean;
@@ -348,6 +349,7 @@ export async function actionSaveProduct(input: {
           checkoutMode: input.checkoutMode,
           externalPlatform: (input.externalPlatform as any) || null,
           externalUrl: input.externalUrl || null,
+          digitalFileUrl: input.digitalFileUrl || null,
           chatMessage: input.chatMessage || null,
           isFeatured: input.isFeatured ?? false,
           isActive: input.isActive ?? true,
@@ -368,6 +370,7 @@ export async function actionSaveProduct(input: {
           checkoutMode: input.checkoutMode,
           externalPlatform: (input.externalPlatform as any) || null,
           externalUrl: input.externalUrl || null,
+          digitalFileUrl: input.digitalFileUrl || null,
           chatMessage: input.chatMessage || null,
           isFeatured: input.isFeatured ?? false,
           isActive: input.isActive ?? true,

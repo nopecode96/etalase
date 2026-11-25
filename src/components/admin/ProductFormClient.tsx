@@ -89,6 +89,10 @@ export function ProductFormClient({
   const [externalUrl, setExternalUrl] = useState(
     initialProduct?.externalUrl || ""
   );
+  const [digitalFileUrl, setDigitalFileUrl] = useState(
+    initialProduct?.digitalFileUrl || ""
+  );
+  const [isUploadingDigital, setIsUploadingDigital] = useState(false);
 
   // Settings & Highlight
   const [isActive, setIsActive] = useState<boolean>(
@@ -148,6 +152,7 @@ export function ProductFormClient({
         checkoutMode,
         externalPlatform: checkoutMode === "EXTERNAL_LINK" ? (externalPlatform as any) : null,
         externalUrl: checkoutMode === "EXTERNAL_LINK" ? externalUrl.trim() : null,
+        digitalFileUrl: digitalFileUrl.trim() || null,
         chatMessage: checkoutMode === "CHAT_ORDER" ? chatMessage.trim() : null,
         isActive,
         isFeatured,
@@ -557,6 +562,65 @@ export function ProductFormClient({
                       />
                     </div>
                   </div>
+                </div>
+              )}
+
+              {/* Digital File / Download Link (for Digital Products & Courses) */}
+              {(productType === "DIGITAL" || productType === "COURSE") && (
+                <div className="p-4 bg-amber-50/50 border border-amber-200 rounded-2xl space-y-2.5">
+                  <div className="flex items-center justify-between gap-2">
+                    <label className="block text-xs font-bold text-amber-950">
+                      File Produk Digital / Link Download (Dikirim Otomatis Setelah Bayar)
+                    </label>
+                    <label className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white border border-amber-300 text-[11px] font-bold text-amber-900 hover:bg-amber-100/60 cursor-pointer transition shrink-0">
+                      {isUploadingDigital ? (
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                      ) : (
+                        <Plus className="w-3 h-3" />
+                      )}
+                      <span>{isUploadingDigital ? "Uploading..." : "Upload File"}</span>
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept=".pdf,.zip,.rar,.mp3,.mp4,.epub,.png,.jpg,.jpeg"
+                        disabled={isUploadingDigital}
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          setIsUploadingDigital(true);
+                          try {
+                            const formData = new FormData();
+                            formData.append("file", file);
+                            const resp = await fetch("/api/upload", {
+                              method: "POST",
+                              body: formData,
+                            });
+                            const json = await resp.json();
+                            if (resp.ok && json.url) {
+                              setDigitalFileUrl(json.url);
+                              showToast("File digital berhasil diunggah!", "success");
+                            } else {
+                              showToast(json.error || "Gagal mengunggah file", "error");
+                            }
+                          } catch {
+                            showToast("Terjadi kesalahan saat mengunggah file", "error");
+                          } finally {
+                            setIsUploadingDigital(false);
+                          }
+                        }}
+                      />
+                    </label>
+                  </div>
+                  <input
+                    type="text"
+                    value={digitalFileUrl}
+                    onChange={(e) => setDigitalFileUrl(e.target.value)}
+                    placeholder="https://drive.google.com/... atau upload file di kanan"
+                    className="w-full px-3.5 py-2 text-xs rounded-xl border border-amber-300 bg-white font-mono text-[#1C1917] outline-none"
+                  />
+                  <p className="text-[11px] text-amber-800">
+                    Pembeli akan langsung menerima akses file/tautan ini setelah transaksi QRIS atau PayPal berstatus lunas.
+                  </p>
                 </div>
               )}
             </div>
