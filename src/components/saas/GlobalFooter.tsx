@@ -33,6 +33,7 @@ export function GlobalFooter() {
       colSales: string;
       colFeatures: string;
       colCompany: string;
+      colLegal: string;
       rights: string;
       statusNormal: string;
       links: {
@@ -52,6 +53,7 @@ export function GlobalFooter() {
         contact: string;
         pricing: string;
         terms: string;
+        refund: string;
         privacy: string;
       };
     }
@@ -62,9 +64,10 @@ export function GlobalFooter() {
       managedBy: "Pengembang & Pengelola",
       trust1: "Pembayaran QRIS Instan",
       trust2: "Kirim File Otomatis ke WA",
-      colSales: "Jualan",
-      colFeatures: "Fitur & Tools",
-      colCompany: "Perusahaan & Bantuan",
+      colSales: "Solusi Jualan",
+      colFeatures: "Fitur Unggulan",
+      colCompany: "Perusahaan",
+      colLegal: "Bantuan & Legal",
       rights: "Hak Cipta Dilindungi di Seluruh Asia Tenggara.",
       statusNormal: "Semua Sistem Normal",
       links: {
@@ -73,17 +76,18 @@ export function GlobalFooter() {
         catalog: "Katalog Fisik & Showroom",
         affiliate: "Affiliate Keranjang Kuning",
         chatOrder: "Order Direct by Chat (0% Fee)",
-        event: "Event, Tiket & Booking Jadwal",
+        event: "Event, Tiket & Jadwal",
         waDelivery: "Kirim File & Struk ke WhatsApp",
         qris: "QRIS Instan & Margin Guard",
         customDomain: "Custom Domain (namabrand.com)",
         archetypes: "4 Arketipe Template Desain",
-        freeTools: "Free Tools WhatsApp & QR Code",
+        freeTools: "Free Tools WhatsApp & QR",
         blog: "Blog & Panduan Monetisasi",
-        helpCenter: "Pusat Bantuan & Panduan",
+        helpCenter: "Pusat Bantuan",
         contact: "Hubungi Kami & Layanan DFY",
-        pricing: "Biaya & Paket Berlangganan",
-        terms: "Syarat & Ketentuan Layanan",
+        pricing: "Biaya & Paket Langganan",
+        terms: "Syarat & Ketentuan",
+        refund: "Kebijakan Pengembalian & Refund",
         privacy: "Kebijakan Privasi",
       },
     },
@@ -93,9 +97,10 @@ export function GlobalFooter() {
       managedBy: "Developed & Operated by",
       trust1: "Instant QRIS Payments",
       trust2: "Automated WhatsApp Delivery",
-      colSales: "Selling",
-      colFeatures: "Features & Tools",
-      colCompany: "Company & Support",
+      colSales: "Sales Solutions",
+      colFeatures: "Core Features",
+      colCompany: "Company",
+      colLegal: "Support & Legal",
       rights: "All Rights Reserved across Southeast Asia.",
       statusNormal: "All Systems Operational",
       links: {
@@ -103,18 +108,19 @@ export function GlobalFooter() {
         digital: "Digital Products & E-Books",
         catalog: "Physical Catalogs & Showrooms",
         affiliate: "TikTok Yellow Basket Affiliate",
-        chatOrder: "Direct Chat Orders (0% Commission)",
-        event: "Events, Tickets & Schedule Bookings",
-        waDelivery: "Automated Files & Receipts to WhatsApp",
-        qris: "Instant QRIS & Margin Guardrails",
+        chatOrder: "Direct Chat Orders (0% Fee)",
+        event: "Events, Tickets & Bookings",
+        waDelivery: "Automated Files to WhatsApp",
+        qris: "Instant QRIS & Margin Guard",
         customDomain: "Custom Domain (yourbrand.com)",
         archetypes: "4 Design Template Archetypes",
-        freeTools: "Free Tools: WhatsApp & QR Code",
+        freeTools: "Free Tools: WhatsApp & QR",
         blog: "Blog & Monetization Guides",
-        helpCenter: "Help Center & Documentation",
+        helpCenter: "Help Center",
         contact: "Contact Us & DFY Concierge",
         pricing: "Pricing & Plans",
         terms: "Terms & Conditions",
+        refund: "Refund Policy",
         privacy: "Privacy Policy",
       },
     },
@@ -124,90 +130,96 @@ export function GlobalFooter() {
       managedBy: "Dibangun & Dikendalikan oleh",
       trust1: "Pembayaran QRIS Pantas",
       trust2: "Hantar Fail Automatik ke WhatsApp",
-      colSales: "Jualan",
-      colFeatures: "Ciri & Alat",
-      colCompany: "Syarikat & Bantuan",
+      colSales: "Penyelesaian Jualan",
+      colFeatures: "Ciri Utama",
+      colCompany: "Syarikat",
+      colLegal: "Bantuan & Perundangan",
       rights: "Hak Cipta Terpelihara di Seluruh Asia Tenggara.",
-      statusNormal: "Semua Sistem Beroperasi Normal",
+      statusNormal: "Semua Sistem Beroperasi",
       links: {
-        about: "Tentang Kami (Profil Syarikat)",
+        about: "Mengenai Kami (Profil Syarikat)",
         digital: "Produk Digital & E-Buku",
         catalog: "Katalog Fizikal & Bilik Pameran",
-        affiliate: "Afiliasi Beg Kuning TikTok",
-        chatOrder: "Pesanan Terus Chat (0% Komisen)",
-        event: "Acara, Tiket & Tempahan Slot",
+        affiliate: "Affiliate Bakul Kuning",
+        chatOrder: "Pesanan Direct Chat (0% Komisen)",
+        event: "Acara, Tiket & Temujanji",
         waDelivery: "Hantar Fail & Resit ke WhatsApp",
         qris: "QRIS Pantas & Kawalan Margin",
         customDomain: "Domain Tersuai (jenamaanda.com)",
-        archetypes: "4 Arketip Templat Reka Bentuk",
-        freeTools: "Alat Percuma WhatsApp & QR Code",
+        archetypes: "4 Reka Bentuk Templat",
+        freeTools: "Alatan Percuma WhatsApp & QR",
         blog: "Blog & Panduan Pengewangan",
-        helpCenter: "Pusat Bantuan & Panduan",
+        helpCenter: "Pusat Bantuan",
         contact: "Hubungi Kami & Servis DFY",
-        pricing: "Yuran & Pelan Langganan",
-        terms: "Terma & Syarat Perkhidmatan",
+        pricing: "Harga & Pakej Langganan",
+        terms: "Terma & Syarat",
+        refund: "Dasar Bayaran Balik",
         privacy: "Dasar Privasi",
       },
     },
     th: {
       tagline:
-        "เว็บไซต์หน้าร้านเดียวสำหรับทุกยอดขายของคุณในเอเชียตะวันออกเฉียงใต้ ไบโอลิงก์แบบรูปภาพ แคตตาล็อกทันใจ และระบบชำระเงินผ่านแชตโดยไม่มีค่าคอมมิชชัน",
+        "เว็บไซต์หน้าร้านเดียวสำหรับทุกยอดขายของคุณในเอเชียตะวันออกเฉียงใต้ ลิงก์โปรไฟล์ แคตตาล็อกสินค้า และระบบสั่งซื้อผ่านแชทโดยไม่มีค่าคอมมิชชัน",
       managedBy: "พัฒนาและดำเนินการโดย",
       trust1: "ชำระเงิน QRIS รวดเร็ว",
-      trust2: "ส่งไฟล์อัตโนมัติถึง WhatsApp",
-      colSales: "การขาย",
-      colFeatures: "ฟีเจอร์และเครื่องมือ",
-      colCompany: "เกี่ยวกับเราและความช่วยเหลือ",
+      trust2: "ส่งไฟล์อัตโนมัติไปยัง WhatsApp",
+      colSales: "โซลูชันการขาย",
+      colFeatures: "ฟีเจอร์เด่น",
+      colCompany: "บริษัท",
+      colLegal: "ช่วยเหลือ & กฎหมาย",
       rights: "สงวนลิขสิทธิ์ทั่วเอเชียตะวันออกเฉียงใต้",
-      statusNormal: "ระบบทั้งหมดทำงานปกติ",
+      statusNormal: "ระบบทำงานปกติทั้งหมด",
       links: {
         about: "เกี่ยวกับเรา (ข้อมูลบริษัท)",
         digital: "สินค้าดิจิทัลและอีบุ๊ก",
-        catalog: "แคตตาล็อกสินค้าจริงและโชว์รูม",
-        affiliate: "แอฟฟิลิเอตตะกร้าเหลือง TikTok",
-        chatOrder: "สั่งซื้อผ่านแชตโดยตรง (0% คอมมิชชัน)",
-        event: "อีเวนต์ ตั๋ว และการจองเวลา",
-        waDelivery: "ส่งไฟล์และใบเสร็จสู่ WhatsApp อัตโนมัติ",
+        catalog: "แคตตาล็อกสินค้าและโชว์รูม",
+        affiliate: "ระบบนายหน้าตะกร้าเหลือง",
+        chatOrder: "สั่งซื้อผ่านแชท (ค่าธรรมเนียม 0%)",
+        event: "อีเวนต์ ตั๋ว และการจองคิว",
+        waDelivery: "ส่งไฟล์อัตโนมัติไปยัง WhatsApp",
         qris: "ระบบ QRIS และป้องกันกำไร",
-        customDomain: "โดเมนส่วนตัว (yourbrand.com)",
-        archetypes: "4 รูปแบบแม่แบบการออกแบบ",
-        freeTools: "เครื่องมือฟรี WhatsApp & QR Code",
+        customDomain: "โดเมนส่วนตัว (แบรนด์ของคุณ.com)",
+        archetypes: "4 รูปแบบแม่แบบมาตรฐาน",
+        freeTools: "เครื่องมือฟรี: WhatsApp & QR",
         blog: "บล็อกและคู่มือสร้างรายได้",
-        helpCenter: "ศูนย์ช่วยเหลือและคู่มือ",
+        helpCenter: "ศูนย์ช่วยเหลือ",
         contact: "ติดต่อเราและบริการ DFY",
         pricing: "ราคาและแพ็กเกจ",
         terms: "ข้อกำหนดและเงื่อนไข",
+        refund: "นโยบายการคืนเงิน",
         privacy: "นโยบายความเป็นส่วนตัว",
       },
     },
     vi: {
       tagline:
-        "Một website storefront cho tất cả sản phẩm bán của bạn tại Đông Nam Á. Link bio trực quan, danh mục tức thì, và chốt đơn qua chat không mất phí hoa hồng.",
-      managedBy: "Phát triển & Quản lý bởi",
+        "Một website cửa hàng cho tất cả hoạt động kinh doanh tại Đông Nam Á. Bio link trực quan, danh mục tức thì, và chốt đơn qua chat không mất phí hoa hồng.",
+      managedBy: "Phát triển và Vận hành bởi",
       trust1: "Thanh toán QRIS tức thì",
-      trust2: "Gửi file tự động vào WhatsApp",
-      colSales: "Bán hàng",
-      colFeatures: "Tính năng & Công cụ",
-      colCompany: "Doanh nghiệp & Hỗ trợ",
+      trust2: "Tự động gửi tệp qua WhatsApp",
+      colSales: "Giải pháp Bán hàng",
+      colFeatures: "Tính năng Nổi bật",
+      colCompany: "Doanh nghiệp",
+      colLegal: "Hỗ trợ & Pháp lý",
       rights: "Bảo lưu mọi quyền tại khu vực Đông Nam Á.",
-      statusNormal: "Mọi hệ thống hoạt động bình thường",
+      statusNormal: "Hệ thống hoạt động bình thường",
       links: {
-        about: "Về chúng tôi (Hồ sơ công ty)",
-        digital: "Sản phẩm số & E-Book",
-        catalog: "Danh mục sản phẩm & Showroom",
-        affiliate: "Tiếp thị liên kết Giỏ vàng TikTok",
-        chatOrder: "Đơn hàng Chat Trực tiếp (0% Hoa hồng)",
-        event: "Sự kiện, Vé & Đặt lịch hẹn",
-        waDelivery: "Gửi file & Hóa đơn tự động qua WhatsApp",
+        about: "Về Chúng Tôi (Hồ sơ Doanh nghiệp)",
+        digital: "Sản phẩm Số & E-Book",
+        catalog: "Danh mục Vật lý & Showroom",
+        affiliate: "Tiếp thị Giỏ hàng Vàng",
+        chatOrder: "Đơn hàng Chat Trực tiếp (0% Phí)",
+        event: "Sự kiện, Vé & Đặt lịch",
+        waDelivery: "Gửi tệp & hóa đơn qua WhatsApp",
         qris: "QRIS Tức thì & Bảo toàn Lợi nhuận",
-        customDomain: "Tên miền riêng (yourbrand.com)",
-        archetypes: "4 Mẫu Giao Diện Thiết Kế",
-        freeTools: "Công cụ Miễn phí WhatsApp & QR Code",
-        blog: "Blog & Cẩm nang Kiếm tiền",
-        helpCenter: "Trung tâm Hỗ trợ & Hướng dẫn",
+        customDomain: "Tên miền Riêng (thuonghieu.com)",
+        archetypes: "4 Mẫu Giao diện Thiết kế",
+        freeTools: "Công cụ Miễn phí: WhatsApp & QR",
+        blog: "Blog & Hướng dẫn Kiếm tiền",
+        helpCenter: "Trung tâm Hỗ trợ",
         contact: "Liên hệ & Dịch vụ Trọn gói DFY",
-        pricing: "Bảng giá & Gói dịch vụ",
-        terms: "Điều khoản & Điều kiện dịch vụ",
+        pricing: "Bảng giá & Gói Dịch vụ",
+        terms: "Điều khoản & Điều kiện",
+        refund: "Chính sách Hoàn tiền",
         privacy: "Chính sách Bảo mật",
       },
     },
@@ -216,18 +228,18 @@ export function GlobalFooter() {
   const t = footerTexts[currentLocale] || footerTexts.id;
 
   return (
-    <footer className="mt-auto bg-white border-t border-[#E7E5E4] py-16 px-4 sm:px-6 lg:px-8 text-xs text-[#57534E]">
-      <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
-        {/* Kolom 1 (Brand & Kontak) */}
-        <div className="space-y-4">
-          <Link href={currentLocale === "id" ? "/" : `/${currentLocale}`}>
+    <footer className="bg-white border-t border-[#E7E5E4] pt-14 pb-12 px-4 sm:px-6 lg:px-8 text-sm text-[#57534E]">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-8 mb-12">
+        {/* Kolom 1 (Brand Profile & Kontak) - spans 4 cols */}
+        <div className="lg:col-span-4 space-y-4 pr-0 lg:pr-4">
+          <Link href={currentLocale === "id" ? "/" : `/${currentLocale}`} className="inline-block">
             <EtalaseLogo size="md" withTagline={true} />
           </Link>
-          <p className="text-[#57534E] text-xs leading-relaxed">
+          <p className="text-[#57534E] text-xs leading-relaxed max-w-sm">
             {t.tagline}
           </p>
 
-          <div className="pt-2 space-y-2 text-xs">
+          <div className="pt-1 space-y-2 text-xs">
             <div className="flex items-center gap-2 text-[#57534E]">
               <Building className="w-4 h-4 text-[#D94E28] shrink-0" />
               <span>{t.managedBy}: <strong className="text-[#1C1917]">PT Rafa Kreasindo Teknologi</strong></span>
@@ -269,10 +281,10 @@ export function GlobalFooter() {
           </div>
         </div>
 
-        {/* Kolom 2 (Jualan) */}
-        <div className="space-y-3">
+        {/* Kolom 2 (Solusi Jualan) - spans 2 cols */}
+        <div className="lg:col-span-2 space-y-3">
           <h4 className="font-bold text-[#1C1917] text-xs uppercase tracking-wider">{t.colSales}</h4>
-          <ul className="space-y-2.5">
+          <ul className="space-y-2.5 text-xs">
             <li>
               <Link href={getLocalizedHref("/fitur#digital")} className="hover:text-[#1C1917] transition">
                 {t.links.digital}
@@ -301,17 +313,17 @@ export function GlobalFooter() {
           </ul>
         </div>
 
-        {/* Kolom 3 (Fitur & Tools) */}
-        <div className="space-y-3">
+        {/* Kolom 3 (Fitur & Tools) - spans 2 cols */}
+        <div className="lg:col-span-2 space-y-3">
           <h4 className="font-bold text-[#1C1917] text-xs uppercase tracking-wider">{t.colFeatures}</h4>
-          <ul className="space-y-2.5">
+          <ul className="space-y-2.5 text-xs">
             <li>
-              <Link href={getLocalizedHref("/fitur#chat-order")} className="hover:text-[#1C1917] transition">
+              <Link href={getLocalizedHref("/fitur#whatsapp")} className="hover:text-[#1C1917] transition">
                 {t.links.waDelivery}
               </Link>
             </li>
             <li>
-              <Link href={getLocalizedHref("/fitur#fintech")} className="hover:text-[#1C1917] transition">
+              <Link href={getLocalizedHref("/fitur#qris")} className="hover:text-[#1C1917] transition">
                 {t.links.qris}
               </Link>
             </li>
@@ -333,18 +345,23 @@ export function GlobalFooter() {
           </ul>
         </div>
 
-        {/* Kolom 4 (Perusahaan & Bantuan) */}
-        <div className="space-y-3">
+        {/* Kolom 4 (Perusahaan) - spans 2 cols */}
+        <div className="lg:col-span-2 space-y-3">
           <h4 className="font-bold text-[#1C1917] text-xs uppercase tracking-wider">{t.colCompany}</h4>
-          <ul className="space-y-2.5">
+          <ul className="space-y-2.5 text-xs">
             <li>
               <Link href={getLocalizedHref("/about")} className="hover:text-[#1C1917] transition font-semibold text-[#D94E28]">
                 {t.links.about}
               </Link>
             </li>
             <li>
-              <Link href={getLocalizedHref("/blog")} className="hover:text-[#1C1917] transition font-medium">
+              <Link href={getLocalizedHref("/blog")} className="hover:text-[#1C1917] transition">
                 {t.links.blog}
+              </Link>
+            </li>
+            <li>
+              <Link href={getLocalizedHref("/harga")} className="hover:text-[#1C1917] transition">
+                {t.links.pricing}
               </Link>
             </li>
             <li>
@@ -353,16 +370,11 @@ export function GlobalFooter() {
               </Link>
             </li>
             <li>
-              <Link href={getLocalizedHref("/bantuan")} className="hover:text-[#1C1917] transition">
-                {t.links.helpCenter}
-              </Link>
-            </li>
-            <li>
               <a
                 href="https://t.me/etalaseonline_bot"
                 target="_blank"
                 rel="noreferrer"
-                className="text-sky-600 hover:text-sky-700 transition font-medium inline-flex items-center gap-2"
+                className="text-sky-600 hover:text-sky-700 transition font-medium inline-flex items-center gap-1.5"
                 title="Chat Customer Service: Rani • EtalaseOnline CS"
               >
                 <div className="relative w-4 h-4 rounded-full overflow-hidden border border-sky-300 shrink-0">
@@ -372,13 +384,20 @@ export function GlobalFooter() {
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <span>Rani • EtalaseOnline CS</span>
+                <span>Rani (CS 24/7)</span>
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               </a>
             </li>
+          </ul>
+        </div>
+
+        {/* Kolom 5 (Bantuan & Legal) - spans 2 cols */}
+        <div className="lg:col-span-2 space-y-3">
+          <h4 className="font-bold text-[#1C1917] text-xs uppercase tracking-wider">{t.colLegal}</h4>
+          <ul className="space-y-2.5 text-xs">
             <li>
-              <Link href={getLocalizedHref("/harga")} className="hover:text-[#1C1917] transition">
-                {t.links.pricing}
+              <Link href={getLocalizedHref("/bantuan")} className="hover:text-[#1C1917] transition">
+                {t.links.helpCenter}
               </Link>
             </li>
             <li>
@@ -388,7 +407,7 @@ export function GlobalFooter() {
             </li>
             <li>
               <Link href={getLocalizedHref("/refund")} className="hover:text-[#1C1917] transition">
-                Kebijakan Pengembalian & Refund
+                {t.links.refund}
               </Link>
             </li>
             <li>
@@ -400,7 +419,8 @@ export function GlobalFooter() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto pt-6 border-t border-[#E7E5E4] flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-[#57534E]">
+      {/* Bottom Bar: Copyright, Language, System Status */}
+      <div className="max-w-7xl mx-auto pt-6 border-t border-[#E7E5E4] flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-[#57534E]">
         <div>
           &copy; {currentYear} PT Rafa Kreasindo Teknologi. {t.rights}
         </div>
