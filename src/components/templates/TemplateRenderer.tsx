@@ -46,17 +46,18 @@ export const TemplateRenderer: React.FC<StoreTemplateProps> = ({
   );
 
   return (
-    <div className="w-full min-h-full transition-colors duration-300" style={containerStyle}>
-      <TemplateComponent
-        store={store}
-        products={products}
-        blocks={blocks}
-        isPreview={isPreview}
-        isMockup={isMockup}
-      />
+    <div className="w-full min-h-full overflow-x-hidden transition-colors duration-300" style={containerStyle}>
+      <div className={isMockup ? "w-full" : "w-full max-w-[480px] mx-auto min-h-screen"}>
+        <TemplateComponent
+          store={store}
+          products={products}
+          blocks={blocks}
+          isPreview={isPreview}
+          isMockup={isMockup}
+        />
 
-      {activeBlocks.length > 0 && (
-        <section className="max-w-xl mx-auto px-4 pb-10 space-y-3">
+        {activeBlocks.length > 0 && (
+          <section className="w-full max-w-[28rem] mx-auto px-4 pb-10 space-y-3">
           {activeBlocks.map((block) => {
             const href = isMockup ? "#" : block.targetUrl || undefined;
             if (block.type === "IMAGE_BANNER" && block.imageUrl) {
@@ -148,6 +149,7 @@ export const TemplateRenderer: React.FC<StoreTemplateProps> = ({
           })}
         </section>
       )}
+      </div>
     </div>
   );
 };
