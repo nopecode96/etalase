@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: StorePageProps): Promise<Meta
   const baseAppUrl = process.env.NEXT_PUBLIC_APP_URL || `https://${rootDomain}`;
 
   const toAbsoluteUrl = (url?: string | null) => {
-    if (!url) return `${baseAppUrl}/og-image.png`;
+    if (!url) return `${baseAppUrl}/og-preview.png`;
     if (url.startsWith("http://") || url.startsWith("https://")) return url;
     return `${baseAppUrl}${url.startsWith("/") ? "" : "/"}${url}`;
   };
