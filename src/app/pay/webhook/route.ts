@@ -3,6 +3,7 @@ import { getActiveBorderpayConfig } from "@/lib/config/env";
 import { prisma } from "@/lib/db/prisma";
 import { emitN8nEvent } from "@/lib/n8n/dispatcher";
 import { logger } from "@/lib/core/logger";
+import { sendMetaCapiEvent } from "@/lib/services/tracking-capi";
 
 export const dynamic = "force-dynamic";
 
@@ -131,6 +132,21 @@ export async function POST(req: NextRequest) {
           currency: order.currency,
           locale: order.store.locale,
         });
+
+        // Fire-and-forget: Server-side Meta CAPI Purchase event (PRO / DFY)
+        if (order.store.tier !== "FREE" && order.store.metaPixelId && order.store.metaCapiToken) {
+          await sendMetaCapiEvent({
+            pixelId: order.store.metaPixelId,
+            accessToken: order.store.metaCapiToken,
+            eventName: "Purchase",
+            eventId: order.orderCode,
+            value: Number(order.amount),
+            currency: order.currency || "IDR",
+            phone: order.buyerWhatsapp,
+            contentIds: [order.productId],
+            contentName: order.product.title,
+          });
+        }
       }
     }
 

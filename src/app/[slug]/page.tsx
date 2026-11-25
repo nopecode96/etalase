@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { prisma, serializePlain } from "@/lib/db/prisma";
 import { TemplateRenderer } from "@/components/templates/TemplateRenderer";
+import { StorefrontPixelTracker } from "@/components/tracking/StorefrontPixelTracker";
 
 interface StorePageProps {
   params: {
@@ -207,25 +208,33 @@ export default async function StorefrontPage({ params }: StorePageProps) {
   }));
 
   return (
-    <TemplateRenderer
-      store={{
-        name: serializedStore.name,
-        slug: serializedStore.slug,
-        bio: serializedStore.bio,
-        avatarUrl: serializedStore.avatarUrl,
-        bannerUrl: serializedStore.bannerUrl,
-        locale: serializedStore.locale,
-        currency: serializedStore.currency,
-        chatChannel: serializedStore.chatChannel,
-        chatHandle: serializedStore.chatHandle,
-        chatChannels: serializedStore.chatChannels as any,
-        tier: serializedStore.tier,
-        templateId: serializedStore.templateId,
-        appearanceConfig: serializedStore.appearanceConfig as any,
-        blocks: formattedBlocks,
-      }}
-      products={formattedProducts}
-      blocks={formattedBlocks}
-    />
+    <>
+      <StorefrontPixelTracker
+        tier={serializedStore.tier}
+        metaPixelId={serializedStore.metaPixelId}
+        tiktokPixelId={serializedStore.tiktokPixelId}
+        gaMeasurementId={serializedStore.gaMeasurementId}
+      />
+      <TemplateRenderer
+        store={{
+          name: serializedStore.name,
+          slug: serializedStore.slug,
+          bio: serializedStore.bio,
+          avatarUrl: serializedStore.avatarUrl,
+          bannerUrl: serializedStore.bannerUrl,
+          locale: serializedStore.locale,
+          currency: serializedStore.currency,
+          chatChannel: serializedStore.chatChannel,
+          chatHandle: serializedStore.chatHandle,
+          chatChannels: serializedStore.chatChannels as any,
+          tier: serializedStore.tier,
+          templateId: serializedStore.templateId,
+          appearanceConfig: serializedStore.appearanceConfig as any,
+          blocks: formattedBlocks,
+        }}
+        products={formattedProducts}
+        blocks={formattedBlocks}
+      />
+    </>
   );
 }

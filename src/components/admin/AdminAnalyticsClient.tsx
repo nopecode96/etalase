@@ -30,6 +30,7 @@ export function AdminAnalyticsClient({ store, tier }: AdminAnalyticsClientProps)
 
   // Marketing Pixels State
   const [metaPixelId, setMetaPixelId] = useState(store.metaPixelId || "");
+  const [metaCapiToken, setMetaCapiToken] = useState(store.metaCapiToken || "");
   const [tiktokPixelId, setTiktokPixelId] = useState(store.tiktokPixelId || "");
   const [gaMeasurementId, setGaMeasurementId] = useState(store.gaMeasurementId || "");
 
@@ -53,6 +54,7 @@ export function AdminAnalyticsClient({ store, tier }: AdminAnalyticsClientProps)
       const res = await actionUpdatePixels({
         storeId: store.id,
         metaPixelId,
+        metaCapiToken,
         tiktokPixelId,
         gaMeasurementId,
       });
@@ -292,6 +294,28 @@ export function AdminAnalyticsClient({ store, tier }: AdminAnalyticsClientProps)
                   Measurement ID starting with G-.
                 </p>
               </div>
+            </div>
+
+            {/* Meta Conversions API (CAPI) Server-Side Token */}
+            <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#E7E5E4] space-y-2">
+              <div className="flex items-center justify-between gap-2">
+                <label className="block text-xs font-bold text-[#1C1917]">
+                  Meta Conversions API (CAPI) Access Token (Opsional — Server-Side)
+                </label>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                  Anti-AdBlock
+                </span>
+              </div>
+              <input
+                type="password"
+                value={metaCapiToken}
+                onChange={(e) => setMetaCapiToken(e.target.value)}
+                placeholder="EAA..."
+                className="w-full px-3.5 py-2 text-xs rounded-xl border border-[#E7E5E4] bg-white font-mono"
+              />
+              <p className="text-[10px] text-[#78716C]">
+                Isi token dari Meta Events Manager &gt; Settings &gt; Generate access token agar event <strong>Purchase</strong> otomatis terkirim langsung dari server saat pembayaran QRIS/PayPal lunas.
+              </p>
             </div>
 
             <div className="flex justify-end pt-2">

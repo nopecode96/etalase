@@ -563,6 +563,7 @@ export async function actionRequestWithdrawal(input: {
 export async function actionUpdatePixels(input: {
   storeId?: string;
   metaPixelId?: string;
+  metaCapiToken?: string;
   tiktokPixelId?: string;
   gaMeasurementId?: string;
 }): Promise<ActionResult> {
@@ -582,6 +583,7 @@ export async function actionUpdatePixels(input: {
       where: { id: verifiedStoreId },
       data: {
         metaPixelId: input.metaPixelId?.trim() || null,
+        metaCapiToken: input.metaCapiToken?.trim() || null,
         tiktokPixelId: input.tiktokPixelId?.trim() || null,
         gaMeasurementId: input.gaMeasurementId?.trim() || null,
       },

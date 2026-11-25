@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma, serializePlain } from "@/lib/db/prisma";
 import { CheckoutClient } from "./CheckoutClient";
+import { StorefrontPixelTracker } from "@/components/tracking/StorefrontPixelTracker";
 
 interface CheckoutPageProps {
   params: {
@@ -55,26 +56,41 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
   const serializedProduct = serializePlain(product);
 
   return (
-    <CheckoutClient
-      store={{
-        slug: serializedStore.slug,
-        name: serializedStore.name,
-        currency: serializedStore.currency,
-        locale: serializedStore.locale,
-        tier: serializedStore.tier,
-        feeBorneBy: serializedStore.feeBorneBy || "CUSTOMER",
-        chatHandle: serializedStore.chatHandle,
-      }}
-      product={{
-        id: serializedProduct.id,
-        slug: serializedProduct.slug,
-        title: serializedProduct.title,
-        description: serializedProduct.description,
-        price: Number(serializedProduct.price),
-        compareAtPrice: serializedProduct.compareAtPrice ? Number(serializedProduct.compareAtPrice) : null,
-        images: serializedProduct.images,
-        productType: serializedProduct.productType,
-      }}
-    />
+    <>
+      <StorefrontPixelTracker
+        tier={serializedStore.tier}
+        metaPixelId={serializedStore.metaPixelId}
+        tiktokPixelId={serializedStore.tiktokPixelId}
+        gaMeasurementId={serializedStore.gaMeasurementId}
+        event={{
+          name: "InitiateCheckout",
+          value: Number(serializedProduct.price),
+          currency: serializedStore.currency || "IDR",
+          contentId: serializedProduct.id,
+          contentName: serializedProduct.title,
+        }}
+      />
+      <CheckoutClient
+        store={{
+          slug: serializedStore.slug,
+          name: serializedStore.name,
+          currency: serializedStore.currency,
+          locale: serializedStore.locale,
+          tier: serializedStore.tier,
+          feeBorneBy: serializedStore.feeBorneBy || "CUSTOMER",
+          chatHandle: serializedStore.chatHandle,
+        }}
+        product={{
+          id: serializedProduct.id,
+          slug: serializedProduct.slug,
+          title: serializedProduct.title,
+          description: serializedProduct.description,
+          price: Number(serializedProduct.price),
+          compareAtPrice: serializedProduct.compareAtPrice ? Number(serializedProduct.compareAtPrice) : null,
+          images: serializedProduct.images,
+          productType: serializedProduct.productType,
+        }}
+      />
+    </>
   );
 }
