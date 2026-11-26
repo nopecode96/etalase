@@ -238,8 +238,7 @@ export function ToolsClient({ locale }: { locale: SupportedLocale }) {
     setGeneratedLink(url);
   };
 
-  // Tool 2: Fee Savings Calculator (transparent with minimum QRIS fee)
-  const minQrisFee = locale === "id" ? 3000 : 0;
+  // Tool 2: Fee Savings Calculator (aligned with PAYMENT_RULES.PRO: flat 2% QRIS, min Rp 25.000 tx)
   const defaultTicket =
     locale === "id" ? 150000 : Math.max(1, Math.round(t.defaultGmv / 50));
   const [monthlyGmv, setMonthlyGmv] = useState(t.defaultGmv);
@@ -247,9 +246,9 @@ export function ToolsClient({ locale }: { locale: SupportedLocale }) {
 
   const txCount = Math.max(1, Math.round(monthlyGmv / Math.max(1, avgTicket)));
   const marketplaceFee = monthlyGmv * 0.1; // 10%
-  const qrisFeePerTx = Math.max(minQrisFee, avgTicket * 0.02); // PRO 2% min Rp 3.000
+  const qrisFeePerTx = Math.ceil(avgTicket * 0.02); // PRO flat 2%
   const etalaseQrisFee = txCount * qrisFeePerTx;
-  const isSmallTicketWarning = locale === "id" && avgTicket < 60000;
+  const isSmallTicketWarning = locale === "id" && avgTicket < 25000;
   const estimatedSavingsQris = Math.max(0, marketplaceFee - etalaseQrisFee);
   const estimatedSavingsChat = marketplaceFee; // 0% platform commission via WhatsApp Chat Order
 
@@ -261,8 +260,8 @@ export function ToolsClient({ locale }: { locale: SupportedLocale }) {
     <div className="min-h-screen bg-[#FAF8F5] text-[#1C1917] flex flex-col">
       <GlobalHeader />
 
-      <main className="py-16 px-4 sm:px-6 lg:px-8 flex-1">
-        <div className="max-w-4xl mx-auto space-y-12">
+      <main className="py-16 px-4 sm:px-6 flex-1">
+        <div className="max-w-6xl mx-auto space-y-12 w-full">
           {/* Header */}
           <ScrollReveal direction="up" delay={50}>
             <div className="text-center space-y-4">
@@ -420,11 +419,9 @@ export function ToolsClient({ locale }: { locale: SupportedLocale }) {
 
                 {isSmallTicketWarning && (
                   <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900 leading-relaxed">
-                    <strong>Catatan Transparan (Produk &lt; Rp 60.000):</strong> Pembayaran QRIS memiliki fee minimum{" "}
-                    <strong>Rp 3.000/transaksi</strong> (setara{" "}
-                    {((qrisFeePerTx / avgTicket) * 100).toFixed(1)}% pada harga {formatMoney(avgTicket)}). Untuk
-                    produk murah, gunakan <strong>Jalur Chat WhatsApp (0% Fee)</strong> atau aktifkan fitur{" "}
-                    <strong>Convenience Fee</strong> agar biaya ditanggung pembeli.
+                    <strong>Catatan Produk &lt; Rp 25.000:</strong> Paket PRO mewajibkan minimal transaksi QRIS{" "}
+                    <strong>Rp 25.000</strong> (paket FREE min. Rp 15.000). Untuk produk eceran di bawah nominal
+                    tersebut, gunakan <strong>Jalur Chat WhatsApp (0% Fee)</strong> tanpa potongan biaya sama sekali.
                   </div>
                 )}
 
@@ -441,7 +438,7 @@ export function ToolsClient({ locale }: { locale: SupportedLocale }) {
                   <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200 space-y-1">
                     <div className="text-xs text-stone-600 font-medium">
                       {locale === "id"
-                        ? "QRIS PRO (2%, min Rp 3.000/tx)"
+                        ? "QRIS PRO (2% / transaksi)"
                         : t.etalaseFeeLabel}
                     </div>
                     <div className="text-xl font-black text-stone-900">

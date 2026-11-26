@@ -2,14 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 import crypto from "crypto";
-import { requireTenantContext } from "@/lib/auth/tenant-guard";
+import { getCurrentUser } from "@/lib/auth/session";
+import { prisma } from "@/lib/db/prisma";
 
 const ALLOWED_MIME_TYPES = new Set([
   "image/jpeg",
   "image/png",
   "image/webp",
   "image/gif",
-  "image/svg+xml",
 ]);
 
 const EXTENSION_MAP: Record<string, string> = {
@@ -17,23 +17,33 @@ const EXTENSION_MAP: Record<string, string> = {
   "image/png": ".png",
   "image/webp": ".webp",
   "image/gif": ".gif",
-  "image/svg+xml": ".svg",
 };
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 export async function POST(req: NextRequest) {
   try {
-    // 1. Strict Tenant Authentication & Isolation Guard
-    const context = await requireTenantContext();
-    const storeId = context.storeId;
+    // 1. Strict Tenant Authentication & Isolation Guard (JSON 401/403 instead of redirect)
+    const user = await getCurrentUser();
+    if (!user?.id) {
+      return NextResponse.json(
+        { success: false, error: "Authentication required" },
+        { status: 401 }
+      );
+    }
 
-    if (!storeId) {
+    const store = await prisma.store.findFirst({
+      where: { ownerId: user.id },
+      select: { id: true },
+    });
+
+    if (!store?.id) {
       return NextResponse.json(
         { success: false, error: "Store context not found" },
         { status: 403 }
       );
     }
+    const storeId = store.id;
 
     // 2. Parse Multipart Form Data
     const formData = await req.formData();
@@ -56,7 +66,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: "Invalid file format. Allowed types: JPG, PNG, WebP, GIF, SVG.",
+          error: "Invalid file format. Allowed types: JPG, PNG, WebP, GIF.",
         },
         { status: 400 }
       );

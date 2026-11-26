@@ -3,7 +3,7 @@
 import React from "react";
 import { usePathname } from "next/navigation";
 import { TemplateRenderer } from "../templates/TemplateRenderer";
-import { Zap, ShoppingBag, MessageCircle, Store } from "lucide-react";
+import { Zap, ShoppingBag, MessageCircle, Store, ExternalLink, Eye } from "lucide-react";
 import { StoreTemplateProps } from "../templates/types";
 import { SupportedLocale } from "@/lib/config/constants";
 
@@ -14,6 +14,8 @@ interface Hero3DDeviceProps {
 const HERO_BADGES: Record<
   SupportedLocale,
   {
+    sampleLabel: string;
+    viewLiveCta: string;
     b1Title: string;
     b1Sub: string;
     b2Title: string;
@@ -25,50 +27,60 @@ const HERO_BADGES: Record<
   }
 > = {
   id: {
+    sampleLabel: "Contoh tampilan",
+    viewLiveCta: "Lihat contoh toko",
     b1Title: "Produk Digital",
     b1Sub: "Auto-Kirim ke WA",
-    b2Title: "Order Direct Chat",
-    b2Sub: "0% Komisi",
+    b2Title: "Order via Chat",
+    b2Sub: "0% Komisi • QRIS 2%",
     b3Title: "Katalog Showroom",
     b3Sub: "Mobil & Properti",
     b4Title: "Keranjang Kuning",
     b4Sub: "+TikTok & Shopee",
   },
   en: {
+    sampleLabel: "Sample preview",
+    viewLiveCta: "View sample store",
     b1Title: "Digital Products",
     b1Sub: "Auto-Sent to WA",
     b2Title: "Direct Chat Orders",
-    b2Sub: "0% Commission",
+    b2Sub: "0% Comm. • QR from 2%",
     b3Title: "Showroom Catalog",
     b3Sub: "Auto & Property",
     b4Title: "Yellow Basket",
     b4Sub: "+TikTok & Shopee",
   },
   ms: {
+    sampleLabel: "Contoh paparan",
+    viewLiveCta: "Lihat contoh kedai",
     b1Title: "Produk Digital",
     b1Sub: "Auto-Hantar ke WA",
-    b2Title: "Pesanan Direct Chat",
-    b2Sub: "0% Komisen",
+    b2Title: "Pesanan Chat",
+    b2Sub: "0% Komisen • QR 2%",
     b3Title: "Katalog Showroom",
     b3Sub: "Kereta & Hartanah",
     b4Title: "Beg Kuning",
     b4Sub: "+TikTok & Shopee",
   },
   th: {
+    sampleLabel: "ตัวอย่างหน้าร้าน",
+    viewLiveCta: "ดูตัวอย่างร้านค้า",
     b1Title: "สินค้าดิจิทัล",
     b1Sub: "ส่งอัตโนมัติถึง WA",
     b2Title: "ออเดอร์ทางแชต",
-    b2Sub: "0% คอมมิชชัน",
+    b2Sub: "0% คอมฯ • QR 2%",
     b3Title: "แคตตาล็อกโชว์รูม",
     b3Sub: "รถยนต์และอสังหาฯ",
     b4Title: "ตะกร้าเหลือง",
     b4Sub: "+TikTok & Shopee",
   },
   vi: {
+    sampleLabel: "Giao diện mẫu",
+    viewLiveCta: "Xem cửa hàng mẫu",
     b1Title: "Sản Phẩm Số",
     b1Sub: "Tự gửi qua WA",
     b2Title: "Đặt Hàng Qua Chat",
-    b2Sub: "0% Hoa Hồng",
+    b2Sub: "0% Phí • QR từ 2%",
     b3Title: "Danh Mục Showroom",
     b3Sub: "Xe & Bất Động Sản",
     b4Title: "Giỏ Hàng Vàng",
@@ -197,7 +209,7 @@ export function Hero3DDevice({ locale: propLocale }: Hero3DDeviceProps = {}) {
       </div>
 
       {/* Badge 4: Bottom Right Outer (Keranjang Kuning) */}
-      <div className="absolute -bottom-2 -right-3 sm:-right-8 z-20 animate-float-delayed flex items-center gap-2 bg-white/95 border border-[#E7E5E4] rounded-2xl px-3 py-2 shadow-md backdrop-blur-xs">
+      <div className="absolute bottom-14 -right-3 sm:-right-8 z-20 animate-float-delayed flex items-center gap-2 bg-white/95 border border-[#E7E5E4] rounded-2xl px-3 py-2 shadow-md backdrop-blur-xs">
         <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
           <ShoppingBag className="w-4 h-4" />
         </div>
@@ -207,11 +219,8 @@ export function Hero3DDevice({ locale: propLocale }: Hero3DDeviceProps = {}) {
         </div>
       </div>
 
-      {/* 3D Container with Tilt */}
-      <div className="relative transform-style-3d tilt-3d-hero">
-        {/* Secondary Screen Depth Layer Behind Mockup */}
-        <div className="absolute inset-0 bg-[#E7E5E4] rounded-[2.8rem] border-2 border-stone-300 tilt-3d-depth-layer opacity-60 blur-[1px]"></div>
-
+      {/* 3D Container with Clean Single-Bezel Tilt */}
+      <div className="relative tilt-3d-hero">
         {/* Primary Smartphone Mockup */}
         <div className="relative w-full h-[580px] bg-[#1C1917] rounded-[2.8rem] p-2.5 shadow-2xl border-4 border-[#292524] flex flex-col items-center ring-1 ring-black/20">
           {/* Dynamic Island Notch */}
@@ -220,15 +229,34 @@ export function Hero3DDevice({ locale: propLocale }: Hero3DDeviceProps = {}) {
             <div className="w-2 h-2 rounded-full bg-stone-800 border border-stone-700"></div>
           </div>
 
-          {/* Screen Content - Single Source of Truth via TemplateRenderer */}
-          <div className="w-full flex-1 bg-white rounded-[2.2rem] overflow-hidden overflow-y-auto custom-scrollbar flex flex-col relative pointer-events-none">
-            <TemplateRenderer
-              store={DEMO_STORE}
-              products={DEMO_PRODUCTS}
-              isMockup={true}
-            />
+          {/* Screen Content - Isolated Clipping Shell + Hidden Scrollbar */}
+          <div className="w-full flex-1 min-h-0 bg-white rounded-[2.2rem] overflow-hidden relative transform-gpu shadow-inner">
+            <div className="w-full h-full overflow-y-auto no-scrollbar pointer-events-auto">
+              <TemplateRenderer
+                store={DEMO_STORE}
+                products={DEMO_PRODUCTS}
+                isMockup={true}
+              />
+            </div>
           </div>
         </div>
+      </div>
+
+      {/* Explicit Sample Store Link Button Below Mockup */}
+      <div className="mt-5 flex justify-center">
+        <a
+          href="https://rafa.etalase.online"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[#E7E5E4] hover:border-[#D94E28]/50 text-xs font-semibold text-[#1C1917] shadow-2xs hover:shadow-xs transition-all"
+        >
+          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-bold">
+            <Eye className="w-3 h-3" />
+            <span>{b.sampleLabel}</span>
+          </span>
+          <span>{b.viewLiveCta}: rafa.etalase.online</span>
+          <ExternalLink className="w-3.5 h-3.5 text-[#D94E28]" />
+        </a>
       </div>
     </div>
   );

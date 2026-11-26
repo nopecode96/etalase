@@ -4,19 +4,31 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { prisma } from "@/lib/db/prisma";
 import { OnboardingClient } from "./OnboardingClient";
 
-export default async function OnboardingPage() {
+export default async function OnboardingPage({
+  searchParams,
+}: {
+  searchParams?: Record<string, string | string[] | undefined>;
+}) {
   const user = await getCurrentUser();
 
-  // If user is already authenticated and already owns a store, redirect directly to /admin
-  if (user?.id) {
-    const existingStore = await prisma.store.findFirst({
-      where: { ownerId: user.id },
-      select: { id: true, slug: true },
-    });
-
-    if (existingStore) {
-      redirect("/admin");
+  // Strictly require authenticated user before onboarding a store
+  if (!user?.id) {
+    const params = new URLSearchParams();
+    for (const [k, v] of Object.entries(searchParams || {})) {
+      if (typeof v === "string" && v) params.set(k, v);
     }
+    const qs = params.toString();
+    redirect(qs ? `/register?${qs}` : "/login?callbackUrl=/onboarding");
+  }
+
+  // If user is already authenticated and already owns a store, redirect directly to /admin
+  const existingStore = await prisma.store.findFirst({
+    where: { ownerId: user.id },
+    select: { id: true, slug: true },
+  });
+
+  if (existingStore) {
+    redirect("/admin");
   }
 
   return (

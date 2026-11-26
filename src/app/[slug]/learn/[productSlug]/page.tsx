@@ -38,7 +38,7 @@ export default async function CoursePage({ params, searchParams }: CoursePagePro
             id: "mod-1",
             title: "Modul 1: Mindset & Riset Niche Konten Asia Tenggara",
             duration: "14:20",
-            videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+            videoUrl: "https://etalase.online/templates",
             isFreePreview: true,
           },
           {

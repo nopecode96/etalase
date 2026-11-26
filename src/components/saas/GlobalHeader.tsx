@@ -11,7 +11,8 @@ export function GlobalHeader() {
   const pathname = usePathname() || "";
 
   let activeLocale: SupportedLocale = "id";
-  if (pathname.startsWith("/en")) activeLocale = "en";
+  if (pathname === "/id" || pathname.startsWith("/id/")) activeLocale = "id";
+  else if (pathname.startsWith("/en")) activeLocale = "en";
   else if (pathname.startsWith("/ms")) activeLocale = "ms";
   else if (pathname.startsWith("/th")) activeLocale = "th";
   else if (pathname.startsWith("/vi")) activeLocale = "vi";
@@ -42,10 +43,7 @@ export function GlobalHeader() {
     const targetLocale = code.toLowerCase();
     const cleanPath = pathname.replace(/^\/(id|en|ms|th|vi)(\/|$)/, "/");
     const targetPath = cleanPath === "" ? "/" : cleanPath;
-    const dest =
-      targetLocale === "id"
-        ? targetPath
-        : `/${targetLocale}${targetPath === "/" ? "" : targetPath}`;
+    const dest = `/${targetLocale}${targetPath === "/" ? "" : targetPath}`;
     window.location.href = dest;
   };
 

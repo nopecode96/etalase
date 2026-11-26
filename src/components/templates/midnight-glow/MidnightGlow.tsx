@@ -143,9 +143,11 @@ export const MidnightGlow: React.FC<StoreTemplateProps> = ({
         })}
       </div>
 
-      <footer className={styles.footer}>
-        Ditenagai oleh <span className="font-semibold text-violet-400">etalase.online</span>
-      </footer>
+      {store.tier === "FREE" && (
+        <footer className={styles.footer}>
+          Ditenagai oleh <span className="font-semibold text-violet-400">etalase.online</span>
+        </footer>
+      )}
     </div>
   );
 };

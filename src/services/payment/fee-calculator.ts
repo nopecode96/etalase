@@ -32,19 +32,20 @@ export function normalizeTier(tier: string | PlanTier): PricingTier {
 }
 
 /**
- * 1. Calculate QRIS Direct Checkout Amount, Platform Fee, and Convenience Fee Bearer.
- * Pure function enforcing BorderPay Anti-Rugi Margin Guard.
+ * 1. Calculate Direct Checkout Amount, Platform Fee, and Convenience Fee Bearer.
+ * Pure function enforcing BorderPay Anti-Rugi Margin Guard for QRIS, and supporting PayPal.
  */
 export function calculateQrisCheckout(
   amountIdr: number,
   tierInput: PricingTier | PlanTier | string,
-  feeBorneBy: FeeBearer | "CUSTOMER" | "MERCHANT" = "CUSTOMER"
+  feeBorneBy: FeeBearer | "CUSTOMER" | "MERCHANT" = "CUSTOMER",
+  paymentProvider: "BORDERPAY_QRIS" | "PAYPAL" = "BORDERPAY_QRIS"
 ): QrisCheckoutCalculation {
   const tier = normalizeTier(tierInput);
   const rules = PAYMENT_RULES[tier];
 
-  // 1. Validation: Minimum QRIS amount guard
-  if (amountIdr < rules.minQrisAmountIdr) {
+  // 1. Validation: Minimum QRIS amount guard (applies strictly to QRIS)
+  if (paymentProvider === "BORDERPAY_QRIS" && amountIdr < rules.minQrisAmountIdr) {
     const minFormatted = `Rp ${rules.minQrisAmountIdr.toLocaleString("id-ID")}`;
     throw new Error(
       `Minimal transaksi QRIS untuk paket Anda adalah ${minFormatted}. Untuk produk di bawah nominal tersebut, gunakan jalur Order by Chat (0% komisi).`

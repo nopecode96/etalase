@@ -1,8 +1,10 @@
 import { prisma, serializePlain } from "@/lib/db/prisma";
-import { getFeeRateForTier } from "@/lib/constants/pricing";
 import { calculateQrisCheckout } from "@/services/payment/fee-calculator";
+import { convertIdrToUsd } from "@/services/payment/plan-lifecycle";
 import { ok, fail, withErrorHandler, ServiceResult } from "@/lib/core/response";
-import { createBorderpayInvoice } from "../payment-borderpay";
+import { createBorderpayInvoice, getBorderpayPaymentStatus } from "../payment-borderpay";
+import { createPaypalOrder, capturePaypalOrder } from "../payment-paypal";
+import { settlePaidCustomerOrder } from "./settlement";
 import { emitN8nEvent } from "@/lib/n8n/dispatcher";
 import { PaymentProvider } from "@prisma/client";
 
@@ -35,14 +37,16 @@ export async function createCheckoutOrder(
 
     const product = store.products[0];
     const basePrice = Number(product.price);
+    const paymentProvider: PaymentProvider = input.paymentProvider || "BORDERPAY_QRIS";
 
-    // 1. Margin Guard: Anti-Rugi BorderPay & Convenience Fee Calculation
+    // 1. Margin Guard & Convenience Fee Calculation
     let feeCalculation;
     try {
       feeCalculation = calculateQrisCheckout(
         basePrice,
         store.tier,
-        store.feeBorneBy || "CUSTOMER"
+        store.feeBorneBy || "CUSTOMER",
+        paymentProvider === "PAYPAL" ? "PAYPAL" : "BORDERPAY_QRIS"
       );
     } catch (err: unknown) {
       return fail(
@@ -59,12 +63,15 @@ export async function createCheckoutOrder(
     const randomSuffix = Math.floor(1000 + Math.random() * 9000);
     const orderCode = `ORD-${timestamp}-${randomSuffix}`;
 
-    const paymentProvider = input.paymentProvider || "BORDERPAY_QRIS";
     let paymentUrl: string | undefined;
     let paymentRef: string | undefined;
     let qrString: string | undefined;
 
     if (paymentProvider === "BORDERPAY_QRIS") {
+      const appUrl = (
+        process.env.NEXT_PUBLIC_APP_URL ||
+        `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN || "etalase.online"}`
+      ).replace(/\/$/, "");
       const invoiceRes = await createBorderpayInvoice({
         orderCode,
         amount: totalPayByCustomer,
@@ -74,13 +81,51 @@ export async function createCheckoutOrder(
         customerEmail: input.buyerEmail,
         description: `${product.title} - ${store.name}`,
         feeBorneBy: feeCalculation.borderpayFeeBearerParam,
+        returnUrl: appUrl.startsWith("https://")
+          ? `${appUrl}/${store.slug}/checkout/${product.slug}?orderCode=${orderCode}`
+          : undefined,
       });
 
-      if (invoiceRes.success && invoiceRes.data) {
-        paymentUrl = invoiceRes.data.paymentUrl;
-        paymentRef = invoiceRes.data.paymentRef;
-        qrString = invoiceRes.data.qrString;
+      if (!invoiceRes.success || !invoiceRes.data) {
+        return fail(
+          "PAYMENT_FAILED",
+          (!invoiceRes.success && invoiceRes.error) ||
+            "Gagal membuat tagihan QRIS. Silakan coba lagi atau order via WhatsApp."
+        );
       }
+
+      paymentUrl = invoiceRes.data.paymentUrl;
+      paymentRef = invoiceRes.data.paymentRef;
+      qrString = invoiceRes.data.qrString;
+    } else if (paymentProvider === "PAYPAL") {
+      const appUrl = (
+        process.env.NEXT_PUBLIC_APP_URL ||
+        `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN || "etalase.online"}`
+      ).replace(/\/$/, "");
+      const amountUsd =
+        store.currency === "USD"
+          ? Math.max(1, Math.round(totalPayByCustomer * 100) / 100)
+          : convertIdrToUsd(totalPayByCustomer);
+
+      const paypalRes = await createPaypalOrder({
+        orderCode,
+        amountUsd,
+        description: `${product.title} - ${store.name}`,
+        returnUrl: `${appUrl}/${store.slug}/checkout/${product.slug}?paypal_status=success&orderCode=${orderCode}`,
+        cancelUrl: `${appUrl}/${store.slug}/checkout/${product.slug}?paypal_status=cancelled&orderCode=${orderCode}`,
+        customId: orderCode,
+      });
+
+      if (!paypalRes.success || !paypalRes.data) {
+        return fail(
+          "PAYMENT_FAILED",
+          (!paypalRes.success && paypalRes.error) ||
+            "Gagal membuat sesi pembayaran PayPal. Silakan coba lagi."
+        );
+      }
+
+      paymentRef = paypalRes.data.orderId;
+      paymentUrl = paypalRes.data.approveUrl;
     }
 
     const order = await prisma.order.create({
@@ -124,6 +169,165 @@ export async function createCheckoutOrder(
         qrString,
       },
       "CREATED"
+    );
+  });
+}
+
+export async function captureCustomerPaypalOrder(input: {
+  orderCode: string;
+  paypalOrderId: string;
+}): Promise<ServiceResult<{ orderCode: string; status: string; amount: number; currency: string; paymentProvider: string }>> {
+  return withErrorHandler(async () => {
+    const existing = await prisma.order.findUnique({
+      where: { orderCode: input.orderCode },
+      select: {
+        id: true,
+        orderCode: true,
+        status: true,
+        paymentRef: true,
+        amount: true,
+        currency: true,
+        paymentProvider: true,
+      },
+    });
+
+    if (!existing) {
+      return fail("NOT_FOUND", "Pesanan tidak ditemukan.");
+    }
+
+    if (existing.status === "PAID" || existing.status === "COMPLETED") {
+      return ok(
+        {
+          orderCode: input.orderCode,
+          status: existing.status,
+          amount: Number(existing.amount),
+          currency: existing.currency,
+          paymentProvider: existing.paymentProvider,
+        },
+        "SAVED"
+      );
+    }
+
+    if (existing.paymentRef && existing.paymentRef !== input.paypalOrderId) {
+      return fail("FORBIDDEN", "PayPal Order ID tidak cocok dengan invoice pesanan.");
+    }
+
+    const captureRes = await capturePaypalOrder(input.paypalOrderId);
+    if (!captureRes.success && captureRes.error !== "ORDER_ALREADY_CAPTURED") {
+      return fail("PAYMENT_FAILED", "Konfirmasi pembayaran PayPal gagal.");
+    }
+
+    const paymentRef = captureRes.success
+      ? captureRes.data?.captureId || input.paypalOrderId
+      : input.paypalOrderId;
+
+    const settlement = await settlePaidCustomerOrder({
+      orderRef: input.orderCode,
+      paymentProvider: "PAYPAL",
+      paymentRef,
+    });
+
+    if (settlement.status !== "SETTLED" && settlement.status !== "ALREADY_PAID") {
+      return fail("NOT_FOUND", "Pesanan tidak ditemukan.");
+    }
+
+    return ok(
+      {
+        orderCode: input.orderCode,
+        status: "PAID",
+        amount: Number(existing.amount),
+        currency: existing.currency,
+        paymentProvider: "PAYPAL",
+      },
+      "SAVED"
+    );
+  });
+}
+
+export async function checkCustomerOrderStatus(
+  orderCode: string
+): Promise<
+  ServiceResult<{
+    orderCode: string;
+    status: string;
+    amount: number;
+    currency: string;
+    paymentProvider: string;
+  }>
+> {
+  return withErrorHandler(async () => {
+    const order = await prisma.order.findUnique({
+      where: { orderCode },
+      select: {
+        orderCode: true,
+        status: true,
+        amount: true,
+        currency: true,
+        paymentProvider: true,
+        paymentRef: true,
+      },
+    });
+
+    if (!order) {
+      return fail("NOT_FOUND", "Pesanan tidak ditemukan.");
+    }
+
+    if (order.status === "PAID" || order.status === "COMPLETED") {
+      return ok(
+        {
+          orderCode: order.orderCode,
+          status: order.status,
+          amount: Number(order.amount),
+          currency: order.currency,
+          paymentProvider: order.paymentProvider,
+        },
+        "SAVED"
+      );
+    }
+
+    if (
+      order.status === "PENDING" &&
+      order.paymentProvider === "BORDERPAY_QRIS"
+    ) {
+      const lookupRef = order.paymentRef || order.orderCode;
+      const bpCheck = await getBorderpayPaymentStatus(lookupRef);
+      if (bpCheck.success && bpCheck.data?.found && bpCheck.data.status === "paid") {
+        const authoritativeAmount =
+          bpCheck.data.orderAmount ?? bpCheck.data.customerPays;
+        const settlement = await settlePaidCustomerOrder({
+          orderRef: order.orderCode,
+          paymentProvider: "BORDERPAY_QRIS",
+          paymentRef: bpCheck.data.referenceId,
+          grossAmount: authoritativeAmount,
+        });
+
+        if (
+          settlement.status === "SETTLED" ||
+          settlement.status === "ALREADY_PAID"
+        ) {
+          return ok(
+            {
+              orderCode: order.orderCode,
+              status: "PAID",
+              amount: Number(order.amount),
+              currency: order.currency,
+              paymentProvider: order.paymentProvider,
+            },
+            "SAVED"
+          );
+        }
+      }
+    }
+
+    return ok(
+      {
+        orderCode: order.orderCode,
+        status: order.status,
+        amount: Number(order.amount),
+        currency: order.currency,
+        paymentProvider: order.paymentProvider,
+      },
+      "SAVED"
     );
   });
 }

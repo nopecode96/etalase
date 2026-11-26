@@ -8,9 +8,14 @@ interface CheckoutPageProps {
     slug: string;
     productSlug: string;
   };
+  searchParams?: {
+    paypal_status?: string;
+    token?: string;
+    orderCode?: string;
+  };
 }
 
-export default async function CheckoutPage({ params }: CheckoutPageProps) {
+export default async function CheckoutPage({ params, searchParams }: CheckoutPageProps) {
   const { slug, productSlug } = params;
 
   // Demo fallback
@@ -34,6 +39,9 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
           price: 79000,
           productType: "DIGITAL",
         }}
+        paypalStatus={searchParams?.paypal_status}
+        paypalToken={searchParams?.token}
+        paypalOrderCode={searchParams?.orderCode}
       />
     );
   }
@@ -90,6 +98,9 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
           images: serializedProduct.images,
           productType: serializedProduct.productType,
         }}
+        paypalStatus={searchParams?.paypal_status}
+        paypalToken={searchParams?.token}
+        paypalOrderCode={searchParams?.orderCode}
       />
     </>
   );

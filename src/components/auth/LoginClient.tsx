@@ -7,6 +7,7 @@ import { signIn } from "next-auth/react";
 import { ShieldCheck } from "lucide-react";
 import { EtalaseLogo } from "@/components/brand/EtalaseLogo";
 import { SupportedLocale } from "@/lib/config/constants";
+import { trackGtmLoginStart } from "@/lib/analytics/gtm";
 
 function GoogleIcon() {
   return (
@@ -110,6 +111,7 @@ function LoginCard({ locale, callbackUrl: propCallbackUrl }: LoginClientProps) {
 
   const handleGoogleSignIn = () => {
     setLoading(true);
+    trackGtmLoginStart({ method: "google" });
     const width = 500;
     const height = 620;
     const left = Math.max(0, window.screenX + (window.outerWidth - width) / 2);

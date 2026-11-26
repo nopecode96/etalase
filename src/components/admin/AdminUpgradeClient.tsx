@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect, useTransition } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { QrCodeImage } from "@/components/ui/QrCodeImage";
 import {
   Sparkles,
   ArrowLeft,
@@ -23,6 +23,7 @@ import {
   Lock,
 } from "lucide-react";
 import { showToast } from "@/components/ui/GlobalToast";
+import { trackGtmBeginCheckout, trackGtmPurchase } from "@/lib/analytics/gtm";
 import {
   actionCreatePlanOrder,
   actionCapturePaypalPlanOrder,
@@ -113,6 +114,28 @@ export function AdminUpgradeClient({
         setIsVerifying(false);
         if (res.success) {
           setIsApproved(true);
+          const approvedOrder = res.data?.order;
+          trackGtmPurchase({
+            transactionId: paypalOrderNumber,
+            currency: approvedOrder?.currency === "USD" ? "USD" : "IDR",
+            value:
+              approvedOrder?.currency === "USD"
+                ? calculateAmountUsd()
+                : Number(approvedOrder?.amount || calculateAmountIdr()),
+            paymentType: "PAYPAL",
+            affiliation: "etalase_plan_upgrade",
+            items: [
+              {
+                item_id: approvedOrder?.planCode || selectedPlan,
+                item_name:
+                  (approvedOrder?.planCode || selectedPlan) === "DFY"
+                    ? "Terima Beres (Done-For-You)"
+                    : `Etalase PRO (${approvedOrder?.billingCycle || billingCycle})`,
+                item_category: "SaaS Plan",
+                price: Number(approvedOrder?.amount || calculateAmountIdr()),
+              },
+            ],
+          });
           showToast("PayPal Credit Card payment approved! Store upgraded to PRO.", "success");
         } else {
           showToast(res.error || "Failed to finalize PayPal capture.", "error");
@@ -129,13 +152,31 @@ export function AdminUpgradeClient({
       const res = await actionCheckPlanOrderStatus(activeOrder.id);
       if (res.success && res.data?.status === "APPROVED") {
         setIsApproved(true);
+        trackGtmPurchase({
+          transactionId: activeOrder.orderNumber,
+          currency: activeOrder.currency || "IDR",
+          value: Number(activeOrder.amount || calculateAmountIdr()),
+          paymentType: activeOrder.paymentMethod || "BORDERPAY_QRIS",
+          affiliation: "etalase_plan_upgrade",
+          items: [
+            {
+              item_id: activeOrder.planCode || selectedPlan,
+              item_name:
+                (activeOrder.planCode || selectedPlan) === "DFY"
+                  ? "Terima Beres (Done-For-You)"
+                  : `Etalase PRO (${activeOrder.billingCycle || billingCycle})`,
+              item_category: "SaaS Plan",
+              price: Number(activeOrder.amount || calculateAmountIdr()),
+            },
+          ],
+        });
         showToast("Payment successfully verified! Your store is now PRO.", "success");
         clearInterval(interval);
       }
     }, 4000);
 
     return () => clearInterval(interval);
-  }, [activeOrder?.id, isApproved]);
+  }, [activeOrder?.id, activeOrder?.orderNumber, activeOrder?.amount, activeOrder?.currency, activeOrder?.paymentMethod, activeOrder?.planCode, activeOrder?.billingCycle, isApproved]);
 
   const handleCopy = (text: string, fieldId: string) => {
     navigator.clipboard.writeText(text);
@@ -171,6 +212,30 @@ export function AdminUpgradeClient({
         if (d.paypalOrderId) setPaypalOrderId(d.paypalOrderId);
         if (d.amountUsd) setAmountUsd(d.amountUsd);
 
+        trackGtmBeginCheckout({
+          currency: paymentProvider === "PAYPAL" ? "USD" : "IDR",
+          value:
+            paymentProvider === "PAYPAL"
+              ? Number(d.amountUsd || calculateAmountUsd())
+              : Number(d.order?.amount || calculateAmountIdr()),
+          paymentType: paymentProvider,
+          transactionId: d.order?.orderNumber,
+          items: [
+            {
+              item_id: selectedPlan,
+              item_name:
+                selectedPlan === "DFY"
+                  ? "Terima Beres (Done-For-You)"
+                  : `Etalase PRO (${billingCycle})`,
+              item_category: "SaaS Plan",
+              price:
+                paymentProvider === "PAYPAL"
+                  ? Number(d.amountUsd || calculateAmountUsd())
+                  : Number(d.order?.amount || calculateAmountIdr()),
+            },
+          ],
+        });
+
         if (paymentProvider === "PAYPAL" && d.paypalApproveUrl) {
           showToast("Redirecting to PayPal secure Credit Card checkout...", "success");
           window.location.href = d.paypalApproveUrl;
@@ -190,6 +255,24 @@ export function AdminUpgradeClient({
       const res = await actionSimulateBorderpaySuccess(activeOrder.id);
       if (res.success) {
         setIsApproved(true);
+        trackGtmPurchase({
+          transactionId: activeOrder.orderNumber,
+          currency: activeOrder.currency || "IDR",
+          value: Number(activeOrder.amount || calculateAmountIdr()),
+          paymentType: "BORDERPAY_QRIS_SIMULATOR",
+          affiliation: "etalase_plan_upgrade",
+          items: [
+            {
+              item_id: activeOrder.planCode || selectedPlan,
+              item_name:
+                (activeOrder.planCode || selectedPlan) === "DFY"
+                  ? "Terima Beres (Done-For-You)"
+                  : `Etalase PRO (${activeOrder.billingCycle || billingCycle})`,
+              item_category: "SaaS Plan",
+              price: Number(activeOrder.amount || calculateAmountIdr()),
+            },
+          ],
+        });
         showToast("Sandbox payment simulated successfully! Store upgraded to PRO.", "success");
       } else {
         showToast(res.error || "Simulation failed", "error");
@@ -281,13 +364,13 @@ export function AdminUpgradeClient({
     );
   }
 
-  const qrisDisplayUrl = qrString
-    ? `https://api.qrserver.com/v1/create-qr-code/?size=350x350&data=${encodeURIComponent(qrString)}`
-    : paymentUrl
-    ? `https://api.qrserver.com/v1/create-qr-code/?size=350x350&data=${encodeURIComponent(paymentUrl)}`
-    : `https://api.qrserver.com/v1/create-qr-code/?size=350x350&data=${encodeURIComponent(
-        `00020101021226590014ID.LINKAJA.WWW01189360091100000000005204581253033605802ID5914ETALASEONLINE6007BANDUNG61054011562070703A016304${activeOrder?.orderNumber?.slice(-4) || "8888"}`
-      )}`;
+  const qrValueToRender =
+    qrString && !qrString.startsWith("SANDBOX_QRIS_SIMULATOR_")
+      ? qrString
+      : !qrString?.startsWith("SANDBOX_QRIS_SIMULATOR_") && paymentUrl
+      ? paymentUrl
+      : "";
+  const isSandboxQr = Boolean(qrString?.startsWith("SANDBOX_QRIS_SIMULATOR_"));
 
   return (
     <div className="w-full space-y-8 animate-in fade-in duration-300">
@@ -409,7 +492,7 @@ export function AdminUpgradeClient({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-3 border-t border-[#E7E5E4] text-xs text-[#1C1917]">
                 <div className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>All 4 Template Archetypes</span>
+                  <span>All 4 Archetypes (14 Templates)</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -417,15 +500,15 @@ export function AdminUpgradeClient({
                 </div>
                 <div className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Low 2% QRIS Fee (min. Rp 3.000)</span>
+                  <span>2% QRIS Fee (min. Rp 25.000 tx)</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Meta Pixel & GA4 Integration</span>
+                  <span>Meta Pixel (CAPI), TikTok Pixel &amp; GA4</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>4x Free Withdrawals/month</span>
+                  <span>4x Free Withdrawals/mo (min. Rp 50.000, Rp 2.500 after)</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -480,7 +563,7 @@ export function AdminUpgradeClient({
                     <Sparkles className="w-3 h-3 text-purple-700" />
                     Done-For-You VIP Service
                   </div>
-                  <h3 className="text-base font-bold text-[#1C1917]">Terima Beres by asistencuan</h3>
+                  <h3 className="text-base font-bold text-[#1C1917]">Terima Beres (Done-For-You)</h3>
                   <p className="text-xs text-[#57534E]">Includes 1 full year of PRO + store setup by our design team.</p>
                 </div>
                 <div className="text-right">
@@ -671,15 +754,27 @@ export function AdminUpgradeClient({
 
                   {/* QRIS Code Image Box */}
                   <div className="bg-white rounded-2xl p-4 border border-[#E7E5E4] inline-block shadow-xs mx-auto">
-                    <div className="relative w-48 h-48 mx-auto">
-                      <Image
-                        src={qrisDisplayUrl}
-                        alt="Borderpay QRIS Code"
-                        fill
-                        unoptimized
-                        className="object-contain"
-                      />
-                    </div>
+                    {qrValueToRender ? (
+                      <div className="relative w-48 h-48 mx-auto">
+                        <QrCodeImage
+                          value={qrValueToRender}
+                          alt="Borderpay QRIS Code"
+                          size={360}
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-48 h-48 mx-auto flex flex-col items-center justify-center rounded-xl bg-amber-50 border border-amber-200 p-4 text-amber-800 gap-2">
+                        <QrCode className="w-10 h-10 text-amber-600" />
+                        <span className="text-[11px] font-bold">
+                          {isSandboxQr ? "Sandbox Test Mode (QRIS Gateway Offline)" : "QRIS code unavailable"}
+                        </span>
+                        <span className="text-[10px] text-amber-700 leading-snug">
+                          {isSandboxQr
+                            ? "Use sandbox simulation or PayPal Credit Card below."
+                            : "Please regenerate the invoice or switch to PayPal."}
+                        </span>
+                      </div>
+                    )}
                     <div className="text-[11px] font-mono font-bold text-stone-800 mt-2">
                       Rp {Number(activeOrder.amount).toLocaleString("id-ID")}
                     </div>
@@ -698,10 +793,10 @@ export function AdminUpgradeClient({
 
                   {/* Step Instructions */}
                   <div className="text-left text-[11px] text-[#57534E] space-y-1.5 pt-1">
-                    <div className="font-bold text-stone-800 mb-1">Cara Bayar:</div>
-                    <p>1. Buka aplikasi BCA Mobile, Livin Mandiri, GoPay, OVO, atau ShopeePay.</p>
-                    <p>2. Pindai kode QRIS di atas dan konfirmasi pembayaran <strong>Rp {Number(activeOrder.amount).toLocaleString("id-ID")}</strong>.</p>
-                    <p>3. Status akun akan otomatis aktif tanpa perlu kirim bukti struk transfer.</p>
+                    <div className="font-bold text-stone-800 mb-1">How to Pay:</div>
+                    <p>1. Open BCA Mobile, Livin Mandiri, GoPay, OVO, DANA, or ShopeePay.</p>
+                    <p>2. Scan the QRIS code above and confirm payment of <strong>Rp {Number(activeOrder.amount).toLocaleString("id-ID")}</strong>.</p>
+                    <p>3. Your PRO plan unlocks automatically as soon as payment settles.</p>
                   </div>
                 </div>
 
@@ -773,13 +868,19 @@ export function AdminUpgradeClient({
                     </div>
                   </div>
 
-                  <a
-                    href={paypalApproveUrl || `https://sandbox.paypal.com`}
-                    className="w-full py-3.5 px-4 rounded-xl bg-[#0070BA] hover:bg-[#003087] text-white font-bold text-xs shadow-xs flex items-center justify-center gap-2 transition"
-                  >
-                    <CreditCard className="w-4 h-4" />
-                    <span>Pay ${amountUsd.toFixed(2)} USD with Credit Card</span>
-                  </a>
+                  {paypalApproveUrl ? (
+                    <a
+                      href={paypalApproveUrl}
+                      className="w-full py-3.5 px-4 rounded-xl bg-[#0070BA] hover:bg-[#003087] text-white font-bold text-xs shadow-xs flex items-center justify-center gap-2 transition"
+                    >
+                      <CreditCard className="w-4 h-4" />
+                      <span>Pay ${amountUsd.toFixed(2)} USD with Credit Card</span>
+                    </a>
+                  ) : (
+                    <div className="text-center text-xs text-stone-500 py-2">
+                      PayPal approval URL not available. Click below to regenerate.
+                    </div>
+                  )}
                 </div>
 
                 <button

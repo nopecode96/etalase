@@ -1,39 +1,54 @@
 "use client";
 
 import React from "react";
-import { StoreTemplateProps, StoreTemplateProduct } from "../types";
+import { StoreTemplateProps } from "../types";
 import { TopBar } from "../shared/TopBar";
 import { CoverBanner } from "../shared/CoverBanner";
 import { SocialLinksBar } from "../shared/SocialLinksBar";
 import { PriceDisplay } from "../shared/PriceDisplay";
-import { Sparkles, Heart, ExternalLink, ArrowRight, ShoppingBag } from "lucide-react";
+import {
+  isDemoStoreContext,
+  getStoreInitial,
+  getProductDiscountPercent,
+  getTemplateProductUrl,
+  getTemplateProductCtaLabel,
+  trackStorefrontEventClient,
+} from "../shared/template-helpers";
+import { Sparkles, Heart, ExternalLink, ArrowRight, ShoppingBag, Zap, MessageCircle } from "lucide-react";
 import styles from "./EditorialPastel.module.css";
 
 export const EditorialPastel: React.FC<StoreTemplateProps> = ({
   store,
   products = [],
-  blocks = [],
   isPreview = false,
   isMockup = false,
 }) => {
   const accent = store.appearanceConfig?.accentColor || "#D94E28";
   const btnStyle = store.appearanceConfig?.buttonStyle || "pill";
-  const btnRadiusClass = btnStyle === "pill" ? "rounded-full" : btnStyle === "sharp" ? "rounded-none" : "rounded-xl";
+  const btnRadiusClass =
+    btnStyle === "pill" ? "rounded-full" : btnStyle === "sharp" ? "rounded-none" : "rounded-xl";
+  const isDemo = isDemoStoreContext(store, isMockup);
+  const isBioLinkMode = store.displayMode === "BIO_LINK";
 
-  const featuredProduct = products.find((p) => p.isFeatured) || products[0];
-  const compactProduct = products.find((p) => p.id !== featuredProduct?.id && p.productType === "DIGITAL") || products.filter((p) => p.id !== featuredProduct?.id)[0];
-  const gridProducts = products.filter((p) => p.id !== featuredProduct?.id && p.id !== compactProduct?.id);
+  const avatarSrc = store.avatarUrl || (isDemo ? "/images/demo/avatar-aisyah.jpg" : undefined);
+  const bannerSrc =
+    store.appearanceConfig?.coverBannerUrl ||
+    store.bannerUrl ||
+    (isDemo ? "/images/demo/banner-beauty.jpg" : undefined);
 
-  const getProductActionUrl = (item: StoreTemplateProduct) => {
-    if (isMockup) return "#";
-    if (item.checkoutMode === "EXTERNAL_LINK") {
-      return item.externalUrl || "#";
+  const featuredProduct = isBioLinkMode ? undefined : products.find((p) => p.isFeatured) || products[0];
+  const remaining = isBioLinkMode ? products : products.filter((p) => p.id !== featuredProduct?.id);
+  const compactProduct = isBioLinkMode
+    ? undefined
+    : remaining.find((p) => p.productType === "DIGITAL") || remaining[0];
+  const gridProducts = isBioLinkMode
+    ? products
+    : remaining.filter((p) => p.id !== compactProduct?.id);
+
+  const handleProductClick = (productId: string) => {
+    if (!isPreview && !isMockup) {
+      trackStorefrontEventClient({ storeSlug: store.slug, type: "click", productId });
     }
-    if (item.checkoutMode === "CHAT_ORDER") {
-      const wa = store.chatHandle || "6281234567893";
-      return `https://wa.me/${wa}?text=Halo%20${encodeURIComponent(store.name)},%20saya%20mau%20tanya%20${encodeURIComponent(item.title)}`;
-    }
-    return `/${store.slug}/checkout/${item.slug}`;
   };
 
   const getPlatformBadge = (platform?: string | null) => {
@@ -58,32 +73,32 @@ export const EditorialPastel: React.FC<StoreTemplateProps> = ({
         </span>
       );
     }
-    return (
-      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-900 bg-rose-100 border border-rose-200 px-2 py-0.5 rounded-full">
-        <span>✨</span> Rekomendasi
-      </span>
-    );
+    return null;
   };
 
   return (
     <div className={styles.container}>
       <TopBar slug={store.slug} isMockup={isMockup} />
 
-      {/* Cover Banner Beauty Editorial */}
       <CoverBanner
-        bannerUrl={store.appearanceConfig?.coverBannerUrl || store.bannerUrl || "/images/demo/banner-beauty.jpg"}
+        bannerUrl={bannerSrc}
         defaultGradient="from-[#FFE4E6] via-[#FECDD3] to-[#FDE8E1]"
         heightClass="h-32"
       />
 
-      {/* Profil Header Beauty dengan Avatar Overlap & Verified Icon */}
+      {/* Profile Header */}
       <div className={styles.profileSection}>
         <div className={styles.avatarWrapper}>
-          <img
-            src={store.avatarUrl || "/images/demo/avatar-aisyah.jpg"}
-            alt={store.name}
-            className={styles.avatar}
-          />
+          {avatarSrc ? (
+            <img src={avatarSrc} alt={store.name} className={styles.avatar} />
+          ) : (
+            <div
+              className={`${styles.avatar} flex items-center justify-center text-2xl font-bold text-white`}
+              style={{ backgroundColor: accent }}
+            >
+              {getStoreInitial(store.name)}
+            </div>
+          )}
           <span className="absolute bottom-1 right-1 w-4 h-4 rounded-full bg-rose-500 border-2 border-white shadow-xs" />
         </div>
 
@@ -96,58 +111,61 @@ export const EditorialPastel: React.FC<StoreTemplateProps> = ({
           <Sparkles className="w-4 h-4 text-[#D94E28] shrink-0" />
         </div>
 
-        {/* Editorial Pill */}
-        <div className={styles.badgeEditorial}>
-          <Heart className="w-3 h-3 shrink-0 fill-current" />
-          <span>Beauty, Hijab &amp; Skincare Favorit &bull; Racun Shopee &amp; TikTok</span>
-        </div>
+        {isDemo && (
+          <div className={styles.badgeEditorial}>
+            <Heart className="w-3 h-3 shrink-0 fill-current" />
+            <span>Beauty, Hijab &amp; Skincare Favorit &bull; Racun Shopee &amp; TikTok</span>
+          </div>
+        )}
 
-        <p className={styles.storeBio}>
-          {store.bio || "Rekomendasi harian skincare, hijab, & makeup yang beneran dipakai & worth to buy. Dapatkan link voucher diskon sebelum checkout! ✨"}
-        </p>
+        {(store.bio || isDemo) && (
+          <p className={styles.storeBio}>
+            {store.bio ||
+              "Rekomendasi harian skincare, hijab, & makeup yang beneran dipakai & worth to buy. Dapatkan link voucher diskon sebelum checkout! ✨"}
+          </p>
+        )}
 
-        {/* Baris Ikon Media Sosial */}
-        <SocialLinksBar
-          links={store.appearanceConfig?.socialLinks}
-          accentColor={accent}
-        />
+        <SocialLinksBar links={store.appearanceConfig?.socialLinks} accentColor={accent} />
       </div>
 
-      {/* Content Blocks (Mixed Layout Beauty Anatomy) */}
+      {/* Storefront Content */}
       <div className={styles.contentBody}>
-        {/* BLOK 1: Featured Racun Spill Card */}
+        {/* Featured Card */}
         {featuredProduct && (
           <div>
             <div className={styles.blockSectionTitle}>
               <span className="flex items-center gap-1.5 text-stone-900 font-bold">
                 <Sparkles className="w-3.5 h-3.5 text-[#D94E28]" />
-                <span>Racun Spill Paling Viral</span>
+                <span>{featuredProduct.isFeatured ? "Pilihan Utama" : "Produk Terbaru"}</span>
               </span>
-              <span className="text-[10px] bg-[#FDF0EC] text-[#D94E28] font-bold px-2 py-0.5 rounded-full border border-[#FADCD3]">
-                Diskon 40% TikTok Shop
-              </span>
+              {getProductDiscountPercent(featuredProduct.price, featuredProduct.compareAtPrice) && (
+                <span className="text-[10px] bg-[#FDF0EC] text-[#D94E28] font-bold px-2 py-0.5 rounded-full border border-[#FADCD3]">
+                  Diskon {getProductDiscountPercent(featuredProduct.price, featuredProduct.compareAtPrice)}%
+                </span>
+              )}
             </div>
 
             <div className={styles.featuredCard}>
-              <div className="relative aspect-video w-full overflow-hidden bg-rose-50">
-                <img
-                  src={featuredProduct.images?.[0] || "/images/demo/product-serum.jpg"}
-                  alt={featuredProduct.title}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute top-2.5 left-2.5 bg-black/75 backdrop-blur-xs text-white text-[10px] font-bold px-2.5 py-1 rounded-lg">
-                  Wajib Punya ✨
+              {(featuredProduct.images?.[0] || isDemo) && (
+                <div className="relative aspect-video w-full overflow-hidden bg-rose-50">
+                  <img
+                    src={featuredProduct.images?.[0] || "/images/demo/product-serum.jpg"}
+                    alt={featuredProduct.title}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
-              </div>
+              )}
 
               <div className="p-4 space-y-3">
                 <div>
                   <h3 className="font-bold text-stone-900 text-sm sm:text-base leading-snug">
                     {featuredProduct.title}
                   </h3>
-                  <p className="text-xs text-stone-600 mt-1 line-clamp-2 leading-relaxed">
-                    {featuredProduct.description || "Serum ceramide 5x yang memperbaiki skin barrier & bikin kulit glowing natural tanpa lengket."}
-                  </p>
+                  {featuredProduct.description && (
+                    <p className="text-xs text-stone-600 mt-1 line-clamp-2 leading-relaxed">
+                      {featuredProduct.description}
+                    </p>
+                  )}
                 </div>
 
                 <div className="flex items-center justify-between pt-1">
@@ -161,104 +179,172 @@ export const EditorialPastel: React.FC<StoreTemplateProps> = ({
                 </div>
 
                 <a
-                  href={getProductActionUrl(featuredProduct)}
+                  href={getTemplateProductUrl(store, featuredProduct, isMockup)}
+                  target={featuredProduct.checkoutMode === "EXTERNAL_LINK" ? "_blank" : undefined}
+                  rel={featuredProduct.checkoutMode === "EXTERNAL_LINK" ? "noopener noreferrer" : undefined}
+                  onClick={() => handleProductClick(featuredProduct.id)}
                   className={`w-full py-3 px-4 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xs transition ${btnRadiusClass} cursor-pointer`}
                   style={{ backgroundColor: accent }}
                 >
-                  <ShoppingBag className="w-4 h-4 fill-current" />
-                  <span>Beli di TikTok Shop / Shopee</span>
-                  <ExternalLink className="w-4 h-4" />
+                  {featuredProduct.checkoutMode === "EXTERNAL_LINK" ? (
+                    <ShoppingBag className="w-4 h-4 fill-current" />
+                  ) : featuredProduct.checkoutMode === "CHAT_ORDER" ? (
+                    <MessageCircle className="w-4 h-4" />
+                  ) : (
+                    <Zap className="w-4 h-4 fill-current" />
+                  )}
+                  <span>{getTemplateProductCtaLabel(featuredProduct)}</span>
+                  <ArrowRight className="w-4 h-4" />
                 </a>
               </div>
             </div>
           </div>
         )}
 
-        {/* BLOK 2: Canva Poster Promo Gajian */}
-        <div>
-          <a
-            href={isMockup ? "#" : `https://tiktok.com/@aisyahlook`}
-            className={styles.posterBanner}
-          >
-            <img
-              src="/images/demo/banner-poster-beauty.jpg"
-              alt="Promo Spesial Canva Poster Beauty"
-            />
-          </a>
-        </div>
+        {/* Demo Only Poster Banner */}
+        {isDemo && (
+          <div>
+            <a
+              href={isMockup ? `https://${store.slug}.etalase.online` : `https://tiktok.com/@aisyahlook`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.posterBanner}
+            >
+              <img src="/images/demo/banner-poster-beauty.jpg" alt="Promo Spesial Canva Poster Beauty" />
+            </a>
+          </div>
+        )}
 
-        {/* BLOK 3: Compact Strip (Panduan Skincare / E-Book) */}
+        {/* Compact Strip */}
         {compactProduct && (
           <div>
             <div className={styles.blockSectionTitle}>
-              <span>Panduan Skincare Rutin</span>
+              <span>Rekomendasi</span>
             </div>
 
             <a
-              href={getProductActionUrl(compactProduct)}
+              href={getTemplateProductUrl(store, compactProduct, isMockup)}
+              target={compactProduct.checkoutMode === "EXTERNAL_LINK" ? "_blank" : undefined}
+              rel={compactProduct.checkoutMode === "EXTERNAL_LINK" ? "noopener noreferrer" : undefined}
+              onClick={() => handleProductClick(compactProduct.id)}
               className={styles.compactStrip}
             >
-              <img
-                src={compactProduct.images?.[0] || "/images/demo/product-ebook.jpg"}
-                alt={compactProduct.title}
-                className="w-14 h-14 rounded-xl object-cover shrink-0 bg-rose-50"
-              />
+              {compactProduct.images?.[0] || isDemo ? (
+                <img
+                  src={compactProduct.images?.[0] || "/images/demo/product-ebook.jpg"}
+                  alt={compactProduct.title}
+                  className="w-14 h-14 rounded-xl object-cover shrink-0 bg-rose-50"
+                />
+              ) : (
+                <div className="w-14 h-14 rounded-xl bg-rose-50 text-rose-500 font-bold text-xs flex items-center justify-center shrink-0">
+                  {getStoreInitial(compactProduct.title)}
+                </div>
+              )}
               <div className="flex-1 min-w-0">
                 <h4 className="font-bold text-xs sm:text-sm text-stone-900 truncate">
                   {compactProduct.title}
                 </h4>
-                <p className="text-[11px] text-stone-500 truncate mt-0.5">
-                  {compactProduct.description || "Panduan step-by-step skincare glowing dalam 14 hari"}
-                </p>
+                {compactProduct.description && (
+                  <p className="text-[11px] text-stone-500 truncate mt-0.5">
+                    {compactProduct.description}
+                  </p>
+                )}
               </div>
               <div className="shrink-0 text-right">
-                <PriceDisplay price={compactProduct.price} compareAtPrice={compactProduct.compareAtPrice} size="sm" accentColor={accent} />
+                <PriceDisplay
+                  price={compactProduct.price}
+                  compareAtPrice={compactProduct.compareAtPrice}
+                  size="sm"
+                  accentColor={accent}
+                />
               </div>
             </a>
           </div>
         )}
 
-        {/* BLOK 4: 2-Column Affiliate Grid with SEA Marketplace Badges */}
-        <div>
-          <div className={styles.blockSectionTitle}>
-            <span>Koleksi Racun &amp; Rekomendasi Hijab</span>
-          </div>
-
-          <div className={styles.grid2Col}>
-            {(gridProducts.length > 0 ? gridProducts : products).map((item) => (
-              <div key={item.id} className={styles.affiliateCard}>
-                <div className="aspect-square w-full overflow-hidden bg-rose-50 relative">
-                  <img
-                    src={item.images?.[0] || "/images/demo/product-lipcream.jpg"}
-                    alt={item.title}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute top-1.5 left-1.5">
-                    {getPlatformBadge(item.externalPlatform)}
-                  </div>
+        {/* Bio Link Mode vs 2-Column Affiliate/Catalog Grid */}
+        {isBioLinkMode ? (
+          <div className="space-y-2.5">
+            {gridProducts.map((item) => (
+              <a
+                key={item.id}
+                href={getTemplateProductUrl(store, item, isMockup)}
+                onClick={() => handleProductClick(item.id)}
+                className={styles.compactStrip}
+              >
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-bold text-xs text-stone-900 truncate">{item.title}</h4>
                 </div>
-                <div className="p-3 flex-1 flex flex-col justify-between space-y-2">
-                  <div>
-                    <h4 className="font-bold text-xs text-stone-900 line-clamp-2 leading-snug">
-                      {item.title}
-                    </h4>
-                    <div className="mt-1">
-                      <PriceDisplay price={item.price} compareAtPrice={item.compareAtPrice} size="sm" accentColor={accent} />
-                    </div>
-                  </div>
-
-                  <a
-                    href={getProductActionUrl(item)}
-                    className={`w-full py-2 px-2 text-center text-[11px] font-bold text-white bg-stone-900 hover:bg-black transition flex items-center justify-center gap-1 ${btnRadiusClass} cursor-pointer`}
-                  >
-                    <span>Keranjang</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
-                </div>
-              </div>
+                <PriceDisplay price={item.price} compareAtPrice={item.compareAtPrice} size="sm" accentColor={accent} />
+              </a>
             ))}
           </div>
-        </div>
+        ) : (
+          gridProducts.length > 0 && (
+            <div>
+              <div className={styles.blockSectionTitle}>
+                <span>Koleksi Produk</span>
+              </div>
+
+              <div className={styles.grid2Col}>
+                {gridProducts.map((item) => (
+                  <div key={item.id} className={styles.affiliateCard}>
+                    <div className="aspect-square w-full overflow-hidden bg-rose-50 relative">
+                      {item.images?.[0] || isDemo ? (
+                        <img
+                          src={item.images?.[0] || "/images/demo/product-lipcream.jpg"}
+                          alt={item.title}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-rose-300 font-bold text-lg">
+                          {getStoreInitial(item.title)}
+                        </div>
+                      )}
+                      {getPlatformBadge(item.externalPlatform) && (
+                        <div className="absolute top-1.5 left-1.5">
+                          {getPlatformBadge(item.externalPlatform)}
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-3 flex-1 flex flex-col justify-between space-y-2">
+                      <div>
+                        <h4 className="font-bold text-xs text-stone-900 line-clamp-2 leading-snug">
+                          {item.title}
+                        </h4>
+                        <div className="mt-1">
+                          <PriceDisplay
+                            price={item.price}
+                            compareAtPrice={item.compareAtPrice}
+                            size="sm"
+                            accentColor={accent}
+                          />
+                        </div>
+                      </div>
+
+                      <a
+                        href={getTemplateProductUrl(store, item, isMockup)}
+                        target={item.checkoutMode === "EXTERNAL_LINK" ? "_blank" : undefined}
+                        rel={item.checkoutMode === "EXTERNAL_LINK" ? "noopener noreferrer" : undefined}
+                        onClick={() => handleProductClick(item.id)}
+                        className={`w-full py-2 px-2 text-center text-[11px] font-bold text-white bg-stone-900 hover:bg-black transition flex items-center justify-center gap-1 ${btnRadiusClass} cursor-pointer`}
+                      >
+                        <span>
+                          {item.checkoutMode === "EXTERNAL_LINK"
+                            ? "Keranjang"
+                            : item.checkoutMode === "CHAT_ORDER"
+                            ? "Chat"
+                            : "Beli"}
+                        </span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )
+        )}
       </div>
     </div>
   );

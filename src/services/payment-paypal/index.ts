@@ -162,6 +162,131 @@ export async function capturePaypalOrder(
 }
 
 /**
+ * Verifies a PayPal webhook event using PayPal's official verify-webhook-signature API.
+ */
+export async function verifyPaypalWebhookSignature(
+  headers: Headers,
+  webhookEvent: Record<string, unknown>
+): Promise<boolean> {
+  const config = getActivePaypalConfig();
+  if (!config.webhookId) {
+    return false;
+  }
+
+  const transmissionId = headers.get("paypal-transmission-id");
+  const transmissionTime = headers.get("paypal-transmission-time");
+  const certUrl = headers.get("paypal-cert-url");
+  const authAlgo = headers.get("paypal-auth-algo");
+  const transmissionSig = headers.get("paypal-transmission-sig");
+
+  if (!transmissionId || !transmissionTime || !certUrl || !authAlgo || !transmissionSig) {
+    return false;
+  }
+
+  const token = await getPaypalAccessToken();
+  if (!token) {
+    return false;
+  }
+
+  try {
+    const res = await fetch(`${config.apiBaseUrl}/v1/notifications/verify-webhook-signature`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        auth_algo: authAlgo,
+        cert_url: certUrl,
+        transmission_id: transmissionId,
+        transmission_sig: transmissionSig,
+        transmission_time: transmissionTime,
+        webhook_id: config.webhookId,
+        webhook_event: webhookEvent,
+      }),
+    });
+
+    if (!res.ok) {
+      return false;
+    }
+
+    const data = await res.json();
+    return data.verification_status === "SUCCESS";
+  } catch (err) {
+    logger.error("PayPal verify-webhook-signature error", "PaypalService", err);
+    return false;
+  }
+}
+
+/**
+ * Authoritatively verifies a capture or checkout order directly from PayPal REST API.
+ */
+export async function verifyPaypalPaymentFromApi(params: {
+  paypalOrderId?: string;
+  captureId?: string;
+}): Promise<{ verified: boolean; status?: string; customId?: string; amountUsd?: number }> {
+  const token = await getPaypalAccessToken();
+  if (!token) {
+    return { verified: false };
+  }
+
+  const config = getActivePaypalConfig();
+
+  try {
+    if (params.paypalOrderId) {
+      const orderRes = await fetch(`${config.apiBaseUrl}/v2/checkout/orders/${encodeURIComponent(params.paypalOrderId)}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        cache: "no-store",
+      });
+
+      if (orderRes.ok) {
+        const data = await orderRes.json();
+        const unit = data.purchase_units?.[0];
+        const capture = unit?.payments?.captures?.[0];
+        const status = capture?.status || data.status;
+        const amountUsd = Number(capture?.amount?.value || unit?.amount?.value || 0);
+        return {
+          verified: status === "COMPLETED",
+          status,
+          customId: unit?.custom_id || unit?.reference_id,
+          amountUsd,
+        };
+      }
+    }
+
+    if (params.captureId) {
+      const capRes = await fetch(`${config.apiBaseUrl}/v2/payments/captures/${encodeURIComponent(params.captureId)}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        cache: "no-store",
+      });
+
+      if (capRes.ok) {
+        const data = await capRes.json();
+        return {
+          verified: data.status === "COMPLETED",
+          status: data.status,
+          customId: data.custom_id || data.invoice_id,
+          amountUsd: Number(data.amount?.value || 0),
+        };
+      }
+    }
+
+    return { verified: false };
+  } catch (err) {
+    logger.error("verifyPaypalPaymentFromApi error", "PaypalService", err);
+    return { verified: false };
+  }
+}
+
+/**
  * Conversion helper: returns USD equivalent for plan amounts
  */
 export function getPlanUsdPrice(planCode: "PRO" | "DFY", billingCycle: "MONTHLY" | "YEARLY" | "ONE_TIME"): number {

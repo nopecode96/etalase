@@ -74,6 +74,44 @@ export function slugify(text: string): string {
     .replace(/-+$/, ""); // Trim - from end of text
 }
 
+export const SUBDOMAIN_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+export function sanitizeSubdomainInput(raw: string): string {
+  return raw
+    .toString()
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9-]/g, "");
+}
+
+export function validateSubdomainFormat(raw: string): {
+  valid: boolean;
+  slug: string;
+  reason?: "length" | "format";
+  message?: string;
+} {
+  const normalized = raw.toString().trim().toLowerCase();
+  if (normalized.length < 3 || normalized.length > 30) {
+    return {
+      valid: false,
+      slug: normalized,
+      reason: "length",
+      message: "Subdomain harus 3–30 karakter (huruf kecil, angka, satu tanda hubung).",
+    };
+  }
+  if (!SUBDOMAIN_REGEX.test(normalized)) {
+    return {
+      valid: false,
+      slug: normalized,
+      reason: "format",
+      message:
+        "Gunakan huruf kecil (a-z), angka (0-9), dan satu tanda hubung (tanpa tanda hubung ganda atau di awal/akhir).",
+    };
+  }
+  return { valid: true, slug: normalized };
+}
+
 export function buildChatUrl(
   channel: string,
   handle: string | null | undefined,

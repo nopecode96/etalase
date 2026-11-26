@@ -5,6 +5,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/db/prisma";
 import { GlobalHeader } from "@/components/saas/GlobalHeader";
 import { GlobalFooter } from "@/components/saas/GlobalFooter";
+import { OfficialSocialLinks } from "@/components/saas/OfficialSocialLinks";
 import { getPostBySlugAndLocale } from "@/lib/queries/blog";
 import {
   generateLocalizedMetadata,
@@ -55,6 +56,11 @@ export async function generateStaticParams() {
       { slug: "optimasi-keranjang-kuning-tiktok" },
       { slug: "otomasi-chat-qris-instan" },
       { slug: "panduan-ekspansi-e-commerce-asean" },
+      { slug: "strategi-booking-konsultasi-1on1-kreator" },
+      { slug: "cara-buat-katalog-menu-cafe-qr-meja" },
+      { slug: "panduan-custom-domain-toko-online-profesional" },
+      { slug: "strategi-flash-sale-harga-coret-naikkan-konversi" },
+      { slug: "monetisasi-kursus-mini-video-whatsapp-member" },
     ];
   }
 }
@@ -418,7 +424,7 @@ export default async function ArticleDetailPage({
 
       <main className="flex-1">
         {/* Breadcrumb Navigation */}
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-8 pb-4">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-8 pb-4 w-full">
           <nav aria-label="Breadcrumb" className="text-xs text-[#57534E] flex flex-wrap items-center gap-2">
             <Link href={locale === "id" ? "/" : `/${locale}`} className="hover:text-[#D94E28] transition">
               {ui.home}
@@ -435,7 +441,7 @@ export default async function ArticleDetailPage({
         </div>
 
         {/* Article Container */}
-        <article className="max-w-4xl mx-auto px-4 sm:px-6 pb-20">
+        <article className="max-w-6xl mx-auto px-4 sm:px-6 pb-20 w-full">
           {/* Language Fallback Notice if active locale has no translation */}
           {!article.isExactLocale && (
             <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 sm:p-5 mb-8 text-xs sm:text-sm text-amber-900 flex items-start gap-3 shadow-2xs">
@@ -514,7 +520,7 @@ export default async function ArticleDetailPage({
           {/* Featured Cover Image with Semantic Alt */}
           {article.coverImage && (
             <figure className="mb-10">
-              <div className="w-full aspect-16/9 overflow-hidden rounded-3xl bg-stone-100 border border-[#E7E5E4] shadow-xs">
+              <div className="w-full aspect-[16/9] overflow-hidden rounded-3xl bg-stone-100 border border-[#E7E5E4] shadow-xs">
                 <img
                   src={article.coverImage}
                   alt={article.coverAlt}
@@ -677,14 +683,17 @@ export default async function ArticleDetailPage({
                 </p>
               </div>
             </div>
-            <div className="pt-3 border-t border-[#E7E5E4] text-[11px] text-[#57534E] flex flex-wrap items-center justify-between gap-2">
+            <div className="pt-3 border-t border-[#E7E5E4] text-[11px] text-[#57534E] flex flex-wrap items-center justify-between gap-3">
               <span>{ui.officialPub}</span>
-              <a
-                href="mailto:support@etalase.online"
-                className="text-[#D94E28] hover:underline font-medium"
-              >
-                support@etalase.online
-              </a>
+              <div className="flex flex-wrap items-center gap-4">
+                <OfficialSocialLinks locale={locale} variant="inline" />
+                <a
+                  href="mailto:support@etalase.online"
+                  className="text-[#D94E28] hover:underline font-medium"
+                >
+                  support@etalase.online
+                </a>
+              </div>
             </div>
           </section>
 

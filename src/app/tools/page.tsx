@@ -2,7 +2,11 @@ import React from "react";
 import { Metadata } from "next";
 import { ToolsClient } from "@/components/tools/ToolsClient";
 import { SupportedLocale, SUPPORTED_LOCALES } from "@/lib/config/constants";
-import { generateLocalizedMetadata } from "@/lib/seo/metadata-helper";
+import {
+  generateLocalizedMetadata,
+  generateBreadcrumbJsonLd,
+  generateWebPageJsonLd,
+} from "@/lib/seo/metadata-helper";
 
 interface ToolsPageProps {
   searchParams?: {
@@ -51,5 +55,30 @@ export default function FreeToolsPage({ searchParams }: ToolsPageProps) {
       ? (rawLang as SupportedLocale)
       : "id";
 
-  return <ToolsClient locale={locale} />;
+  const path = locale === "id" ? "/tools" : `/${locale}/tools`;
+  const breadcrumbsJsonLd = generateBreadcrumbJsonLd([
+    { name: locale === "id" ? "Beranda" : "Home", url: locale === "id" ? "/" : `/${locale}` },
+    { name: "Tools", url: path },
+  ]);
+  const webPageJsonLd = generateWebPageJsonLd({
+    url: path,
+    name: "Alat Bantu Bisnis Gratis — WhatsApp Link Generator & Kalkulator Profit",
+    description:
+      "Buat tautan chat WhatsApp, Zalo, dan LINE otomatis sekaligus hitung perbandingan penghematan komisi marketplace secara gratis.",
+    locale,
+  });
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }}
+      />
+      <ToolsClient locale={locale} />
+    </>
+  );
 }

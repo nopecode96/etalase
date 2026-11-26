@@ -2,10 +2,10 @@
 
 import React from "react";
 import { usePathname } from "next/navigation";
-import { CheckCircle2, ShoppingBag, MessageCircle, Zap } from "lucide-react";
+import { ShoppingBag, MessageCircle, Zap, ExternalLink, Eye } from "lucide-react";
 import { SupportedLocale } from "@/lib/config/constants";
 
-interface CreatorCard {
+interface DemoStoreCard {
   name: string;
   subdomain: string;
   role: Record<SupportedLocale, string>;
@@ -16,12 +16,27 @@ interface CreatorCard {
   productPrice: Record<SupportedLocale, string>;
   modeIcon: "qris" | "yellow" | "chat";
   modeLabel: Record<SupportedLocale, string>;
-  stat: Record<SupportedLocale, string>;
 }
 
-const CREATORS: CreatorCard[] = [
+const SAMPLE_LABEL: Record<SupportedLocale, string> = {
+  id: "Contoh tampilan",
+  en: "Sample store",
+  ms: "Contoh paparan",
+  th: "ตัวอย่างหน้าร้าน",
+  vi: "Cửa hàng mẫu",
+};
+
+const VIEW_DEMO_LABEL: Record<SupportedLocale, string> = {
+  id: "Lihat contoh →",
+  en: "View sample →",
+  ms: "Lihat contoh →",
+  th: "ดูตัวอย่าง →",
+  vi: "Xem mẫu →",
+};
+
+const DEMO_STORES: DemoStoreCard[] = [
   {
-    name: "Rafa Creative Studio",
+    name: "Studio Rafa Creative",
     subdomain: "rafa.etalase.online",
     role: {
       id: "Video Editor & Digital Creator",
@@ -30,7 +45,7 @@ const CREATORS: CreatorCard[] = [
       th: "นักตัดต่อวิดีโอและครีเอเตอร์",
       vi: "Biên tập Video & Nhà Sáng Tạo",
     },
-    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
+    avatar: "/images/demo/avatar-rafa.jpg",
     templateName: "Clean Minimal",
     templateTag: {
       id: "Gratis",
@@ -61,13 +76,6 @@ const CREATORS: CreatorCard[] = [
       th: "ชำระเงินผ่าน QR ทันใจ",
       vi: "Thanh Toán QR Tức Thì",
     },
-    stat: {
-      id: "1,420 Terjual",
-      en: "1,420 Sold",
-      ms: "1,420 Terjual",
-      th: "ขายแล้ว 1,420 ชิ้น",
-      vi: "Đã bán 1.420",
-    },
   },
   {
     name: "Kopi Senja & Roastery",
@@ -89,11 +97,11 @@ const CREATORS: CreatorCard[] = [
       vi: "Pro",
     },
     productTitle: {
-      id: "Buku Menu Visual & Meja Kasir QR",
-      en: "Visual Menu & Table QR Ordering",
-      ms: "Menu Visual & Meja Kasir QR",
-      th: "เมนูรูปภาพ & QR สั่งอาหารที่โต๊ะ",
-      vi: "Thực Đơn Trực Quan & QR Tại Bàn",
+      id: "Buku Menu Visual & Order WhatsApp",
+      en: "Visual Menu & WhatsApp Ordering",
+      ms: "Menu Visual & Pesanan WhatsApp",
+      th: "เมนูรูปภาพและสั่งซื้อผ่าน WhatsApp",
+      vi: "Thực Đơn Trực Quan & Đặt Qua WhatsApp",
     },
     productPrice: {
       id: "Rp 25.000",
@@ -107,25 +115,18 @@ const CREATORS: CreatorCard[] = [
       id: "Order via WhatsApp (0% Fee)",
       en: "WhatsApp Order (0% Fee)",
       ms: "Pesanan WhatsApp (0% Fi)",
-      th: "สั่งผ่าน WhatsApp (ฟรีค่าธรรมเนียม)",
+      th: "สั่งผ่าน WhatsApp (0% ค่าคอมฯ)",
       vi: "Đặt qua WhatsApp (0% Phí)",
-    },
-    stat: {
-      id: "850+ Order/Bln",
-      en: "850+ Orders/Mo",
-      ms: "850+ Pesanan/Bln",
-      th: "850+ ออเดอร์/เดือน",
-      vi: "850+ Đơn/Tháng",
     },
   },
   {
     name: "Bastian Showroom Mobil",
     subdomain: "bastianmobil.etalase.online",
     role: {
-      id: "Konsultan Otomotif Senior",
-      en: "Senior Automotive Consultant",
-      ms: "Perunding Automotif Kanan",
-      th: "ที่ปรึกษาการขายยานยนต์อาวุโส",
+      id: "Konsultan Otomotif",
+      en: "Automotive Consultant",
+      ms: "Perunding Automotif",
+      th: "ที่ปรึกษาการขายยานยนต์",
       vi: "Chuyên Viên Tư Vấn Ô Tô",
     },
     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80",
@@ -159,13 +160,6 @@ const CREATORS: CreatorCard[] = [
       th: "นัดหมายทดลองขับโดยตรง",
       vi: "Đăng Ký Lái Thử Trực Tiếp",
     },
-    stat: {
-      id: "12 Unit Terjual",
-      en: "12 Units Sold",
-      ms: "12 Unit Terjual",
-      th: "ส่งมอบแล้ว 12 คัน",
-      vi: "Đã giao 12 Xe",
-    },
   },
   {
     name: "Aisyah Hijab & Beauty",
@@ -174,8 +168,8 @@ const CREATORS: CreatorCard[] = [
       id: "Beauty & Fashion Creator",
       en: "Beauty & Fashion Creator",
       ms: "Pencipta Fesyen & Kecantikan",
-      th: "บิวตี้และแฟชั่นบล็อกเกอร์",
-      vi: "Nhà Sáng Tạo Làm Đẹp & Thời Trang",
+      th: "บิวตี้และแฟชั่นครีเอเตอร์",
+      vi: "Nhà Sáng Tạo Làm Đẹp",
     },
     avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=80",
     templateName: "Editorial Pastel",
@@ -187,44 +181,37 @@ const CREATORS: CreatorCard[] = [
       vi: "Pro",
     },
     productTitle: {
-      id: "Rekomendasi Lipcream & Pashmina Silk",
-      en: "Curated Lip Cream & Silk Pashmina",
-      ms: "Syor Krim Bibir & Pashmina Sutera",
-      th: "รวมไอเทมลิปสติกและผ้าคลุมผมซิลค์",
-      vi: "BST Son Môi & Khăn Lụa Cao Cấp",
+      id: "Katalog Skincare & Pashmina Silk",
+      en: "Curated Skincare & Silk Pashmina",
+      ms: "Syor Penjagaan Kulit & Pashmina",
+      th: "รวมสกินแคร์และผ้าคลุมผมซิลค์",
+      vi: "BST Chăm Sóc Da & Khăn Lụa",
     },
     productPrice: {
-      id: "Keranjang Kuning",
-      en: "Yellow Basket",
-      ms: "Beg Kuning",
-      th: "ตะกร้าเหลือง",
-      vi: "Giỏ Vàng",
+      id: "Rp 89.000",
+      en: "$5.99",
+      ms: "RM 25.00",
+      th: "฿199",
+      vi: "145.000 ₫",
     },
     modeIcon: "yellow",
     modeLabel: {
-      id: "TikTok Shop Affiliate",
-      en: "TikTok Shop Affiliate",
-      ms: "Afiliasi TikTok Shop",
-      th: "แอฟฟิลิเอต TikTok Shop",
-      vi: "Tiếp thị TikTok Shop",
-    },
-    stat: {
-      id: "3.4K Klik Rekomendasi",
-      en: "3.4K Product Clicks",
-      ms: "3.4K Klik Syor",
-      th: "3.4 พันคลิกแนะนำ",
-      vi: "3,4K Lượt Nhấp",
+      id: "TikTok & Shopee Affiliate",
+      en: "TikTok & Shopee Affiliate",
+      ms: "Afiliasi TikTok & Shopee",
+      th: "แอฟฟิลิเอต TikTok & Shopee",
+      vi: "Tiếp thị TikTok & Shopee",
     },
   },
   {
-    name: "Dr. Hendra Wibowo",
-    subdomain: "drhendra.etalase.online",
+    name: "Konsultasi Finansial 1-on-1",
+    subdomain: "demo.etalase.online",
     role: {
-      id: "Konsultan Finansial & Edukasi Saham",
-      en: "Financial Consultant & Wealth Coach",
-      ms: "Perunding Kewangan & Jurulatih Saham",
-      th: "ที่ปรึกษาการเงินและการลงทุน",
-      vi: "Chuyên Gia Tư Vấn Tài Chính",
+      id: "Coach & Mentor Bisnis",
+      en: "Business Coach & Mentor",
+      ms: "Jurulatih & Mentor Perniagaan",
+      th: "โค้ชและที่ปรึกษาธุรกิจ",
+      vi: "Cố Vấn & Huấn Luyện Viên",
     },
     avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80",
     templateName: "Clean Minimal",
@@ -236,11 +223,11 @@ const CREATORS: CreatorCard[] = [
       vi: "Miễn Phí",
     },
     productTitle: {
-      id: "Mentoring Portfolio Audit 1-on-1",
-      en: "1-on-1 Portfolio Audit Mentoring",
-      ms: "Pementoran Audit Portfolio 1-on-1",
-      th: "ให้คำปรึกษาตรวจพอร์ตการลงทุน 1 ต่อ 1",
-      vi: "Cố Vấn & Đánh Giá Danh Mục 1-kèm-1",
+      id: "Sesi Mentoring & Konsultasi Jadwal",
+      en: "1-on-1 Mentoring & Calendar Booking",
+      ms: "Pementoran 1-on-1 & Tempahan Jadual",
+      th: "เซสชันที่ปรึกษาและจองคิวเวลา",
+      vi: "Cố Vấn 1-kèm-1 & Đặt Lịch",
     },
     productPrice: {
       id: "Rp 350.000",
@@ -257,23 +244,16 @@ const CREATORS: CreatorCard[] = [
       th: "จองเซสชัน Google Meet",
       vi: "Đặt Lịch Google Meet",
     },
-    stat: {
-      id: "94 Slot Penuh",
-      en: "94 Booked Slots",
-      ms: "94 Slot Dipenuhi",
-      th: "เต็ม 94 รอบ",
-      vi: "Đã kín 94 Lịch",
-    },
   },
   {
-    name: "Nurul Kitchen KL",
-    subdomain: "nurulkl.etalase.online",
+    name: "Katalog UMKM Kuliner",
+    subdomain: "kopisenja.etalase.online",
     role: {
-      id: "Kek & Pastri Homebaker",
-      en: "Artisan Pastry & Homebaker",
-      ms: "Kek & Pastri Homebaker",
-      th: "เบเกอรี่โฮมเมดและขนมอบ",
-      vi: "Bánh Ngọt & Tiệm Bánh Thủ Công",
+      id: "Toko Kue & Katering Harian",
+      en: "Bakery & Daily Catering",
+      ms: "Kek & Katering Harian",
+      th: "เบเกอรี่และอาหารกล่องโฮมเมด",
+      vi: "Tiệm Bánh & Đặt Tiệc",
     },
     avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80",
     templateName: "Visual Menu Grid",
@@ -285,11 +265,11 @@ const CREATORS: CreatorCard[] = [
       vi: "Pro",
     },
     productTitle: {
-      id: "Order Kek Batik & Brownies",
-      en: "Fudge Brownies & Artisan Cakes",
-      ms: "Pesanan Kek Batik & Brownies",
-      th: "สั่งบราวนี่และเค้กพรีเมียม",
-      vi: "Đặt Bánh Brownie & Bánh Kem",
+      id: "Paket Hampers & Katalog Menu",
+      en: "Gift Hampers & Digital Menu",
+      ms: "Pakej Hamper & Menu Digital",
+      th: "เซ็ตของขวัญและเมนูดิจิทัล",
+      vi: "Set Quà Tặng & Menu Online",
     },
     productPrice: {
       id: "Rp 120.000",
@@ -306,13 +286,6 @@ const CREATORS: CreatorCard[] = [
       th: "สั่งออเดอร์ตรงสู่ WhatsApp",
       vi: "Đặt Trực Tiếp Qua WhatsApp",
     },
-    stat: {
-      id: "1,150 Kotak/Bln",
-      en: "1,150 Boxes/Mo",
-      ms: "1,150 Kotak/Bln",
-      th: "1,150 กล่อง/เดือน",
-      vi: "1.150 Hộp/Tháng",
-    },
   },
 ];
 
@@ -325,15 +298,32 @@ export function CreatorMarquee() {
   else if (pathname.startsWith("/th")) currentLocale = "th";
   else if (pathname.startsWith("/vi")) currentLocale = "vi";
 
+  const sampleLabel = SAMPLE_LABEL[currentLocale] || SAMPLE_LABEL.id;
+  const viewDemoLabel = VIEW_DEMO_LABEL[currentLocale] || VIEW_DEMO_LABEL.id;
+
   return (
-    <div className="w-full overflow-hidden select-none relative group py-2">
-      <div className="flex w-max animate-marquee hover:[animation-play-state:paused] gap-5">
-        {[...CREATORS, ...CREATORS].map((item, idx) => (
-          <div
-            key={idx}
-            className="w-[300px] sm:w-[320px] bg-[#FAF8F5] border border-[#E7E5E4] rounded-2xl p-4 flex flex-col justify-between shadow-2xs hover:shadow-xs hover:border-[#D94E28]/40 transition shrink-0"
+    <div className="max-w-6xl mx-auto px-4 sm:px-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+        {DEMO_STORES.map((item, idx) => (
+          <a
+            key={`${item.name}-${idx}`}
+            href={`https://${item.subdomain}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-[#FAF8F5] border border-[#E7E5E4] rounded-2xl p-4 flex flex-col justify-between shadow-2xs hover:shadow-sm hover:border-[#D94E28]/50 transition group"
           >
-            {/* Header Profil Kreator */}
+            {/* Sample label + template tier badge */}
+            <div className="flex items-center justify-between gap-2 mb-3">
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
+                <Eye className="w-3 h-3" />
+                <span>{sampleLabel}</span>
+              </span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#57534E] bg-white border border-[#E7E5E4] px-2 py-0.5 rounded-md shrink-0">
+                {item.templateName} &bull; {item.templateTag[currentLocale] || item.templateTag.id}
+              </span>
+            </div>
+
+            {/* Header Profil Toko Demo */}
             <div className="flex items-center gap-3">
               <img
                 src={item.avatar}
@@ -341,24 +331,21 @@ export function CreatorMarquee() {
                 className="w-10 h-10 rounded-full object-cover border border-[#E7E5E4] shrink-0"
               />
               <div className="flex-1 min-w-0 text-left">
-                <div className="flex items-center gap-1.5">
-                  <span className="font-bold text-xs text-[#1C1917] truncate">
-                    {item.name}
-                  </span>
-                  <CheckCircle2 className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+                <div className="font-bold text-xs text-[#1C1917] truncate">
+                  {item.name}
+                </div>
+                <div className="text-[11px] text-[#57534E] truncate">
+                  {item.role[currentLocale] || item.role.id}
                 </div>
                 <div className="text-[11px] text-[#D94E28] font-mono truncate">
                   {item.subdomain}
                 </div>
               </div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#57534E] bg-white border border-[#E7E5E4] px-2 py-0.5 rounded-md shrink-0">
-                {item.templateTag[currentLocale] || item.templateTag.id}
-              </span>
             </div>
 
             {/* Produk Unggulan Preview */}
-            <div className="mt-3 pt-3 border-t border-stone-200/60 flex items-center justify-between text-left">
-              <div className="min-w-0 pr-2">
+            <div className="mt-3 pt-3 border-t border-stone-200/70 flex items-center justify-between text-left gap-2">
+              <div className="min-w-0">
                 <div className="text-[11px] text-[#57534E] truncate font-medium">
                   {item.productTitle[currentLocale] || item.productTitle.id}
                 </div>
@@ -366,26 +353,22 @@ export function CreatorMarquee() {
                   {item.productPrice[currentLocale] || item.productPrice.id}
                 </div>
               </div>
-              <div className="text-right shrink-0">
-                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 block">
-                  {item.stat[currentLocale] || item.stat.id}
-                </span>
-              </div>
+              <span className="text-[11px] font-semibold text-[#D94E28] group-hover:underline shrink-0 inline-flex items-center gap-1">
+                <span>{viewDemoLabel}</span>
+                <ExternalLink className="w-3 h-3" />
+              </span>
             </div>
 
             {/* Mode Transaksi Chip */}
-            <div className="mt-2.5 pt-2 border-t border-stone-200/40 flex items-center justify-between text-[10px] text-[#57534E]">
+            <div className="mt-2.5 pt-2 border-t border-stone-200/50 flex items-center justify-between text-[10px] text-[#57534E]">
               <span className="flex items-center gap-1 font-semibold truncate">
                 {item.modeIcon === "qris" && <Zap className="w-3 h-3 text-[#D94E28]" />}
                 {item.modeIcon === "chat" && <MessageCircle className="w-3 h-3 text-emerald-600" />}
                 {item.modeIcon === "yellow" && <ShoppingBag className="w-3 h-3 text-amber-600" />}
                 {item.modeLabel[currentLocale] || item.modeLabel.id}
               </span>
-              <span className="text-[10px] text-stone-400 font-medium">
-                {item.templateName}
-              </span>
             </div>
-          </div>
+          </a>
         ))}
       </div>
     </div>

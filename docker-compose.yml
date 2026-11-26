@@ -27,6 +27,7 @@ services:
         condition: service_healthy
     networks:
       - etalase_net
+      - locallytrip_network
 
   postgres:
     image: postgres:16-alpine
@@ -59,13 +60,33 @@ services:
       - N8N_PORT=5678
       - N8N_PROTOCOL=https
       - NODE_ENV=production
-      - WEBHOOK_URL=https://flow.${NEXT_PUBLIC_ROOT_DOMAIN:-etalase.online}/
+      - N8N_WEBHOOK_URL=https://flow.${NEXT_PUBLIC_ROOT_DOMAIN:-etalase.online}/
       - GENERIC_TIMEZONE=Asia/Jakarta
+      # Penghematan Resource & Memory Optimization
+      - EXECUTIONS_DATA_PRUNE=true
+      - EXECUTIONS_DATA_MAX_AGE=168
+      - EXECUTIONS_DATA_PRUNE_MAX_COUNT=5000
+      - EXECUTIONS_DATA_SAVE_ON_ERROR=all
+      - EXECUTIONS_DATA_SAVE_ON_SUCCESS=none
+      - EXECUTIONS_DATA_SAVE_MANUAL_EXECUTIONS=false
+      - N8N_METRICS=false
+      - N8N_DIAGNOSTICS_ENABLED=false
+      - N8N_VERSION_NOTIFICATIONS_ENABLED=false
+      - NODE_OPTIONS=--max-old-space-size=512
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 640M
+        reservations:
+          cpus: '0.10'
+          memory: 256M
     volumes:
       - etalase_n8n_data:/home/node/.n8n
       - ./automation/n8n/workflows:/data/workflows
     networks:
       - etalase_net
+      - locallytrip_network
 
 volumes:
   etalase_pg_data:
@@ -77,3 +98,5 @@ networks:
   etalase_net:
     name: etalase_network
     driver: bridge
+  locallytrip_network:
+    external: true

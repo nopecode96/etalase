@@ -151,7 +151,7 @@ export function AdminOrdersPayoutsClient({
     e.preventDefault();
 
     if (!payoutAccountNumber.trim() || !payoutAccountHolder.trim()) {
-      showToast("Mohon isi nomor dan nama pemilik rekening secara lengkap.", "error");
+      showToast("Please complete both account number and account holder name.", "error");
       return;
     }
 
@@ -168,12 +168,12 @@ export function AdminOrdersPayoutsClient({
       setIsSavingBank(false);
 
       if (res.success) {
-        showToast("Rekening bank pencairan berhasil disimpan!", "success");
+        showToast("Payout bank account saved successfully!", "success");
         setModalBankName(payoutBankName);
         setModalAccountNumber(payoutAccountNumber);
         setModalAccountHolder(payoutAccountHolder);
       } else {
-        showToast(res.error || "Gagal menyimpan rekening pencairan", "error");
+        showToast(res.error || "Failed to save payout bank account", "error");
       }
     });
   };
@@ -187,7 +187,7 @@ export function AdminOrdersPayoutsClient({
 
     if (!hasAccount) {
       showToast(
-        "Silakan daftarkan Rekening Bank Pencairan terlebih dahulu sebelum mengajukan payout.",
+        "Please configure your Payout Bank Account first before requesting a withdrawal.",
         "error"
       );
       const card = document.getElementById("payout-bank-card");
@@ -211,19 +211,19 @@ export function AdminOrdersPayoutsClient({
 
     if (withdrawalAmount < rules.minWithdrawalAmountIdr) {
       showToast(
-        `Minimum penarikan adalah Rp ${rules.minWithdrawalAmountIdr.toLocaleString("id-ID")}`,
+        `Minimum withdrawal amount is Rp ${rules.minWithdrawalAmountIdr.toLocaleString("id-ID")}`,
         "error"
       );
       return;
     }
 
     if (withdrawalAmount > walletBalance) {
-      showToast("Saldo dompet tidak mencukupi untuk penarikan.", "error");
+      showToast("Insufficient wallet balance for this withdrawal.", "error");
       return;
     }
 
     if (!modalAccountNumber.trim() || !modalAccountHolder.trim()) {
-      showToast("Detail rekening bank pencairan belum lengkap.", "error");
+      showToast("Payout bank account details are incomplete.", "error");
       return;
     }
 
@@ -239,9 +239,9 @@ export function AdminOrdersPayoutsClient({
       if (res.success && res.data) {
         setWithdrawals([res.data, ...withdrawals]);
         setPayoutModalOpen(false);
-        showToast("Permintaan pencairan berhasil dikirim! Diproses dalam 1x24 jam.", "success");
+        showToast("Withdrawal request submitted! Processed within 24 hours.", "success");
       } else {
-        showToast(res.error || "Gagal mengajukan penarikan", "error");
+        showToast(res.error || "Failed to submit withdrawal request", "error");
       }
     });
   };
@@ -255,7 +255,7 @@ export function AdminOrdersPayoutsClient({
             Wallet &amp; Withdrawals
           </h1>
           <p className="text-xs sm:text-sm text-[#57534E] mt-1">
-            Kelola saldo dompet toko, margin guard BorderPay, dan ajukan pencairan ke rekening bank.
+            Manage store wallet balance, BorderPay margin guardrails, and request bank payouts.
           </p>
         </div>
 
@@ -291,7 +291,7 @@ export function AdminOrdersPayoutsClient({
             <span className="text-[#57534E]">Monthly Payout Status:</span>
             <span className="font-bold text-[#1C1917]">
               {isFree
-                ? "Standard (Rp 5.000/tarik)"
+                ? "Standard (Rp 5.000/payout)"
                 : `${remainingFreeWithdrawals} of 4 Free remaining`}
             </span>
           </div>
@@ -312,8 +312,8 @@ export function AdminOrdersPayoutsClient({
           </div>
 
           <p className="text-xs text-[#57534E] leading-relaxed">
-            Tentukan siapa penanggung biaya pemrosesan pembayaran QRIS ({rules.directCheckoutFeePercent}%).
-            Sistem kami dirancang untuk melindungi 100% margin keuntungan toko Anda.
+            Choose who covers the QRIS payment processing fee ({rules.directCheckoutFeePercent}%).
+            Designed to protect 100% of your product profit margin.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
@@ -340,7 +340,7 @@ export function AdminOrdersPayoutsClient({
                   Customer Pays Fee <span className="text-emerald-700 font-bold">(Recommended)</span>
                 </p>
                 <p className="text-[11px] text-[#57534E] mt-0.5 leading-snug">
-                  Ditambahkan otomatis sebagai biaya layanan saat checkout. Toko Anda menerima 100% nominal harga produk.
+                  Added automatically as a service fee at checkout. Your store keeps 100% of your selling price.
                 </p>
               </div>
             </div>
@@ -368,7 +368,7 @@ export function AdminOrdersPayoutsClient({
                   Merchant Absorbs Fee
                 </p>
                 <p className="text-[11px] text-[#57534E] mt-0.5 leading-snug">
-                  Biaya ({rules.directCheckoutFeePercent}%) dipotong langsung dari saldo pencairan toko.
+                  The ({rules.directCheckoutFeePercent}%) fee is deducted directly from settled wallet earnings.
                 </p>
               </div>
             </div>
@@ -388,10 +388,10 @@ export function AdminOrdersPayoutsClient({
             </div>
             <div>
               <h2 className="text-base font-bold text-[#1C1917]">
-                Rekening Pencairan (Payout Bank Account)
+                Payout Bank Account
               </h2>
               <p className="text-xs text-[#57534E] mt-0.5">
-                Daftarkan rekening bank atau e-wallet untuk menerima transfer saldo pencairan otomatis.
+                Register your bank account or e-wallet to receive settled balance withdrawals.
               </p>
             </div>
           </div>
@@ -404,7 +404,7 @@ export function AdminOrdersPayoutsClient({
                   : "bg-amber-50 text-amber-700 border border-amber-200"
               }`}
             >
-              {payoutAccountNumber ? "✓ Rekening Terdaftar" : "! Belum Didaftarkan"}
+              {payoutAccountNumber ? "✓ Account Registered" : "! Not Configured"}
             </span>
           </div>
         </div>
@@ -414,9 +414,9 @@ export function AdminOrdersPayoutsClient({
             {/* Country Dropdown (Database-Driven) */}
             <div className="space-y-1.5">
               <label className="block text-xs font-bold text-[#1C1917] flex items-center justify-between">
-                <span>Negara Operasional Toko</span>
+                <span>Operational Country</span>
                 <span className="text-[10px] text-[#78716C] font-normal">
-                  Bahasa antarmuka terpisah dari negara toko
+                  Separate from console UI language
                 </span>
               </label>
               <select
@@ -430,19 +430,19 @@ export function AdminOrdersPayoutsClient({
                     value={c.code}
                     disabled={!c.isActive}
                   >
-                    {c.flagEmoji} {c.name} ({c.currencyCode}) {c.isActive ? "— Aktif" : "— Segera Hadir"}
+                    {c.flagEmoji} {c.name} ({c.currencyCode}) {c.isActive ? "— Active" : "— Coming Soon"}
                   </option>
                 ))}
               </select>
               <p className="text-[10px] text-[#78716C]">
-                Hanya negara bertanda <b>Aktif</b> yang mendukung direct payout BorderPay saat ini.
+                Only countries marked <b>Active</b> support direct payouts at this time.
               </p>
             </div>
 
             {/* Bank / E-Wallet Dynamic Dropdown */}
             <div className="space-y-1.5">
               <label className="block text-xs font-bold text-[#1C1917]">
-                Bank / Dompet Digital Pencairan *
+                Payout Bank / E-Wallet *
               </label>
               <select
                 value={payoutBankId || payoutBankName}
@@ -459,7 +459,7 @@ export function AdminOrdersPayoutsClient({
                   </optgroup>
                 )}
                 {ewalletOptions.length > 0 && (
-                  <optgroup label="📱 Dompet Digital (E-Wallet)">
+                  <optgroup label="📱 Digital Wallets (E-Wallet)">
                     {ewalletOptions.map((b) => (
                       <option key={b.id} value={b.id}>
                         {b.name}
@@ -476,7 +476,7 @@ export function AdminOrdersPayoutsClient({
             {/* Account Number */}
             <div className="space-y-1.5">
               <label className="block text-xs font-bold text-[#1C1917]">
-                Nomor Rekening / No. HP E-Wallet *
+                Account Number / E-Wallet Phone *
               </label>
               <input
                 type="text"
@@ -484,7 +484,7 @@ export function AdminOrdersPayoutsClient({
                 required
                 value={payoutAccountNumber}
                 onChange={(e) => setPayoutAccountNumber(e.target.value)}
-                placeholder="Contoh: 1234567890 atau 081234567890"
+                placeholder="e.g. 1234567890 or 081234567890"
                 className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#E7E5E4] font-mono focus:outline-none focus:ring-2 focus:ring-[#D94E28]/20 focus:border-[#D94E28]"
               />
             </div>
@@ -492,14 +492,14 @@ export function AdminOrdersPayoutsClient({
             {/* Account Holder Name */}
             <div className="space-y-1.5">
               <label className="block text-xs font-bold text-[#1C1917]">
-                Nama Pemilik Rekening (Sesuai KTP / Rekening) *
+                Account Holder Name (Matches ID / Bank Book) *
               </label>
               <input
                 type="text"
                 required
                 value={payoutAccountHolder}
                 onChange={(e) => setPayoutAccountHolder(e.target.value)}
-                placeholder="Contoh: BUDI SANTOSO"
+                placeholder="e.g. JOHN DOE"
                 className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#E7E5E4] font-semibold uppercase focus:outline-none focus:ring-2 focus:ring-[#D94E28]/20 focus:border-[#D94E28]"
               />
             </div>
@@ -507,7 +507,7 @@ export function AdminOrdersPayoutsClient({
 
           <div className="flex items-center justify-between pt-2 border-t border-[#E7E5E4]">
             <p className="text-[11px] text-[#78716C]">
-              Rekening ini akan otomatis terisi saat Anda mengajukan penarikan dana.
+              This account will be pre-filled automatically whenever you request a payout.
             </p>
             <button
               type="submit"
@@ -519,7 +519,7 @@ export function AdminOrdersPayoutsClient({
               ) : (
                 <Save className="w-3.5 h-3.5" />
               )}
-              <span>Simpan Rekening Pencairan</span>
+              <span>Save Payout Account</span>
             </button>
           </div>
         </form>
@@ -528,22 +528,22 @@ export function AdminOrdersPayoutsClient({
       {/* 3. Withdrawal History */}
       <section className="bg-white rounded-3xl border border-[#E7E5E4] shadow-xs p-6 space-y-4">
         <h2 className="text-base font-bold text-[#1C1917]">
-          Riwayat Penarikan Dana ({withdrawals.length})
+          Withdrawal History ({withdrawals.length})
         </h2>
 
         {withdrawals.length === 0 ? (
-          <p className="text-xs text-[#78716C] py-4">Belum ada riwayat penarikan dana.</p>
+          <p className="text-xs text-[#78716C] py-4">No withdrawal history yet.</p>
         ) : (
           <>
             <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead className="bg-[#FAF8F5] text-[#78716C] font-semibold border-y border-[#E7E5E4]">
                 <tr>
-                  <th className="py-2.5 px-4">Tanggal</th>
-                  <th className="py-2.5 px-4">Jumlah Diminta</th>
-                  <th className="py-2.5 px-4">Biaya Payout</th>
-                  <th className="py-2.5 px-4">Dana Diterima</th>
-                  <th className="py-2.5 px-4">Rekening Tujuan</th>
+                  <th className="py-2.5 px-4">Date</th>
+                  <th className="py-2.5 px-4">Requested Amount</th>
+                  <th className="py-2.5 px-4">Payout Fee</th>
+                  <th className="py-2.5 px-4">Net Received</th>
+                  <th className="py-2.5 px-4">Destination</th>
                   <th className="py-2.5 px-4">Status</th>
                 </tr>
               </thead>
@@ -603,7 +603,7 @@ export function AdminOrdersPayoutsClient({
               <div className="flex items-center gap-2">
                 <CreditCard className="w-5 h-5 text-[#D94E28]" />
                 <h3 className="text-base font-bold text-[#1C1917]">
-                  Ajukan Penarikan Saldo
+                  Request Balance Withdrawal
                 </h3>
               </div>
               <button
@@ -618,7 +618,7 @@ export function AdminOrdersPayoutsClient({
             <form onSubmit={handleRequestWithdrawal} className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-[#1C1917] mb-1">
-                  Nominal Penarikan (IDR)
+                  Withdrawal Amount (IDR)
                 </label>
                 <input
                   type="number"
@@ -630,14 +630,14 @@ export function AdminOrdersPayoutsClient({
                   className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#E7E5E4] font-bold"
                 />
                 <p className="text-[11px] text-[#78716C] mt-1">
-                  Tersedia: Rp {walletBalance.toLocaleString("id-ID")} &bull; Minimum: Rp{" "}
+                  Available: Rp {walletBalance.toLocaleString("id-ID")} &bull; Minimum: Rp{" "}
                   {rules.minWithdrawalAmountIdr.toLocaleString("id-ID")}
                 </p>
               </div>
 
               <div>
                 <label className="block text-xs font-bold text-[#1C1917] mb-1">
-                  Bank / E-Wallet Tujuan
+                  Destination Bank / E-Wallet
                 </label>
                 <input
                   type="text"
@@ -650,7 +650,7 @@ export function AdminOrdersPayoutsClient({
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-[#1C1917] mb-1">
-                    Nomor Rekening
+                    Account Number
                   </label>
                   <input
                     type="text"
@@ -661,7 +661,7 @@ export function AdminOrdersPayoutsClient({
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-[#1C1917] mb-1">
-                    Atas Nama
+                    Account Holder
                   </label>
                   <input
                     type="text"
@@ -674,19 +674,19 @@ export function AdminOrdersPayoutsClient({
 
               <div className="p-3.5 rounded-2xl bg-[#FAF8F5] border border-[#E7E5E4] space-y-1.5 text-xs">
                 <div className="flex justify-between text-[#57534E]">
-                  <span>Nominal Diminta:</span>
+                  <span>Requested Amount:</span>
                   <span className="font-semibold text-[#1C1917]">
                     Rp {withdrawalAmount.toLocaleString("id-ID")}
                   </span>
                 </div>
                 <div className="flex justify-between text-[#57534E]">
-                  <span>Biaya Payout:</span>
+                  <span>Payout Fee:</span>
                   <span className="font-semibold text-emerald-600">
-                    {isFreeQuota ? "Rp 0 (Kuota Gratis)" : `Rp ${estimatedFee.toLocaleString("id-ID")}`}
+                    {isFreeQuota ? "Rp 0 (Free Quota)" : `Rp ${estimatedFee.toLocaleString("id-ID")}`}
                   </span>
                 </div>
                 <div className="flex justify-between pt-1 border-t border-[#E7E5E4] font-bold text-sm text-[#1C1917]">
-                  <span>Estimasi Dana Masuk:</span>
+                  <span>Estimated Net Payout:</span>
                   <span className="text-emerald-700">Rp {netAmount.toLocaleString("id-ID")}</span>
                 </div>
               </div>
@@ -697,7 +697,7 @@ export function AdminOrdersPayoutsClient({
                   onClick={() => setPayoutModalOpen(false)}
                   className="px-4 py-2 text-xs font-semibold text-stone-600 hover:bg-stone-100 rounded-xl transition"
                 >
-                  Batal
+                  Cancel
                 </button>
                 <button
                   type="submit"
@@ -705,7 +705,7 @@ export function AdminOrdersPayoutsClient({
                   className="px-5 py-2 text-xs font-bold text-white bg-[#D94E28] hover:bg-[#B83E1D] rounded-xl transition shadow-xs flex items-center gap-2 disabled:opacity-50 cursor-pointer"
                 >
                   {isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
-                  <span>Konfirmasi Pengajuan Payout</span>
+                  <span>Confirm Payout Request</span>
                 </button>
               </div>
             </form>

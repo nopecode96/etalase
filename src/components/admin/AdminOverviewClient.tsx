@@ -190,7 +190,7 @@ export function AdminOverviewClient({
                 {isFree ? "Rp 5.000 payout fee" : `${remainingFreeWithdrawals}/4 Free Payouts`}
               </span>
               <Link
-                href="/admin/orders"
+                href="/admin/orders/payouts"
                 className="font-semibold text-[#D94E28] hover:underline"
               >
                 Withdraw ↗

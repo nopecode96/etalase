@@ -2,7 +2,11 @@ import React from "react";
 import { Metadata } from "next";
 import { FiturClient } from "@/components/fitur/FiturClient";
 import { SupportedLocale, SUPPORTED_LOCALES } from "@/lib/config/constants";
-import { generateLocalizedMetadata } from "@/lib/seo/metadata-helper";
+import {
+  generateLocalizedMetadata,
+  generateBreadcrumbJsonLd,
+  generateWebPageJsonLd,
+} from "@/lib/seo/metadata-helper";
 
 interface FiturPageProps {
   searchParams?: {
@@ -51,5 +55,30 @@ export default function FiturPage({ searchParams }: FiturPageProps) {
       ? (rawLang as SupportedLocale)
       : "id";
 
-  return <FiturClient locale={locale} />;
+  const path = locale === "id" ? "/fitur" : `/${locale}/fitur`;
+  const breadcrumbsJsonLd = generateBreadcrumbJsonLd([
+    { name: locale === "id" ? "Beranda" : "Home", url: locale === "id" ? "/" : `/${locale}` },
+    { name: locale === "id" ? "Fitur" : "Features", url: path },
+  ]);
+  const webPageJsonLd = generateWebPageJsonLd({
+    url: path,
+    name: "Katalog Fitur Lengkap etalase.online",
+    description:
+      "Auto-delivery file digital ke WhatsApp, katalog showroom mobil/properti, booking 1-on-1, QRIS instan 2%/4,5%, custom domain + SSL, dan pixel tracking.",
+    locale,
+  });
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }}
+      />
+      <FiturClient locale={locale} />
+    </>
+  );
 }

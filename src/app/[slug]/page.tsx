@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { prisma, serializePlain } from "@/lib/db/prisma";
+import { isStorePlanExpired } from "@/services/payment/plan-lifecycle";
 import { TemplateRenderer } from "@/components/templates/TemplateRenderer";
 import { StorefrontPixelTracker } from "@/components/tracking/StorefrontPixelTracker";
 
@@ -56,7 +57,14 @@ export async function generateMetadata({ params }: StorePageProps): Promise<Meta
       avatarUrl: true,
       bannerUrl: true,
       customDomain: true,
+      tier: true,
+      planExpiresAt: true,
       isActive: true,
+      products: {
+        where: { isActive: true },
+        select: { id: true },
+        take: 1,
+      },
     },
   });
 
@@ -67,17 +75,24 @@ export async function generateMetadata({ params }: StorePageProps): Promise<Meta
     };
   }
 
-  const storeUrl = store.customDomain
-    ? `https://${store.customDomain}`
-    : `https://${store.slug}.${rootDomain}`;
-  const title = `${store.name} | etalase.online`;
+  const effectiveIsPro =
+    store.tier !== "FREE" && !isStorePlanExpired(store.tier, store.planExpiresAt);
+
+  const storeUrl =
+    effectiveIsPro && store.customDomain
+      ? `https://${store.customDomain}`
+      : `https://${store.slug}.${rootDomain}`;
+  const title = effectiveIsPro ? store.name : `${store.name} | etalase.online`;
   const description =
-    store.bio?.trim() || `Kunjungi etalase resmi ${store.name} di ${store.slug}.${rootDomain}.`;
+    store.bio?.trim() || `Kunjungi etalase resmi ${store.name}.`;
   const ogImage = toAbsoluteUrl(store.bannerUrl || store.avatarUrl);
+
+  const isEmptyStore = store.products.length === 0;
 
   return {
     title,
     description,
+    ...(isEmptyStore ? { robots: { index: false, follow: false } } : {}),
     alternates: {
       canonical: storeUrl,
     },
@@ -176,6 +191,9 @@ export default async function StorefrontPage({ params }: StorePageProps) {
   }
 
   const serializedStore = serializePlain(store);
+  const effectiveTier = isStorePlanExpired(store.tier, store.planExpiresAt)
+    ? "FREE"
+    : serializedStore.tier;
 
   const formattedProducts = serializedStore.products.map((p) => ({
     id: p.id,
@@ -191,6 +209,7 @@ export default async function StorefrontPage({ params }: StorePageProps) {
     externalLabel: p.externalLabel,
     isFeatured: p.isFeatured,
     category: p.category,
+    productType: p.productType,
     secondaryModes: p.secondaryModes as any,
   }));
 
@@ -210,7 +229,7 @@ export default async function StorefrontPage({ params }: StorePageProps) {
   return (
     <>
       <StorefrontPixelTracker
-        tier={serializedStore.tier}
+        tier={effectiveTier}
         metaPixelId={serializedStore.metaPixelId}
         tiktokPixelId={serializedStore.tiktokPixelId}
         gaMeasurementId={serializedStore.gaMeasurementId}
@@ -227,7 +246,9 @@ export default async function StorefrontPage({ params }: StorePageProps) {
           chatChannel: serializedStore.chatChannel,
           chatHandle: serializedStore.chatHandle,
           chatChannels: serializedStore.chatChannels as any,
-          tier: serializedStore.tier,
+          tier: effectiveTier,
+          isDemo: serializedStore.isDemo,
+          displayMode: serializedStore.displayMode,
           templateId: serializedStore.templateId,
           appearanceConfig: serializedStore.appearanceConfig as any,
           blocks: formattedBlocks,

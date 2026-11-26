@@ -129,17 +129,17 @@ export function AdminSettingsProfileClient({ store }: AdminSettingsProfileClient
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-sm">🇮🇩</span>
-                <span className="text-xs font-bold text-[#1C1917]">Negara Operasional: Indonesia (ID)</span>
+                <span className="text-xs font-bold text-[#1C1917]">Operational Country: Indonesia (ID)</span>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                  Aktif (Direct QRIS &amp; Payout)
+                  Active (Direct QRIS &amp; Payout)
                 </span>
               </div>
               <p className="text-[11px] text-[#78716C] mt-0.5">
-                Pencairan dana dan checkout QRIS terhubung penuh ke sistem perbankan nasional.
+                Payouts and QRIS direct checkout are routed to domestic bank and e-wallet rails.
               </p>
             </div>
             <div className="text-[10px] text-stone-500 bg-white px-2.5 py-1 rounded-xl border border-stone-200 shrink-0">
-              🌍 Ekspansi Global (SG, MY, TH, VN, INTL) Siap Diaktifkan dari Mabes
+              🌍 Global Expansion (SG, MY, TH, VN, INTL) Managed by Platform Ops
             </div>
           </div>
         </div>

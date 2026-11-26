@@ -149,9 +149,11 @@ export const CatalogGrid: React.FC<StoreTemplateProps> = ({
         })}
       </div>
 
-      <footer className={styles.footer}>
-        Ditenagai oleh <span className="font-semibold text-slate-700">etalase.online</span>
-      </footer>
+      {store.tier === "FREE" && (
+        <footer className={styles.footer}>
+          Ditenagai oleh <span className="font-semibold text-slate-700">etalase.online</span>
+        </footer>
+      )}
     </div>
   );
 };

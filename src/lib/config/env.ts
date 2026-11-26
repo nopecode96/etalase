@@ -21,6 +21,7 @@ const envSchema = z.object({
 
   // Borderpay QRIS & Cross-Border Gateway
   BORDERPAY_ENV: z.enum(["test", "live"]).default("test"),
+  BORDERPAY_API_BASE_URL: z.string().optional().default(""),
   BORDERPAY_TEST_API_KEY: z.string().default("bp_test_zwqnyfoD8B4JtuEteZWeakZg54V3Ltmv"),
   BORDERPAY_TEST_WEBHOOK_KEY: z.string().default("bpt_Sccoz-yvaOZTa-7TkS_wnxiyrPS0Pb3l"),
   BORDERPAY_LIVE_API_KEY: z.string().default("bp_live_riyC1KnSgDGtaCEVj10VmDIFVyTJEe8D"),
@@ -29,6 +30,7 @@ const envSchema = z.object({
 
   PAYPAL_CLIENT_ID: z.string().optional().default(""),
   PAYPAL_CLIENT_SECRET: z.string().optional().default(""),
+  PAYPAL_WEBHOOK_ID: z.string().optional().default(""),
   PAYPAL_MODE: z.enum(["sandbox", "live"]).default("sandbox"),
   PAYPAL_WEBHOOK_URL: z.string().default("https://etalase.online/paypal/webhook"),
   PAYPAL_SANDBOX_EMAIL: z.string().optional().default(""),
@@ -59,12 +61,13 @@ export const env = parsed.success
  */
 export function getActiveBorderpayConfig() {
   const isLive = env.BORDERPAY_ENV === "live";
+  const customBaseUrl = env.BORDERPAY_API_BASE_URL?.trim().replace(/\/$/, "");
   return {
     isLive,
     apiKey: isLive ? env.BORDERPAY_LIVE_API_KEY : env.BORDERPAY_TEST_API_KEY,
     webhookKey: isLive ? env.BORDERPAY_LIVE_WEBHOOK_KEY : env.BORDERPAY_TEST_WEBHOOK_KEY,
     webhookUrl: env.BORDERPAY_WEBHOOK_URL,
-    apiBaseUrl: isLive ? "https://api.borderpay.id/v1" : "https://sandbox-api.borderpay.id/v1",
+    apiBaseUrl: customBaseUrl || "https://borderpay.id/api/v1",
   };
 }
 
@@ -77,6 +80,7 @@ export function getActivePaypalConfig() {
     isSandbox,
     clientId: env.PAYPAL_CLIENT_ID,
     clientSecret: env.PAYPAL_CLIENT_SECRET,
+    webhookId: env.PAYPAL_WEBHOOK_ID,
     mode: env.PAYPAL_MODE,
     webhookUrl: env.PAYPAL_WEBHOOK_URL,
     sandboxEmail: env.PAYPAL_SANDBOX_EMAIL,

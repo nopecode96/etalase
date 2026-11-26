@@ -54,45 +54,45 @@ export function OnboardingTour({ store }: OnboardingTourProps) {
 
   const steps = [
     {
-      title: "Selamat Datang di etalase.online!",
-      subtitle: "Langkah 1 dari 4 • Profil & WhatsApp Toko",
+      title: "Welcome to etalase.online!",
+      subtitle: "Step 1 of 4 • Store Profile & WhatsApp",
       icon: Store,
       iconBg: "bg-orange-100 text-[#D94E28]",
-      desc: "Lengkapi nama merek dan nomor WhatsApp resmi toko Anda. Pelanggan dapat langsung menghubungi Anda untuk pesanan via WhatsApp tanpa potongan biaya komisi (0% Fee).",
-      actionText: "Buka Pengaturan Profil",
+      desc: "Set up your brand name and official WhatsApp number. Buyers can place chat orders directly with 0% commission.",
+      actionText: "Open Store Profile",
       actionHref: "/admin/settings/profile",
-      tip: "Tips: Pastikan format nomor WhatsApp diawali kode negara (contoh: 6281234567890).",
+      tip: "Tip: Use your country code without leading zeros or '+' (e.g. 6281234567890).",
     },
     {
-      title: "Pasang Produk Pertama Anda",
-      subtitle: "Langkah 2 dari 4 • Katalog & Etalase",
+      title: "Publish Your First Product",
+      subtitle: "Step 2 of 4 • Catalog & Storefront",
       icon: ShoppingBag,
       iconBg: "bg-emerald-100 text-emerald-600",
-      desc: "Mulai berjualan dengan mengunggah foto, nama produk, dan harga. Anda bisa menjual barang fisik, produk digital (unduh otomatis), voucher, atau jasa.",
-      actionText: "Tambah Produk Sekarang",
+      desc: "Start selling by uploading images, title, and pricing for digital downloads, physical goods, courses, or consultations.",
+      actionText: "Add Product Now",
       actionHref: "/admin/products/new",
-      tip: "Tips: Gunakan foto beresolusi jelas dengan rasio 1:1 agar etalase tampak profesional.",
+      tip: "Tip: Clear square (1:1) photos help showcase your products cleanly on mobile screens.",
     },
     {
-      title: "Daftarkan Rekening Bank Pencairan",
-      subtitle: "Langkah 3 dari 4 • Payout & BorderPay",
+      title: "Configure Your Payout Bank",
+      subtitle: "Step 3 of 4 • Wallet & Withdrawals",
       icon: Building2,
       iconBg: "bg-sky-100 text-sky-600",
-      desc: "Simpan nomor rekening bank (BCA, Mandiri, BRI, BNI, dll) atau dompet digital (GoPay, OVO, DANA) Anda. Seluruh hasil pembayaran QRIS otomatis dicairkan ke rekening ini.",
-      actionText: "Atur Rekening Pencairan",
+      desc: "Save your bank account (BCA, Mandiri, BRI, BNI) or e-wallet (GoPay, OVO, DANA) to withdraw QRIS & PayPal sales balances.",
+      actionText: "Set Payout Account",
       actionHref: "/admin/orders/payouts#payout-bank-card",
-      tip: "Tips: Sistem BorderPay Anti-Rugi otomatis memproteksi margin keuntungan toko Anda.",
+      tip: "Tip: Margin Guard lets customers cover QRIS processing fees so you keep 100% of your product price.",
     },
     {
-      title: "Etalase Anda Siap Menerima Order!",
-      subtitle: "Langkah 4 dari 4 • Bagikan Link Toko",
+      title: "Your Storefront Is Ready!",
+      subtitle: "Step 4 of 4 • Share Your Store Link",
       icon: Globe,
       iconBg: "bg-purple-100 text-purple-600",
-      desc: "Selamat! Toko online Anda sudah aktif. Salin dan tempelkan tautan toko ke bio Instagram, TikTok, WhatsApp Story, atau website profil Anda.",
-      actionText: "Lihat Etalase Toko",
+      desc: "Your online storefront is active. Share your link across Instagram, TikTok, and WhatsApp profiles to start converting.",
+      actionText: "View Live Storefront",
       actionHref: liveStoreUrl,
       isExternal: true,
-      tip: "Tips: Anda juga dapat menghubungkan domain kustom sendiri (contoh: tokoanda.com).",
+      tip: "Tip: PRO stores can also connect a custom domain (e.g. shop.yourbrand.com).",
     },
   ];
 
@@ -106,7 +106,7 @@ export function OnboardingTour({ store }: OnboardingTourProps) {
       }
       setIsOpen(false);
       if (isFinalStep) {
-        showToast("Tur onboarding selesai! Selamat berjualan di etalase.online.", "success");
+        showToast("Onboarding tour completed! Welcome to etalase.online.", "success");
       }
     });
   };
@@ -139,14 +139,14 @@ export function OnboardingTour({ store }: OnboardingTourProps) {
               <Sparkles className="w-4 h-4" />
             </span>
             <span className="text-xs font-bold text-stone-700 tracking-wide">
-              Panduan Memulai Toko
+              Store Setup Guide
             </span>
           </div>
           <button
             type="button"
             onClick={() => handleFinishOrSkip(false)}
             className="text-stone-400 hover:text-stone-600 p-1 rounded-lg hover:bg-stone-200/60 transition cursor-pointer"
-            title="Tutup & Lewati Panduan"
+            title="Skip & Close Guide"
           >
             <X className="w-4 h-4" />
           </button>
@@ -228,7 +228,7 @@ export function OnboardingTour({ store }: OnboardingTourProps) {
             disabled={isPending}
             className="text-xs font-semibold text-stone-500 hover:text-stone-800 transition"
           >
-            Lewati Panduan
+            Skip Guide
           </button>
 
           <div className="flex items-center gap-2">
@@ -240,7 +240,7 @@ export function OnboardingTour({ store }: OnboardingTourProps) {
                 className="inline-flex items-center gap-1 px-3 py-2 text-xs font-semibold text-stone-700 bg-white border border-[#E7E5E4] hover:bg-stone-50 rounded-xl transition cursor-pointer"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Sebelumnya</span>
+                <span>Previous</span>
               </button>
             )}
 
@@ -255,11 +255,11 @@ export function OnboardingTour({ store }: OnboardingTourProps) {
               ) : currentStep === steps.length - 1 ? (
                 <>
                   <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>Selesai &amp; Mulai</span>
+                  <span>Finish &amp; Start</span>
                 </>
               ) : (
                 <>
-                  <span>Lanjut</span>
+                  <span>Next</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </>
               )}

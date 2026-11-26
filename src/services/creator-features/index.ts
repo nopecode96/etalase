@@ -47,29 +47,9 @@ export async function getCourseContent(
       return fail("NOT_FOUND");
     }
 
-    const rawModules = (product.courseModules as unknown as CourseModuleItem[]) || [
-      {
-        id: "mod-1",
-        title: "Modul 1: Pengenalan & Mindset Dasar",
-        duration: "12:45",
-        videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-        isFreePreview: true,
-      },
-      {
-        id: "mod-2",
-        title: "Modul 2: Setup Ekosistem Penjualan Otomatis",
-        duration: "25:10",
-        videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-        isFreePreview: false,
-      },
-      {
-        id: "mod-3",
-        title: "Modul 3: Skalasi Trafik Organik TikTok & WhatsApp",
-        duration: "34:20",
-        videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-        isFreePreview: false,
-      },
-    ];
+    const rawModules = Array.isArray(product.courseModules)
+      ? (product.courseModules as unknown as CourseModuleItem[])
+      : [];
 
     let hasAccess = false;
 
@@ -80,7 +60,7 @@ export async function getCourseContent(
           storeId: store.id,
           productId: product.id,
           buyerWhatsapp: cleanPhone,
-          status: "PAID",
+          status: { in: ["PAID", "COMPLETED"] },
         },
       });
 

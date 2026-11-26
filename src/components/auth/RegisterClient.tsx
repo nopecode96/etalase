@@ -1,12 +1,15 @@
 "use client";
 
-import React, { Suspense, useState, useEffect } from "react";
+import React, { Suspense, useState, useEffect, useCallback, useRef, useTransition } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { CheckCircle2, ShieldCheck, Sparkles } from "lucide-react";
+import { CheckCircle2, Lock, Loader2, ShieldCheck, Sparkles, XCircle } from "lucide-react";
 import { EtalaseLogo } from "@/components/brand/EtalaseLogo";
 import { SupportedLocale } from "@/lib/config/constants";
+import { trackGtmRegisterView, trackGtmSignUpStart } from "@/lib/analytics/gtm";
+import { actionCheckSlug } from "@/app/onboarding/actions";
+import { validateSubdomainFormat } from "@/lib/core/formatters";
 
 function GoogleIcon() {
   return (
@@ -34,9 +37,16 @@ function GoogleIcon() {
 export interface RegisterTranslation {
   title: string;
   subtitle: string;
-  slugBadgeLabel: string;
+  slugLabel: string;
+  slugPlaceholder: string;
+  slugHint: string;
   ctaButton: string;
   connecting: string;
+  googleReassurance: string;
+  consentPrefix: string;
+  termsLabel: string;
+  consentAnd: string;
+  privacyLabel: string;
   trustGuarantee: string;
   hasAccount: string;
   loginLink: string;
@@ -47,9 +57,16 @@ export const REGISTER_TRANSLATIONS: Record<SupportedLocale, RegisterTranslation>
   id: {
     title: "Mulai Gratis dengan Google",
     subtitle: "Klaim subdomain etalasemu dalam 30 detik.",
-    slugBadgeLabel: "Subdomain pilihanmu:",
+    slugLabel: "Pilih alamat subdomain etalasemu:",
+    slugPlaceholder: "nama-tokomu",
+    slugHint: "Huruf kecil, angka, satu tanda hubung, 3–30 karakter.",
     ctaButton: "Lanjutkan dengan Google",
     connecting: "Menghubungkan...",
+    googleReassurance: "Kami hanya membaca nama dan email Anda.",
+    consentPrefix: "Dengan mendaftar, Anda menyetujui",
+    termsLabel: "Syarat & Ketentuan",
+    consentAnd: "dan",
+    privacyLabel: "Kebijakan Privasi",
     trustGuarantee: "0% Komisi order chat • Tanpa kartu kredit • Siap 30 detik",
     hasAccount: "Sudah punya akun?",
     loginLink: "Masuk",
@@ -58,9 +75,16 @@ export const REGISTER_TRANSLATIONS: Record<SupportedLocale, RegisterTranslation>
   en: {
     title: "Start Free with Google",
     subtitle: "Claim your custom etalase subdomain in 30 seconds.",
-    slugBadgeLabel: "Your selected subdomain:",
+    slugLabel: "Choose your storefront subdomain:",
+    slugPlaceholder: "your-store-name",
+    slugHint: "Lowercase letters, numbers, single hyphen, 3–30 characters.",
     ctaButton: "Continue with Google",
     connecting: "Connecting...",
+    googleReassurance: "We only read your name and email address.",
+    consentPrefix: "By signing up, you agree to our",
+    termsLabel: "Terms & Conditions",
+    consentAnd: "and",
+    privacyLabel: "Privacy Policy",
     trustGuarantee: "0% chat order commission • No credit card required • Ready in 30s",
     hasAccount: "Already have an account?",
     loginLink: "Sign In",
@@ -69,9 +93,16 @@ export const REGISTER_TRANSLATIONS: Record<SupportedLocale, RegisterTranslation>
   ms: {
     title: "Mula Percuma dengan Google",
     subtitle: "Tuntut subdomain etalase anda dalam masa 30 saat.",
-    slugBadgeLabel: "Subdomain pilihan anda:",
+    slugLabel: "Pilih alamat subdomain kedai anda:",
+    slugPlaceholder: "nama-kedai-anda",
+    slugHint: "Huruf kecil, nombor, satu tanda sempang, 3–30 aksara.",
     ctaButton: "Teruskan dengan Google",
     connecting: "Menyambung...",
+    googleReassurance: "Kami hanya membaca nama dan e-mel anda.",
+    consentPrefix: "Dengan mendaftar, anda bersetuju dengan",
+    termsLabel: "Terma & Syarat",
+    consentAnd: "dan",
+    privacyLabel: "Dasar Privasi",
     trustGuarantee: "0% Komisen pesanan chat • Tanpa kad kredit • Siap 30 saat",
     hasAccount: "Sudah mempunyai akaun?",
     loginLink: "Log Masuk",
@@ -80,9 +111,16 @@ export const REGISTER_TRANSLATIONS: Record<SupportedLocale, RegisterTranslation>
   th: {
     title: "เริ่มต้นใช้งานฟรีด้วย Google",
     subtitle: "จองซับโดเมนร้านค้าของคุณได้ภายใน 30 วินาที",
-    slugBadgeLabel: "ซับโดเมนที่คุณเลือก:",
+    slugLabel: "เลือกซับโดเมนร้านค้าของคุณ:",
+    slugPlaceholder: "your-shop",
+    slugHint: "ตัวพิมพ์เล็ก ตัวเลข ขีดกลางเดี่ยว ความยาว 3–30 ตัวอักษร",
     ctaButton: "ดำเนินการต่อด้วย Google",
     connecting: "กำลังเชื่อมต่อ...",
+    googleReassurance: "เราจะอ่านเฉพาะชื่อและอีเมลของคุณเท่านั้น",
+    consentPrefix: "การสมัครใช้งานถือว่าคุณยอมรับ",
+    termsLabel: "ข้อกำหนดและเงื่อนไข",
+    consentAnd: "และ",
+    privacyLabel: "นโยบายความเป็นส่วนตัว",
     trustGuarantee: "คอมมิชชันแชต 0% • ไม่ต้องใช้บัตรเครดิต • พร้อมใช้ใน 30 วิ",
     hasAccount: "มีบัญชีอยู่แล้ว?",
     loginLink: "เข้าสู่ระบบ",
@@ -91,9 +129,16 @@ export const REGISTER_TRANSLATIONS: Record<SupportedLocale, RegisterTranslation>
   vi: {
     title: "Bắt đầu miễn phí với Google",
     subtitle: "Sở hữu tên miền phụ cửa hàng của bạn trong 30 giây.",
-    slugBadgeLabel: "Tên miền phụ đã chọn:",
+    slugLabel: "Chọn tên miền phụ cửa hàng:",
+    slugPlaceholder: "ten-shop-cua-ban",
+    slugHint: "Chữ thường, số, một dấu gạch nối, dài 3–30 ký tự.",
     ctaButton: "Tiếp tục với Google",
     connecting: "Đang kết nối...",
+    googleReassurance: "Chúng tôi chỉ đọc tên và email của bạn.",
+    consentPrefix: "Khi đăng ký, bạn đồng ý với",
+    termsLabel: "Điều khoản & Điều kiện",
+    consentAnd: "và",
+    privacyLabel: "Chính sách bảo mật",
     trustGuarantee: "0% Phí hoa hồng đơn chat • Không cần thẻ tín dụng • Sẵn sàng trong 30s",
     hasAccount: "Đã có tài khoản?",
     loginLink: "Đăng nhập",
@@ -107,21 +152,85 @@ interface RegisterClientProps {
   initialPlan?: string;
 }
 
+type SlugStatus = "idle" | "checking" | "available" | "taken" | "invalid";
+
 function RegisterCard({ locale, initialSlug = "", initialPlan = "" }: RegisterClientProps) {
   const searchParams = useSearchParams();
   const slugParam = searchParams.get("slug") || initialSlug;
   const planParam = searchParams.get("plan") || searchParams.get("tier") || initialPlan;
   const cycleParam = searchParams.get("cycle");
 
-  const [slug, setSlug] = useState(slugParam);
+  const [slug, setSlug] = useState(slugParam ? slugParam.trim().toLowerCase() : "");
   const [plan, setPlan] = useState(planParam);
   const [loading, setLoading] = useState(false);
+  const [slugStatus, setSlugStatus] = useState<SlugStatus>("idle");
+  const [slugMessage, setSlugMessage] = useState<string>("");
+  const [suggestion, setSuggestion] = useState<string | undefined>(undefined);
+  const [, startTransition] = useTransition();
+  const latestQueryRef = useRef("");
 
   const t = REGISTER_TRANSLATIONS[locale] || REGISTER_TRANSLATIONS.id;
 
   useEffect(() => {
+    trackGtmRegisterView({
+      slug: slugParam || undefined,
+      plan: planParam || "free",
+      locale,
+    });
+  }, [locale, planParam, slugParam]);
+
+  const checkSlugRealtime = useCallback((rawInput: string) => {
+    const trimmed = rawInput.trim().toLowerCase();
+    if (!trimmed) {
+      latestQueryRef.current = "";
+      setSlugStatus("idle");
+      setSlugMessage("");
+      setSuggestion(undefined);
+      return;
+    }
+
+    const formatCheck = validateSubdomainFormat(trimmed);
+    if (!formatCheck.valid) {
+      setSlugStatus("invalid");
+      setSlugMessage(formatCheck.message || t.slugHint);
+      setSuggestion(undefined);
+      return;
+    }
+
+    const clean = formatCheck.slug;
+    latestQueryRef.current = clean;
+    setSlugStatus("checking");
+    setSlugMessage("");
+    setSuggestion(undefined);
+
+    startTransition(async () => {
+      try {
+        const res = await actionCheckSlug(clean);
+        if (latestQueryRef.current !== clean) return;
+        if (res.success && res.data) {
+          setSuggestion(res.data.suggestion);
+          if (res.data.available) {
+            setSlugStatus("available");
+            setSlugMessage(`✓ ${res.data.slug}.etalase.online tersedia`);
+          } else if (res.data.reason === "format" || res.data.reason === "length") {
+            setSlugStatus("invalid");
+            setSlugMessage(res.data.message || t.slugHint);
+          } else {
+            setSlugStatus("taken");
+            setSlugMessage(`✗ ${res.data.message || "Subdomain sudah dipakai"}`);
+          }
+        }
+      } catch {
+        if (latestQueryRef.current === clean) {
+          setSlugStatus("idle");
+        }
+      }
+    });
+  }, [t.slugHint]);
+
+  useEffect(() => {
     if (slugParam) {
-      const clean = slugParam.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-");
+      const clean = slugParam.trim().toLowerCase();
       setSlug(clean);
       try {
         sessionStorage.setItem("claimed_slug", clean);
@@ -131,6 +240,11 @@ function RegisterCard({ locale, initialSlug = "", initialPlan = "" }: RegisterCl
       }
     }
   }, [slugParam]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => checkSlugRealtime(slug), 280);
+    return () => clearTimeout(timer);
+  }, [slug, checkSlugRealtime]);
 
   useEffect(() => {
     if (planParam) {
@@ -148,11 +262,36 @@ function RegisterCard({ locale, initialSlug = "", initialPlan = "" }: RegisterCl
     }
   }, [planParam, cycleParam]);
 
+  const handleApplySuggestion = () => {
+    if (!suggestion) return;
+    setSlug(suggestion);
+    checkSlugRealtime(suggestion);
+  };
+
   const handleGoogleConnect = () => {
+    const trimmedSlug = slug.trim().toLowerCase();
+    if (trimmedSlug) {
+      const formatCheck = validateSubdomainFormat(trimmedSlug);
+      if (!formatCheck.valid) {
+        setSlugStatus("invalid");
+        setSlugMessage(formatCheck.message || t.slugHint);
+        return;
+      }
+      if (slugStatus === "taken") {
+        return;
+      }
+    }
+
     setLoading(true);
-    const targetSlug = slug ? slug.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-") : "";
+    const targetSlug = trimmedSlug;
     const targetPlan = plan ? plan.trim().toLowerCase() : "";
     const targetCycle = cycleParam ? cycleParam.trim().toLowerCase() : "";
+
+    trackGtmSignUpStart({
+      method: "google",
+      claimedSlug: targetSlug || undefined,
+      selectedPlan: targetPlan || undefined,
+    });
 
     if (targetSlug) {
       try {
@@ -230,16 +369,11 @@ function RegisterCard({ locale, initialSlug = "", initialPlan = "" }: RegisterCl
     };
   };
 
-  // Determine localized login link
-  const loginHref =
-    locale === "id"
-      ? "/login"
-      : locale === "en"
-      ? "/login"
-      : `/${locale}/login`;
+  const loginHref = locale === "id" || locale === "en" ? "/login" : `/${locale}/login`;
+  const hasBlockingSlugError = slug.trim().length > 0 && (slugStatus === "taken" || slugStatus === "invalid");
 
   return (
-    <div className="w-full max-w-md bg-white rounded-3xl border border-[#E7E5E4] shadow-sm p-8 sm:p-10 text-center space-y-6">
+    <div className="w-full max-w-md bg-white rounded-3xl border border-[#E7E5E4] shadow-sm p-7 sm:p-9 text-center space-y-5">
       {/* Logo etalase.online */}
       <div className="flex justify-center">
         <Link href={locale === "id" ? "/" : `/${locale}`}>
@@ -248,7 +382,7 @@ function RegisterCard({ locale, initialSlug = "", initialPlan = "" }: RegisterCl
       </div>
 
       {/* Judul & Subjudul */}
-      <div className="space-y-2">
+      <div className="space-y-1.5">
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1C1917]">
           {t.title}
         </h1>
@@ -257,24 +391,81 @@ function RegisterCard({ locale, initialSlug = "", initialPlan = "" }: RegisterCl
         </p>
       </div>
 
-      {/* Badge Konfirmasi Subdomain (?slug=...) */}
-      {slug ? (
-        <div className="inline-flex items-center gap-2 bg-[#FDF0EC] border border-[#FADCD3] text-[#B83E1D] px-3.5 py-2 rounded-2xl text-xs font-semibold w-full justify-center">
-          <CheckCircle2 className="w-4 h-4 text-[#D94E28] shrink-0" />
-          <span className="truncate">
-            {t.slugBadgeLabel} <strong>{slug}.etalase.online</strong>
+      {/* Input & Cek Subdomain Real-Time Sebelum Lanjut Google */}
+      <div className="text-left space-y-1.5">
+        <label
+          htmlFor="register-slug-input"
+          className="block text-[11px] font-bold uppercase tracking-wider text-[#57534E]"
+        >
+          {t.slugLabel}
+        </label>
+        <div
+          className={`flex items-center rounded-xl border px-3 py-2.5 bg-[#FAF8F5] transition-all ${
+            slugStatus === "available"
+              ? "border-emerald-400 bg-emerald-50/40"
+              : slugStatus === "taken" || slugStatus === "invalid"
+              ? "border-red-400 bg-red-50/40"
+              : "border-[#E7E5E4] focus-within:border-[#D94E28] focus-within:bg-white"
+          }`}
+        >
+          <input
+            id="register-slug-input"
+            type="text"
+            maxLength={30}
+            value={slug}
+            onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/\s+/g, "-"))}
+            placeholder={t.slugPlaceholder}
+            className="w-full min-w-0 bg-transparent text-sm font-semibold text-[#1C1917] focus:outline-none placeholder:text-[#57534E]/45"
+          />
+          <span className="text-xs font-semibold text-[#57534E] pl-1 whitespace-nowrap select-none">
+            .etalase.online
           </span>
         </div>
-      ) : null}
+
+        {/* Real-time status feedback */}
+        {slugStatus === "checking" && (
+          <div className="flex items-center gap-1.5 text-[11px] text-[#57534E]">
+            <Loader2 className="w-3.5 h-3.5 animate-spin text-[#D94E28]" />
+            <span>Memeriksa ketersediaan...</span>
+          </div>
+        )}
+        {slugStatus === "available" && (
+          <div className="flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700">
+            <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+            <span>{slugMessage}</span>
+          </div>
+        )}
+        {(slugStatus === "taken" || slugStatus === "invalid") && (
+          <div className="flex flex-wrap items-center gap-1.5 text-[11px] font-semibold text-red-600">
+            <span className="inline-flex items-center gap-1">
+              <XCircle className="w-3.5 h-3.5 shrink-0" />
+              <span>{slugMessage}</span>
+            </span>
+            {suggestion && (
+              <button
+                type="button"
+                onClick={handleApplySuggestion}
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 hover:bg-amber-100 transition-colors cursor-pointer"
+              >
+                <Sparkles className="w-3 h-3" />
+                <span>coba {suggestion}</span>
+              </button>
+            )}
+          </div>
+        )}
+        {slugStatus === "idle" && (
+          <p className="text-[11px] text-[#57534E]/80">{t.slugHint}</p>
+        )}
+      </div>
 
       {/* Badge Konfirmasi Plan (?plan=pro / ?plan=dfy) */}
       {plan ? (
         <div className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 text-amber-900 px-3.5 py-2 rounded-2xl text-xs font-semibold w-full justify-center">
           <Sparkles className="w-4 h-4 text-[#D94E28] shrink-0" />
           <span>
-            Selected Upgrade:{" "}
+            Paket Dipilih:{" "}
             <strong>
-              {plan.toUpperCase() === "DFY" ? "Terima Beres (DFY)" : "PRO Plan (Rp 49.000/mo)"}
+              {plan.toUpperCase() === "DFY" ? "Terima Beres (DFY)" : "PRO Plan (Rp 49.000/bln)"}
             </strong>
           </span>
         </div>
@@ -285,8 +476,8 @@ function RegisterCard({ locale, initialSlug = "", initialPlan = "" }: RegisterCl
         <button
           type="button"
           onClick={handleGoogleConnect}
-          disabled={loading}
-          className="w-full py-3.5 px-4 rounded-xl border border-[#E7E5E4] bg-white hover:bg-[#FAF8F5] font-semibold text-[#1C1917] shadow-xs flex items-center justify-center gap-3 transition-all hover:border-[#D94E28]/40 hover:shadow-sm cursor-pointer disabled:opacity-60"
+          disabled={loading || hasBlockingSlugError}
+          className="w-full py-3.5 px-4 rounded-xl border border-[#E7E5E4] bg-white hover:bg-[#FAF8F5] font-semibold text-[#1C1917] shadow-xs flex items-center justify-center gap-3 transition-all hover:border-[#D94E28]/40 hover:shadow-sm cursor-pointer disabled:opacity-55 disabled:cursor-not-allowed"
         >
           <GoogleIcon />
           <span className="text-sm">
@@ -294,9 +485,28 @@ function RegisterCard({ locale, initialSlug = "", initialPlan = "" }: RegisterCl
           </span>
         </button>
 
+        {/* Kalimat penenang izin Google */}
+        <div className="flex items-center justify-center gap-1.5 text-[11px] text-[#57534E] font-medium">
+          <Lock className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+          <span>{t.googleReassurance}</span>
+        </div>
+
+        {/* Teks persetujuan Syarat & Ketentuan + Kebijakan Privasi */}
+        <p className="text-[11px] text-[#57534E]/90 leading-relaxed px-2">
+          {t.consentPrefix}{" "}
+          <Link href="/syarat" className="text-[#1C1917] font-semibold underline hover:text-[#D94E28]">
+            {t.termsLabel}
+          </Link>{" "}
+          {t.consentAnd}{" "}
+          <Link href="/privasi" className="text-[#1C1917] font-semibold underline hover:text-[#D94E28]">
+            {t.privacyLabel}
+          </Link>
+          .
+        </p>
+
         {/* Micro-trust Guarantee */}
-        <div className="flex items-center justify-center gap-2 text-[11px] text-[#57534E] font-medium pt-1">
-          <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+        <div className="flex items-center justify-center gap-2 text-[11px] text-[#57534E] font-medium pt-0.5">
+          <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
           <span>{t.trustGuarantee}</span>
         </div>
       </div>

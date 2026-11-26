@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { TemplateRenderer } from "../templates/TemplateRenderer";
 import { StoreTemplateProps } from "../templates/types";
-import { CheckCircle2, ArrowRight } from "lucide-react";
+import { CheckCircle2, ArrowRight, ExternalLink, Eye } from "lucide-react";
 import { SupportedLocale } from "@/lib/config/constants";
 
 interface ArchetypeDemo {
@@ -61,49 +61,54 @@ const ARCHETYPE_LOCALES: Record<
 
 const UI_TEXT = {
   id: {
-    badge: "Subdomain Mandiri Aktif",
+    badge: "Contoh tampilan • Subdomain Mandiri",
     descPrefix: "Dirancang khusus untuk kebutuhan",
     descSuffix: "Desain mobile-first yang rapi dan memudahkan pembeli menyelesaikan pesanan dalam 1 kali klik.",
     point1: "Desain mobile-first yang rapi dan memudahkan checkout 1-klik",
     point2: "Mendukung harga pasti, simulasi DP, hingga tombol 'Tanya Harga'",
-    point3: "Terhubung langsung ke WhatsApp & Checkout QRIS Instan",
+    point3: "Terhubung langsung ke WhatsApp (0% komisi) & Checkout QRIS (mulai 2%)",
     btn: "Gunakan Template Ini Sekarang",
+    previewBtn: "Lihat contoh toko",
   },
   en: {
-    badge: "Active Dedicated Subdomain",
+    badge: "Sample preview • Dedicated Subdomain",
     descPrefix: "Engineered specifically for",
     descSuffix: "Polished mobile-first layout designed to help buyers complete orders in a single click.",
     point1: "Refined mobile-first layout enabling frictionless 1-click checkout",
     point2: "Supports fixed prices, down-payment estimates, and 'Inquire Price' buttons",
-    point3: "Directly connected to WhatsApp & instant QR payment checkout",
+    point3: "Connected to WhatsApp (0% commission) & instant QRIS checkout (from 2%)",
     btn: "Use This Template Now",
+    previewBtn: "View sample store",
   },
   ms: {
-    badge: "Subdomain Sendiri Aktif",
+    badge: "Contoh paparan • Subdomain Sendiri",
     descPrefix: "Direka khas untuk keperluan",
     descSuffix: "Reka bentuk mobile-first yang kemas dan memudahkan pembeli menyelesaikan pesanan dalam 1 klik.",
     point1: "Reka bentuk mobile-first kemas untuk pembelian 1-klik mudah",
     point2: "Menyokong harga tetap, simulasi wang pendahuluan, dan butang 'Tanya Harga'",
-    point3: "Terhubung terus ke WhatsApp & pembayaran QR pantas",
+    point3: "Terhubung ke WhatsApp (0% komisen) & bayaran QRIS pantas (dari 2%)",
     btn: "Gunakan Templat Ini Sekarang",
+    previewBtn: "Lihat contoh kedai",
   },
   th: {
-    badge: "ซับโดเมนส่วนตัวพร้อมใช้งาน",
+    badge: "ตัวอย่างหน้าร้าน • ซับโดเมนส่วนตัว",
     descPrefix: "ออกแบบมาเป็นพิเศษสำหรับ",
     descSuffix: "เลย์เอาต์แนวตั้งสำหรับมือถือที่สวยงาม ช่วยให้ลูกค้าสั่งซื้อเสร็จสิ้นได้ในคลิกเดียว",
     point1: "เลย์เอาต์สำหรับมือถือที่ใช้งานง่าย สั่งซื้อได้ในคลิกเดียว",
     point2: "รองรับราคาคงที่ การจำลองเงินดาวน์ และปุ่ม 'สอบถามราคา'",
-    point3: "เชื่อมต่อกับ WhatsApp โดยตรงและระบบชำระเงิน QR อัตโนมัติ",
+    point3: "เชื่อมต่อ WhatsApp (0% คอมฯ) และระบบชำระเงิน QR (เริ่มต้น 2%)",
     btn: "ใช้เทมเพลตนี้ตอนนี้",
+    previewBtn: "ดูตัวอย่างร้านค้า",
   },
   vi: {
-    badge: "Tên Miền Phụ Độc Lập Sẵn Sàng",
+    badge: "Giao diện mẫu • Tên Miền Phụ Độc Lập",
     descPrefix: "Được thiết kế chuyên biệt cho",
     descSuffix: "Giao diện tối ưu di động tinh tế giúp người mua hoàn tất đơn hàng chỉ với 1 chạm.",
     point1: "Thiết kế tối ưu di động giúp chốt đơn trong 1 chạm",
     point2: "Hỗ trợ giá niêm yết, dự tính trả trước và nút 'Hỏi giá'",
-    point3: "Kết nối trực tiếp đến WhatsApp & Cổng thanh toán mã QR tức thì",
+    point3: "Kết nối trực tiếp đến WhatsApp (0% phí) & Thanh toán mã QR (từ 2%)",
     btn: "Sử Dụng Giao Diện Này Ngay",
+    previewBtn: "Xem cửa hàng mẫu",
   },
 };
 
@@ -458,6 +463,7 @@ export function Showcase4Archetypes({ locale: propLocale }: { locale?: Supported
         {/* Left Column: Archetype Details */}
         <div className="lg:col-span-6 space-y-6 text-left">
           <div className="inline-flex items-center gap-1.5 bg-[#FDF0EC] border border-[#FADCD3] text-[#D94E28] text-xs font-bold px-3 py-1 rounded-full">
+            <Eye className="w-3.5 h-3.5" />
             <span>{copy.badge}</span>
           </div>
 
@@ -465,10 +471,15 @@ export function Showcase4Archetypes({ locale: propLocale }: { locale?: Supported
             <h3 className="text-2xl sm:text-3xl font-bold text-[#1C1917]">
               {activeLocInfo.name}
             </h3>
-            <div className="font-mono text-sm sm:text-base font-bold text-[#D94E28] mt-1 flex items-center gap-1.5">
+            <a
+              href={`https://${activeArchetype.subdomain}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-mono text-sm sm:text-base font-bold text-[#D94E28] mt-1 inline-flex items-center gap-1.5 hover:underline"
+            >
               <span>https://{activeArchetype.subdomain}</span>
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-            </div>
+              <ExternalLink className="w-4 h-4" />
+            </a>
             <p className="text-sm text-[#57534E] mt-3 leading-relaxed">
               {copy.descPrefix} {activeLocInfo.industry}. {copy.descSuffix}
             </p>
@@ -489,7 +500,7 @@ export function Showcase4Archetypes({ locale: propLocale }: { locale?: Supported
             </div>
           </div>
 
-          <div className="pt-2">
+          <div className="pt-2 flex flex-wrap items-center gap-3">
             <Link
               href={getLocalizedRegisterHref(activeArchetype.id)}
               className="inline-flex items-center gap-2 bg-[#D94E28] hover:bg-[#B83E1D] text-white px-6 py-3 rounded-xl font-bold text-xs sm:text-sm shadow-xs transition"
@@ -497,6 +508,15 @@ export function Showcase4Archetypes({ locale: propLocale }: { locale?: Supported
               <span>{copy.btn}</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
+            <a
+              href={`https://${activeArchetype.subdomain}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-[#FAF8F5] hover:bg-white border border-[#E7E5E4] text-[#1C1917] px-5 py-3 rounded-xl font-semibold text-xs sm:text-sm transition"
+            >
+              <span>{copy.previewBtn}</span>
+              <ExternalLink className="w-3.5 h-3.5 text-[#D94E28]" />
+            </a>
           </div>
         </div>
 

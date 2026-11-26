@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import { requireTenantContext } from "@/lib/auth/tenant-guard";
 import { prisma, serializePlain } from "@/lib/db/prisma";
 import { AdminUpgradeClient } from "@/components/admin/AdminUpgradeClient";
+import { getActiveBorderpayConfig } from "@/lib/config/env";
 
 export const metadata: Metadata = {
   title: "Upgrade Storefront Plan — etalase.online",
@@ -35,9 +36,22 @@ export default async function UpgradePage({ searchParams }: UpgradePageProps) {
     orderBy: { createdAt: "desc" },
   });
 
+  const isBorderpayLive = getActiveBorderpayConfig().isLive;
   const allowSandbox =
-    process.env.NODE_ENV !== "production" ||
-    process.env.ALLOW_PAYMENT_SANDBOX === "true";
+    !isBorderpayLive &&
+    (process.env.NODE_ENV !== "production" ||
+      process.env.ALLOW_PAYMENT_SANDBOX === "true");
+
+  // Do not show stale sandbox simulator orders when live gateway is active
+  let sanitizedOrder = activeOrder ? serializePlain(activeOrder) : null;
+  if (!allowSandbox && sanitizedOrder?.notes) {
+    try {
+      const notesObj = JSON.parse(sanitizedOrder.notes);
+      if (notesObj?.qrString?.startsWith("SANDBOX_QRIS_SIMULATOR_")) {
+        sanitizedOrder = null;
+      }
+    } catch {}
+  }
 
   return (
     <AdminUpgradeClient
@@ -47,7 +61,7 @@ export default async function UpgradePage({ searchParams }: UpgradePageProps) {
       initialPlan={searchParams?.plan || "pro"}
       initialCycle={searchParams?.cycle || "yearly"}
       returnTo={searchParams?.returnTo || "/admin"}
-      existingOrder={activeOrder ? serializePlain(activeOrder) : null}
+      existingOrder={sanitizedOrder}
       paypalStatus={searchParams?.status}
       paypalToken={searchParams?.token}
       paypalOrderNumber={searchParams?.orderNumber}

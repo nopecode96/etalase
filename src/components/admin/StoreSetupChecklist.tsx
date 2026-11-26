@@ -30,35 +30,35 @@ export function StoreSetupChecklist({ store, onReplayTour }: StoreSetupChecklist
   const items = [
     {
       id: "profile",
-      title: "Profil & WhatsApp Penjual",
-      desc: "Lengkapi nama toko dan nomor WhatsApp untuk order chat langsung 0% komisi.",
+      title: "Store Profile & Seller WhatsApp",
+      desc: "Set your store name and WhatsApp handle to receive 0% commission direct chat orders.",
       isDone: hasProfile,
       href: "/admin/settings/profile",
-      cta: "Atur Profil",
+      cta: "Edit Profile",
       icon: Store,
     },
     {
       id: "product",
-      title: "Produk Pertama di Etalase",
-      desc: "Pasang minimal 1 produk fisik atau digital agar etalase dapat dikunjungi pembeli.",
+      title: "First Storefront Product",
+      desc: "Publish at least 1 digital or physical product so visitors can browse and checkout.",
       isDone: hasProducts,
       href: "/admin/products/new",
-      cta: "Tambah Produk",
+      cta: "Add Product",
       icon: ShoppingBag,
     },
     {
       id: "payout",
-      title: "Rekening Bank Pencairan",
-      desc: "Daftarkan rekening bank atau e-wallet (BCA, Mandiri, GoPay, dll) untuk pencairan saldo.",
+      title: "Payout Bank Account",
+      desc: "Configure your bank or e-wallet account (BCA, Mandiri, GoPay, etc.) for wallet withdrawals.",
       isDone: hasPayoutBank,
       href: "/admin/orders/payouts#payout-bank-card",
-      cta: "Atur Rekening",
+      cta: "Set Account",
       icon: Building2,
     },
     {
       id: "tour",
-      title: "Tur Panduan Onboarding",
-      desc: "Pelajari fitur esensial katalog online, borderless checkout, dan manajemen etalase.",
+      title: "Onboarding Store Guide",
+      desc: "Walk through storefront customization, QRIS checkout, and order payout management.",
       isDone: hasCompletedTour,
       action: () => {
         if (onReplayTour) {
@@ -67,7 +67,7 @@ export function StoreSetupChecklist({ store, onReplayTour }: StoreSetupChecklist
           window.dispatchEvent(new CustomEvent("open-onboarding-tour"));
         }
       },
-      cta: "Buka Panduan",
+      cta: "Open Guide",
       icon: HelpCircle,
     },
   ];
@@ -86,16 +86,16 @@ export function StoreSetupChecklist({ store, onReplayTour }: StoreSetupChecklist
               <Sparkles className="w-4 h-4" />
             </span>
             <h2 className="text-base font-bold text-[#1C1917]">
-              Checklist Kesiapan Toko
+              Store Launch Checklist
             </h2>
             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-stone-100 text-stone-700">
-              {completedCount}/{items.length} Selesai
+              {completedCount}/{items.length} Completed
             </span>
           </div>
           <p className="text-xs text-[#57534E] mt-1">
             {isAllDone
-              ? "Luar biasa! Seluruh konfigurasi dasar toko Anda telah lengkap dan siap beroperasi penuh."
-              : "Selesaikan 4 langkah esensial berikut agar etalase Anda siap menerima pembeli dan mencairkan hasil penjualan."}
+              ? "All set! Your essential store settings are complete and ready to accept orders."
+              : "Complete these 4 essential steps so your storefront is ready to accept payments and process payouts."}
           </p>
         </div>
 
@@ -116,7 +116,7 @@ export function StoreSetupChecklist({ store, onReplayTour }: StoreSetupChecklist
             onClick={() => setCollapsed(!collapsed)}
             className="text-xs text-stone-500 hover:text-stone-800 font-semibold px-2 py-1 rounded-lg hover:bg-stone-100 transition"
           >
-            {collapsed ? "Tampilkan" : "Sembunyikan"}
+            {collapsed ? "Show" : "Hide"}
           </button>
         </div>
       </div>
@@ -168,7 +168,7 @@ export function StoreSetupChecklist({ store, onReplayTour }: StoreSetupChecklist
                         : "bg-amber-50 text-amber-700"
                     }`}
                   >
-                    {item.isDone ? "Sudah Aktif" : "Perlu Diatur"}
+                    {item.isDone ? "Completed" : "Needs Setup"}
                   </span>
 
                   {item.href ? (

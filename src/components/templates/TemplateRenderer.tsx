@@ -1,8 +1,20 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { StoreTemplateProps } from "./types";
 import { getTemplateComponent } from "./index";
+import { StoreFooter } from "./shared/StoreFooter";
+import { trackStorefrontEventClient } from "./shared/template-helpers";
+
+const MODERN_TEMPLATES = new Set([
+  "clean-minimal",
+  "visual-menu-grid",
+  "showroom-pro",
+  "editorial-pastel",
+  "cafe-menu",
+  "sales-showcase",
+  "beauty-glam",
+]);
 
 export const TemplateRenderer: React.FC<StoreTemplateProps> = ({
   store,
@@ -13,6 +25,19 @@ export const TemplateRenderer: React.FC<StoreTemplateProps> = ({
 }) => {
   const TemplateComponent = getTemplateComponent(store.templateId);
   const appearance = store.appearanceConfig;
+  const isModernTemplate = MODERN_TEMPLATES.has(store.templateId || "clean-minimal");
+  const displayMode = store.displayMode || "HYBRID";
+
+  useEffect(() => {
+    if (isPreview || isMockup || !store.slug || store.slug === "demo") return;
+    trackStorefrontEventClient({
+      storeSlug: store.slug,
+      type: "view",
+      productIds: products.map((p) => p.id),
+    });
+    // Track impression once per storefront load
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [store.slug]);
 
   // Compute background styling overrides if specified
   const containerStyle: React.CSSProperties = {};
@@ -41,9 +66,13 @@ export const TemplateRenderer: React.FC<StoreTemplateProps> = ({
     containerStyle.backgroundAttachment = "fixed";
   }
 
-  const activeBlocks = (blocks.length > 0 ? blocks : store.blocks || []).filter(
+  const rawBlocks = (blocks.length > 0 ? blocks : store.blocks || []).filter(
     (b) => b.isActive !== false
   );
+  const activeBlocks =
+    displayMode === "CATALOG"
+      ? rawBlocks.filter((b) => b.type === "IMAGE_BANNER")
+      : rawBlocks;
 
   return (
     <div className="w-full min-h-full overflow-x-hidden transition-colors duration-300" style={containerStyle}>
@@ -57,9 +86,11 @@ export const TemplateRenderer: React.FC<StoreTemplateProps> = ({
         />
 
         {activeBlocks.length > 0 && (
-          <section className="w-full max-w-[28rem] mx-auto px-4 pb-10 space-y-3">
+          <section className="w-full max-w-[28rem] mx-auto px-4 pb-8 space-y-3">
           {activeBlocks.map((block) => {
-            const href = isMockup ? "#" : block.targetUrl || undefined;
+            const href = isMockup
+              ? `https://${store.slug}.etalase.online`
+              : block.targetUrl || undefined;
             if (block.type === "IMAGE_BANNER" && block.imageUrl) {
               const inner = (
                 <div className="rounded-2xl overflow-hidden border border-black/10 bg-white shadow-xs group">
@@ -149,6 +180,8 @@ export const TemplateRenderer: React.FC<StoreTemplateProps> = ({
           })}
         </section>
       )}
+
+      {isModernTemplate && <StoreFooter tier={store.tier} />}
       </div>
     </div>
   );

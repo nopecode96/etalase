@@ -7,7 +7,11 @@ import { Showcase4Archetypes } from "@/components/home/Showcase4Archetypes";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { Sparkles, ArrowRight, CheckCircle2 } from "lucide-react";
 import { SupportedLocale, SUPPORTED_LOCALES } from "@/lib/config/constants";
-import { generateLocalizedMetadata } from "@/lib/seo/metadata-helper";
+import {
+  generateLocalizedMetadata,
+  generateBreadcrumbJsonLd,
+  generateWebPageJsonLd,
+} from "@/lib/seo/metadata-helper";
 
 interface TemplatePageProps {
   searchParams?: {
@@ -160,24 +164,45 @@ export default function TemplatePage({ searchParams }: TemplatePageProps) {
   };
 
   const t = templateTranslations[locale] || templateTranslations.id;
+  const path = locale === "id" ? "/template" : `/${locale}/template`;
+  const breadcrumbsJsonLd = generateBreadcrumbJsonLd([
+    { name: locale === "id" ? "Beranda" : "Home", url: locale === "id" ? "/" : `/${locale}` },
+    { name: "Template", url: path },
+  ]);
+  const webPageJsonLd = generateWebPageJsonLd({
+    url: path,
+    name: t.h1,
+    description: t.subtitle,
+    locale,
+  });
 
   return (
     <div className="flex flex-col min-h-screen bg-[#FAF8F5] text-[#1C1917]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }}
+      />
       <GlobalHeader />
 
       {/* Header Halaman */}
-      <section className="pt-16 pb-12 px-4 sm:px-6 text-center max-w-4xl mx-auto">
+      <section className="pt-16 pb-12 px-4 sm:px-6 text-center max-w-6xl mx-auto w-full">
         <ScrollReveal direction="up" delay={50}>
-          <div className="inline-flex items-center gap-1.5 bg-[#FDF0EC] border border-[#FADCD3] text-[#D94E28] px-3.5 py-1.5 rounded-full text-xs font-semibold mb-4">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>{t.badge}</span>
+          <div className="max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-1.5 bg-[#FDF0EC] border border-[#FADCD3] text-[#D94E28] px-3.5 py-1.5 rounded-full text-xs font-semibold mb-4">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>{t.badge}</span>
+            </div>
+            <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-[#1C1917] mb-4">
+              {t.h1}
+            </h1>
+            <p className="text-[#57534E] text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+              {t.subtitle}
+            </p>
           </div>
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-[#1C1917] mb-4">
-            {t.h1}
-          </h1>
-          <p className="text-[#57534E] text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-            {t.subtitle}
-          </p>
         </ScrollReveal>
       </section>
 

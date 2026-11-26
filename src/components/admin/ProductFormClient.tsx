@@ -54,11 +54,39 @@ export function ProductFormClient({
   const [category, setCategory] = useState(
     initialProduct?.category || "Digital Product (E-Book/Preset/Template)"
   );
-  const [productType, setProductType] = useState<string>(
-    initialProduct?.productType || "DIGITAL"
-  );
+  const normalizedInitialType =
+    initialProduct?.productType === "SERVICE"
+      ? "APPOINTMENT"
+      : initialProduct?.productType === "EVENT"
+      ? "EVENT_WEBINAR"
+      : initialProduct?.productType || "DIGITAL";
+
+  const [productType, setProductType] = useState<string>(normalizedInitialType);
   const [description, setDescription] = useState(
     initialProduct?.description || ""
+  );
+
+  // Course, Appointment & Event Extensions
+  const [courseModules, setCourseModules] = useState<
+    Array<{ id: string; title: string; duration: string; videoUrl: string; isFreePreview: boolean }>
+  >(() =>
+    Array.isArray(initialProduct?.courseModules) ? initialProduct.courseModules : []
+  );
+  const [appointmentDuration, setAppointmentDuration] = useState<number>(
+    initialProduct?.appointmentDuration || 45
+  );
+  const [appointmentSlotsText, setAppointmentSlotsText] = useState<string>(() =>
+    Array.isArray(initialProduct?.appointmentSlots)
+      ? initialProduct.appointmentSlots.join(", ")
+      : "Besok 10:00 WIB, Besok 14:00 WIB, Besok 16:00 WIB"
+  );
+  const [eventDate, setEventDate] = useState<string>(() => {
+    if (!initialProduct?.eventDate) return "";
+    const d = new Date(initialProduct.eventDate);
+    return Number.isNaN(d.getTime()) ? "" : d.toISOString().slice(0, 16);
+  });
+  const [eventLocation, setEventLocation] = useState<string>(
+    initialProduct?.eventLocation || ""
   );
 
   // Media (Up to 4 images: Primary + 3 Gallery slots)
@@ -138,6 +166,14 @@ export function ProductFormClient({
       (img): img is string => typeof img === "string" && img.trim().length > 0
     );
 
+    const parsedSlots =
+      productType === "APPOINTMENT"
+        ? appointmentSlotsText
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean)
+        : undefined;
+
     startTransition(async () => {
       const res = await actionSaveProduct({
         storeId: store.id,
@@ -159,6 +195,15 @@ export function ProductFormClient({
         promoActive,
         promoPrice: promoActive && promoPrice ? Number(promoPrice) : null,
         promoDurationNote,
+        courseModules:
+          productType === "COURSE"
+            ? courseModules.filter((m) => m.title.trim().length > 0)
+            : undefined,
+        appointmentDuration:
+          productType === "APPOINTMENT" ? Number(appointmentDuration) || 45 : undefined,
+        appointmentSlots: parsedSlots,
+        eventDate: productType === "EVENT_WEBINAR" ? eventDate || null : undefined,
+        eventLocation: productType === "EVENT_WEBINAR" ? eventLocation.trim() || null : undefined,
       });
 
       if (res.success) {
@@ -285,9 +330,11 @@ export function ProductFormClient({
                   >
                     <option value="DIGITAL">Digital Item (Instant Download / Link)</option>
                     <option value="PHYSICAL">Physical Parcel (Courier Delivery)</option>
-                    <option value="SERVICE">Service / 1-on-1 Consultation</option>
+                    <option value="APPOINTMENT">Service / 1-on-1 Consultation Booking</option>
                     <option value="COURSE">Video Course / LMS Module</option>
-                    <option value="EVENT">Event / Ticket Pass</option>
+                    <option value="EVENT_WEBINAR">Event / Ticket Pass</option>
+                    <option value="AFFILIATE_LINK">Affiliate Recommendation</option>
+                    <option value="SUPPORT_TIP">Creator Support / Tip</option>
                   </select>
                 </div>
               </div>
@@ -621,6 +668,183 @@ export function ProductFormClient({
                   <p className="text-[11px] text-amber-800">
                     Buyers will automatically receive access to this file or link once their QRIS or PayPal payment is settled.
                   </p>
+                </div>
+              )}
+
+              {/* Consultation Booking Schedule Settings */}
+              {productType === "APPOINTMENT" && (
+                <div className="p-4 bg-emerald-50/50 border border-emerald-200 rounded-2xl space-y-3">
+                  <div className="text-xs font-bold text-emerald-950">
+                    1-on-1 Consultation Booking Settings
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-[11px] font-bold text-emerald-900 mb-1">
+                        Duration (Minutes)
+                      </label>
+                      <input
+                        type="number"
+                        min={15}
+                        max={240}
+                        value={appointmentDuration}
+                        onChange={(e) => setAppointmentDuration(Number(e.target.value))}
+                        className="w-full px-3 py-2 text-xs rounded-xl border border-emerald-300 bg-white font-mono text-[#1C1917]"
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className="block text-[11px] font-bold text-emerald-900 mb-1">
+                        Available Slots (comma-separated)
+                      </label>
+                      <input
+                        type="text"
+                        value={appointmentSlotsText}
+                        onChange={(e) => setAppointmentSlotsText(e.target.value)}
+                        placeholder="Tomorrow 10:00 WIB, Tomorrow 14:00 WIB"
+                        className="w-full px-3 py-2 text-xs rounded-xl border border-emerald-300 bg-white text-[#1C1917]"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Event / Webinar Date & Location */}
+              {productType === "EVENT_WEBINAR" && (
+                <div className="p-4 bg-purple-50/50 border border-purple-200 rounded-2xl space-y-3">
+                  <div className="text-xs font-bold text-purple-950">
+                    Event / Webinar Details
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[11px] font-bold text-purple-900 mb-1">
+                        Event Date &amp; Time
+                      </label>
+                      <input
+                        type="datetime-local"
+                        value={eventDate}
+                        onChange={(e) => setEventDate(e.target.value)}
+                        className="w-full px-3 py-2 text-xs rounded-xl border border-purple-300 bg-white text-[#1C1917]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-bold text-purple-900 mb-1">
+                        Venue or Meeting Link
+                      </label>
+                      <input
+                        type="text"
+                        value={eventLocation}
+                        onChange={(e) => setEventLocation(e.target.value)}
+                        placeholder="https://zoom.us/j/... or Venue Address"
+                        className="w-full px-3 py-2 text-xs rounded-xl border border-purple-300 bg-white text-[#1C1917]"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Video Course Modules */}
+              {productType === "COURSE" && (
+                <div className="p-4 bg-sky-50/50 border border-sky-200 rounded-2xl space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-sky-950">
+                      Course Curriculum Modules ({courseModules.length})
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setCourseModules((prev) => [
+                          ...prev,
+                          {
+                            id: `mod-${Date.now()}`,
+                            title: "",
+                            duration: "10:00",
+                            videoUrl: "",
+                            isFreePreview: prev.length === 0,
+                          },
+                        ])
+                      }
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white border border-sky-300 text-[11px] font-bold text-sky-900 hover:bg-sky-100/60"
+                    >
+                      <Plus className="w-3 h-3" />
+                      <span>Add Module</span>
+                    </button>
+                  </div>
+
+                  {courseModules.length === 0 && (
+                    <p className="text-[11px] text-sky-800">
+                      Add video modules here so paid buyers can unlock them in your Member Area.
+                    </p>
+                  )}
+
+                  <div className="space-y-2.5">
+                    {courseModules.map((mod, idx) => (
+                      <div key={mod.id} className="p-3 bg-white rounded-xl border border-sky-200 space-y-2">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            placeholder={`Module ${idx + 1} Title`}
+                            value={mod.title}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setCourseModules((prev) =>
+                                prev.map((item, i) => (i === idx ? { ...item, title: val } : item))
+                              );
+                            }}
+                            className="flex-1 px-2.5 py-1.5 text-xs rounded-lg border border-stone-200"
+                          />
+                          <input
+                            type="text"
+                            placeholder="Duration"
+                            value={mod.duration}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setCourseModules((prev) =>
+                                prev.map((item, i) => (i === idx ? { ...item, duration: val } : item))
+                              );
+                            }}
+                            className="w-20 px-2.5 py-1.5 text-xs rounded-lg border border-stone-200 font-mono"
+                          />
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setCourseModules((prev) => prev.filter((_, i) => i !== idx))
+                            }
+                            className="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="url"
+                            placeholder="https://youtube.com/... or Vimeo/Drive video URL"
+                            value={mod.videoUrl}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setCourseModules((prev) =>
+                                prev.map((item, i) => (i === idx ? { ...item, videoUrl: val } : item))
+                              );
+                            }}
+                            className="flex-1 px-2.5 py-1.5 text-xs rounded-lg border border-stone-200 font-mono"
+                          />
+                          <label className="flex items-center gap-1.5 text-[11px] text-stone-700 shrink-0">
+                            <input
+                              type="checkbox"
+                              checked={mod.isFreePreview}
+                              onChange={(e) => {
+                                const checked = e.target.checked;
+                                setCourseModules((prev) =>
+                                  prev.map((item, i) =>
+                                    i === idx ? { ...item, isFreePreview: checked } : item
+                                  )
+                                );
+                              }}
+                            />
+                            <span>Free Preview</span>
+                          </label>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>

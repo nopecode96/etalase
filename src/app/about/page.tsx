@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { GlobalHeader } from "@/components/saas/GlobalHeader";
 import { GlobalFooter } from "@/components/saas/GlobalFooter";
+import { OfficialSocialLinks } from "@/components/saas/OfficialSocialLinks";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import {
   Building,
@@ -18,9 +19,14 @@ import {
 import {
   generateLocalizedMetadata,
   generateBreadcrumbJsonLd,
+  generateWebPageJsonLd,
   BASE_URL,
 } from "@/lib/seo/metadata-helper";
-import { SupportedLocale, SUPPORTED_LOCALES } from "@/lib/config/constants";
+import {
+  SupportedLocale,
+  SUPPORTED_LOCALES,
+  OFFICIAL_SOCIAL_URLS,
+} from "@/lib/config/constants";
 
 interface AboutPageProps {
   searchParams?: {
@@ -376,6 +382,7 @@ export default function AboutPage({ searchParams }: AboutPageProps) {
       url: BASE_URL,
       logo: `${BASE_URL}/favicon.svg`,
       email: "halo@etalase.online",
+      sameAs: OFFICIAL_SOCIAL_URLS,
       address: {
         "@type": "PostalAddress",
         streetAddress: "Jl. Nias Dalam No. 14",
@@ -387,6 +394,13 @@ export default function AboutPage({ searchParams }: AboutPageProps) {
     },
   };
 
+  const webPageJsonLd = generateWebPageJsonLd({
+    url: getLocalizedHref("/about"),
+    name: content.h1,
+    description: content.subtitle,
+    locale,
+  });
+
   return (
     <div className="flex flex-col min-h-screen bg-[#FAF8F5] text-[#1C1917]">
       <script
@@ -397,12 +411,16 @@ export default function AboutPage({ searchParams }: AboutPageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }}
+      />
 
       <GlobalHeader />
 
       <main className="flex-1">
         {/* Breadcrumb Navigation */}
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-6 w-full">
           <nav aria-label="Breadcrumb" className="text-xs text-[#57534E] flex items-center gap-2">
             <Link href={locale === "id" ? "/" : `/${locale}`} className="hover:text-[#D94E28] transition">
               {content.breadcrumbHome}
@@ -415,23 +433,25 @@ export default function AboutPage({ searchParams }: AboutPageProps) {
         </div>
 
         {/* Hero Section */}
-        <section className="pt-10 pb-14 px-4 sm:px-6 text-center max-w-4xl mx-auto">
+        <section className="pt-10 pb-14 px-4 sm:px-6 text-center max-w-6xl mx-auto w-full">
           <ScrollReveal direction="up" delay={50}>
-            <div className="inline-flex items-center gap-1.5 bg-[#FDF0EC] border border-[#FADCD3] text-[#D94E28] px-3.5 py-1.5 rounded-full text-xs font-semibold mb-4">
-              <Building className="w-3.5 h-3.5" />
-              <span>{content.badge}</span>
+            <div className="max-w-3xl mx-auto">
+              <div className="inline-flex items-center gap-1.5 bg-[#FDF0EC] border border-[#FADCD3] text-[#D94E28] px-3.5 py-1.5 rounded-full text-xs font-semibold mb-4">
+                <Building className="w-3.5 h-3.5" />
+                <span>{content.badge}</span>
+              </div>
+              <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-[#1C1917] mb-5 leading-[1.18]">
+                {content.h1}
+              </h1>
+              <p className="text-[#57534E] text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+                {content.subtitle}
+              </p>
             </div>
-            <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-[#1C1917] mb-5 leading-[1.18]">
-              {content.h1}
-            </h1>
-            <p className="text-[#57534E] text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-              {content.subtitle}
-            </p>
           </ScrollReveal>
         </section>
 
         {/* Narrative Section: Who is Rafa Kreasindo Teknologi */}
-        <section className="py-12 px-4 sm:px-6 max-w-5xl mx-auto w-full">
+        <section className="py-12 px-4 sm:px-6 max-w-6xl mx-auto w-full">
           <div className="bg-white border border-[#E7E5E4] rounded-3xl p-8 sm:p-12 shadow-xs space-y-6">
             <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#D94E28] bg-[#FDF0EC] px-3 py-1 rounded-full">
               <HeartHandshake className="w-3.5 h-3.5" />
@@ -461,7 +481,7 @@ export default function AboutPage({ searchParams }: AboutPageProps) {
         </section>
 
         {/* Core Values Grid */}
-        <section className="py-12 px-4 sm:px-6 max-w-5xl mx-auto w-full">
+        <section className="py-12 px-4 sm:px-6 max-w-6xl mx-auto w-full">
           <div className="text-center mb-10 space-y-2">
             <h2 className="text-2xl sm:text-3xl font-bold text-[#1C1917] tracking-tight">
               {content.valuesTitle}
@@ -488,7 +508,7 @@ export default function AboutPage({ searchParams }: AboutPageProps) {
         </section>
 
         {/* Legal & Operational Information Box */}
-        <section className="py-12 px-4 sm:px-6 max-w-5xl mx-auto w-full">
+        <section className="py-12 px-4 sm:px-6 max-w-6xl mx-auto w-full">
           <div className="bg-[#FAF8F5] border-2 border-[#E7E5E4] rounded-3xl p-8 sm:p-10 space-y-6">
             <h2 className="text-xl sm:text-2xl font-bold text-[#1C1917]">
               {content.legalTitle}
@@ -542,12 +562,19 @@ export default function AboutPage({ searchParams }: AboutPageProps) {
                   {content.supportEmail}
                 </a>
               </div>
+
+              <OfficialSocialLinks
+                locale={locale}
+                variant="cards"
+                cardBg="white"
+                gridItemsOnly
+              />
             </div>
           </div>
         </section>
 
         {/* CTA Box */}
-        <section className="py-12 pb-24 px-4 sm:px-6 max-w-5xl mx-auto w-full">
+        <section className="py-12 pb-24 px-4 sm:px-6 max-w-6xl mx-auto w-full">
           <div className="bg-[#FDF0EC] border border-[#FADCD3] rounded-3xl p-8 sm:p-12 text-center shadow-xs space-y-4">
             <div className="inline-flex items-center gap-1.5 bg-white border border-[#FADCD3] text-[#D94E28] text-xs font-semibold px-3 py-1 rounded-full">
               <Sparkles className="w-3.5 h-3.5" />

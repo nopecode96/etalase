@@ -117,10 +117,9 @@ export function StorefrontPixelTracker({
           <Script id="etalase-ga4-init" strategy="afterInteractive">
             {`
               window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              window.gtag = gtag;
-              gtag('js', new Date());
-              gtag('config', '${cleanGa4.replace(/[^a-zA-Z0-9_-]/g, "")}');
+              window.gtag = window.gtag || function gtag(){window.dataLayer.push(arguments);};
+              window.gtag('js', new Date());
+              window.gtag('config', '${cleanGa4.replace(/[^a-zA-Z0-9_-]/g, "")}');
             `}
           </Script>
         </>

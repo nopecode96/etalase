@@ -85,7 +85,7 @@ async function main() {
     where: { slug: fallbackTestSlug },
     update: {
       category: "Eksplorasi Pasar SEA",
-      coverImage: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80",
+      coverImage: "/images/blog/cover-asean-expansion.jpg",
       authorName: "Tim Riset Makro Etalase",
       authorRole: "Ekonom Digital & Kebijakan Transaksi Lintas Batas",
       isPublished: true,
@@ -94,7 +94,7 @@ async function main() {
     create: {
       slug: fallbackTestSlug,
       category: "Eksplorasi Pasar SEA",
-      coverImage: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80",
+      coverImage: "/images/blog/cover-asean-expansion.jpg",
       authorName: "Tim Riset Makro Etalase",
       authorRole: "Ekonom Digital & Kebijakan Transaksi Lintas Batas",
       isPublished: true,

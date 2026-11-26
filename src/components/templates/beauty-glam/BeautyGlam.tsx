@@ -119,9 +119,11 @@ export const BeautyGlam: React.FC<StoreTemplateProps> = ({
         })}
       </div>
 
-      <footer className={styles.footer}>
-        Affiliate Storefront &bull; <span className="font-bold text-rose-950">etalase.online</span>
-      </footer>
+      {store.tier === "FREE" && (
+        <footer className={styles.footer}>
+          Affiliate Storefront &bull; <span className="font-bold text-rose-950">etalase.online</span>
+        </footer>
+      )}
     </div>
   );
 };

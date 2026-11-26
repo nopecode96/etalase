@@ -14,7 +14,7 @@ import {
   Plus,
   ArrowRight,
 } from "lucide-react";
-import { actionSaveProduct } from "@/app/admin/actions";
+import { actionToggleProductPromo } from "@/app/admin/actions";
 import { showToast } from "@/components/ui/GlobalToast";
 import { AdminPagination } from "@/components/admin/AdminPagination";
 
@@ -25,6 +25,7 @@ interface AdminProductsPromosClientProps {
 
 export function AdminProductsPromosClient({ store }: AdminProductsPromosClientProps) {
   const [products, setProducts] = useState<any[]>(store.products || []);
+  const [draftPrices, setDraftPrices] = useState<Record<string, string>>({});
   const [isPending, startTransition] = useTransition();
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
@@ -42,19 +43,13 @@ export function AdminProductsPromosClient({ store }: AdminProductsPromosClientPr
   ).length;
 
   const handleTogglePromo = (product: any, activate: boolean) => {
-    const originalPrice = Number(product.compareAtPrice || product.price);
-    const promoDiscountPrice = activate ? Math.round(originalPrice * 0.8) : originalPrice;
-
+    const draft = Number(draftPrices[product.id]);
     startTransition(async () => {
-      const res = await actionSaveProduct({
+      const res = await actionToggleProductPromo({
         storeId: store.id,
         productId: product.id,
-        title: product.title,
-        price: activate ? promoDiscountPrice : originalPrice,
-        compareAtPrice: activate ? originalPrice : null,
-        checkoutMode: product.checkoutMode,
-        promoActive: activate,
-        promoPrice: activate ? promoDiscountPrice : null,
+        activate,
+        promoPrice: activate && draft > 0 ? draft : undefined,
       });
 
       if (res.success && res.data) {
@@ -73,17 +68,12 @@ export function AdminProductsPromosClient({ store }: AdminProductsPromosClientPr
 
   const handleUpdatePromoPrice = (product: any, newPromoPrice: number) => {
     if (newPromoPrice <= 0) return;
-    const originalPrice = Number(product.compareAtPrice || product.price);
 
     startTransition(async () => {
-      const res = await actionSaveProduct({
+      const res = await actionToggleProductPromo({
         storeId: store.id,
         productId: product.id,
-        title: product.title,
-        price: newPromoPrice,
-        compareAtPrice: originalPrice,
-        checkoutMode: product.checkoutMode,
-        promoActive: true,
+        activate: true,
         promoPrice: newPromoPrice,
       });
 
@@ -243,15 +233,36 @@ export function AdminProductsPromosClient({ store }: AdminProductsPromosClientPr
                       </td>
 
                       <td className="py-3 px-4">
-                        {isPromoActive ? (
-                          <div className="flex items-center gap-1.5">
-                            <span className="font-mono text-xs font-bold text-rose-600">
-                              Rp {currentPrice.toLocaleString("id-ID")}
-                            </span>
-                          </div>
-                        ) : (
-                          <span className="text-stone-400 italic">No Promo</span>
-                        )}
+                        <div className="flex items-center gap-1.5">
+                          <input
+                            type="number"
+                            min={1000}
+                            max={Math.max(1000, regularPrice - 1)}
+                            value={
+                              draftPrices[product.id] ??
+                              (isPromoActive ? String(currentPrice) : String(Math.round(regularPrice * 0.8)))
+                            }
+                            onChange={(e) =>
+                              setDraftPrices((prev) => ({ ...prev, [product.id]: e.target.value }))
+                            }
+                            className="w-24 px-2 py-1 rounded-lg border border-[#E7E5E4] font-mono text-xs font-bold text-[#1C1917] bg-white focus:border-[#D94E28] outline-none"
+                          />
+                          {isPromoActive && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleUpdatePromoPrice(
+                                  product,
+                                  Number(draftPrices[product.id] ?? currentPrice)
+                                )
+                              }
+                              disabled={isPending}
+                              className="px-2 py-1 rounded-lg bg-stone-100 hover:bg-stone-200 text-[10px] font-bold text-stone-700 transition"
+                            >
+                              Save
+                            </button>
+                          )}
+                        </div>
                       </td>
 
                       <td className="py-3 px-4">

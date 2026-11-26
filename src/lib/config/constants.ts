@@ -4,6 +4,8 @@ export const RESERVED_SLUGS = [
   "flow",
   "n8n",
   "admin",
+  "dashboard",
+  "front",
   "app",
   "api",
   "www",
@@ -38,12 +40,76 @@ export const RESERVED_SLUGS = [
   "about",
   "tentang",
   "contact",
+  "mail",
+  "webmail",
+  "smtp",
+  "imap",
+  "pop",
+  "ftp",
+  "pay",
+  "payment",
+  "checkout",
+  "qris",
+  "syarat",
+  "privasi",
+  "refund",
+  "alternatif-lynk-id",
+  "digital-product",
+  "event",
+  "consultation",
+  "affiliate",
+  "webhook",
+  "webhooks",
+  "dashboard",
+  "panel",
+  "status",
+  "docs",
+  "helpdesk",
+  "official",
+  "etalase",
+  "etalaseonline",
   "id",
   "en",
   "ms",
   "th",
   "vi",
 ] as const;
+
+export const OFFICIAL_WHATSAPP_GROUP_URL =
+  "https://chat.whatsapp.com/GDoHkzW0dxXITWadlgJJ1r?mode=gi_t";
+export const OFFICIAL_SUPPORT_EMAIL = "support@etalase.online";
+export const OFFICIAL_CONTACT_EMAIL = "halo@etalase.online";
+
+export const OFFICIAL_INSTAGRAM_HANDLE = "@etalaseonline.official";
+export const OFFICIAL_INSTAGRAM_URL = "https://www.instagram.com/etalaseonline.official";
+export const OFFICIAL_THREADS_HANDLE = "@etalaseonline.official";
+export const OFFICIAL_THREADS_URL = "https://www.threads.net/@etalaseonline.official";
+
+export interface OfficialSocialAccount {
+  id: "instagram" | "threads";
+  name: string;
+  handle: string;
+  url: string;
+}
+
+export const OFFICIAL_SOCIAL_ACCOUNTS: readonly OfficialSocialAccount[] = [
+  {
+    id: "instagram",
+    name: "Instagram",
+    handle: OFFICIAL_INSTAGRAM_HANDLE,
+    url: OFFICIAL_INSTAGRAM_URL,
+  },
+  {
+    id: "threads",
+    name: "Threads",
+    handle: OFFICIAL_THREADS_HANDLE,
+    url: OFFICIAL_THREADS_URL,
+  },
+] as const;
+
+export const OFFICIAL_SOCIAL_URLS: string[] = OFFICIAL_SOCIAL_ACCOUNTS.map(
+  (account) => account.url
+);
 
 export const SUPPORTED_LOCALES = ["id", "en", "ms", "th", "vi"] as const;
 export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];

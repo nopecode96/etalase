@@ -148,9 +148,11 @@ export const BoutiqueVisual: React.FC<StoreTemplateProps> = ({
         })}
       </div>
 
-      <footer className={styles.footer}>
-        Boutique visual oleh <span className="font-semibold text-black">etalase.online</span>
-      </footer>
+      {store.tier === "FREE" && (
+        <footer className={styles.footer}>
+          Boutique visual oleh <span className="font-semibold text-black">etalase.online</span>
+        </footer>
+      )}
     </div>
   );
 };

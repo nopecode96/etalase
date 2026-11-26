@@ -1,5 +1,9 @@
 import { Metadata } from "next";
-import { SupportedLocale, SUPPORTED_LOCALES } from "@/lib/config/constants";
+import {
+  SupportedLocale,
+  SUPPORTED_LOCALES,
+  OFFICIAL_SOCIAL_URLS,
+} from "@/lib/config/constants";
 
 export const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://etalase.online";
 
@@ -43,7 +47,7 @@ export function generateLocalizedMetadata({
   title,
   description,
   imageUrl = `${BASE_URL}/og-preview.png`,
-  imageAlt = "etalase.online — Satu Website Etalase untuk Semua Jualan Anda",
+  imageAlt = "etalase.online — Katalog Online yang Closing di WhatsApp. Gratis, Tanpa Komisi.",
   type = "website",
   publishedTime,
   modifiedTime,
@@ -111,8 +115,6 @@ export function generateLocalizedMetadata({
       title,
       description,
       images: [imageUrl],
-      creator: "@etalase_online",
-      site: "@etalase_online",
     },
     robots: {
       index: true,
@@ -136,29 +138,38 @@ export function generateOrganizationJsonLd() {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "etalase.online",
-    legalName: "Rafa Kreasindo Teknologi",
+    legalName: "PT Rafa Kreasindo Teknologi",
     url: BASE_URL,
     logo: `${BASE_URL}/favicon.svg`,
     description:
-      "Platform storefront terintegrasi, bio link visual, dan sistem checkout otomatis via WhatsApp & QRIS untuk pebisnis di Asia Tenggara, dikembangkan dan dikelola oleh Rafa Kreasindo Teknologi.",
-    sameAs: [
-      "https://instagram.com/etalase.online",
-      "https://tiktok.com/@etalase.online",
-      "https://twitter.com/etalase_online",
-    ],
-    contactPoint: {
-      "@type": "ContactPoint",
-      contactType: "customer service",
-      email: "support@etalase.online",
-      availableLanguage: [
-        "Indonesian",
-        "English",
-        "Malay",
-        "Thai",
-        "Vietnamese",
-      ],
-      areaServed: ["ID", "MY", "SG", "TH", "VN", "PH"],
+      "Platform katalog online, bio link visual, dan checkout WhatsApp (0% komisi) serta QRIS otomatis untuk kreator, UMKM, kafe, dan showroom di Asia Tenggara, dikembangkan oleh PT Rafa Kreasindo Teknologi.",
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: "Jl. Nias Dalam No. 14",
+      addressLocality: "Bandung",
+      addressRegion: "Jawa Barat",
+      postalCode: "40115",
+      addressCountry: "ID",
     },
+    sameAs: OFFICIAL_SOCIAL_URLS,
+    contactPoint: [
+      {
+        "@type": "ContactPoint",
+        contactType: "customer support",
+        email: "support@etalase.online",
+        url: `${BASE_URL}/kontak`,
+        availableLanguage: ["Indonesian", "English", "Malay", "Thai", "Vietnamese"],
+        areaServed: ["ID", "MY", "SG", "TH", "VN", "PH"],
+      },
+      {
+        "@type": "ContactPoint",
+        contactType: "sales",
+        email: "halo@etalase.online",
+        url: `${BASE_URL}/bantuan`,
+        availableLanguage: ["Indonesian", "English"],
+        areaServed: ["ID", "MY", "SG", "TH", "VN"],
+      },
+    ],
   };
 }
 
@@ -190,22 +201,121 @@ export function generateSoftwareAppJsonLd() {
   return {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    name: "Etalase.online Storefront Platform",
+    name: "etalase.online Storefront Platform",
     operatingSystem: "Web Browser, iOS, Android",
     applicationCategory: "BusinessApplication",
-    offers: {
-      "@type": "Offer",
-      price: "0",
-      priceCurrency: "IDR",
+    publisher: {
+      "@type": "Organization",
+      name: "PT Rafa Kreasindo Teknologi",
+      url: `${BASE_URL}/about`,
     },
-    featureList: [
-      "Bio Link Visual & Storefront Modern",
-      "Checkout WhatsApp Tanpa Potongan Komisi (0%)",
-      "Pembayaran QRIS BorderPay Terverifikasi Otomatis",
-      "Pengiriman Produk Digital Otomatis ke WhatsApp 3 Detik",
-      "4 Arketipe Template Terisolasi",
-      "Dukungan Mata Uang Asia Tenggara (IDR, MYR, SGD, THB, VND, PHP)",
+    offers: [
+      {
+        "@type": "Offer",
+        name: "Paket Gratis (Free Tier)",
+        price: "0",
+        priceCurrency: "IDR",
+        url: `${BASE_URL}/harga`,
+      },
+      {
+        "@type": "Offer",
+        name: "Paket PRO Bulanan",
+        price: "49000",
+        priceCurrency: "IDR",
+        url: `${BASE_URL}/harga`,
+      },
+      {
+        "@type": "Offer",
+        name: "Paket Terima Beres (DFY Concierge)",
+        price: "899000",
+        priceCurrency: "IDR",
+        url: `${BASE_URL}/harga`,
+      },
     ],
+    featureList: [
+      "Katalog Online & Bio Link Visual Mobile-First",
+      "Order Chat WhatsApp Tanpa Komisi (0%)",
+      "Pembayaran QRIS Otomatis (4,5% Free / 2% PRO) + Convenience Fee",
+      "Auto-Delivery File Digital ke WhatsApp & Dynamic PDF Watermark",
+      "14 Variasi Template dalam 4 Arketipe Desain Terisolasi",
+      "Pencairan Saldo Minimum Rp 50.000 (PRO Gratis 4x/bulan)",
+      "Custom Domain + SSL Gratis, Meta Pixel CAPI, TikTok Pixel & GA4",
+    ],
+  };
+}
+
+/**
+ * WebPage + Speakable Schema.org JSON-LD for EEAT, AEO, GEO & AIO
+ */
+export function generateWebPageJsonLd({
+  url,
+  name,
+  description,
+  locale = "id",
+  dateModified = "2026-11-25",
+  speakableSelectors = ["h1", "main p"],
+}: {
+  url: string;
+  name: string;
+  description: string;
+  locale?: SupportedLocale;
+  dateModified?: string;
+  speakableSelectors?: string[];
+}) {
+  const fullUrl = url.startsWith("http") ? url : `${BASE_URL}${url}`;
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": fullUrl,
+    url: fullUrl,
+    name,
+    description,
+    inLanguage: locale,
+    dateModified,
+    isPartOf: {
+      "@type": "WebSite",
+      name: "etalase.online",
+      url: BASE_URL,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "PT Rafa Kreasindo Teknologi",
+      url: `${BASE_URL}/about`,
+    },
+    speakable: {
+      "@type": "SpeakableSpecification",
+      cssSelector: speakableSelectors,
+    },
+  };
+}
+
+/**
+ * HowTo Schema.org JSON-LD for AEO/GEO Step Walkthroughs
+ */
+export function generateHowToJsonLd({
+  name,
+  description,
+  totalTime = "PT1M",
+  steps,
+}: {
+  name: string;
+  description: string;
+  totalTime?: string;
+  steps: { name: string; text: string; url?: string }[];
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    name,
+    description,
+    totalTime,
+    step: steps.map((s, idx) => ({
+      "@type": "HowToStep",
+      position: idx + 1,
+      name: s.name,
+      text: s.text,
+      url: s.url || `${BASE_URL}/register`,
+    })),
   };
 }
 

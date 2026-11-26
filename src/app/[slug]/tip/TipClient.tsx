@@ -2,7 +2,10 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Coffee, Heart, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { Coffee, Heart, ArrowLeft, CheckCircle2, Loader2 } from "lucide-react";
+import { actionSubmitTip } from "@/lib/actions/creator-actions";
+import { showServiceResultToast } from "@/components/ui/GlobalToast";
+import { trackGtmGenerateLead } from "@/lib/analytics/gtm";
 
 interface TipClientProps {
   storeSlug: string;
@@ -18,13 +21,45 @@ export default function TipClient({ storeSlug, storeName, avatarUrl }: TipClient
   const [supporterName, setSupporterName] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [orderCode, setOrderCode] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
   const finalAmount = customAmount ? Number(customAmount) : selectedAmount;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    if (!supporterName.trim() || !whatsapp.trim() || finalAmount <= 0) return;
+
+    if (storeSlug === "demo") {
+      setOrderCode("TIP-DEMO-001");
+      setSubmitted(true);
+      return;
+    }
+
+    setLoading(true);
+    const res = await actionSubmitTip({
+      storeSlug,
+      supporterName: supporterName.trim(),
+      supporterWhatsapp: whatsapp.trim(),
+      amount: finalAmount,
+      message: message.trim() || undefined,
+    });
+    setLoading(false);
+    showServiceResultToast(res);
+
+    if (res.success && res.data) {
+      setOrderCode(res.data.orderCode);
+      setSubmitted(true);
+      trackGtmGenerateLead({
+        currency: "IDR",
+        value: Number(finalAmount || 0),
+        leadSource: "creator_support_tip",
+        storeSlug,
+        itemName: `Tip - ${storeName}`,
+        transactionId: res.data.orderCode,
+      });
+    }
   };
 
   return (
@@ -44,8 +79,13 @@ export default function TipClient({ storeSlug, storeName, avatarUrl }: TipClient
               <CheckCircle2 className="w-8 h-8" />
             </div>
             <h2 className="text-2xl font-bold text-white">Terima Kasih Banyak!</h2>
+            {orderCode && (
+              <div className="inline-block text-xs font-mono bg-slate-800 px-3 py-1 rounded-lg text-amber-400">
+                Kode Dukungan: {orderCode}
+              </div>
+            )}
             <p className="text-sm text-slate-400">
-              Apresiasi sebesar <span className="text-emerald-400 font-bold">Rp {finalAmount.toLocaleString("id-ID")}</span> telah diteruskan ke {storeName}.
+              Apresiasi sebesar <span className="text-emerald-400 font-bold">Rp {finalAmount.toLocaleString("id-ID")}</span> untuk {storeName} telah dicatat.
             </p>
             <div className="pt-4">
               <Link
@@ -158,9 +198,10 @@ export default function TipClient({ storeSlug, storeName, avatarUrl }: TipClient
 
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-slate-950 font-bold py-3.5 rounded-xl text-xs transition shadow-lg flex items-center justify-center gap-1.5"
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 disabled:opacity-50 text-slate-950 font-bold py-3.5 rounded-xl text-xs transition shadow-lg flex items-center justify-center gap-1.5"
               >
-                <Heart className="w-4 h-4 fill-current" />
+                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Heart className="w-4 h-4 fill-current" />}
                 <span>Kirim Dukungan Rp {finalAmount.toLocaleString("id-ID")}</span>
               </button>
             </form>

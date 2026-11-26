@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { GlobalHeader } from "@/components/saas/GlobalHeader";
 import { GlobalFooter } from "@/components/saas/GlobalFooter";
-import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import {
   Sparkles,
   ArrowRight,
@@ -871,19 +870,80 @@ export function SolusiClient({ locale }: { locale: SupportedLocale }) {
   const industries = currentLocaleData.industries;
 
   const [selectedIndustry, setSelectedIndustry] = useState<string>("creator");
-  const current = industries.find((i) => i.id === selectedIndustry) || industries[0];
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  const resolveIndustryId = useCallback(
+    (hashString: string) => {
+      const clean = hashString
+        .replace(/^#/, "")
+        .replace(/^segmen-/, "")
+        .toLowerCase()
+        .trim();
+      if (!clean) return null;
+      if (clean === "kreator" || clean === "creator") return "creator";
+      if (clean === "afiliasi" || clean === "affiliate") return "affiliate";
+      if (clean === "showroom" || clean === "sales") return "sales";
+      if (clean === "cafe" || clean === "fnb") return "cafe";
+      if (clean === "konsultan" || clean === "consultant") return "consultant";
+      if (clean === "umkm" || clean === "rental") return "rental";
+
+      const match = industries.find((i) => i.id === clean);
+      return match ? match.id : null;
+    },
+    [industries]
+  );
+
+  useEffect(() => {
+    const syncFromHash = () => {
+      if (typeof window !== "undefined" && window.location.hash) {
+        const resolved = resolveIndustryId(window.location.hash);
+        if (resolved) {
+          setSelectedIndustry(resolved);
+        }
+      }
+    };
+    syncFromHash();
+    window.addEventListener("hashchange", syncFromHash);
+    window.addEventListener("popstate", syncFromHash);
+    return () => {
+      window.removeEventListener("hashchange", syncFromHash);
+      window.removeEventListener("popstate", syncFromHash);
+    };
+  }, [resolveIndustryId]);
+
+  const handleSelectIndustry = (industryId: string, scrollMobile = true) => {
+    setSelectedIndustry(industryId);
+    if (typeof window !== "undefined") {
+      history.replaceState(null, "", `#segmen-${industryId}`);
+      if (scrollMobile && window.innerWidth < 1024 && panelRef.current) {
+        panelRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+  };
 
   const getLocalizedHref = (basePath: string) => {
     if (locale === "id") return basePath;
     return `/${locale}${basePath}`;
   };
 
+  const getSegmentRoute = (industryId: string) => {
+    const slugMap: Record<string, string> = {
+      creator: "kreator",
+      affiliate: "afiliasi",
+      sales: "showroom",
+      cafe: "cafe",
+      consultant: "konsultan",
+      rental: "umkm",
+    };
+    return getLocalizedHref(`/solusi/${slugMap[industryId] || industryId}`);
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-[#FAF8F5] text-[#1C1917]">
       <GlobalHeader />
 
-      <section className="pt-16 pb-12 px-4 sm:px-6 text-center max-w-4xl mx-auto">
-        <ScrollReveal direction="up" delay={50}>
+      <section className="pt-16 pb-12 px-4 sm:px-6 text-center max-w-6xl mx-auto w-full">
+        <div className="max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-1.5 bg-[#FDF0EC] border border-[#FADCD3] text-[#D94E28] px-3.5 py-1.5 rounded-full text-xs font-semibold mb-4">
             <Sparkles className="w-3.5 h-3.5" />
             <span>{currentLocaleData.badge}</span>
@@ -894,7 +954,7 @@ export function SolusiClient({ locale }: { locale: SupportedLocale }) {
           <p className="text-[#57534E] text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
             {currentLocaleData.subtitle}
           </p>
-        </ScrollReveal>
+        </div>
       </section>
 
       <section className="pb-24 px-4 sm:px-6 max-w-6xl mx-auto w-full">
@@ -908,9 +968,13 @@ export function SolusiClient({ locale }: { locale: SupportedLocale }) {
               const Icon = ind.icon;
               const isSelected = selectedIndustry === ind.id;
               return (
-                <button
+                <a
                   key={ind.id}
-                  onClick={() => setSelectedIndustry(ind.id)}
+                  href={`#segmen-${ind.id}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleSelectIndustry(ind.id, true);
+                  }}
                   className={`w-full text-left p-4 rounded-2xl border transition-all flex items-center justify-between cursor-pointer ${
                     isSelected
                       ? "bg-white border-[#D94E28] shadow-sm text-[#1C1917] ring-1 ring-[#D94E28]/15"
@@ -934,91 +998,110 @@ export function SolusiClient({ locale }: { locale: SupportedLocale }) {
                       isSelected ? "text-[#D94E28] translate-x-1" : "text-stone-300"
                     }`}
                   />
-                </button>
+                </a>
               );
             })}
           </div>
 
-          {/* Panel Komparasi: Masalah vs Solusi */}
-          <div className="lg:col-span-8 bg-white border border-[#E7E5E4] rounded-3xl p-7 sm:p-10 shadow-sm space-y-8">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-6 border-b border-[#E7E5E4]">
-              <div>
-                <h2 className="text-2xl font-bold text-[#1C1917]">{current.title}</h2>
-                <p className="text-xs sm:text-sm text-[#57534E] mt-0.5">{current.tagline}</p>
-              </div>
-              <div className="inline-flex items-center gap-2 bg-[#FAF8F5] border border-[#E7E5E4] px-3 py-1.5 rounded-xl text-xs font-mono font-bold text-[#D94E28]">
-                <span>https://{current.templateLink}</span>
-              </div>
-            </div>
-
-            {/* Grid Komparasi: Masalah vs Solusi */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Kolom Masalah (Sebelum) */}
-              <div className="bg-red-50/50 border border-red-100 rounded-2xl p-6 space-y-4">
-                <div className="flex items-center gap-2 text-red-700 font-bold text-xs uppercase tracking-wider">
-                  <XCircle className="w-4 h-4" />
-                  <span>{currentLocaleData.beforeHeader}</span>
-                </div>
-                <div className="space-y-3">
-                  {current.beforeProblems.map((prob, idx) => (
-                    <div key={idx} className="flex items-start gap-2.5 text-xs text-red-950/80 leading-relaxed">
-                      <span className="text-red-400 font-bold shrink-0">&times;</span>
-                      <span>{prob}</span>
+          {/* Panel Komparasi: tampilkan hanya segmen yang dipilih secara visual, tetap indexable di DOM */}
+          <div ref={panelRef} className="lg:col-span-8 scroll-mt-24">
+            {industries.map((seg) => {
+              const isSelected = selectedIndustry === seg.id;
+              return (
+                <article
+                  key={seg.id}
+                  id={`segmen-${seg.id}`}
+                  aria-hidden={!isSelected}
+                  className={
+                    isSelected
+                      ? "bg-white border border-[#E7E5E4] rounded-3xl p-7 sm:p-10 shadow-sm space-y-8 transition-all"
+                      : "sr-only"
+                  }
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-6 border-b border-[#E7E5E4]">
+                    <div>
+                      <h2 className="text-2xl font-bold text-[#1C1917]">{seg.title}</h2>
+                      <p className="text-xs sm:text-sm text-[#57534E] mt-0.5">{seg.tagline}</p>
                     </div>
-                  ))}
-                </div>
-              </div>
+                    <a
+                      href={`https://${seg.templateLink}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 bg-[#FAF8F5] hover:border-[#D94E28] border border-[#E7E5E4] px-3 py-1.5 rounded-xl text-xs font-mono font-bold text-[#D94E28] transition shrink-0"
+                    >
+                      <span>Contoh: {seg.templateLink}</span>
+                    </a>
+                  </div>
 
-              {/* Kolom Solusi (Dengan etalase.online) */}
-              <div className="bg-[#FDF0EC]/60 border border-[#FADCD3] rounded-2xl p-6 space-y-4">
-                <div className="flex items-center gap-2 text-[#D94E28] font-bold text-xs uppercase tracking-wider">
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span>{currentLocaleData.afterHeader}</span>
-                </div>
-                <div className="space-y-3">
-                  {current.afterSolutions.map((sol, idx) => (
-                    <div key={idx} className="flex items-start gap-2.5 text-xs text-[#1C1917] leading-relaxed">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-[#D94E28] shrink-0 mt-0.5" />
-                      <span>{sol}</span>
+                  {/* Grid Komparasi: Masalah vs Solusi */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="bg-red-50/50 border border-red-100 rounded-2xl p-6 space-y-4">
+                      <div className="flex items-center gap-2 text-red-700 font-bold text-xs uppercase tracking-wider">
+                        <XCircle className="w-4 h-4" />
+                        <span>{currentLocaleData.beforeHeader}</span>
+                      </div>
+                      <div className="space-y-3">
+                        {seg.beforeProblems.map((prob, idx) => (
+                          <div key={idx} className="flex items-start gap-2.5 text-xs text-red-950/80 leading-relaxed">
+                            <span className="text-red-400 font-bold shrink-0">&times;</span>
+                            <span>{prob}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  ))}
-                </div>
-              </div>
-            </div>
 
-            {/* Feature Tags */}
-            <div className="space-y-3 pt-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#57534E]">
-                {currentLocaleData.featuresHeader}
-              </span>
-              <div className="flex flex-wrap gap-2">
-                {current.features.map((f, idx) => (
-                  <span
-                    key={idx}
-                    className="text-xs font-semibold bg-[#FAF8F5] border border-[#E7E5E4] text-[#1C1917] px-3 py-1 rounded-lg"
-                  >
-                    ✓ {f}
-                  </span>
-                ))}
-              </div>
-            </div>
+                    <div className="bg-[#FDF0EC]/60 border border-[#FADCD3] rounded-2xl p-6 space-y-4">
+                      <div className="flex items-center gap-2 text-[#D94E28] font-bold text-xs uppercase tracking-wider">
+                        <CheckCircle2 className="w-4 h-4" />
+                        <span>{currentLocaleData.afterHeader}</span>
+                      </div>
+                      <div className="space-y-3">
+                        {seg.afterSolutions.map((sol, idx) => (
+                          <div key={idx} className="flex items-start gap-2.5 text-xs text-[#1C1917] leading-relaxed">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-[#D94E28] shrink-0 mt-0.5" />
+                            <span>{sol}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
 
-            {/* Bottom Actions */}
-            <div className="pt-6 border-t border-[#E7E5E4] flex flex-col sm:flex-row items-center justify-between gap-4">
-              <Link
-                href={getLocalizedHref("/register")}
-                className="w-full sm:w-auto bg-[#D94E28] hover:bg-[#B83E1D] text-white px-8 py-3.5 rounded-xl font-bold text-xs sm:text-sm shadow-xs transition flex items-center justify-center gap-2"
-              >
-                <span>{currentLocaleData.ctaPrefix} {current.title}</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link
-                href={getLocalizedHref("/template")}
-                className="text-xs font-semibold text-[#57534E] hover:text-[#1C1917]"
-              >
-                {currentLocaleData.ctaSecondary}
-              </Link>
-            </div>
+                  {/* Feature Tags */}
+                  <div className="space-y-3 pt-1">
+                    <span className="text-xs font-bold uppercase tracking-wider text-[#57534E]">
+                      {currentLocaleData.featuresHeader}
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {seg.features.map((f, idx) => (
+                        <span
+                          key={idx}
+                          className="text-xs font-semibold bg-[#FAF8F5] border border-[#E7E5E4] text-[#1C1917] px-3 py-1 rounded-lg"
+                        >
+                          ✓ {f}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Bottom Actions */}
+                  <div className="pt-5 border-t border-[#E7E5E4] flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <Link
+                      href={getLocalizedHref("/register")}
+                      className="w-full sm:w-auto bg-[#D94E28] hover:bg-[#B83E1D] text-white px-7 py-3.5 rounded-xl font-bold text-xs sm:text-sm shadow-xs transition flex items-center justify-center gap-2"
+                    >
+                      <span>{currentLocaleData.ctaPrefix} {seg.title}</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
+                    <Link
+                      href={getSegmentRoute(seg.id)}
+                      className="text-xs font-semibold text-[#D94E28] hover:underline"
+                    >
+                      {locale === "id" ? "Buka Halaman Khusus Segmen Ini →" : "Open Dedicated Segment Page →"}
+                    </Link>
+                  </div>
+                </article>
+              );
+            })}
           </div>
         </div>
       </section>

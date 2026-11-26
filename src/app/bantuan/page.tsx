@@ -2,7 +2,11 @@ import React from "react";
 import { Metadata } from "next";
 import { BantuanClient } from "@/components/bantuan/BantuanClient";
 import { SupportedLocale, SUPPORTED_LOCALES } from "@/lib/config/constants";
-import { generateLocalizedMetadata } from "@/lib/seo/metadata-helper";
+import {
+  generateLocalizedMetadata,
+  generateBreadcrumbJsonLd,
+  generateWebPageJsonLd,
+} from "@/lib/seo/metadata-helper";
 
 interface BantuanPageProps {
   searchParams?: {
@@ -51,5 +55,30 @@ export default function BantuanPage({ searchParams }: BantuanPageProps) {
       ? (rawLang as SupportedLocale)
       : "id";
 
-  return <BantuanClient locale={locale} />;
+  const path = locale === "id" ? "/bantuan" : `/${locale}/bantuan`;
+  const breadcrumbsJsonLd = generateBreadcrumbJsonLd([
+    { name: locale === "id" ? "Beranda" : "Home", url: locale === "id" ? "/" : `/${locale}` },
+    { name: locale === "id" ? "Pusat Bantuan" : "Help Center", url: path },
+  ]);
+  const webPageJsonLd = generateWebPageJsonLd({
+    url: path,
+    name: "Pusat Bantuan & Panduan Lengkap etalase.online",
+    description:
+      "Pusat pengetahuan dan 14 FAQ lengkap untuk calon tenant dan pemilik toko aktif tentang subdomain, biaya QRIS, pencairan saldo, domain kustom, dan pixel iklan.",
+    locale,
+  });
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }}
+      />
+      <BantuanClient locale={locale} />
+    </>
+  );
 }

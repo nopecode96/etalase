@@ -51,7 +51,7 @@ export const ARTICLES_DATA: ArticleData[] = [
     datePublished: "2026-11-20T08:00:00+07:00",
     dateModified: "2026-11-23T14:30:00+07:00",
     image: {
-      url: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=1200&q=80",
+      url: "/images/blog/cover-digital-products.jpg",
       width: 1200,
       height: 675,
       alt: {
@@ -303,7 +303,7 @@ export const ARTICLES_DATA: ArticleData[] = [
     datePublished: "2026-11-18T09:00:00+07:00",
     dateModified: "2026-11-23T15:00:00+07:00",
     image: {
-      url: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80",
+      url: "/images/blog/cover-showroom-sales.jpg",
       width: 1200,
       height: 675,
       alt: {
@@ -495,7 +495,7 @@ export const ARTICLES_DATA: ArticleData[] = [
     datePublished: "2026-11-15T10:00:00+07:00",
     dateModified: "2026-11-23T15:15:00+07:00",
     image: {
-      url: "https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=1200&q=80",
+      url: "/images/blog/cover-tiktok-affiliate.jpg",
       width: 1200,
       height: 675,
       alt: {
@@ -681,7 +681,7 @@ export const ARTICLES_DATA: ArticleData[] = [
     datePublished: "2026-11-12T11:00:00+07:00",
     dateModified: "2026-11-23T15:30:00+07:00",
     image: {
-      url: "https://images.unsplash.com/photo-1556742049-0a67c5574f73?auto=format&fit=crop&w=1200&q=80",
+      url: "/images/blog/cover-qris-automation.jpg",
       width: 1200,
       height: 675,
       alt: {
@@ -863,6 +863,908 @@ export const ARTICLES_DATA: ArticleData[] = [
           {
             question: "Chính sách phí tiện ích thanh toán hoạt động ra sao?",
             answer: "Chủ cửa hàng có thể tùy chọn tính phí giao dịch vào người mua để giữ trọn vẹn 100% lợi nhuận.",
+          },
+        ],
+      },
+    },
+  },
+  {
+    slug: "strategi-booking-konsultasi-1on1-kreator",
+    datePublished: "2026-11-24T09:00:00+07:00",
+    dateModified: "2026-11-25T10:00:00+07:00",
+    image: {
+      url: "/images/blog/cover-booking-consultation.jpg",
+      width: 1200,
+      height: 800,
+      alt: {
+        id: "Mentor kreatif berdiskusi langsung dengan klien dalam sesi konsultasi 1-on-1 terjadwal lewat etalase.online",
+        en: "Creative mentor conducting a scheduled 1-on-1 paid consultation session via etalase.online",
+        ms: "Mentor kreatif mengadakan sesi konsultasi 1-on-1 berbayar secara tersusun melalui etalase.online",
+        th: "ที่ปรึกษามืออาชีพจัดเซสชันให้คำปรึกษาแบบ 1 ต่อ 1 ผ่านระบบจองเวลาบน etalase.online",
+        vi: "Chuyên gia thực hiện buổi tư vấn 1-1 có lịch hẹn tự động qua etalase.online",
+      },
+      caption: {
+        id: "Sistem Booking Slot 1-on-1 otomatis mencegah drama tanya jawab jadwal berulang di WhatsApp.",
+        en: "Automated 1-on-1 slot booking eliminates endless scheduling back-and-forth on WhatsApp.",
+        ms: "Sistem tempahan slot automatik mengelakkan rundingan jadual yang berulang.",
+        th: "ระบบจองเวลาอัตโนมัติช่วยลดการถามตอบเรื่องคิวว่างซ้ำซาก",
+        vi: "Đặt lịch 1-1 tự động loại bỏ hoàn toàn trao đổi lặp lại để chốt giờ hẹn.",
+      },
+    },
+    author: {
+      name: EDITORIAL_TEAM_MAP,
+      role: {
+        id: "Strategis Monetisasi Jasa & Konsultasi",
+        en: "Coaching & Service Monetization Strategist",
+        ms: "Pakar Pengewangan Servis & Konsultasi",
+        th: "นักกลยุทธ์การสร้างรายได้จากบริการและที่ปรึกษา",
+        vi: "Chiến lược gia Kinh doanh Dịch vụ & Tư vấn",
+      },
+      bio: {
+        id: "Membantu konsultan, desainer, mentor karier, dan coach di Asia Tenggara mengubah waktu luang menjadi sesi berbayar dengan alur booking otomatis.",
+        en: "Helping consultants, designers, and coaches across Southeast Asia convert expertise into prepaid scheduled sessions.",
+        ms: "Membantu perunding dan jurulatih menukar kepakaran menjadi sesi berjadual prabayar.",
+        th: "ช่วยที่ปรึกษาและโค้ชเปลี่ยนเวลาว่างให้เป็นเซสชันแบบชำระเงินล่วงหน้า",
+        vi: "Hỗ trợ chuyên gia tư vấn biến thời gian rảnh thành lịch hẹn trả phí trước.",
+      },
+      avatar: "/favicon.svg",
+    },
+    translations: {
+      id: {
+        title: "Cara Jual Sesi Konsultasi 1-on-1 Tanpa Ribet Balas Chat Tanya Jadwal Kosong",
+        summary: "Panduan praktis bagi mentor, freelancer, dokter kecantikan, dan konsultan bisnis untuk mengaktifkan halaman booking slot berbayar yang langsung terhubung ke WhatsApp.",
+        category: "Konsultasi & Jasa",
+        readTime: "5 min baca",
+        directAnswer: "Menjual sesi konsultasi 1-on-1 paling efisien dilakukan dengan menampilkan pilihan durasi (misal 30/60 menit) dan slot jam tersedia di halaman `/book`, mewajibkan pembayaran QRIS atau konfirmasi di muka agar tidak ada no-show, dan mengirimkan detail sesi ke WhatsApp klien.",
+        keyTakeaways: [
+          "Tampilkan tarif transparan per sesi langsung di etalase untuk menyaring penanya iseng.",
+          "Gunakan daftar slot jam tetap (misal 09:00, 14:00, 19:00 WIB) agar kalender Anda tidak berantakan.",
+          "Aktifkan pembayaran QRIS di muka atau Order by Chat agar tingkat kehadiran (show-up rate) mendekati 100%.",
+          "Rekap agenda topik klien otomatis tersimpan rapi di tabel Pesanan dashboard admin.",
+        ],
+        table: {
+          caption: "Alur Booking Konsultasi: Manual via DM/Chat vs Halaman Booking Etalase",
+          headers: ["Tahapan", "Etalase Booking (`/book`)", "Tanya Jadwal Manual di Chat"],
+          rows: [
+            ["Cek Ketersediaan Jam", "Langsung pilih slot di layar HP", "Tanya-balas 6-10 pesan berhari-hari"],
+            ["Kepastian Hadir (No-Show)", "Sangat rendah (konfirmasi & komitmen jelas)", "Tinggi karena tidak ada komitmen awal"],
+            ["Catatan Topik Klien", "Diisi di form sebelum booking selesai", "Tercecer di riwayat chat WhatsApp"],
+          ],
+        },
+        sections: [
+          {
+            heading: "1. Masalah Utama Konsultan Pemula: Gratis Terlalu Lama di Awal",
+            directAnswer: "Lebih dari 60% calon klien hanya bertanya 'bisa hari apa dan biayanya berapa?' lalu menghilang saat chat terlalu lambat dibalas.",
+            content: [
+              "Ketika Anda menjual jasa review portofolio, konsultasi pajak UMKM, bedah akun iklan, atau mentoring karier, waktu Anda adalah inventaris yang tidak bisa digandakan.",
+              "Di etalase.online, tipe produk Konsultasi (`APPOINTMENT`) memungkinkan Anda mengisi durasi menit dan daftar slot waktu langsung dari form tambah produk. Pengunjung cukup klik tombol booking, memilih hari & jam, menuliskan keluhan atau link yang ingin dibahas, dan sesi langsung tercatat ke database toko Anda.",
+            ],
+          },
+          {
+            heading: "2. Menyiapkan Agenda Sesi Berkonversi Tinggi",
+            directAnswer: "Cantumkan 3 hasil konkret yang didapat klien setelah sesi selesai di deskripsi produk.",
+            content: [
+              "Jangan sekadar menulis 'Konsultasi Bisnis 60 Menit'. Tulis secara spesifik: 'Audit Landing Page & Iklan Meta 45 Menit + Rekaman Solusi Konkret'. Kejelasan manfaat membuat calon pembeli lebih cepat memilih slot tanpa ragu.",
+            ],
+          },
+        ],
+        faqs: [
+          {
+            question: "Bagaimana klien mendapatkan tautan Google Meet atau Zoom setelah booking?",
+            answer: "Setelah booking tersimpan di database Order Console dan notifikasi Telegram masuk, Anda dapat mengirim tautan meeting langsung ke nomor WhatsApp klien yang tercantum.",
+          },
+        ],
+      },
+      en: {
+        title: "How to Sell 1-on-1 Coaching Sessions Without Endless Calendar Back-and-Forth",
+        summary: "A practical workflow for mentors, freelancers, and consultants to launch prepaid `/book` time slots wired straight to WhatsApp and admin tracking.",
+        category: "Coaching & Services",
+        readTime: "5 min read",
+        directAnswer: "Publish fixed session durations and daily time slots on your `/book` storefront page so buyers commit upfront before consuming your personal chat time.",
+        keyTakeaways: [
+          "Publish clear session pricing and deliverables on the card.",
+          "Configure recurring available time slots right inside Product Form.",
+          "Capture client topic notes before the call even begins.",
+        ],
+        sections: [
+          {
+            heading: "1. Turn Unstructured DMs Into Booked Calendar Slots",
+            directAnswer: "Structured appointment pages eliminate slow DM negotiation.",
+            content: ["Display fixed session lengths and let clients reserve slots directly on mobile."],
+          },
+        ],
+        faqs: [
+          {
+            question: "Where are confirmed appointments stored?",
+            answer: "Every reservation saves straight into your Orders database console and triggers instant Telegram alerts.",
+          },
+        ],
+      },
+      ms: {
+        title: "Cara Jual Sesi Konsultasi 1-on-1 Tanpa Rundingan Jadual Berulang di Chat",
+        summary: "Panduan menyediakan halaman tempahan slot masa berbayar untuk mentor, pereka grafik, dan perunding.",
+        category: "Konsultasi & Servis",
+        readTime: "5 min baca",
+        directAnswer: "Paparkan harga dan slot masa tetap terus di etalase `/book` supaya pelanggan boleh menempah dalam 1 minit tanpa berbalas mesej panjang.",
+        keyTakeaways: [
+          "Tetapkan slot jam harian terus dari papan pemuka admin.",
+          "Kurangkan risiko pelanggan membatalkan sesi di saat akhir.",
+        ],
+        sections: [
+          {
+            heading: "1. Ubah Pertanyaan DM Menjadi Tempahan Rasmi",
+            directAnswer: "Borang tempahan terstruktur mempercepat pengesahan pelanggan.",
+            content: ["Pelanggan memilih masa dan menulis nota topik sebelum menghantar pesanan."],
+          },
+        ],
+        faqs: [
+          {
+            question: "Di manakah rekod tempahan disimpan?",
+            answer: "Semua tempahan masuk terus ke konsol Pesanan dan pemberitahuan Telegram.",
+          },
+        ],
+      },
+      th: {
+        title: "วิธีขายคอร์สให้คำปรึกษาแบบ 1 ต่อ 1 โดยไม่ต้องเสียเวลาทักถามคิวว่าง",
+        summary: "แนวทางสำหรับที่ปรึกษาและฟรีแลนซ์ในการเปิดหน้าจองเวลาแบบชำระเงินล่วงหน้า",
+        category: "บริการและที่ปรึกษา",
+        readTime: "5 นาทีอ่าน",
+        directAnswer: "แสดงระยะเวลาและช่วงเวลาว่างบนหน้า `/book` เพื่อลดขั้นตอนการนัดหมายทางแชตและลดอัตราการเบี้ยวนัด",
+        keyTakeaways: [
+          "ระบุราคาและผลลัพธ์ที่จะได้รับอย่างชัดเจน",
+          "จัดการช่วงเวลาจองได้ทันทีจากแดชบอร์ดร้านค้า",
+        ],
+        sections: [
+          {
+            heading: "1. เปลี่ยนแชตถามคิวเป็นระบบจองเวลาอัตโนมัติ",
+            directAnswer: "ลูกค้าสามารถเลือกวันเวลาที่สะดวกได้ด้วยตัวเอง",
+            content: ["ประหยัดเวลาตอบแชตซ้ำ ๆ เพื่อโฟกัสที่การให้คำปรึกษาคุณภาพสูง"],
+          },
+        ],
+        faqs: [
+          {
+            question: "ดูรายละเอียดการจองได้ที่ไหน?",
+            answer: "ข้อมูลทั้งหมดถูกบันทึกในหน้ารายการคำสั่งซื้อและแจ้งเตือนผ่าน Telegram ทันที",
+          },
+        ],
+      },
+      vi: {
+        title: "Cách Bán Lịch Tư Vấn 1-1 Không Cần Nhắn Tin Chốt Giờ Thủ Công",
+        summary: "Hướng dẫn dành cho mentor và freelancer thiết lập trang đặt lịch tự động kết nối WhatsApp.",
+        category: "Tư vấn & Dịch vụ",
+        readTime: "5 phút đọc",
+        directAnswer: "Hiển thị khung giờ cố định và mức phí rõ ràng trên trang `/book` giúp khách hàng tự đặt lịch trong 1 phút mà không làm mất thời gian trao đổi qua lại.",
+        keyTakeaways: [
+          "Cài đặt danh sách khung giờ trực tiếp trong phần quản lý sản phẩm.",
+          "Thu thập trước chủ đề buổi tư vấn của khách hàng.",
+        ],
+        sections: [
+          {
+            heading: "1. Chuẩn hóa quy trình đặt lịch cho chuyên gia",
+            directAnswer: "Loại bỏ tình trạng khách hỏi giờ rồi biến mất.",
+            content: ["Mọi lịch hẹn được lưu tự động về bảng quản trị đơn hàng."],
+          },
+        ],
+        faqs: [
+          {
+            question: "Lịch hẹn của khách được lưu ở đâu?",
+            answer: "Toàn bộ thông tin đặt lịch lưu trong bảng Orders và gửi cảnh báo về Telegram ngay lập tức.",
+          },
+        ],
+      },
+    },
+  },
+  {
+    slug: "cara-buat-katalog-menu-cafe-qr-meja",
+    datePublished: "2026-11-24T14:00:00+07:00",
+    dateModified: "2026-11-25T10:30:00+07:00",
+    image: {
+      url: "/images/blog/cover-cafe-menu-qr.jpg",
+      width: 1200,
+      height: 1800,
+      alt: {
+        id: "Secangkir kopi latte di kafe artisan yang menggunakan katalog menu digital etalase.online bebas PDF buram",
+        en: "Artisan coffee latte cups on a warm wooden cafe table showcasing mobile QR menu browsing",
+        ms: "Cawan kopi latte di kafe moden yang menggunakan katalog menu digital mesra telefon bimbit",
+        th: "กาแฟลาเต้ในร้านคาเฟ่ที่ใช้เมนูดิจิทัลผ่าน QR Code บนโต๊ะ",
+        vi: "Ly cà phê latte tại quán hiện đại sử dụng menu điện tử quét mã QR",
+      },
+      caption: {
+        id: "Template Visual Menu Grid & Cafe Menu membuat foto kopi dan pastry tampil menggoda di layar HP pelanggan.",
+        en: "Visual Menu Grid displays crisp drinks and pastries tailored for hungry mobile shoppers.",
+        ms: "Paparan grid visual memaparkan gambar minuman dan pastri dengan jelas di skrin telefon.",
+        th: "ตารางเมนูภาพช่วยให้ลูกค้าเลือกเครื่องดื่มและขนมได้ง่ายขึ้นบนมือถือ",
+        vi: "Giao diện lưới hình ảnh giúp thực khách chọn món nhanh và trực quan ngay trên điện thoại.",
+      },
+    },
+    author: {
+      name: EDITORIAL_TEAM_MAP,
+      role: {
+        id: "Konsultan Digitalisasi F&B & UMKM",
+        en: "F&B & SME Digitalization Advisor",
+        ms: "Penasihat Pendigitalan F&B & PKS",
+        th: "ที่ปรึกษาด้านดิจิทัลสำหรับร้านอาหารและ SME",
+        vi: "Cố vấn Chuyển đổi Số Ngành F&B",
+      },
+      bio: {
+        id: "Mendampingi pemilik coffee shop, bakery, dan usaha kuliner membangun katalog menu QR cepat tanpa potongan komisi aplikasi pesan-antar.",
+        en: "Helping coffee shops, bakeries, and local eateries deploy fast QR menus with zero delivery-app markups.",
+        ms: "Membantu pemilik kafe membina menu QR pantas tanpa komisen aplikasi penghantaran.",
+        th: "ช่วยร้านกาแฟและร้านอาหารสร้างเมนูดิจิทัลที่โหลดไวและไร้ค่าคอมมิชชัน",
+        vi: "Đồng hành cùng quán cà phê và tiệm bánh xây dựng thực đơn trực tuyến không mất phí hoa hồng.",
+      },
+      avatar: "/favicon.svg",
+    },
+    translations: {
+      id: {
+        title: "Stop Pakai Menu PDF Buram: Cara Kafe & UMKM F&B Tingkatkan Order Meja & Takeaway",
+        summary: "Mengapa pelanggan malas men-zoom file menu PDF di Google Drive, dan bagaimana katalog foto visual mempercepat pesanan kopi serta snack langsung ke kasir WhatsApp.",
+        category: "Kuliner & F&B",
+        readTime: "4 min baca",
+        directAnswer: "Mengganti menu PDF Google Drive dengan katalog etalase visual interaktif membuat tamu kafe melihat foto produk tajam secara instan, memilih varian/porsi, lalu memesan atau membayar QRIS tanpa antre di meja kasir.",
+        keyTakeaways: [
+          "Menu PDF 15 MB membuat pelanggan kesal karena lemot saat sinyal dalam ruangan kurang stabil.",
+          "Foto grid berkualitas dengan label Bestseller menaikkan order item pendamping (pastry/snack) hingga 28%.",
+          "Order *Takeaway* dan *Pre-Order* lewat link bio Instagram masuk ke WhatsApp kasir dengan komisi 0%.",
+          "Update menu habis atau promo jam sepi (*Happy Hour*) cukup 1 klik tanpa cetak ulang buku menu.",
+        ],
+        table: {
+          caption: "Menu PDF Statis vs Katalog Visual Etalase untuk Bisnis F&B",
+          headers: ["Aspek", "Katalog Etalase.online", "File Menu PDF / Gambar WA"],
+          rows: [
+            ["Kecepatan Buka di HP", "< 1 Detik langsung tampil grid menu", "Harus download file ber-MB & zoom manual"],
+            ["Edit Harga & Stok Habis", "Ubah langsung di HP (< 30 detik)", "Desain ulang Canva & upload link baru"],
+            ["Checkout / Order Takeaway", "Keranjang/Order WA atau QRIS BorderPay", "Pembeli harus ketik nama menu manual"],
+          ],
+        },
+        sections: [
+          {
+            heading: "1. Efek Visual Foto Makanan terhadap Nilai Struk Rata-Rata",
+            directAnswer: "Pelanggan yang melihat foto close-up croissant hangat lebih sering menambah item tambahan daripada sekadar membaca tulisan teks di daftar PDF.",
+            content: [
+              "Di jam sibuk makan siang atau nongkrong sore, kecepatan melihat gambar adalah pendorong utama *upselling*. Menggunakan template **Visual Menu Grid** atau **Cafe Menu**, Anda bisa menaruh banner promo paket bundling di bagian atas (Content Blocks), diikuti grid foto menu andalan.",
+              "Untuk pelanggan yang ingin ambil cepat (*pickup*) dari kantor sebelah, cukup arahkan link Instagram kafe Anda ke etalase. Pembeli memilih kopi susu aren dan bayar QRIS di awal atau kirim format order otomatis ke WhatsApp barista dengan 0% komisi pihak ketiga.",
+            ],
+          },
+        ],
+        faqs: [
+          {
+            question: "Apakah kode QR untuk ditaruh di meja kasir sudah tersedia?",
+            answer: "Ya, setelah toko kafe aktif, halaman Marketing Kit di Admin Console langsung menyediakan QR Storefront siap cetak maupun poster siap bagikan ke Instagram Story.",
+          },
+        ],
+      },
+      en: {
+        title: "Ditch Blurry PDF Menus: How Cafes & Local Kitchens Increase Takeaway Orders",
+        summary: "Why zooming into heavy Drive PDFs hurts F&B ticket sizes, and how mobile-first visual menu grids accelerate counter & WhatsApp takeaway sales.",
+        category: "Culinary & F&B",
+        readTime: "4 min read",
+        directAnswer: "Replacing heavy PDF menu links with a visual storefront grid eliminates download friction and lets hungry customers place 0%-commission takeaway orders right from mobile.",
+        keyTakeaways: [
+          "Instant mobile loading even on indoor café reception.",
+          "Update sold-out items or Happy Hour promos in seconds without reprinting.",
+          "Generate printable table QR stands from Marketing Kit.",
+        ],
+        sections: [
+          {
+            heading: "1. Mouth-Watering Photos Drive Higher Basket Size",
+            directAnswer: "Visual pairing prompts customers to add pastries and snacks alongside drinks.",
+            content: ["Skip heavy PDF zooms and let customers browse high-contrast menu cards instantly."],
+          },
+        ],
+        faqs: [
+          {
+            question: "Can we print QR codes for dining tables?",
+            answer: "Yes, download ready-to-print store QR codes directly inside the Marketing Kit section of your tenant dashboard.",
+          },
+        ],
+      },
+      ms: {
+        title: "Hentikan Menu PDF Kabur: Cara Kafe Naikkan Pesanan Takeaway & Meja",
+        summary: "Mengapa fail PDF menyusahkan pelanggan dan bagaimana katalog foto visual mempercepat tempahan terus ke WhatsApp kaunter.",
+        category: "Kulinari & F&B",
+        readTime: "4 min baca",
+        directAnswer: "Gantikan pautan menu PDF dengan grid visual interaktif supaya pelanggan boleh memilih kopi dan pastri dengan mudah di telefon bimbit.",
+        keyTakeaways: [
+          "Tiada muat turun fail berat diperlukan.",
+          "Kemas kini stok habis terus dari telefon dalam masa 30 saat.",
+        ],
+        sections: [
+          {
+            heading: "1. Kuasa Gambar Makanan Meningkatkan Jualan Tambahan",
+            directAnswer: "Gambar makanan yang jelas menggalakkan pelanggan menambah pesanan pastri.",
+            content: ["Tempahan bawa pulang masuk terus ke WhatsApp juruwang tanpa komisen tambahan."],
+          },
+        ],
+        faqs: [
+          {
+            question: "Adakah kod QR untuk meja disediakan?",
+            answer: "Ya, Marketing Kit di Admin Console menjana kod QR kedai yang sedia untuk dicetak.",
+          },
+        ],
+      },
+      th: {
+        title: "เลิกใช้เมนู PDF ที่ซูมยาก: วิธีเพิ่มยอดสั่งซื้อคาเฟ่และร้านอาหารด้วยเมนูดิจิทัล",
+        summary: "เปลี่ยนจากไฟล์ PDF หนักเครื่องมาเป็นกริดเมนูรูปภาพที่สั่งซื้อผ่านแชตได้ทันที",
+        category: "อาหารและเครื่องดื่ม",
+        readTime: "4 นาทีอ่าน",
+        directAnswer: "แคตตาล็อกเมนูรูปภาพช่วยลดเวลารอโหลดและเพิ่มโอกาสการสั่งขนมเคียงคู่เครื่องดื่มได้สูงขึ้น",
+        keyTakeaways: [
+          "เปิดดูเมนูได้ไวใน 1 วินาทีบนมือถือ",
+          "อัปเดตเมนูหมดหรือโปรโมชันได้ทันทีไม่ต้องพิมพ์ใหม่",
+        ],
+        sections: [
+          {
+            heading: "1. รูปภาพเมนูที่คมชัดช่วยเพิ่มยอดต่อบิล",
+            directAnswer: "การเห็นรูปจริงช่วยกระตุ้นการสั่งสินค้าเพิ่มเติมหน้าเคาน์เตอร์",
+            content: ["รับออเดอร์ล่วงหน้าผ่านแชตได้โดยไม่เสียค่า GP แพลตฟอร์มส่งอาหาร"],
+          },
+        ],
+        faqs: [
+          {
+            question: "มีไฟล์ QR Code สำหรับตั้งบนโต๊ะหรือไม่?",
+            answer: "มี สามารถดาวน์โหลดจากเมนู Marketing Kit ในหลังบ้านร้านค้าได้เลย",
+          },
+        ],
+      },
+      vi: {
+        title: "Ngừng Dùng Menu PDF Mờ Nhòe: Cách Quán Cà Phê Tăng Đơn Mang Đi",
+        summary: "Vì sao khách ngại phóng to file PDF trên điện thoại và giải pháp thực đơn ảnh trực quan đặt món nhanh qua WhatsApp.",
+        category: "Ẩm thực & F&B",
+        readTime: "4 phút đọc",
+        directAnswer: "Thay thế file PDF nặng nề bằng thực đơn lưới hình ảnh giúp khách chọn món tức thì và đặt đơn mang đi miễn phí hoa hồng.",
+        keyTakeaways: [
+          "Tải trang cực nhanh ngay cả khi sóng yếu trong quán.",
+          "Cập nhật món hết hàng trong 30 giây không cần in lại menu.",
+        ],
+        sections: [
+          {
+            heading: "1. Hình ảnh hấp dẫn giúp tăng giá trị trung bình mỗi hóa đơn",
+            directAnswer: "Ảnh món ăn rõ nét thúc đẩy khách gọi thêm bánh ngọt kèm đồ uống.",
+            content: ["Hỗ trợ nhận đơn mang về trực tiếp qua chat không mất phí trung gian."],
+          },
+        ],
+        faqs: [
+          {
+            question: "Có thể tạo mã QR đặt trên bàn không?",
+            answer: "Có, mục Marketing Kit trong bảng điều khiển tạo sẵn mã QR cửa hàng để bạn in ấn.",
+          },
+        ],
+      },
+    },
+  },
+  {
+    slug: "panduan-custom-domain-toko-online-profesional",
+    datePublished: "2026-11-24T19:00:00+07:00",
+    dateModified: "2026-11-25T11:00:00+07:00",
+    image: {
+      url: "/images/blog/cover-custom-domain.jpg",
+      width: 1200,
+      height: 855,
+      alt: {
+        id: "Tampilan dashboard etalase toko online dengan custom domain merek sendiri di laptop modern",
+        en: "Modern laptop showing clean branded storefront analytics and custom domain configuration",
+        ms: "Komputer riba memaparkan papan pemuka kedai dalam talian dengan domain jenama sendiri",
+        th: "แล็ปท็อปแสดงแดชบอร์ดร้านค้าออนไลน์และการตั้งค่าโดเมนเนมของแบรนด์เอง",
+        vi: "Laptop hiện đại hiển thị bảng điều khiển gian hàng trực tuyến với tên miền thương hiệu riêng",
+      },
+      caption: {
+        id: "Custom domain pribadi + White-label storefront meningkatkan kredibilitas brand di mata pembeli maupun algoritma iklan.",
+        en: "Custom domain branding + white-label storefronts build instant shopper and ad-platform trust.",
+        ms: "Domain sendiri dan reka bentuk white-label meningkatkan kepercayaan pembeli.",
+        th: "การใช้โดเมนส่วนตัวและหน้าร้านแบบไร้โลโก้แพลตฟอร์มช่วยเสริมความน่าเชื่อถือ",
+        vi: "Tên miền riêng và giao diện white-label giúp nâng cao độ tin cậy với khách hàng.",
+      },
+    },
+    author: {
+      name: EDITORIAL_TEAM_MAP,
+      role: {
+        id: "Arsitek Brand & Performance Marketing",
+        en: "Brand & Performance Marketing Architect",
+        ms: "Arkitek Jenama & Pemasaran Prestasi",
+        th: "ผู้เชี่ยวชาญการสร้างแบรนด์และการตลาดดิจิทัล",
+        vi: "Kiến trúc sư Thương hiệu & Tiếp thị Hiệu suất",
+      },
+      bio: {
+        id: "Membantu UMKM bertransformasi dari tautan gratisan menjadi merek terpercaya dengan domain pribadi dan pelacakan pixel akurat.",
+        en: "Helping emerging brands graduate from generic bio links to white-label custom domains with server-side pixel tracking.",
+        ms: "Membantu PKS beralih kepada domain jenama sendiri dengan penjejakan piksel tepat.",
+        th: "ช่วยธุรกิจเปลี่ยนจากลิงก์ทั่วไปสู่โดเมนส่วนตัวพร้อมระบบติดตาม Pixel แม่นยำ",
+        vi: "Giúp thương hiệu nâng cấp lên tên miền riêng kết hợp đo lường pixel chính xác.",
+      },
+      avatar: "/favicon.svg",
+    },
+    translations: {
+      id: {
+        title: "Mengapa Custom Domain & White-Label Wajib Saat Anda Mulai Beriklan di Meta & TikTok Ads",
+        summary: "Dampak menggunakan domain merek sendiri (`brandanda.com`) terhadap biaya iklan (CPA), kepercayaan pembeli baru, serta keakuratan Meta CAPI dan TikTok Pixel.",
+        category: "Branding & Bisnis",
+        readTime: "5 min baca",
+        directAnswer: "Menggunakan custom domain sendiri (`brandanda.com`) pada paket PRO menghilangkan kebingungan pembeli, menurunkan rasio pentalan di landing page iklan hingga 32%, dan memungkinkan verifikasi kepemilikan domain untuk Meta Pixel & CAPI secara penuh.",
+        keyTakeaways: [
+          "Pembeli iklan berbayar jauh lebih percaya pada domain `.com`/`.id` resmi milik brand daripada link sub-platform generik.",
+          "Paket PRO etalase.online menghapus badge footer platform (White-Label penuh) dan menyingkirkan embel-embel judul situs.",
+          "Hubungkan CNAME cukup sekali di panel DNS Cloudflare/Niagahoster/Rumahweb pada menu Settings > Custom Domain.",
+          "Integrasikan Meta Pixel + Conversions API (CAPI) agar algoritma iklan tepat membaca event `Purchase` berbayar.",
+        ],
+        table: {
+          caption: "Perbandingan Kesiapan Iklan: Subdomain Gratis vs Custom Domain PRO",
+          headers: ["Parameter", "Custom Domain PRO", "Link Bio Standar"],
+          rows: [
+            ["White-Label Footer & Title", "100% Bersih Nama Toko Sendiri", "Menampilkan branding platform"],
+            ["Kesiapan Verifikasi Iklan", "Mandiri per domain milik Anda", "Berbagi reputasi domain massal"],
+            ["Biaya Transaksi QRIS", "Hemat hanya 2% (min. Rp 25.000)", "Tarif standar 4.5% (min. Rp 15.000)"],
+            ["Meta CAPI + TikTok Pixel + GA4", "Aktif penuh server-side & client", "Hanya analitik dasar"],
+          ],
+        },
+        sections: [
+          {
+            heading: "1. Mengapa Domain Pribadi Mempengaruhi Biaya per Klik & Closing Iklan?",
+            directAnswer: "Saat seseorang mengklik iklan produk seharga Rp 199.000 lalu melihat alamat browser berbeda dari nama merek di video iklan, keraguan muncul seketika.",
+            content: [
+              "Di era banyaknya tautan phishing, konsumen Indonesia makin kritis mengecek address bar browser sebelum memindai QRIS atau mengisi nomor WhatsApp.",
+              "Dengan mengaktifkan PRO (mulai Rp 49.000/bln atau Rp 468.000/tahun), Anda bisa memasang domain seperti `tokoanda.com` langsung di menu **Settings > Custom Domain** dan menyalin rekaman CNAME ke penyedia domain Anda.",
+            ],
+          },
+        ],
+        faqs: [
+          {
+            question: "Berapa lama propagasi custom domain setelah setting CNAME?",
+            answer: "Biasanya aktif dalam 5 hingga 30 menit melalui DNS Cloudflare, atau maksimal 24 jam tergantung registrar domain Anda.",
+          },
+        ],
+      },
+      en: {
+        title: "Why Custom Domains & White-Label Storefronts Matter Before Running Paid Ads",
+        summary: "How switching from generic links to your own branded domain lowers ad CPA, eliminates platform footers, and unlocks accurate Meta CAPI tracking.",
+        category: "Branding & Domain",
+        readTime: "5 min read",
+        directAnswer: "Using a white-label custom domain builds immediate cold-traffic trust and isolates your Meta/TikTok Pixel domain verification cleanly.",
+        keyTakeaways: [
+          "Remove all platform footer badges under PRO white-label mode.",
+          "Lower QRIS platform fee from 4.5% down to 2%.",
+          "Track ViewContent, InitiateCheckout, and Purchase server-side with Meta CAPI.",
+        ],
+        sections: [
+          {
+            heading: "1. Cold Ad Traffic Demands Address Bar Consistency",
+            directAnswer: "Matching ad brand names with the browser domain cuts landing-page skepticism.",
+            content: ["Point your CNAME inside Settings > Custom Domain and remove third-party footer links automatically."],
+          },
+        ],
+        faqs: [
+          {
+            question: "Is white-label included automatically on PRO?",
+            answer: "Yes, PRO and DFY stores render your brand name exclusively in browser titles and omit platform footers.",
+          },
+        ],
+      },
+      ms: {
+        title: "Mengapa Domain Sendiri & White-Label Penting Sebelum Menjalankan Iklan Berbayar",
+        summary: "Kesan penggunaan domain jenama sendiri terhadap keyakinan pembeli baharu serta ketepatan Meta Pixel dan CAPI.",
+        category: "Penjenamaan & Bisnes",
+        readTime: "5 min baca",
+        directAnswer: "Domain sendiri menghapuskan keraguan pembeli baharu dan membolehkan pengesahan penuh Meta CAPI serta TikTok Pixel.",
+        keyTakeaways: [
+          "Mod White-Label membuang lencana kaki halaman platform.",
+          "Yuran QRIS diturunkan kepada hanya 2% bagi pelan PRO.",
+        ],
+        sections: [
+          {
+            heading: "1. Membina Kredibiliti Segera pada Bar Alamat Pelayar",
+            directAnswer: "Pembeli lebih yakin mengimbas QRIS apabila domain sepadan dengan jenama.",
+            content: ["Tetapkan rekod CNAME dengan mudah di halaman Settings > Custom Domain."],
+          },
+        ],
+        faqs: [
+          {
+            question: "Adakah white-label termasuk dalam pelan PRO?",
+            answer: "Ya, pelan PRO menyembunyikan penjenamaan platform secara automatik.",
+          },
+        ],
+      },
+      th: {
+        title: "ทำไมการใช้โดเมนส่วนตัวและหน้าร้าน White-Label จึงสำคัญก่อนยิงแอด",
+        summary: "ผลลัพธ์ของการเปลี่ยนลิงก์ทั่วไปเป็นโดเมนแบรนด์ตัวเองต่อความน่าเชื่อถือและความแม่นยำของ Pixel",
+        category: "การสร้างแบรนด์และธุรกิจ",
+        readTime: "5 นาทีอ่าน",
+        directAnswer: "โดเมนส่วนตัวช่วยลดความลังเลของลูกค้าจากโฆษณาและรองรับการวัดผล Meta CAPI แบบเต็มรูปแบบ",
+        keyTakeaways: [
+          "ลบโลโก้แพลตฟอร์มท้ายหน้าเว็บแบบ White-Label 100%",
+          "ค่าธรรมเนียม QRIS ลดลงเหลือเพียง 2% บนแพ็กเกจ PRO",
+        ],
+        sections: [
+          {
+            heading: "1. ความน่าเชื่อถือเริ่มต้นที่ชื่อโดเมน",
+            directAnswer: "ลูกค้ามั่นใจมากขึ้นเมื่อชื่อเว็บตรงกับชื่อแบรนด์ในโฆษณา",
+            content: ["ผูก CNAME ได้ง่าย ๆ ผ่านเมนู Settings > Custom Domain"],
+          },
+        ],
+        faqs: [
+          {
+            question: "แพ็กเกจ PRO ได้รับสิทธิ์ White-Label อัตโนมัติหรือไม่?",
+            answer: "ใช่ ร้านค้า PRO จะแสดงเฉพาะชื่อแบรนด์ของคุณโดยไม่มีโลโก้แพลตฟอร์มท้ายหน้าเว็บ",
+          },
+        ],
+      },
+      vi: {
+        title: "Vì Sao Tên Miền Riêng & Giao Diện White-Label Quan Trọng Khi Chạy Quảng Cáo",
+        summary: "Tác động của tên miền thương hiệu riêng tới độ tin cậy khách hàng mới và độ chính xác của Meta CAPI, TikTok Pixel.",
+        category: "Thương hiệu & Kinh doanh",
+        readTime: "5 phút đọc",
+        directAnswer: "Tên miền riêng ở gói PRO loại bỏ thương hiệu nền tảng, tăng độ tin cậy khi khách bấm quảng cáo và tối ưu hóa đo lường chuyển đổi.",
+        keyTakeaways: [
+          "Gói PRO ẩn hoàn toàn chân trang nền tảng (White-label).",
+          "Giảm phí QRIS xuống chỉ còn 2% mỗi giao dịch.",
+        ],
+        sections: [
+          {
+            heading: "1. Độ đồng bộ thương hiệu giúp giảm tỷ lệ thoát trang",
+            directAnswer: "Người mua tin tưởng hơn khi đường dẫn trình duyệt khớp với tên thương hiệu quảng cáo.",
+            content: ["Chỉ cần cấu hình CNAME một lần tại Settings > Custom Domain."],
+          },
+        ],
+        faqs: [
+          {
+            question: "Gói PRO có hỗ trợ gỡ thương hiệu nền tảng không?",
+            answer: "Có, toàn bộ cửa hàng PRO hiển thị độc quyền thương hiệu của bạn.",
+          },
+        ],
+      },
+    },
+  },
+  {
+    slug: "strategi-flash-sale-harga-coret-naikkan-konversi",
+    datePublished: "2026-11-25T08:00:00+07:00",
+    dateModified: "2026-11-25T11:30:00+07:00",
+    image: {
+      url: "/images/blog/cover-flash-sale.jpg",
+      width: 1200,
+      height: 800,
+      alt: {
+        id: "Tas belanja promo berwarna merah terakota dan hitam menggambarkan strategi Flash Sale toko online",
+        en: "Terracotta and charcoal boutique shopping bags illustrating flash sale price anchoring campaigns",
+        ms: "Beg beli-belah promosi menggambarkan kempen jualan kilat dan diskaun harga",
+        th: "ถุงช้อปปิ้งโทนสีส้มอิฐและดำสะท้อนกลยุทธ์โปรโมชัน Flash Sale",
+        vi: "Túi mua sắm khuyến mãi minh họa chiến dịch Flash Sale tăng tỷ lệ chốt đơn",
+      },
+      caption: {
+        id: "Kombinasi Banner Content Block + Harga Coret Flash Sale memicu pembeli mengambil keputusan saat itu juga.",
+        en: "Combining visual Content Block banners with slashed promo pricing triggers immediate buyer action.",
+        ms: "Gabungan sepanduk visual dan harga diskaun mencetuskan pembelian segera.",
+        th: "การใช้แบนเนอร์โปรโมชันร่วมกับป้ายราคาขีดฆ่าช่วยกระตุ้นการตัดสินใจซื้อทันที",
+        vi: "Kết hợp banner Content Blocks và giá gạch ngang kích thích hành vi mua ngay.",
+      },
+    },
+    author: {
+      name: EDITORIAL_TEAM_MAP,
+      role: {
+        id: "Praktisi CRO & Merchandising Ritel",
+        en: "CRO & Retail Merchandising Specialist",
+        ms: "Pakar CRO & Peruncitan Digital",
+        th: "ผู้เชี่ยวชาญด้านการเพิ่มอัตราการสั่งซื้อและจัดวางสินค้า",
+        vi: "Chuyên gia Tối ưu Chuyển đổi Bán lẻ",
+      },
+      bio: {
+        id: "Merancang arsitektur tampilan promo, penjangkaran harga, dan alur checkout tercepat agar trafik media sosial berujung transaksi nyata.",
+        en: "Designing high-converting promo merchandising and price-anchoring flows for mobile-first storefronts.",
+        ms: "Merancang susun atur promosi dan penetapan harga berimpak tinggi.",
+        th: "ออกแบบการวางสินค้าโปรโมชันและการตั้งราคาดึงดูดใจบนหน้าร้านมือถือ",
+        vi: "Thiết kế bố cục khuyến mãi và chiến lược neo giá giúp tăng đơn hàng.",
+      },
+      avatar: "/favicon.svg",
+    },
+    translations: {
+      id: {
+        title: "Psikologi Harga Coret & Flash Sale 24 Jam untuk Menggandakan Closing Bio Link",
+        summary: "Cara menggabungkan fitur Promo Flash Sale dengan Content Blocks poster promo agar pengunjung storefront tidak menunda checkout hingga esok hari.",
+        category: "Konversi & Promo",
+        readTime: "4 min baca",
+        directAnswer: "Menampilkan harga asli yang dicoret secara berdampingan dengan harga promo (disertai badge persentase hemat) meningkatkan rasio klik beli hingga 38% karena otak pembeli langsung melihat nilai penghematan tanpa menghitung ulang.",
+        keyTakeaways: [
+          "Gunakan selisih diskon minimal 20%–40% pada produk pancingan utama (*tripwire product*).",
+          "Aktifkan Promo Flash Sale langsung dari menu `Products & Promos > Flash Sale & Promos` tanpa menghapus data produk.",
+          "Tambahkan poster promo di atas daftar produk lewat **Content Blocks** sebagai penarik perhatian visual pertama.",
+          "Batasi durasi promo (misal Gajian Sale tanggal 25–28) untuk menciptakan urgensi sehat.",
+        ],
+        table: {
+          caption: "Efek Penjangkaran Harga pada Kartu Produk Etalase",
+          headers: ["Tampilan Harga", "Persepsi Pembeli", "Performa Konversi"],
+          rows: [
+            ["Satu angka polos (Rp 79.000)", "Menebak-nebak apakah mahal/murah", "Standar"],
+            ["Harga coret + badge (Rp 79.000 vs ~~Rp 149.000~~ -47%)", "Langsung terasa nilai hematnya", "Lebih tinggi signifikan"],
+          ],
+        },
+        sections: [
+          {
+            heading: "1. Mengatur Promo Tanpa Ribet Edit Ulang Katalog",
+            directAnswer: "Di dashboard Admin Console, Anda dapat mengaktifkan/mematikan harga Flash Sale cukup 1 klik dan harga normal otomatis kembali saat promo selesai.",
+            content: [
+              "Kesalahan banyak seller saat membuat promo akhir pekan adalah mengubah harga produk secara manual, lalu lupa atau kewalahan mengembalikan harga normalnya pada Senin pagi.",
+              "Pada menu **Flash Sale & Promos** di etalase.online, harga reguler dan harga Flash Sale tersimpan terpisah di database. Ketika toggle promo dimatikan, sistem langsung mengembalikan harga normal dengan rapi.",
+            ],
+          },
+        ],
+        faqs: [
+          {
+            question: "Apakah harga promo otomatis berlaku saat pelanggan menuju halaman Checkout QRIS?",
+            answer: "Ya, baik tampilan storefront maupun invoice QRIS/PayPal langsung menggunakan harga promo yang sedang aktif secara konsisten.",
+          },
+        ],
+      },
+      en: {
+        title: "The Psychology of Slashed Promo Pricing & 24-Hour Flash Sales on Storefronts",
+        summary: "Pair Flash Sale price anchoring with Content Block promo banners to turn passive bio link browsers into immediate buyers.",
+        category: "Conversion & Promos",
+        readTime: "4 min read",
+        directAnswer: "Displaying slashed compare-at prices alongside active promo pricing lifts add-to-checkout click rates by removing buyer hesitation.",
+        keyTakeaways: [
+          "Separate regular price and promo price in Admin Console so ending a sale takes one click.",
+          "Place a high-contrast visual banner above the catalog using Content Blocks.",
+          "Active Flash Sale pricing syncs automatically into BorderPay QRIS invoices.",
+        ],
+        sections: [
+          {
+            heading: "1. Zero-Friction Weekend Flash Sales",
+            directAnswer: "Toggle promotions on and off cleanly without overwriting original base prices.",
+            content: ["Configure promo prices under Products & Promos > Flash Sale & Promos in seconds."],
+          },
+        ],
+        faqs: [
+          {
+            question: "Does the promo price carry over into QRIS checkout automatically?",
+            answer: "Yes, checkout invoices strictly reflect the active discounted price stored in the database.",
+          },
+        ],
+      },
+      ms: {
+        title: "Psikologi Harga Diskaun & Flash Sale 24 Jam untuk Ganda Jualan",
+        summary: "Cara menggabungkan harga diskaun coret dan sepanduk Content Blocks untuk menggalakkan pelanggan membuat bayaran segera.",
+        category: "Penukaran & Promosi",
+        readTime: "4 min baca",
+        directAnswer: "Memaparkan harga asal yang dicoret di sebelah harga promosi meningkatkan kadar klik pembayaran dengan jelas.",
+        keyTakeaways: [
+          "Urus harga biasa dan harga promo secara berasingan dengan satu klik.",
+          "Harga promosi diselaraskan automatik ke bil QRIS.",
+        ],
+        sections: [
+          {
+            heading: "1. Kempen Jualan Hujung Minggu Tanpa Ubah Katalog Secara Manual",
+            directAnswer: "Matikan promosi dengan satu suis apabila tempoh tamat.",
+            content: ["Gunakan bahagian Flash Sale & Promos pada papan pemuka pentadbir."],
+          },
+        ],
+        faqs: [
+          {
+            question: "Adakah harga promo digunakan automatik semasa checkout?",
+            answer: "Ya, halaman bayaran menggunakan harga promosi aktif secara automatik.",
+          },
+        ],
+      },
+      th: {
+        title: "จิตวิทยาการติดป้ายราคาขีดฆ่าและ Flash Sale 24 ชั่วโมงเพื่อเพิ่มยอดปิดการขาย",
+        summary: "ผสานป้ายลดราคากับแบนเนอร์ Content Blocks เพื่อให้ผู้ชมตัดสินใจซื้อทันทีไม่รอข้ามวัน",
+        category: "โปรโมชันและยอดขาย",
+        readTime: "4 นาทีอ่าน",
+        directAnswer: "การแสดงราคาเต็มแบบขีดฆ่าคู่กับราคาพิเศษช่วยเพิ่มแรงจูงใจในการกดชำระเงินทันที",
+        keyTakeaways: [
+          "ตั้งค่าราคา Flash Sale แยกจากราคาปกติในคลิกเดียว",
+          "ราคาโปรโมชันเชื่อมต่อกับระบบบิล QRIS อัตโนมัติ",
+        ],
+        sections: [
+          {
+            heading: "1. จัดโปรโมชันสุดสัปดาห์โดยไม่ต้องแก้ข้อมูลซ้ำ",
+            directAnswer: "เปิด-ปิดสถานะโปรโมชันได้ทันทีเมื่อจบแคมเปญ",
+            content: ["ตั้งค่าได้ในเมนู Products & Promos > Flash Sale & Promos"],
+          },
+        ],
+        faqs: [
+          {
+            question: "ราคาโปรโมชันจะอัปเดตในหน้าชำระเงิน QRIS ทันทีไหม?",
+            answer: "ใช่ ระบบบิลชำระเงินดึงราคาล่าสุดจากฐานข้อมูลโดยตรง",
+          },
+        ],
+      },
+      vi: {
+        title: "Tâm Lý Giá Gạch Ngang & Flash Sale 24 Giờ Giúp Nhân Đôi Tỷ Lệ Chốt Đơn",
+        summary: "Kết hợp Flash Sale và Content Blocks để biến khách xem bio link thành người mua hàng ngay lập tức.",
+        category: "Chuyển đổi & Khuyến mãi",
+        readTime: "4 phút đọc",
+        directAnswer: "Hiển thị giá gốc gạch ngang bên cạnh giá khuyến mãi giúp khách thấy ngay mức tiết kiệm và giảm chần chừ khi thanh toán.",
+        keyTakeaways: [
+          "Bật tắt giá Flash Sale chỉ bằng một cú nhấp không làm mất giá gốc.",
+          "Giá khuyến mãi đồng bộ tự động vào hóa đơn thanh toán QRIS.",
+        ],
+        sections: [
+          {
+            heading: "1. Chạy Flash Sale cuối tuần không cần sửa lại toàn bộ sản phẩm",
+            directAnswer: "Lưu riêng giá gốc và giá ưu đãi trong trang quản trị.",
+            content: ["Quản lý trực quan tại mục Products & Promos > Flash Sale & Promos."],
+          },
+        ],
+        faqs: [
+          {
+            question: "Giá khuyến mãi có tự động áp dụng khi khách thanh toán QRIS không?",
+            answer: "Có, hệ thống thanh toán tự động tính đúng mức giá ưu đãi đang bật.",
+          },
+        ],
+      },
+    },
+  },
+  {
+    slug: "monetisasi-kursus-mini-video-whatsapp-member",
+    datePublished: "2026-11-25T11:30:00+07:00",
+    dateModified: "2026-11-25T12:00:00+07:00",
+    image: {
+      url: "/images/blog/cover-mini-course.jpg",
+      width: 1200,
+      height: 800,
+      alt: {
+        id: "Kreator edukasi mempresentasikan materi kursus mini video di layar laptop untuk siswa member",
+        en: "Educator walking through online mini-course lessons on a laptop screen",
+        ms: "Pencipta kandungan pendidikan membentangkan modul kursus video dalam talian pada komputer riba",
+        th: "ผู้สอนกำลังนำเสนอบทเรียนวิดีโอคอร์สออนไลน์สั้นบนหน้าจอแล็ปท็อป",
+        vi: "Nhà đào tạo chia sẻ bài giảng khóa học video ngắn trên màn hình laptop",
+      },
+      caption: {
+        id: "Area Member Kursus (`/learn`) membuka modul video pelajaran otomatis bagi pembeli dengan status PAID.",
+        en: "Built-in course player (`/learn`) unlocks video modules automatically once payment settles.",
+        ms: "Ruang ahli kursus membuka modul video secara automatik selepas pembayaran disahkan.",
+        th: "ห้องเรียนออนไลน์ (`/learn`) ปลดล็อกบทเรียนวิดีโอทันทีเมื่อชำระเงินสำเร็จ",
+        vi: "Khu vực học viên (`/learn`) tự động mở khóa bài giảng video sau khi thanh toán.",
+      },
+    },
+    author: {
+      name: EDITORIAL_TEAM_MAP,
+      role: {
+        id: "Spesialis Produk Edukasi & Kreator",
+        en: "EdTech & Creator Economy Specialist",
+        ms: "Pakar Ekonomi Pencipta & EdTech",
+        th: "ผู้เชี่ยวชาญด้านเศรษฐกิจครีเอเตอร์และคอร์สออนไลน์",
+        vi: "Chuyên gia Kinh tế Sáng tạo & EdTech",
+      },
+      bio: {
+        id: "Membantu praktisi skill meluncurkan kelas video ringkas berbayar tanpa biaya langganan LMS bulanan jutaan rupiah.",
+        en: "Helping practitioners launch high-impact micro video courses without heavy monthly LMS overhead.",
+        ms: "Membantu pengajar melancarkan kursus video ringkas tanpa kos platform LMS yang mahal.",
+        th: "ช่วยให้ผู้เชี่ยวชาญเปิดคอร์สวิดีโอขนาดกะทัดรัดได้ทันทีโดยไม่ต้องจ่ายค่าเช่า LMS แพง",
+        vi: "Giúp chuyên gia ra mắt khóa học video ngắn mà không tốn chi phí thuê LMS đắt đỏ.",
+      },
+      avatar: "/favicon.svg",
+    },
+    translations: {
+      id: {
+        title: "Jual Mini-Course Video Rp 99 Ribu Tanpa Sewa LMS Mahal: Panduan Fitur Member Area",
+        summary: "Bagaimana kreator tutorial desain, bahasa asing, hingga keuangan menjual modul video pendek yang terkunci otomatis berdasarkan kode pesanan bayar.",
+        category: "Kreator & Kursus",
+        readTime: "5 min baca",
+        directAnswer: "Dengan fitur Kursus (`/learn`) di etalase.online, kreator cukup menyusun daftar judul bab dan tautan video (YouTube Unlisted / Vimeo / MP4) di form produk `COURSE`; halaman materi otomatis terkunci dan hanya terbuka untuk pembeli yang status ordernya `PAID` atau `COMPLETED`.",
+        keyTakeaways: [
+          "Fokus pada 'Mini-Course' 4–8 video praktis berdurasi 5–10 menit per bab agar tingkat selesai siswa tinggi.",
+          "Susun modul bab langsung di dashboard produk tanpa perlu integrasi plugin LMS rumit.",
+          "Akses ruang belajar divalidasi di sisi server menggunakan verifikasi nomor WhatsApp + kode order.",
+          "Cocok digabung dengan upsell konsultasi 1-on-1 atau template kerja pendukung.",
+        ],
+        table: {
+          caption: "Meluncurkan Kursus Video: Etalase Course Area vs LMS Berat Tradisional",
+          headers: ["Aspek", "Etalase Course (`/learn`)", "Platform LMS Berat"],
+          rows: [
+            ["Biaya Setup Awal", "Rp 0 (Bisa langsung di paket Gratis)", "Berbayar bulanan mahal USD"],
+            ["Proteksi Akses Materi", "Terkunci di server cek order PAID", "Setting login kompleks bagi pemula"],
+            ["Kemudahan Siswa di HP", "Cukup masukkan Order Code / WA", "Sering lupa password akun LMS"],
+          ],
+        },
+        sections: [
+          {
+            heading: "1. Mengapa Mini-Course Lebih Laris daripada Kelas 40 Jam?",
+            directAnswer: "Pembeli modern membayar untuk hasil cepat di akhir pekan, bukan ratusan video berjam-jam yang akhirnya tidak pernah ditonton.",
+            content: [
+              "Kelas ringkas seperti 'Tutorial Edit Reels CapCut 6 Bab' atau 'Cara Pembukuan UMKM di Excel dalam 90 Menit' jauh lebih mudah dijual di kisaran Rp 79.000 hingga Rp 249.000.",
+              "Melalui tipe produk **Online Course** di etalase.online, Anda dapat menambahkan daftar modul beserta URL video secara langsung saat membuat produk. Siswa yang sudah membayar QRIS atau Order disetujui tinggal masuk ke halaman `/learn` dengan kode pesanan atau nomor WhatsApp mereka untuk langsung menonton seluruh modul.",
+            ],
+          },
+        ],
+        faqs: [
+          {
+            question: "Bagaimana sistem mencegah link video kursus dibuka orang yang belum bayar?",
+            answer: "Daftar modul hanya dikirim oleh server setelah `actionVerifyCourseAccess` memastikan ada transaksi `PAID` atau `COMPLETED` pada database untuk produk tersebut.",
+          },
+        ],
+      },
+      en: {
+        title: "Sell Mini Video Courses Without Expensive LMS Subscriptions",
+        summary: "How educators and skilled practitioners lock video course modules behind verified order checks straight inside etalase.online.",
+        category: "Creators & Courses",
+        readTime: "5 min read",
+        directAnswer: "Use the `COURSE` product type to organize chapter titles and video links cleanly; the server validates `PAID` or `COMPLETED` orders before unlocking course modules.",
+        keyTakeaways: [
+          "Short 4–8 lesson sprints convert better than overwhelming 40-hour courses.",
+          "Zero monthly LMS software tax to launch your first curriculum.",
+          "Server-verified access via Order Code and WhatsApp number.",
+        ],
+        sections: [
+          {
+            heading: "1. Outcome-Driven Micro Courses Win Mobile Attention",
+            directAnswer: "Learners gladly pay for focused skills they can master over one weekend.",
+            content: ["Manage modules directly inside the Admin Console product editor without external plugins."],
+          },
+        ],
+        faqs: [
+          {
+            question: "Are course videos protected from unpaid visitors?",
+            answer: "Yes, module URLs are strictly gated server-side and unlocked only after verified PAID or COMPLETED order lookup.",
+          },
+        ],
+      },
+      ms: {
+        title: "Jual Kursus Video Mini Tanpa Langganan LMS Mahal",
+        summary: "Cara pengajar menyusun modul video yang terkunci automatik berdasarkan pengesahan pesanan berbayar.",
+        category: "Pencipta & Kursus",
+        readTime: "5 min baca",
+        directAnswer: "Pilih jenis produk Kursus untuk menyusun bab video terus di papan pemuka; pelayan hanya membuka akses kepada pesanan berstatus `PAID` atau `COMPLETED`.",
+        keyTakeaways: [
+          "Kursus pendek 4-8 modul lebih cepat disiapkan dan laris dibeli.",
+          "Pengesahan akses di sisi pelayan menggunakan kod pesanan.",
+        ],
+        sections: [
+          {
+            heading: "1. Kursus Ringkas Menjimatkan Masa Pelajar",
+            directAnswer: "Pelajar suka kemahiran pantas yang dapat diaplikasikan dalam masa sehari.",
+            content: ["Tambah modul pelajaran terus pada borang produk tanpa sistem luar yang rumit."],
+          },
+        ],
+        faqs: [
+          {
+            question: "Bagaimana akses modul dikawal?",
+            answer: "Pelayan menyemak rekod pesanan yang telah dibayar sebelum memaparkan senarai video modul.",
+          },
+        ],
+      },
+      th: {
+        title: "ขายคอร์สวิดีโอขนาดสั้นโดยไม่ต้องจ่ายค่าเช่า LMS แพง",
+        summary: "วิธีจัดบทเรียนวิดีโอที่ปลดล็อกสิทธิ์อัตโนมัติตามสถานะการชำระเงินจริงในฐานข้อมูล",
+        category: "ครีเอเตอร์และคอร์สเรียน",
+        readTime: "5 นาทีอ่าน",
+        directAnswer: "เลือกประเภทสินค้า Online Course เพื่อเพิ่มบทเรียนและลิงก์วิดีโอ ระบบหลังบ้านจะตรวจสอบสถานะ PAID/COMPLETED ก่อนเปิดหน้าบทเรียน",
+        keyTakeaways: [
+          "คอร์สสั้น 4-8 บทเรียนขายง่ายและผู้เรียนเรียนจบไว",
+          "ระบบตรวจสอบสิทธิ์ฝั่งเซิร์ฟเวอร์ด้วยรหัสสั่งซื้อ",
+        ],
+        sections: [
+          {
+            heading: "1. คอร์สสั้นเน้นผลลัพธ์จริงตอบโจทย์ผู้เรียนยุคใหม่",
+            directAnswer: "ประหยัดต้นทุนระบบ LMS รายเดือนตั้งแต่คอร์สแรก",
+            content: ["จัดการรายชื่อบทเรียนได้ทันทีในหน้าแก้ไขสินค้า"],
+          },
+        ],
+        faqs: [
+          {
+            question: "ป้องกันผู้ที่ยังไม่ชำระเงินเข้าดูบทเรียนได้อย่างไร?",
+            answer: "ระบบตรวจสอบสถานะคำสั่งซื้อ PAID/COMPLETED จากฐานข้อมูลก่อนส่งมอบเนื้อหาวิดีโอ",
+          },
+        ],
+      },
+      vi: {
+        title: "Bán Khóa Học Video Ngắn Không Cần Thuê Nền Tảng LMS Đắt Đỏ",
+        summary: "Cách chuyên gia thiết lập các chương học video chỉ mở khóa tự động khi đơn hàng đã được xác nhận thanh toán.",
+        category: "Nhà sáng tạo & Khóa học",
+        readTime: "5 phút đọc",
+        directAnswer: "Sử dụng loại sản phẩm Khóa học (`COURSE`) để nhập danh sách bài giảng; máy chủ tự động đối chiếu đơn hàng `PAID` hoặc `COMPLETED` trước khi mở khóa video.",
+        keyTakeaways: [
+          "Khóa học cô đọng 4-8 video thực chiến có tỷ lệ hoàn thành cao hơn.",
+          "Kiểm tra quyền truy cập tại máy chủ bằng mã đơn hàng và số WhatsApp.",
+        ],
+        sections: [
+          {
+            heading: "1. Khóa học siêu gọn giải quyết đúng một vấn đề",
+            directAnswer: "Không tốn phí thuê LMS hàng tháng để bắt đầu bán kiến thức.",
+            content: ["Chỉnh sửa từng chương bài học ngay trong trang quản lý sản phẩm."],
+          },
+        ],
+        faqs: [
+          {
+            question: "Hệ thống ngăn chặn người chưa mua xem video bằng cách nào?",
+            answer: "Dữ liệu bài học chỉ được máy chủ trả về sau khi xác nhận giao dịch thanh toán thành công.",
           },
         ],
       },

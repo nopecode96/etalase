@@ -147,9 +147,11 @@ export const SageCreator: React.FC<StoreTemplateProps> = ({
         })}
       </div>
 
-      <footer className={styles.footer}>
-        Ditenagai oleh <span className="font-semibold text-[#283618]">etalase.online</span>
-      </footer>
+      {store.tier === "FREE" && (
+        <footer className={styles.footer}>
+          Ditenagai oleh <span className="font-semibold text-[#283618]">etalase.online</span>
+        </footer>
+      )}
     </div>
   );
 };

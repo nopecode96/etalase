@@ -2,7 +2,10 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Calendar, Clock, Video, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { Calendar, Clock, Video, ArrowLeft, CheckCircle2, Loader2 } from "lucide-react";
+import { actionBookAppointment } from "@/lib/actions/creator-actions";
+import { showServiceResultToast } from "@/components/ui/GlobalToast";
+import { trackGtmGenerateLead } from "@/lib/analytics/gtm";
 
 interface BookingClientProps {
   storeSlug: string;
@@ -27,11 +30,44 @@ export default function BookingClient({
   const [name, setName] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [topic, setTopic] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [orderCode, setOrderCode] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    if (!name.trim() || !whatsapp.trim()) return;
+
+    if (storeSlug === "demo") {
+      setOrderCode("BOOK-DEMO-001");
+      setSubmitted(true);
+      return;
+    }
+
+    setLoading(true);
+    const res = await actionBookAppointment({
+      storeSlug,
+      productSlug,
+      buyerName: name.trim(),
+      buyerWhatsapp: whatsapp.trim(),
+      bookedSlot: selectedSlot,
+      notes: topic.trim() || undefined,
+    });
+    setLoading(false);
+    showServiceResultToast(res);
+
+    if (res.success && res.data) {
+      setOrderCode(res.data.orderCode);
+      setSubmitted(true);
+      trackGtmGenerateLead({
+        currency: "IDR",
+        value: Number(price || 0),
+        leadSource: "consultation_booking",
+        storeSlug,
+        itemName: title,
+        transactionId: res.data.orderCode,
+      });
+    }
   };
 
   return (
@@ -51,11 +87,24 @@ export default function BookingClient({
               <CheckCircle2 className="w-8 h-8" />
             </div>
             <h2 className="text-2xl font-bold text-white">Sesi Konsultasi Terjadwal!</h2>
+            {orderCode && (
+              <div className="inline-block text-xs font-mono bg-slate-800 px-3 py-1 rounded-lg text-emerald-400">
+                Kode Booking: {orderCode}
+              </div>
+            )}
             <p className="text-sm text-slate-400">
               Jadwal Anda: <span className="text-emerald-400 font-semibold">{selectedSlot}</span>.
-              Detail link Google Meet telah dikirimkan ke WhatsApp <span className="text-white font-mono">{whatsapp}</span>.
+              Detail konfirmasi sesi akan dikirimkan ke WhatsApp <span className="text-white font-mono">{whatsapp}</span>.
             </p>
-            <div className="pt-4">
+            <div className="pt-4 flex flex-col sm:flex-row justify-center gap-3">
+              {price > 0 && (
+                <Link
+                  href={`/${storeSlug}/checkout/${productSlug}`}
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 rounded-xl text-xs transition"
+                >
+                  Lanjut Bayar Sekarang (QRIS / PayPal)
+                </Link>
+              )}
               <Link
                 href={`/${storeSlug}`}
                 className="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-6 py-3 rounded-xl text-xs transition"
@@ -153,9 +202,11 @@ export default function BookingClient({
 
               <button
                 type="submit"
-                className="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-3.5 rounded-xl text-xs transition shadow-lg shadow-emerald-500/20"
+                disabled={loading}
+                className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-slate-950 font-bold py-3.5 rounded-xl text-xs transition shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2"
               >
-                Konfirmasi Jadwal Konsultasi (Rp {price.toLocaleString("id-ID")})
+                {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+                <span>Konfirmasi Jadwal Konsultasi (Rp {price.toLocaleString("id-ID")})</span>
               </button>
             </form>
           </div>

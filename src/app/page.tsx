@@ -8,12 +8,16 @@ import { Hero3DDevice } from "@/components/home/Hero3DDevice";
 import { CreatorMarquee } from "@/components/home/CreatorMarquee";
 import { InteractiveFeatureShowcase } from "@/components/home/InteractiveFeatureShowcase";
 import { Showcase4Archetypes } from "@/components/home/Showcase4Archetypes";
+import { HomeWalkthrough } from "@/components/home/HomeWalkthrough";
+import { HomeFaqSection } from "@/components/home/HomeFaqSection";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { Sparkles, ArrowRight } from "lucide-react";
 import {
   generateOrganizationJsonLd,
   generateWebsiteJsonLd,
   generateSoftwareAppJsonLd,
+  generateWebPageJsonLd,
+  generateHowToJsonLd,
   generateLocalizedMetadata,
 } from "@/lib/seo/metadata-helper";
 import { SupportedLocale, SUPPORTED_LOCALES } from "@/lib/config/constants";
@@ -34,19 +38,19 @@ export async function generateMetadata({
       : "id";
 
   const titles: Record<SupportedLocale, string> = {
-    id: "etalase.online — Satu Website Etalase untuk Semua Jualan Anda",
-    en: "etalase.online — One Storefront Website for All Your Sales",
-    ms: "etalase.online — Satu Laman Web Etalase untuk Semua Jualan Anda",
-    th: "etalase.online — เว็บไซต์หน้าร้านเดียวสำหรับทุกยอดขายของคุณ",
-    vi: "etalase.online — Một Website Storefront Cho Mọi Hoạt Động Bán Hàng",
+    id: "etalase.online — Katalog Online yang Closing di WhatsApp. Gratis, Tanpa Komisi.",
+    en: "etalase.online — Online Catalog That Closes on WhatsApp. Free, Zero Commission.",
+    ms: "etalase.online — Katalog Dalam Talian yang Tutup Jualan di WhatsApp. Percuma, Tanpa Komisen.",
+    th: "etalase.online — แคตตาล็อกออนไลน์ที่ปิดการขายบน WhatsApp ฟรี ไม่มีค่าคอมมิชชัน",
+    vi: "etalase.online — Danh Mục Online Chốt Đơn Trên WhatsApp. Miễn Phí, Không Hoa Hồng.",
   };
 
   const descriptions: Record<SupportedLocale, string> = {
-    id: "Bio link visual, katalog instan, dan checkout chat tanpa potongan komisi untuk kreator, afiliator, sales showroom, dan UMKM di Asia Tenggara.",
-    en: "Visual bio link, instant catalog, and zero-commission chat checkouts for creators, affiliates, auto showrooms, and SMBs across Southeast Asia.",
-    ms: "Pautan bio visual, katalog pantas, dan pembayaran chat tanpa potongan komisen untuk pencipta, afiliasi, bilik pameran, dan PKS di Asia Tenggara.",
-    th: "ไบโอลิงก์แบบรูปภาพ แคตตาล็อกทันใจ และระบบชำระเงินผ่านแชตโดยไม่มีค่าคอมมิชชันสำหรับครีเอเตอร์และธุรกิจในเอเชียตะวันออกเฉียงใต้",
-    vi: "Link bio trực quan, danh mục tức thì, và thanh toán qua chat không phí hoa hồng cho nhà sáng tạo, tiếp thị liên kết, và doanh nghiệp tại Đông Nam Á.",
+    id: "Cocok untuk jualan produk digital atau katalog produk fisik—pembeli langsung pesan ke WhatsApp (0% komisi) atau bayar QRIS instan mulai 2%.",
+    en: "Great for digital products or physical catalogs—buyers message straight to WhatsApp (0% commission) or pay via instant QRIS from 2%.",
+    ms: "Sesuai untuk jual produk digital atau katalog fizikal—pembeli terus pesan ke WhatsApp (0% komisen) atau bayar QRIS bermula 2%.",
+    th: "เหมาะสำหรับขายสินค้าดิจิทัลหรือแคตตาล็อกสินค้าจริง ลูกค้าทักสั่งผ่าน WhatsApp (0%) หรือจ่าย QRIS เริ่มต้น 2%",
+    vi: "Phù hợp bán sản phẩm số hoặc danh mục vật lý—khách đặt thẳng qua WhatsApp (0% hoa hồng) hoặc thanh toán QR từ 2%.",
   };
 
   return generateLocalizedMetadata({
@@ -68,6 +72,25 @@ export default function HomePage({ searchParams }: HomePageProps) {
   const orgJsonLd = generateOrganizationJsonLd();
   const websiteJsonLd = generateWebsiteJsonLd(locale);
   const softwareAppJsonLd = generateSoftwareAppJsonLd();
+  const webPageJsonLd = generateWebPageJsonLd({
+    url: locale === "id" ? "/" : `/${locale}`,
+    name: "etalase.online — Katalog Online yang Closing di WhatsApp. Gratis, Tanpa Komisi.",
+    description:
+      "Platform katalog online dan bio-link visual untuk jualan produk digital atau katalog UMKM dengan 0% komisi order chat WhatsApp serta checkout QRIS otomatis mulai 2%.",
+    locale,
+    speakableSelectors: ["h1", "header + main p"],
+  });
+  const howToJsonLd = generateHowToJsonLd({
+    name: "Cara Membuat Toko Online & Katalog WhatsApp di etalase.online",
+    description: "Langkah praktis dari klaim subdomain hingga toko online live dalam ±45 detik.",
+    totalTime: "PT1M",
+    steps: [
+      { name: "Klaim Subdomain", text: "Ketik nama bisnis dan cek ketersediaannya secara real-time (3–30 karakter)." },
+      { name: "Login 1-Klik Google", text: "Daftar menggunakan akun Google tanpa password baru; kami hanya membaca nama dan email." },
+      { name: "Tambah Produk & Metode Closing", text: "Unggah foto produk lalu pilih Order WhatsApp (0% komisi) atau QRIS Instan." },
+      { name: "Toko Live", text: "Pasang link toko .etalase.online ke bio Instagram, TikTok, atau WhatsApp." },
+    ],
+  });
 
   const getLocalizedHref = (basePath: string) => {
     if (locale === "id") return basePath;
@@ -76,14 +99,14 @@ export default function HomePage({ searchParams }: HomePageProps) {
 
   const homeTranslations = {
     id: {
-      heroBadge: "Satu Website Etalase, Semua Penjualan",
-      heroTitle: "Satu Website Etalase untuk Semua Jualan Anda.",
+      heroBadge: "Katalog Bio Link & Closing WhatsApp",
+      heroTitle: "Katalog online yang closing di WhatsApp. Gratis, tanpa komisi.",
       heroDesc:
-        "Jual produk digital, pajang katalog fisik, tautkan keranjang kuning, atau terima pesanan langsung ke WhatsApp. Siap pakai dalam hitungan menit.",
+        "Cocok untuk jualan produk digital maupun katalog UMKM—pembeli langsung pesan ke WhatsApp (0% komisi) atau bayar QRIS instan mulai 2%.",
       claimBtn: "Klaim Gratis",
       claimPlaceholder: "namamu",
-      trust: ["Gratis Selamanya", "0% Komisi Order Chat", "Otomatis ke WhatsApp"],
-      marqueeTitle: "Dipercaya Kreator, Coach & Pebisnis di Seluruh Asia Tenggara",
+      trust: ["Gratis Selamanya", "0% Komisi Order Chat (QRIS mulai 2%)", "Otomatis ke WhatsApp"],
+      marqueeTitle: "Contoh Tampilan Toko di Berbagai Kategori Bisnis",
       sec1Badge: "Kemampuan Lengkap",
       sec1Title: "Lebih dari Sekadar Link di Bio",
       sec1Desc:
@@ -95,21 +118,21 @@ export default function HomePage({ searchParams }: HomePageProps) {
       ctaBadge: "Mulai Gratis Tanpa Kartu Kredit",
       ctaTitle: "Amankan Nama Subdomain Bisnismu Sebelum Diambil Orang Lain.",
       ctaDesc:
-        "Daftar gratis dalam 30 detik pakai akun Google. 0% komisi order chat, tanpa kartu kredit, dan langsung terhubung ke WhatsApp Anda.",
+        "Daftar gratis dalam 30 detik pakai akun Google. 0% komisi order chat (QRIS mulai 2%), tanpa kartu kredit, langsung terhubung ke WhatsApp Anda.",
       ctaPrimaryBtn: "Buat Etalase Gratis Sekarang",
       ctaSecondaryBtn: "Lihat 4 Arketipe Template",
       ctaTrust:
         "Gratis Selamanya • Setup Kurang dari 3 Menit • Subdomain Mandiri Siap Pakai",
     },
     en: {
-      heroBadge: "One Storefront Website, All Your Sales",
-      heroTitle: "One Storefront Website for All Your Sales.",
+      heroBadge: "Visual Storefront & WhatsApp Closing",
+      heroTitle: "Online catalog that closes on WhatsApp. Free, zero commission.",
       heroDesc:
-        "Sell digital products, display physical catalogs, link TikTok yellow baskets, or take instant WhatsApp orders. Ready in minutes.",
+        "Great for digital products or physical catalogs—buyers message straight to WhatsApp (0% commission) or pay via instant QRIS from 2%.",
       claimBtn: "Claim Free",
       claimPlaceholder: "yourname",
-      trust: ["Free Forever", "0% Chat Order Commission", "Automated to WhatsApp"],
-      marqueeTitle: "Trusted by Creators, Coaches & Businesses Across Southeast Asia",
+      trust: ["Free Forever", "0% Chat Orders (QRIS from 2%)", "Automated to WhatsApp"],
+      marqueeTitle: "Sample Storefront Previews Across Business Categories",
       sec1Badge: "Full Capabilities",
       sec1Title: "More Than Just a Link in Bio",
       sec1Desc:
@@ -121,21 +144,21 @@ export default function HomePage({ searchParams }: HomePageProps) {
       ctaBadge: "Start Free Without Credit Card",
       ctaTitle: "Claim Your Business Subdomain Before Someone Else Does.",
       ctaDesc:
-        "Sign up free in 30 seconds with Google. 0% chat commissions, no credit card required, connected straight to your WhatsApp.",
+        "Sign up free in 30 seconds with Google. 0% chat commissions (QRIS from 2%), no credit card required, connected straight to your WhatsApp.",
       ctaPrimaryBtn: "Create Free Storefront Now",
       ctaSecondaryBtn: "Explore 4 Archetype Templates",
       ctaTrust:
         "Free Forever • Setup Under 3 Minutes • Ready-to-Use Dedicated Subdomain",
     },
     ms: {
-      heroBadge: "Satu Laman Web Etalase, Semua Jualan Anda",
-      heroTitle: "Satu Laman Web Etalase untuk Semua Jualan Anda.",
+      heroBadge: "Katalog Bio Link & Jualan WhatsApp",
+      heroTitle: "Katalog dalam talian yang tutup jualan di WhatsApp. Percuma, tanpa komisen.",
       heroDesc:
-        "Jual produk digital, pamer katalog fizikal, paut beg kuning TikTok, atau terima pesanan terus ke WhatsApp. Siap dalam beberapa minit.",
+        "Sesuai untuk jual produk digital atau katalog PKS—pembeli terus pesan ke WhatsApp (0% komisen) atau bayar QRIS bermula 2%.",
       claimBtn: "Tuntut Percuma",
       claimPlaceholder: "namamu",
-      trust: ["Percuma Selamanya", "0% Komisen Pesanan Chat", "Automatik ke WhatsApp"],
-      marqueeTitle: "Dipercayai Pencipta, Jurulatih & Peniaga di Seluruh Asia Tenggara",
+      trust: ["Percuma Selamanya", "0% Pesanan Chat (QRIS dari 2%)", "Automatik ke WhatsApp"],
+      marqueeTitle: "Contoh Paparan Kedai Mengikut Kategori Perniagaan",
       sec1Badge: "Keupayaan Lengkap",
       sec1Title: "Lebih daripada Sekadar Pautan di Bio",
       sec1Desc:
@@ -147,21 +170,21 @@ export default function HomePage({ searchParams }: HomePageProps) {
       ctaBadge: "Mula Percuma Tanpa Kad Kredit",
       ctaTitle: "Kunci Nama Subdomain Perniagaan Anda Sebelum Diambil Orang Lain.",
       ctaDesc:
-        "Daftar percuma dalam 30 saat dengan akaun Google. 0% komisen sembang, tiada kad kredit, terus disambungkan ke WhatsApp anda.",
+        "Daftar percuma dalam 30 saat dengan akaun Google. 0% komisen pesanan chat (QRIS dari 2%), tiada kad kredit, terus disambungkan ke WhatsApp anda.",
       ctaPrimaryBtn: "Bina Etalase Percuma Sekarang",
       ctaSecondaryBtn: "Lihat 4 Arketip Templat",
       ctaTrust:
         "Percuma Selamanya • Persediaan Bawah 3 Minit • Subdomain Sendiri Siap Digunakan",
     },
     th: {
-      heroBadge: "เว็บไซต์หน้าร้านเดียวสำหรับทุกยอดขายของคุณ",
-      heroTitle: "เว็บไซต์หน้าร้านเดียวสำหรับทุกยอดขายของคุณ",
+      heroBadge: "แคตตาล็อกไบโอลิงก์และปิดการขายทาง WhatsApp",
+      heroTitle: "แคตตาล็อกออนไลน์ที่ปิดการขายบน WhatsApp ฟรี ไม่มีค่าคอมมิชชัน",
       heroDesc:
-        "ขายสินค้าดิจิทัล แคตตาล็อกสินค้าจริง ลิงก์ตะกร้าเหลือง TikTok หรือรับออเดอร์ตรงสู่ WhatsApp พร้อมใช้งานในไม่กี่นาที",
+        "เหมาะสำหรับขายสินค้าดิจิทัลหรือแคตตาล็อกร้านค้า ลูกค้าทักสั่งทาง WhatsApp (0%) หรือชำระ QRIS ทันใจเริ่มต้น 2%",
       claimBtn: "รับชื่อฟรี",
       claimPlaceholder: "yourname",
-      trust: ["ฟรีตลอดชีพ", "0% ค่าคอมมิชชันคำสั่งซื้อทางแชต", "อัตโนมัติถึง WhatsApp"],
-      marqueeTitle: "ได้รับความไว้วางใจจากครีเอเตอร์ โค้ช และธุรกิจทั่วเอเชียตะวันออกเฉียงใต้",
+      trust: ["ฟรีตลอดชีพ", "0% ออเดอร์แชต (QRIS เริ่ม 2%)", "อัตโนมัติถึง WhatsApp"],
+      marqueeTitle: "ตัวอย่างหน้าร้านในหมวดหมู่ธุรกิจต่างๆ",
       sec1Badge: "ความสามารถครบครัน",
       sec1Title: "มากกว่าแค่ลิงก์รวมบนไบโอ",
       sec1Desc:
@@ -173,21 +196,21 @@ export default function HomePage({ searchParams }: HomePageProps) {
       ctaBadge: "เริ่มต้นฟรีโดยไม่ต้องใช้บัตรเครดิต",
       ctaTitle: "จองชื่อซับโดเมนธุรกิจของคุณก่อนที่ผู้อื่นจะใช้ไป",
       ctaDesc:
-        "สมัครฟรีใน 30 วินาทีด้วยบัญชี Google ไม่มีค่าคอมมิชชันแชต ไม่ต้องใช้บัตรเครดิต เชื่อมต่อ WhatsApp ของคุณทันที",
+        "สมัครฟรีใน 30 วินาทีด้วยบัญชี Google ค่าคอมฯ แชต 0% (QRIS เริ่ม 2%) ไม่ต้องใช้บัตรเครดิต เชื่อมต่อ WhatsApp ทันที",
       ctaPrimaryBtn: "สร้างหน้าร้านฟรีตอนนี้",
       ctaSecondaryBtn: "ดูเทมเพลตทั้ง 4 รูปแบบ",
       ctaTrust:
         "ฟรีตลอดชีพ • ตั้งค่าในเวลาไม่ถึง 3 นาที • ซับโดเมนพร้อมใช้งานทันที",
     },
     vi: {
-      heroBadge: "Một website storefront cho tất cả sản phẩm",
-      heroTitle: "Một Website Storefront Cho Mọi Hoạt Động Bán Hàng.",
+      heroBadge: "Danh Mục Link Bio & Chốt Đơn WhatsApp",
+      heroTitle: "Danh mục online chốt đơn trên WhatsApp. Miễn phí, không hoa hồng.",
       heroDesc:
-        "Bán sản phẩm số, trưng bày danh mục vật lý, gắn liên kết giỏ hàng TikTok, hoặc nhận đơn hàng trực tiếp qua WhatsApp. Sẵn sàng sau vài phút.",
+        "Phù hợp bán sản phẩm số hoặc danh mục sản phẩm—khách đặt thẳng qua WhatsApp (0% hoa hồng) hoặc thanh toán QR từ 2%.",
       claimBtn: "Nhận Miễn Phí",
       claimPlaceholder: "tenban",
-      trust: ["Miễn phí vĩnh viễn", "0% hoa hồng đơn hàng chat", "Tự động gửi qua WhatsApp"],
-      marqueeTitle: "Được tin dùng bởi các Nhà sáng tạo, Chuyên gia & Doanh nghiệp tại Đông Nam Á",
+      trust: ["Miễn phí vĩnh viễn", "0% Đơn Chat (QR từ 2%)", "Tự động gửi qua WhatsApp"],
+      marqueeTitle: "Giao Diện Cửa Hàng Mẫu Theo Ngành Hàng",
       sec1Badge: "Tính năng Toàn diện",
       sec1Title: "Vượt Trội Hơn Một Trang Link Bio Thông Thường",
       sec1Desc:
@@ -224,6 +247,14 @@ export default function HomePage({ searchParams }: HomePageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareAppJsonLd) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }}
+      />
 
       {/* 1. Global Header Terpusat */}
       <GlobalHeader />
@@ -232,50 +263,41 @@ export default function HomePage({ searchParams }: HomePageProps) {
       <section className="border-b border-[#E7E5E4] pt-14 sm:pt-20 lg:pt-24 pb-20 lg:pb-28 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto w-full">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-center">
-            {/* Kolom Kiri: Copywriting & Subdomain Claim Bar with Typewriter */}
+            {/* Kolom Kiri: Copywriting & Subdomain Claim Bar (Immediate paint, zero fade delay) */}
             <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
-              <ScrollReveal direction="up" delay={50}>
-                <div className="inline-flex items-center gap-2 bg-[#FDF0EC] border border-[#FADCD3] text-[#D94E28] px-3.5 py-1.5 rounded-full text-xs font-semibold">
-                  <Sparkles className="w-3.5 h-3.5 text-[#D94E28]" />
-                  <span>{copy.heroBadge}</span>
-                </div>
-              </ScrollReveal>
+              <div className="inline-flex items-center gap-2 bg-[#FDF0EC] border border-[#FADCD3] text-[#D94E28] px-3.5 py-1.5 rounded-full text-xs font-semibold">
+                <Sparkles className="w-3.5 h-3.5 text-[#D94E28]" />
+                <span>{copy.heroBadge}</span>
+              </div>
 
-              <ScrollReveal direction="up" delay={120}>
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[#1C1917] tracking-tight leading-[1.12]">
-                  {copy.heroTitle}
-                </h1>
-              </ScrollReveal>
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[#1C1917] tracking-tight leading-[1.12]">
+                {copy.heroTitle}
+              </h1>
 
-              <ScrollReveal direction="up" delay={180}>
-                <p className="text-[#57534E] text-base sm:text-lg max-w-xl mx-auto lg:mx-0 leading-relaxed font-normal">
-                  {copy.heroDesc}
-                </p>
-              </ScrollReveal>
+              <p className="text-[#57534E] text-base sm:text-lg max-w-xl mx-auto lg:mx-0 leading-relaxed font-normal">
+                {copy.heroDesc}
+              </p>
 
-              {/* Subdomain Claim Input Bar dengan Typewriter Effect */}
-              <ScrollReveal direction="up" delay={240}>
-                <SubdomainClaimer
-                  buttonText={copy.claimBtn}
-                  defaultPlaceholder={copy.claimPlaceholder}
-                />
-              </ScrollReveal>
+              {/* Subdomain Claim Input Bar dengan Real-Time Availability */}
+              <SubdomainClaimer
+                buttonText={copy.claimBtn}
+                defaultPlaceholder={copy.claimPlaceholder}
+                registerBasePath={getLocalizedHref("/register")}
+              />
 
               {/* 3 Micro-trust text */}
-              <ScrollReveal direction="up" delay={300}>
-                <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 text-xs text-[#57534E] pt-1 font-medium">
-                  <span>{copy.trust[0]}</span>
-                  <span className="text-[#E7E5E4]">&bull;</span>
-                  <span>{copy.trust[1]}</span>
-                  <span className="text-[#E7E5E4]">&bull;</span>
-                  <span>{copy.trust[2]}</span>
-                </div>
-              </ScrollReveal>
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 text-xs text-[#57534E] pt-1 font-medium">
+                <span>{copy.trust[0]}</span>
+                <span className="text-[#E7E5E4]">&bull;</span>
+                <span>{copy.trust[1]}</span>
+                <span className="text-[#E7E5E4]">&bull;</span>
+                <span>{copy.trust[2]}</span>
+              </div>
             </div>
 
-            {/* Kolom Kanan: CSS 3D Tilt Smartphone Mockup + Secondary Depth Layer + 4 Outer Floating 3D Badges */}
+            {/* Kolom Kanan: CSS 3D Tilt Smartphone Mockup */}
             <div className="lg:col-span-5 flex justify-center">
-              <ScrollReveal direction="none" delay={200}>
+              <ScrollReveal direction="none" delay={150}>
                 <Hero3DDevice locale={locale} />
               </ScrollReveal>
             </div>
@@ -283,14 +305,15 @@ export default function HomePage({ searchParams }: HomePageProps) {
         </div>
       </section>
 
-      {/* 3. Social Proof / Creator Marquee Section (Subdomain URLs) */}
-      <section className="py-10 bg-white border-b border-[#E7E5E4]">
-        <div className="max-w-6xl mx-auto px-4 text-center mb-4">
-          <ScrollReveal direction="up" delay={80}>
-            <span className="text-xs font-bold uppercase tracking-wider text-[#57534E]">
-              {copy.marqueeTitle}
-            </span>
-          </ScrollReveal>
+      {/* 2B. Interactive 45s Walkthrough Preview Right Below Hero */}
+      <HomeWalkthrough locale={locale} />
+
+      {/* 3. Sample Storefronts Showcase (Rendered Once) */}
+      <section className="py-12 bg-white border-b border-[#E7E5E4]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center mb-6">
+          <span className="text-xs font-bold uppercase tracking-wider text-[#57534E]">
+            {copy.marqueeTitle}
+          </span>
         </div>
         <CreatorMarquee />
       </section>
@@ -333,8 +356,11 @@ export default function HomePage({ searchParams }: HomePageProps) {
         <Showcase4Archetypes locale={locale} />
       </section>
 
-      {/* 6. Closing CTA Banner - Harmonis Soft Tint (#FDF0EC) */}
-      <section className="py-20 lg:py-28 px-4 sm:px-6 max-w-5xl mx-auto w-full">
+      {/* 6. Homepage FAQ (5 Key Questions & Honest Answers) */}
+      <HomeFaqSection locale={locale} />
+
+      {/* 7. Closing CTA Banner - Harmonis Soft Tint (#FDF0EC) */}
+      <section className="py-20 lg:py-28 px-4 sm:px-6 max-w-6xl mx-auto w-full">
         <ScrollReveal direction="up" delay={150}>
           <div className="bg-[#FDF0EC] border border-[#FADCD3] rounded-3xl p-10 sm:p-16 text-center shadow-xs space-y-6">
             <div className="inline-flex items-center gap-2 bg-white/90 border border-[#FADCD3] text-[#D94E28] px-3.5 py-1.5 rounded-full text-xs font-semibold">

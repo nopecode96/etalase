@@ -3,7 +3,7 @@ import { RESERVED_SLUGS } from "@/lib/config/constants";
 import { ok, fail, withErrorHandler, ServiceResult } from "@/lib/core/response";
 import { emitN8nEvent } from "@/lib/n8n/dispatcher";
 import { notifyMabesNewTenant } from "@/lib/services/telegram-service";
-import { slugify } from "@/lib/core/formatters";
+import { validateSubdomainFormat } from "@/lib/core/formatters";
 
 export interface OnboardingInput {
   name?: string;
@@ -16,19 +16,64 @@ export interface OnboardingInput {
   whatsappNumber?: string;
 }
 
-/**
- * Validates whether a store slug is available and legal.
- */
-export async function checkSlugAvailability(rawSlug: string): Promise<ServiceResult<{ available: boolean; slug: string }>> {
-  return withErrorHandler(async () => {
-    const slug = slugify(rawSlug);
+export interface SlugCheckResult {
+  available: boolean;
+  slug: string;
+  reason?: "format" | "length" | "reserved" | "taken";
+  suggestion?: string;
+  message?: string;
+}
 
-    if (!slug || slug.length < 3) {
-      return fail("INVALID_INPUT", "Slug minimal terdiri dari 3 karakter alfanumerik.");
+const SUGGESTION_SUFFIXES = ["-studio", "-id", "-shop", "-store", "-online"];
+
+async function findAvailableSuggestion(baseSlug: string): Promise<string | undefined> {
+  const candidates = SUGGESTION_SUFFIXES.map((suffix) => {
+    const maxBaseLen = Math.max(3, 30 - suffix.length);
+    const trimmedBase = baseSlug.slice(0, maxBaseLen).replace(/-+$/, "");
+    return `${trimmedBase}${suffix}`;
+  }).filter(
+    (candidate) =>
+      candidate.length >= 3 &&
+      candidate.length <= 30 &&
+      !(RESERVED_SLUGS as readonly string[]).includes(candidate)
+  );
+
+  if (candidates.length === 0) return undefined;
+
+  const takenRows = await prisma.store.findMany({
+    where: { slug: { in: candidates } },
+    select: { slug: true },
+  });
+  const takenSet = new Set(takenRows.map((row) => row.slug));
+  return candidates.find((candidate) => !takenSet.has(candidate));
+}
+
+/**
+ * Validates whether a store slug follows format rules, isn't reserved, and is available.
+ */
+export async function checkSlugAvailability(rawSlug: string): Promise<ServiceResult<SlugCheckResult>> {
+  return withErrorHandler<SlugCheckResult>(async () => {
+    const formatCheck = validateSubdomainFormat(rawSlug);
+    if (!formatCheck.valid) {
+      return ok({
+        available: false,
+        slug: formatCheck.slug,
+        reason: formatCheck.reason || "format",
+        message: formatCheck.message,
+      });
     }
 
+    const slug = formatCheck.slug;
+
     if ((RESERVED_SLUGS as readonly string[]).includes(slug)) {
-      return fail("SLUG_RESERVED");
+      const suggestion = await findAvailableSuggestion(`${slug}-store`);
+      return ok({
+        available: false,
+        slug,
+        reason: "reserved",
+        suggestion,
+        message: `Kata "${slug}" dicadangkan oleh sistem.`,
+      });
     }
 
     const existing = await prisma.store.findUnique({
@@ -37,7 +82,16 @@ export async function checkSlugAvailability(rawSlug: string): Promise<ServiceRes
     });
 
     if (existing) {
-      return fail("SLUG_TAKEN");
+      const suggestion = await findAvailableSuggestion(slug);
+      return ok({
+        available: false,
+        slug,
+        reason: "taken",
+        suggestion,
+        message: suggestion
+          ? `Sudah dipakai, coba ${suggestion}`
+          : "Subdomain sudah dipakai, silakan pilih nama lain.",
+      });
     }
 
     return ok({ available: true, slug });
@@ -55,6 +109,16 @@ export async function createInitialStore(
     const slugCheck = await checkSlugAvailability(input.slug);
     if (!slugCheck.success) {
       return slugCheck;
+    }
+    if (!slugCheck.data.available) {
+      return fail(
+        slugCheck.data.reason === "reserved"
+          ? "SLUG_RESERVED"
+          : slugCheck.data.reason === "taken"
+          ? "SLUG_TAKEN"
+          : "INVALID_INPUT",
+        slugCheck.data.message || "Subdomain tidak dapat digunakan."
+      );
     }
 
     const cleanSlug = slugCheck.data.slug;

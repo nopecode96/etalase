@@ -71,6 +71,8 @@ export interface StoreTemplateStore {
   chatHandle?: string | null;
   chatChannels?: Array<{ channel: string; handle: string; isPrimary?: boolean }> | null;
   tier: string;
+  isDemo?: boolean;
+  displayMode?: string;
   templateId?: string;
   appearanceConfig?: AppearanceConfig | null;
   blocks?: StoreBlockItem[] | null;

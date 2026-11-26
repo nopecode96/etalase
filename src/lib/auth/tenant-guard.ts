@@ -3,6 +3,7 @@ import { getCurrentUser } from "./session";
 import { prisma, serializePlain } from "@/lib/db/prisma";
 import { PlanTier } from "@prisma/client";
 import { PAYMENT_RULES } from "@/lib/constants/pricing";
+import { isStorePlanExpired } from "@/services/payment/plan-lifecycle";
 
 export interface TenantContext {
   user: {
@@ -107,6 +108,19 @@ export async function requireTenantContext(targetStoreId?: string): Promise<Tena
   // Reject access if client tried to manipulate targetStoreId
   if (targetStoreId && targetStoreId !== store.id && !isSuperAdmin) {
     throw new Error("FORBIDDEN: Cross-tenant data access violation. Access denied.");
+  }
+
+  // Automatic plan expiration check: downgrade expired PRO/DFY plans back to FREE
+  if (isStorePlanExpired(store.tier, store.planExpiresAt)) {
+    await prisma.store.update({
+      where: { id: store.id },
+      data: {
+        tier: PlanTier.FREE,
+        domainVerified: false,
+      },
+    });
+    store.tier = PlanTier.FREE;
+    store.domainVerified = false;
   }
 
   // Calculate monthly withdrawal quota usage for active store

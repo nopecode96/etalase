@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { GlobalHeader } from "@/components/saas/GlobalHeader";
 import { GlobalFooter } from "@/components/saas/GlobalFooter";
+import { OfficialSocialLinks } from "@/components/saas/OfficialSocialLinks";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import {
   Mail,
@@ -15,13 +16,20 @@ import {
   FileText,
   LifeBuoy,
   Send,
+  MessageCircle,
 } from "lucide-react";
 import {
   generateLocalizedMetadata,
   generateBreadcrumbJsonLd,
+  generateWebPageJsonLd,
   BASE_URL,
 } from "@/lib/seo/metadata-helper";
-import { SupportedLocale, SUPPORTED_LOCALES } from "@/lib/config/constants";
+import {
+  OFFICIAL_WHATSAPP_GROUP_URL,
+  OFFICIAL_SOCIAL_URLS,
+  SupportedLocale,
+  SUPPORTED_LOCALES,
+} from "@/lib/config/constants";
 
 interface KontakPageProps {
   searchParams?: {
@@ -96,7 +104,8 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
       hoursTitle: "Waktu Operasional Tim Bantuan:",
       hours1: "Senin - Sabtu: 08:00 - 21:00 WIB",
       hours2: "Minggu & Hari Libur: 09:00 - 17:00 WIB",
-      telegramCsBtn: "Chat CS: Rani • EtalaseOnline CS",
+      waGroupBtn: "Gabung Grup WhatsApp Support Resmi",
+      telegramCsBtn: "Chat Bot CS Rani (Telegram)",
       helpDeskBtn: "Email Dukungan ke support@etalase.online",
       helpCenterBtn: "Kunjungi Pusat Bantuan & Dokumentasi",
       card2Badge: "Korespondensi Resmi",
@@ -123,7 +132,8 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
       hoursTitle: "Support Operational Hours (GMT+7):",
       hours1: "Monday - Saturday: 08:00 - 21:00 WIB",
       hours2: "Sunday & Holidays: 09:00 - 17:00 WIB",
-      telegramCsBtn: "Chat CS: Rani • EtalaseOnline CS",
+      waGroupBtn: "Join Official WhatsApp Support Group",
+      telegramCsBtn: "Chat Bot CS Rani (Telegram)",
       helpDeskBtn: "Email Support at support@etalase.online",
       helpCenterBtn: "Visit Help Center & Documentation",
       card2Badge: "Official Correspondence",
@@ -150,7 +160,8 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
       hoursTitle: "Waktu Operasi Bantuan:",
       hours1: "Isnin - Sabtu: 08:00 - 21:00 WIB",
       hours2: "Ahad & Cuti Umum: 09:00 - 17:00 WIB",
-      telegramCsBtn: "Sembang CS: Rani • EtalaseOnline CS",
+      waGroupBtn: "Sertai Kumpulan WhatsApp Sokongan Rasmi",
+      telegramCsBtn: "Sembang CS Rani (Telegram)",
       helpDeskBtn: "Hantar E-mel ke support@etalase.online",
       helpCenterBtn: "Lawati Pusat Bantuan & Dokumentasi",
       card2Badge: "Surat-Menyurat Rasmi",
@@ -176,7 +187,8 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
       hoursTitle: "เวลาทำการของทีมสนับสนุน:",
       hours1: "จันทร์ - เสาร์: 08:00 - 21:00 น. (GMT+7)",
       hours2: "อาทิตย์และวันหยุด: 09:00 - 17:00 น. (GMT+7)",
-      telegramCsBtn: "แชท CS: Rani • EtalaseOnline CS",
+      waGroupBtn: "เข้าร่วมกลุ่ม WhatsApp ฝ่ายสนับสนุนอย่างเป็นทางการ",
+      telegramCsBtn: "แชท CS Rani (Telegram)",
       helpDeskBtn: "ส่งอีเมลถึง support@etalase.online",
       helpCenterBtn: "ไปที่ศูนย์ช่วยเหลือและคู่มือการใช้งาน",
       card2Badge: "การติดต่ออย่างเป็นทางการ",
@@ -202,7 +214,8 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
       hoursTitle: "Thời Gian Hỗ Trợ Trực Tuyến:",
       hours1: "Thứ Hai - Thứ Bảy: 08:00 - 21:00 (GMT+7)",
       hours2: "Chủ Nhật & Ngày Lễ: 09:00 - 17:00 (GMT+7)",
-      telegramCsBtn: "Trò chuyện CS: Rani • EtalaseOnline CS",
+      waGroupBtn: "Tham Gia Nhóm Hỗ Trợ WhatsApp Chính Thức",
+      telegramCsBtn: "Trò chuyện CS Rani (Telegram)",
       helpDeskBtn: "Gửi email đến support@etalase.online",
       helpCenterBtn: "Truy cập Trung tâm Trợ giúp & Tài liệu",
       card2Badge: "Thư tín chính thức",
@@ -231,10 +244,11 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
     url: `${BASE_URL}${locale === "id" ? "" : `/${locale}`}/kontak`,
     mainEntity: {
       "@type": "Organization",
-      name: "Rafa Kreasindo Teknologi",
-      legalName: "Rafa Kreasindo Teknologi",
+      name: "PT Rafa Kreasindo Teknologi",
+      legalName: "PT Rafa Kreasindo Teknologi",
       url: BASE_URL,
       email: "halo@etalase.online",
+      sameAs: [OFFICIAL_WHATSAPP_GROUP_URL, ...OFFICIAL_SOCIAL_URLS],
       contactPoint: [
         {
           "@type": "ContactPoint",
@@ -256,6 +270,13 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
     },
   };
 
+  const webPageJsonLd = generateWebPageJsonLd({
+    url: getLocalizedHref("/kontak"),
+    name: copy.h1,
+    description: copy.subtitle,
+    locale,
+  });
+
   return (
     <div className="flex flex-col min-h-screen bg-[#FAF8F5] text-[#1C1917]">
       <script
@@ -266,12 +287,16 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(contactJsonLd) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }}
+      />
 
       <GlobalHeader />
 
       <main className="flex-1">
         {/* Breadcrumb Navigation */}
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-6 w-full">
           <nav aria-label="Breadcrumb" className="text-xs text-[#57534E] flex items-center gap-2">
             <Link href={locale === "id" ? "/" : `/${locale}`} className="hover:text-[#D94E28] transition">
               {copy.breadcrumbHome}
@@ -284,23 +309,25 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
         </div>
 
         {/* Hero Section */}
-        <section className="pt-10 pb-12 px-4 sm:px-6 text-center max-w-3xl mx-auto">
+        <section className="pt-10 pb-12 px-4 sm:px-6 text-center max-w-6xl mx-auto w-full">
           <ScrollReveal direction="up" delay={50}>
-            <div className="inline-flex items-center gap-1.5 bg-[#FDF0EC] border border-[#FADCD3] text-[#D94E28] px-3.5 py-1.5 rounded-full text-xs font-semibold mb-4">
-              <Building className="w-3.5 h-3.5" />
-              <span>{copy.badge}</span>
+            <div className="max-w-3xl mx-auto">
+              <div className="inline-flex items-center gap-1.5 bg-[#FDF0EC] border border-[#FADCD3] text-[#D94E28] px-3.5 py-1.5 rounded-full text-xs font-semibold mb-4">
+                <Building className="w-3.5 h-3.5" />
+                <span>{copy.badge}</span>
+              </div>
+              <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-[#1C1917] mb-4 leading-[1.18]">
+                {copy.h1}
+              </h1>
+              <p className="text-[#57534E] text-base sm:text-lg leading-relaxed">
+                {copy.subtitle}
+              </p>
             </div>
-            <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-[#1C1917] mb-4 leading-[1.18]">
-              {copy.h1}
-            </h1>
-            <p className="text-[#57534E] text-base sm:text-lg leading-relaxed">
-              {copy.subtitle}
-            </p>
           </ScrollReveal>
         </section>
 
         {/* 2 Main Columns */}
-        <section className="pb-24 px-4 sm:px-6 max-w-5xl mx-auto w-full">
+        <section className="pb-24 px-4 sm:px-6 max-w-6xl mx-auto w-full">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
             {/* Card 1: Official Support & Priority Ticket */}
             <div className="bg-white border-2 border-[#D94E28] rounded-3xl p-8 sm:p-10 shadow-lg space-y-6 flex flex-col justify-between">
@@ -331,19 +358,13 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
 
               <div className="space-y-2.5 pt-2">
                 <a
-                  href="https://t.me/etalaseonline_bot"
+                  href={OFFICIAL_WHATSAPP_GROUP_URL}
                   target="_blank"
-                  rel="noreferrer"
-                  className="w-full bg-sky-600 hover:bg-sky-500 text-white py-3.5 px-4 rounded-xl font-bold text-xs sm:text-sm shadow-sm transition flex items-center justify-center gap-2.5 cursor-pointer text-center"
+                  rel="noopener noreferrer"
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 px-4 rounded-xl font-bold text-xs sm:text-sm shadow-sm transition flex items-center justify-center gap-2.5 cursor-pointer text-center"
                 >
-                  <div className="w-5 h-5 rounded-full overflow-hidden border border-white/40 shrink-0">
-                    <img
-                      src="/images/rani-cs.png"
-                      alt="Rani CS"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <span>{copy.telegramCsBtn}</span>
+                  <MessageCircle className="w-4 h-4 shrink-0" />
+                  <span>{copy.waGroupBtn}</span>
                 </a>
 
                 <a
@@ -352,6 +373,23 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
                 >
                   <Mail className="w-3.5 h-3.5 text-[#57534E]" />
                   <span>{copy.helpDeskBtn}</span>
+                </a>
+
+                <a
+                  href="https://t.me/etalaseonline_bot"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-full bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 py-2.5 px-4 rounded-xl font-semibold text-xs transition flex items-center justify-center gap-2 cursor-pointer text-center"
+                  title="Chat Customer Support (Rani • EtalaseOnline CS via Telegram)"
+                >
+                  <div className="w-4 h-4 rounded-full overflow-hidden border border-sky-300 shrink-0">
+                    <img
+                      src="/images/rani-cs.png"
+                      alt="Rani CS"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <span>{copy.telegramCsBtn}</span>
                 </a>
 
                 <Link
@@ -423,6 +461,13 @@ export default function KontakPage({ searchParams }: KontakPageProps) {
                   </a>
                 </div>
               </div>
+
+              <OfficialSocialLinks
+                locale={locale}
+                variant="cards"
+                cardBg="cream"
+                showHeading
+              />
 
               <div className="text-[11px] text-[#57534E] pt-4 border-t border-[#E7E5E4] leading-relaxed">
                 {copy.legalNotice}

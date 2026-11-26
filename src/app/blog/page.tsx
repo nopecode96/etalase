@@ -2,6 +2,7 @@ import React from "react";
 import { Metadata } from "next";
 import { GlobalHeader } from "@/components/saas/GlobalHeader";
 import { GlobalFooter } from "@/components/saas/GlobalFooter";
+import { OfficialSocialLinks } from "@/components/saas/OfficialSocialLinks";
 import { BlogListClient, BlogListItemProps } from "@/components/blog/BlogListClient";
 import { BookOpen } from "lucide-react";
 import {
@@ -11,9 +12,14 @@ import {
 import {
   generateLocalizedMetadata,
   generateBreadcrumbJsonLd,
+  generateWebPageJsonLd,
   BASE_URL,
 } from "@/lib/seo/metadata-helper";
-import { SupportedLocale, SUPPORTED_LOCALES } from "@/lib/config/constants";
+import {
+  SupportedLocale,
+  SUPPORTED_LOCALES,
+  OFFICIAL_SOCIAL_URLS,
+} from "@/lib/config/constants";
 
 interface BlogPageProps {
   searchParams?: {
@@ -159,6 +165,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
       name: "etalase.online",
       url: BASE_URL,
       logo: `${BASE_URL}/favicon.svg`,
+      sameAs: OFFICIAL_SOCIAL_URLS,
     },
     blogPost: dbPosts.map((a) => ({
       "@type": "BlogPosting",
@@ -204,6 +211,20 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(blogSchemaJsonLd) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            generateWebPageJsonLd({
+              url: locale === "id" ? "/blog" : `/${locale}/blog`,
+              name: "Blog & Panduan Monetisasi etalase.online",
+              description:
+                "Artikel dan panduan praktis closing WhatsApp, produk digital, katalog showroom, dan affiliate marketing di Asia Tenggara.",
+              locale,
+            })
+          ),
+        }}
+      />
 
       <GlobalHeader />
 
@@ -219,17 +240,22 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
       </div>
 
       {/* Header Section */}
-      <section className="pt-8 pb-10 px-4 sm:px-6 text-center max-w-4xl mx-auto">
-        <div className="inline-flex items-center gap-1.5 bg-[#FDF0EC] border border-[#FADCD3] text-[#D94E28] px-3.5 py-1.5 rounded-full text-xs font-semibold mb-4">
-          <BookOpen className="w-3.5 h-3.5" />
-          <span>{copy.badge}</span>
+      <section className="pt-8 pb-10 px-4 sm:px-6 text-center max-w-6xl mx-auto w-full">
+        <div className="max-w-3xl mx-auto">
+          <div className="inline-flex items-center gap-1.5 bg-[#FDF0EC] border border-[#FADCD3] text-[#D94E28] px-3.5 py-1.5 rounded-full text-xs font-semibold mb-4">
+            <BookOpen className="w-3.5 h-3.5" />
+            <span>{copy.badge}</span>
+          </div>
+          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-[#1C1917] mb-4">
+            {copy.h1}
+          </h1>
+          <p className="text-[#57534E] text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+            {copy.subtitle}
+          </p>
+          <div className="pt-5 flex justify-center">
+            <OfficialSocialLinks locale={locale} variant="pills" align="center" />
+          </div>
         </div>
-        <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-[#1C1917] mb-4">
-          {copy.h1}
-        </h1>
-        <p className="text-[#57534E] text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-          {copy.subtitle}
-        </p>
       </section>
 
       {/* Articles Grid with Interactive Filter Client */}

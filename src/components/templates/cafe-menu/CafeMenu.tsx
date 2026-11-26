@@ -110,9 +110,11 @@ export const CafeMenu: React.FC<StoreTemplateProps> = ({
         })}
       </div>
 
-      <footer className={styles.footer}>
-        Menu Visual &bull; <span className="font-bold text-amber-950">etalase.online</span>
-      </footer>
+      {store.tier === "FREE" && (
+        <footer className={styles.footer}>
+          Menu Visual &bull; <span className="font-bold text-amber-950">etalase.online</span>
+        </footer>
+      )}
     </div>
   );
 };

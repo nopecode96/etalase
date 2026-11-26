@@ -285,6 +285,11 @@ export async function actionSaveProduct(input: {
   promoActive?: boolean;
   promoPrice?: number | null;
   promoDurationNote?: string | null;
+  courseModules?: any;
+  appointmentDuration?: number | null;
+  appointmentSlots?: any;
+  eventDate?: string | null;
+  eventLocation?: string | null;
 }): Promise<ActionResult> {
   try {
     const ctx = await requireTenantContext(input.storeId);
@@ -298,61 +303,103 @@ export async function actionSaveProduct(input: {
       return { success: false, error: "Price cannot be negative." };
     }
 
-    // Auto-slugify
-    const baseSlug = input.slug ? slugify(input.slug) : slugify(input.title);
-    let finalSlug = baseSlug;
-
-    if (!input.productId) {
-      let counter = 1;
-      while (true) {
-        const existingSlug = await prisma.product.findUnique({
-          where: { storeId_slug: { storeId: verifiedStoreId, slug: finalSlug } },
-          select: { id: true },
-        });
-        if (!existingSlug) break;
-        finalSlug = `${baseSlug}-${counter++}`;
-      }
-    }
-
-    // Handle promo price: if active promo, price uses promoPrice while compareAtPrice retains original price
-    let effectivePrice = input.price;
-    let effectiveCompare = input.compareAtPrice;
-
-    if (input.promoActive && input.promoPrice && input.promoPrice > 0) {
-      effectiveCompare = input.price;
-      effectivePrice = input.promoPrice;
-    }
-
-    let result;
+    // Load existing record on update so we deduplicate slug cleanly and never clobber omitted fields
+    let existingProduct: any = null;
     if (input.productId) {
-      // Compound check: verify product belongs to this tenant
-      const existingProduct = await prisma.product.findFirst({
+      existingProduct = await prisma.product.findFirst({
         where: { id: input.productId, storeId: verifiedStoreId },
-        select: { id: true },
       });
 
       if (!existingProduct) {
         return { success: false, error: "Product not found or access denied." };
       }
+    }
 
+    // Auto-slugify & deduplicate on both create and update
+    const baseSlug = input.slug
+      ? slugify(input.slug)
+      : existingProduct && existingProduct.title === input.title.trim()
+      ? existingProduct.slug
+      : slugify(input.title);
+    let finalSlug = baseSlug || `product-${Date.now()}`;
+
+    let counter = 1;
+    while (true) {
+      const conflict = await prisma.product.findFirst({
+        where: {
+          storeId: verifiedStoreId,
+          slug: finalSlug,
+          ...(existingProduct ? { id: { not: existingProduct.id } } : {}),
+        },
+        select: { id: true },
+      });
+      if (!conflict) break;
+      finalSlug = `${baseSlug || "product"}-${counter++}`;
+    }
+
+    // Handle promo price cleanly without collapsing compareAtPrice == price
+    let effectivePrice = input.price;
+    let effectiveCompare = input.compareAtPrice;
+
+    if (input.promoActive && input.promoPrice && input.promoPrice > 0) {
+      const regularBase =
+        input.compareAtPrice && input.compareAtPrice > input.promoPrice
+          ? input.compareAtPrice
+          : input.price > input.promoPrice
+          ? input.price
+          : existingProduct?.compareAtPrice && Number(existingProduct.compareAtPrice) > input.promoPrice
+          ? Number(existingProduct.compareAtPrice)
+          : Number(existingProduct?.price || input.price);
+
+      if (input.promoPrice >= regularBase) {
+        return {
+          success: false,
+          error: "Flash sale promo price must be lower than the regular price.",
+        };
+      }
+      effectiveCompare = regularBase;
+      effectivePrice = input.promoPrice;
+    }
+
+    const parsedEventDate =
+      input.eventDate !== undefined
+        ? input.eventDate
+          ? new Date(input.eventDate)
+          : null
+        : undefined;
+
+    const normalizedProductType =
+      input.productType === "SERVICE"
+        ? "APPOINTMENT"
+        : input.productType === "EVENT"
+        ? "EVENT_WEBINAR"
+        : input.productType;
+
+    let result;
+    if (existingProduct) {
       result = await prisma.product.update({
         where: { id: existingProduct.id },
         data: {
           title: input.title.trim(),
           slug: finalSlug,
-          description: input.description,
-          category: input.category || "General",
-          images: input.images || [],
+          ...(input.description !== undefined ? { description: input.description } : {}),
+          ...(input.category !== undefined ? { category: input.category || "General" } : {}),
+          ...(input.images !== undefined ? { images: input.images } : {}),
           price: effectivePrice,
-          compareAtPrice: effectiveCompare,
-          productType: (input.productType as any) || "DIGITAL",
+          ...(effectiveCompare !== undefined ? { compareAtPrice: effectiveCompare } : {}),
+          ...(normalizedProductType !== undefined ? { productType: (normalizedProductType as any) || "DIGITAL" } : {}),
           checkoutMode: input.checkoutMode,
-          externalPlatform: (input.externalPlatform as any) || null,
-          externalUrl: input.externalUrl || null,
-          digitalFileUrl: input.digitalFileUrl || null,
-          chatMessage: input.chatMessage || null,
-          isFeatured: input.isFeatured ?? false,
-          isActive: input.isActive ?? true,
+          ...(input.externalPlatform !== undefined ? { externalPlatform: (input.externalPlatform as any) || null } : {}),
+          ...(input.externalUrl !== undefined ? { externalUrl: input.externalUrl || null } : {}),
+          ...(input.digitalFileUrl !== undefined ? { digitalFileUrl: input.digitalFileUrl || null } : {}),
+          ...(input.chatMessage !== undefined ? { chatMessage: input.chatMessage || null } : {}),
+          ...(input.isFeatured !== undefined ? { isFeatured: input.isFeatured } : {}),
+          ...(input.isActive !== undefined ? { isActive: input.isActive } : {}),
+          ...(input.courseModules !== undefined ? { courseModules: input.courseModules } : {}),
+          ...(input.appointmentDuration !== undefined ? { appointmentDuration: input.appointmentDuration } : {}),
+          ...(input.appointmentSlots !== undefined ? { appointmentSlots: input.appointmentSlots } : {}),
+          ...(parsedEventDate !== undefined ? { eventDate: parsedEventDate } : {}),
+          ...(input.eventLocation !== undefined ? { eventLocation: input.eventLocation || null } : {}),
         },
       });
     } else {
@@ -366,7 +413,7 @@ export async function actionSaveProduct(input: {
           images: input.images || [],
           price: effectivePrice,
           compareAtPrice: effectiveCompare,
-          productType: (input.productType as any) || "DIGITAL",
+          productType: (normalizedProductType as any) || "DIGITAL",
           checkoutMode: input.checkoutMode,
           externalPlatform: (input.externalPlatform as any) || null,
           externalUrl: input.externalUrl || null,
@@ -374,6 +421,11 @@ export async function actionSaveProduct(input: {
           chatMessage: input.chatMessage || null,
           isFeatured: input.isFeatured ?? false,
           isActive: input.isActive ?? true,
+          courseModules: input.courseModules ?? undefined,
+          appointmentDuration: input.appointmentDuration ?? undefined,
+          appointmentSlots: input.appointmentSlots ?? undefined,
+          eventDate: parsedEventDate ?? undefined,
+          eventLocation: input.eventLocation || undefined,
         },
       });
     }
@@ -385,6 +437,70 @@ export async function actionSaveProduct(input: {
     return { success: true, data: serializePlain(result) };
   } catch (err: any) {
     return { success: false, error: err.message || "Failed to save product" };
+  }
+}
+
+export async function actionToggleProductPromo(input: {
+  storeId?: string;
+  productId: string;
+  activate: boolean;
+  promoPrice?: number;
+}): Promise<ActionResult> {
+  try {
+    const ctx = await requireTenantContext(input.storeId);
+    const product = await prisma.product.findFirst({
+      where: { id: input.productId, storeId: ctx.storeId },
+    });
+
+    if (!product) {
+      return { success: false, error: "Product not found or access denied." };
+    }
+
+    const currentPrice = Number(product.price);
+    const currentCompare = product.compareAtPrice ? Number(product.compareAtPrice) : null;
+    const regularPrice =
+      currentCompare && currentCompare > currentPrice ? currentCompare : currentPrice;
+
+    if (!input.activate) {
+      const updated = await prisma.product.update({
+        where: { id: product.id },
+        data: {
+          price: regularPrice,
+          compareAtPrice: null,
+        },
+      });
+      revalidatePath("/admin/products");
+      revalidatePath("/admin/products/promos");
+      revalidatePath(`/${ctx.store.slug}`);
+      return { success: true, data: serializePlain(updated) };
+    }
+
+    const targetPromoPrice =
+      input.promoPrice && input.promoPrice > 0
+        ? Math.round(input.promoPrice)
+        : Math.round(regularPrice * 0.8);
+
+    if (targetPromoPrice <= 0 || targetPromoPrice >= regularPrice) {
+      return {
+        success: false,
+        error: "Flash sale price must be greater than 0 and lower than the regular price.",
+      };
+    }
+
+    const updated = await prisma.product.update({
+      where: { id: product.id },
+      data: {
+        price: targetPromoPrice,
+        compareAtPrice: regularPrice,
+      },
+    });
+
+    revalidatePath("/admin/products");
+    revalidatePath("/admin/products/promos");
+    revalidatePath(`/${ctx.store.slug}`);
+    return { success: true, data: serializePlain(updated) };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Failed to update flash sale promo" };
   }
 }
 
@@ -615,17 +731,55 @@ export async function actionUpdateStoreSettings(input: {
     const store = ctx.store;
     const verifiedStoreId = ctx.storeId;
 
-    // Custom domain gating for FREE tier
-    if (input.customDomain && input.customDomain.trim() && store.tier === PlanTier.FREE) {
-      return {
-        success: false,
-        error: "Custom domain connection is a PRO feature. Upgrade to attach your custom domain.",
+    let domainUpdateData: { customDomain?: string | null; domainVerified?: boolean } = {};
+
+    // Only touch customDomain when caller explicitly passes it (avoid wiping from profile save!)
+    if (input.customDomain !== undefined) {
+      const cleanDomain = input.customDomain
+        .trim()
+        .toLowerCase()
+        .replace(/^https?:\/\//, "")
+        .split("/")[0]
+        .split(":")[0];
+
+      if (cleanDomain && store.tier === PlanTier.FREE) {
+        return {
+          success: false,
+          error: "Custom domain connection is a PRO feature. Upgrade to attach your custom domain.",
+        };
+      }
+
+      if (cleanDomain) {
+        const domainOwner = await prisma.store.findFirst({
+          where: { customDomain: cleanDomain, id: { not: verifiedStoreId } },
+          select: { id: true },
+        });
+        if (domainOwner) {
+          return {
+            success: false,
+            error: "This custom domain is already connected to another store.",
+          };
+        }
+      }
+
+      domainUpdateData = {
+        customDomain: cleanDomain || null,
+        domainVerified: false,
       };
     }
 
-    const cleanDomain = input.customDomain
-      ? input.customDomain.trim().toLowerCase().replace(/^https?:\/\//, "")
-      : null;
+    // Sync chatChannels JSON array when chatHandle is updated
+    let updatedChatChannels: any = undefined;
+    if (input.chatHandle !== undefined) {
+      const cleanHandle = input.chatHandle.trim();
+      const existingChannels = Array.isArray((store as any).chatChannels)
+        ? ((store as any).chatChannels as any[])
+        : [];
+      const nonPrimary = existingChannels.filter((c) => c?.channel !== "WHATSAPP");
+      updatedChatChannels = cleanHandle
+        ? [{ channel: "WHATSAPP", handle: cleanHandle, isPrimary: true }, ...nonPrimary]
+        : nonPrimary;
+    }
 
     const updated = await prisma.store.update({
       where: { id: verifiedStoreId },
@@ -633,10 +787,10 @@ export async function actionUpdateStoreSettings(input: {
         name: input.name !== undefined ? input.name.trim() : undefined,
         bio: input.bio !== undefined ? input.bio.trim() : undefined,
         chatHandle: input.chatHandle !== undefined ? input.chatHandle.trim() : undefined,
+        ...(updatedChatChannels !== undefined ? { chatChannels: updatedChatChannels } : {}),
         locale: input.locale || undefined,
         currency: input.currency || undefined,
-        customDomain: cleanDomain || null,
-        domainVerified: cleanDomain ? false : false,
+        ...domainUpdateData,
       },
     });
 

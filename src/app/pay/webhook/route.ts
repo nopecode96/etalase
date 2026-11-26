@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getActiveBorderpayConfig } from "@/lib/config/env";
-import { prisma } from "@/lib/db/prisma";
-import { emitN8nEvent } from "@/lib/n8n/dispatcher";
 import { logger } from "@/lib/core/logger";
-import { sendMetaCapiEvent } from "@/lib/services/tracking-capi";
-import { notifyTenantNewOrder } from "@/lib/services/telegram-service";
+import { getBorderpayPaymentStatus } from "@/services/payment-borderpay";
+import {
+  settlePaidCustomerOrder,
+  settlePaidPlanOrder,
+} from "@/services/checkout-order/settlement";
 
 export const dynamic = "force-dynamic";
 
@@ -12,159 +13,225 @@ export async function POST(req: NextRequest) {
   try {
     const config = getActiveBorderpayConfig();
     const tokenHeader =
+      req.headers.get("x-borderpay-token") ||
       req.headers.get("x-callback-token") ||
       req.headers.get("x-borderpay-key") ||
-      req.headers.get("authorization")?.replace("Bearer ", "");
+      req.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
 
     const body = await req.json().catch(() => null);
+    const payload =
+      (body?.data && typeof body.data === "object" ? body.data : body) || {};
+    const eventHeader =
+      req.headers.get("x-borderpay-event") || body?.event || "";
+    const modeHeader = String(
+      req.headers.get("x-borderpay-mode") || body?.mode || ""
+    ).toLowerCase();
+
+    const referenceId =
+      payload.reference_id ||
+      payload.order_id ||
+      body?.reference_id ||
+      body?.order_id;
+    const rawStatus = String(
+      payload.status || payload.transaction_status || ""
+    ).toLowerCase();
 
     logger.info("Borderpay Webhook received", "BorderpayWebhook", {
       tokenPresent: !!tokenHeader,
-      body,
+      event: eventHeader,
+      mode: modeHeader || (config.isLive ? "live" : "test"),
+      referenceId,
+      status: rawStatus,
     });
 
-    // Verify webhook key against active Borderpay configuration
-    if (tokenHeader && tokenHeader !== config.webhookKey) {
-      logger.warn("Invalid Borderpay webhook key", "BorderpayWebhook", { tokenHeader });
-      return NextResponse.json({ error: "Unauthorized webhook key" }, { status: 401 });
+    // 1. Fail-closed token verification (x-borderpay-token per BorderPay docs)
+    if (!config.webhookKey || !tokenHeader || tokenHeader !== config.webhookKey) {
+      logger.warn(
+        "Rejected unauthenticated or invalid Borderpay webhook",
+        "BorderpayWebhook",
+        { tokenPresent: !!tokenHeader }
+      );
+      return NextResponse.json(
+        { error: "Unauthorized webhook key" },
+        { status: 401 }
+      );
     }
 
-    const { order_id, transaction_status, gross_amount, payment_reference } = body || {};
-
-    if (!order_id) {
-      return NextResponse.json({ message: "No order_id in webhook" }, { status: 400 });
+    // 2. Prevent test-mode webhooks from crediting live environment
+    if (config.isLive && modeHeader === "test") {
+      logger.warn(
+        "Rejected test-mode Borderpay webhook while server is in live mode",
+        "BorderpayWebhook",
+        { referenceId }
+      );
+      return NextResponse.json(
+        { error: "Test mode webhook rejected in live environment" },
+        { status: 401 }
+      );
     }
 
-    // Process payment success / paid event
+    if (!referenceId) {
+      return NextResponse.json(
+        { message: "No reference_id or order_id in webhook" },
+        { status: 400 }
+      );
+    }
+
+    if (
+      eventHeader === "payment.expired" ||
+      eventHeader === "payment.failed" ||
+      rawStatus === "expired" ||
+      rawStatus === "failed"
+    ) {
+      return NextResponse.json({
+        success: true,
+        received: true,
+        ignoredStatus: rawStatus || eventHeader,
+      });
+    }
+
     const isPaid =
-      transaction_status === "SUCCESS" ||
-      transaction_status === "PAID" ||
-      transaction_status === "settlement";
+      rawStatus === "paid" ||
+      rawStatus === "success" ||
+      rawStatus === "settlement" ||
+      (!rawStatus && eventHeader === "payment.paid");
 
-    if (isPaid) {
-      // 1. Check if this is an Admin Plan Upgrade (PlanOrder)
-      if (typeof order_id === "string" && (order_id.startsWith("INV-UPG-") || order_id.startsWith("UPG-"))) {
-        const planOrder = await prisma.planOrder.findUnique({
-          where: { orderNumber: order_id },
-          include: { store: true },
-        });
+    if (!isPaid) {
+      return NextResponse.json({ success: true, received: true });
+    }
 
-        if (planOrder && planOrder.status !== "APPROVED") {
-          await prisma.$transaction([
-            prisma.planOrder.update({
-              where: { id: planOrder.id },
-              data: {
-                status: "APPROVED",
-                paymentMethod: "BORDERPAY_QRIS",
-                paidAt: new Date(),
-                approvedAt: new Date(),
-                adminNotes: `Auto-verified via Borderpay QRIS Webhook (${payment_reference || "SETTLED"})`,
-              },
-            }),
-            prisma.store.update({
-              where: { id: planOrder.storeId },
-              data: {
-                tier: planOrder.planCode === "DFY" ? "DFY_BUSINESS" : "PRO",
-              },
-            }),
-          ]);
+    let authoritativeAmount =
+      payload.order_amount !== undefined
+        ? Number(payload.order_amount)
+        : payload.amount !== undefined
+        ? Number(payload.amount)
+        : payload.gross_amount !== undefined
+        ? Number(payload.gross_amount)
+        : undefined;
 
-          logger.info(`PlanOrder ${planOrder.orderNumber} upgraded to ${planOrder.planCode} via Borderpay Webhook`, "BorderpayWebhook");
+    const paymentRef =
+      String(
+        payload.reference_id ||
+          payload.payment_reference ||
+          body?.payment_reference ||
+          referenceId
+      );
 
-          await emitN8nEvent("tier.upgraded", {
-            orderNumber: planOrder.orderNumber,
-            storeId: planOrder.storeId,
-            storeSlug: planOrder.store.slug,
-            planCode: planOrder.planCode,
-            billingCycle: planOrder.billingCycle,
-            amount: Number(planOrder.amount),
-            paidVia: "BORDERPAY_QRIS",
-          });
-
-          return NextResponse.json({ success: true, type: "plan_upgrade", received: true });
-        }
+    // 3. In live mode, verify status directly via BorderPay REST API (Rule #4 / security tip)
+    if (config.isLive && process.env.BORDERPAY_VERIFY_VIA_API !== "false") {
+      const apiCheck = await getBorderpayPaymentStatus(String(paymentRef));
+      if (!apiCheck.success || !apiCheck.data) {
+        logger.warn(
+          "Borderpay REST API verification failed",
+          "BorderpayWebhook",
+          { paymentRef }
+        );
+        return NextResponse.json(
+          { error: "Unable to verify payment with Borderpay API" },
+          { status: 502 }
+        );
       }
 
-      // 2. Standard Storefront Customer Order
-      const order = await prisma.order.findUnique({
-        where: { orderCode: String(order_id) },
-        include: { store: true, product: true },
+      if (!apiCheck.data.found || apiCheck.data.status !== "paid") {
+        logger.warn(
+          "Rejected Borderpay webhook because API status is not paid",
+          "BorderpayWebhook",
+          {
+            paymentRef,
+            found: apiCheck.data.found,
+            apiStatus: apiCheck.data.status,
+          }
+        );
+        return NextResponse.json(
+          { error: "Payment not verified as paid on Borderpay" },
+          { status: apiCheck.data.found ? 400 : 401 }
+        );
+      }
+
+      if (apiCheck.data.orderAmount !== undefined) {
+        authoritativeAmount = apiCheck.data.orderAmount;
+      } else if (apiCheck.data.customerPays !== undefined) {
+        authoritativeAmount = apiCheck.data.customerPays;
+      }
+    }
+
+    // 4. Route to Admin Plan Upgrade (PlanOrder) or Customer Order
+    const cleanRef = String(payload.order_id || referenceId);
+    if (cleanRef.startsWith("INV-UPG-") || cleanRef.startsWith("UPG-")) {
+      const planSettlement = await settlePaidPlanOrder({
+        orderNumber: cleanRef,
+        paymentProvider: "BORDERPAY_QRIS",
+        paymentRef,
+        grossAmount: authoritativeAmount,
+        adminNotes: `Auto-verified via Borderpay QRIS Webhook (${paymentRef})`,
       });
 
-      if (!order) {
-        logger.warn(`Order not found for code: ${order_id}`, "BorderpayWebhook");
-        return NextResponse.json({ message: "Order not found" }, { status: 404 });
+      if (planSettlement.status === "NOT_FOUND") {
+        return NextResponse.json(
+          { message: "Plan order not found" },
+          { status: 404 }
+        );
       }
 
-      if (order.status !== "PAID") {
-        // Update order status & credit tenant wallet balance atomically
-        await prisma.$transaction([
-          prisma.order.update({
-            where: { id: order.id },
-            data: {
-              status: "PAID",
-              paymentRef: payment_reference || order.paymentRef,
-            },
-          }),
-          prisma.store.update({
-            where: { id: order.storeId },
-            data: {
-              walletBalance: {
-                increment: order.netAmount,
-              },
-            },
-          }),
-        ]);
-
-        logger.info(`Order ${order.orderCode} marked as PAID`, "BorderpayWebhook");
-
-        // Fire-and-forget: Trigger n8n Ops-02 WA delivery flow
-        await emitN8nEvent("order.paid", {
-          orderId: order.id,
-          orderCode: order.orderCode,
-          storeId: order.storeId,
-          storeSlug: order.store.slug,
-          buyerName: order.buyerName,
-          buyerWhatsapp: order.buyerWhatsapp,
-          productTitle: order.product.title,
-          productType: order.product.productType,
-          digitalFileUrl: order.product.digitalFileUrl,
-          amount: Number(order.amount),
-          currency: order.currency,
-          locale: order.store.locale,
-        });
-
-        // Fire-and-forget: Notify tenant on Telegram if linked
-        notifyTenantNewOrder(order.storeId, {
-          orderCode: order.orderCode,
-          productTitle: order.product.title,
-          amount: Number(order.amount),
-          buyerName: order.buyerName,
-          buyerWhatsapp: order.buyerWhatsapp,
-          paymentMethod: "BORDERPAY_QRIS",
-        }).catch(() => {});
-
-        // Fire-and-forget: Server-side Meta CAPI Purchase event (PRO / DFY)
-        if (order.store.tier !== "FREE" && order.store.metaPixelId && order.store.metaCapiToken) {
-          await sendMetaCapiEvent({
-            pixelId: order.store.metaPixelId,
-            accessToken: order.store.metaCapiToken,
-            eventName: "Purchase",
-            eventId: order.orderCode,
-            value: Number(order.amount),
-            currency: order.currency || "IDR",
-            phone: order.buyerWhatsapp,
-            contentIds: [order.productId],
-            contentName: order.product.title,
-          });
-        }
+      if (planSettlement.status === "AMOUNT_MISMATCH") {
+        logger.warn(
+          "Borderpay webhook amount mismatch for plan order",
+          "BorderpayWebhook",
+          {
+            orderNumber: cleanRef,
+            expected: planSettlement.expected,
+            received: planSettlement.received,
+          }
+        );
+        return NextResponse.json({ error: "Amount mismatch" }, { status: 400 });
       }
+
+      return NextResponse.json({
+        success: true,
+        type: "plan_upgrade",
+        alreadyProcessed: planSettlement.status === "ALREADY_APPROVED",
+        received: true,
+      });
     }
 
-    return NextResponse.json({ success: true, received: true });
+    // 5. Standard Storefront Customer Order
+    const settlement = await settlePaidCustomerOrder({
+      orderRef: cleanRef,
+      paymentProvider: "BORDERPAY_QRIS",
+      paymentRef,
+      grossAmount: authoritativeAmount,
+    });
+
+    if (settlement.status === "NOT_FOUND") {
+      logger.warn(`Order not found for code: ${cleanRef}`, "BorderpayWebhook");
+      return NextResponse.json({ message: "Order not found" }, { status: 404 });
+    }
+
+    if (settlement.status === "AMOUNT_MISMATCH") {
+      logger.warn(
+        "Borderpay webhook amount mismatch for customer order",
+        "BorderpayWebhook",
+        {
+          orderCode: cleanRef,
+          expected: settlement.expected,
+          received: settlement.received,
+        }
+      );
+      return NextResponse.json({ error: "Amount mismatch" }, { status: 400 });
+    }
+
+    return NextResponse.json({
+      success: true,
+      type: "customer_order",
+      alreadyProcessed: settlement.status === "ALREADY_PAID",
+      received: true,
+    });
   } catch (error: unknown) {
     logger.error("Borderpay Webhook handler error", "BorderpayWebhook", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
 

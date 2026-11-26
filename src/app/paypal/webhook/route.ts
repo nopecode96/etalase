@@ -3,8 +3,12 @@ import { getActivePaypalConfig } from "@/lib/config/env";
 import { prisma } from "@/lib/db/prisma";
 import { emitN8nEvent } from "@/lib/n8n/dispatcher";
 import { logger } from "@/lib/core/logger";
-import { sendMetaCapiEvent } from "@/lib/services/tracking-capi";
-import { notifyTenantNewOrder } from "@/lib/services/telegram-service";
+import {
+  verifyPaypalWebhookSignature,
+  verifyPaypalPaymentFromApi,
+} from "@/services/payment-paypal";
+import { computePlanExpiryDate } from "@/services/payment/plan-lifecycle";
+import { settlePaidCustomerOrder } from "@/services/checkout-order/settlement";
 
 export const dynamic = "force-dynamic";
 
@@ -31,6 +35,19 @@ export async function POST(req: NextRequest) {
       mode: config.mode,
     });
 
+    // Authoritative verification: cryptographic webhook signature (if PAYPAL_WEBHOOK_ID is set)
+    // OR direct verification of completed transaction against PayPal REST API.
+    let isSignatureVerified = false;
+    if (config.webhookId) {
+      isSignatureVerified = await verifyPaypalWebhookSignature(req.headers, body);
+      if (!isSignatureVerified) {
+        logger.warn("Rejected PayPal webhook with invalid signature", "PaypalWebhook", {
+          id: body.id,
+        });
+        return NextResponse.json({ error: "Invalid PayPal webhook signature" }, { status: 401 });
+      }
+    }
+
     // Handle completed payment / sale / capture
     const isPaymentCompleted =
       eventType === "PAYMENT.CAPTURE.COMPLETED" ||
@@ -38,11 +55,29 @@ export async function POST(req: NextRequest) {
       eventType === "CHECKOUT.ORDER.APPROVED";
 
     if (isPaymentCompleted) {
+      const paypalOrderId = resource.supplementary_data?.related_ids?.order_id;
+      const captureId = resource.id;
+
+      // Always verify payment state directly against PayPal REST API if signature wasn't verified
+      if (!isSignatureVerified) {
+        const apiCheck = await verifyPaypalPaymentFromApi({
+          paypalOrderId,
+          captureId,
+        });
+        if (!apiCheck.verified) {
+          logger.warn("Rejected unverified PayPal webhook payment claim", "PaypalWebhook", {
+            paypalOrderId,
+            captureId,
+          });
+          return NextResponse.json({ error: "Unauthorized unverified webhook" }, { status: 401 });
+        }
+      }
+
       // Look for order reference in standard PayPal fields
       const orderRef =
         resource.custom_id ||
         resource.invoice_id ||
-        resource.supplementary_data?.related_ids?.order_id ||
+        paypalOrderId ||
         resource.id;
 
       if (!orderRef) {
@@ -58,6 +93,11 @@ export async function POST(req: NextRequest) {
         });
 
         if (planOrder && planOrder.status !== "APPROVED") {
+          const nextExpiry = computePlanExpiryDate(
+            planOrder.billingCycle,
+            planOrder.store.planExpiresAt
+          );
+
           await prisma.$transaction([
             prisma.planOrder.update({
               where: { id: planOrder.id },
@@ -73,6 +113,7 @@ export async function POST(req: NextRequest) {
               where: { id: planOrder.storeId },
               data: {
                 tier: planOrder.planCode === "DFY" ? "DFY_BUSINESS" : "PRO",
+                planExpiresAt: nextExpiry,
               },
             }),
           ]);
@@ -94,78 +135,13 @@ export async function POST(req: NextRequest) {
       }
 
       // Check standard Storefront Customer Order
-      const order = await prisma.order.findFirst({
-        where: {
-          OR: [
-            { orderCode: String(orderRef) },
-            { paymentRef: String(orderRef) },
-          ],
-        },
-        include: { store: true, product: true },
+      const settlement = await settlePaidCustomerOrder({
+        orderRef: String(orderRef),
+        paymentProvider: "PAYPAL",
+        paymentRef: resource.id,
       });
 
-      if (order && order.status !== "PAID") {
-        await prisma.$transaction([
-          prisma.order.update({
-            where: { id: order.id },
-            data: {
-              status: "PAID",
-              paymentProvider: "PAYPAL",
-              paymentRef: resource.id || order.paymentRef,
-            },
-          }),
-          prisma.store.update({
-            where: { id: order.storeId },
-            data: {
-              walletBalance: {
-                increment: order.netAmount,
-              },
-            },
-          }),
-        ]);
-
-        logger.info(`Customer Order ${order.orderCode} marked as PAID via PayPal`, "PaypalWebhook");
-
-        await emitN8nEvent("order.paid", {
-          orderId: order.id,
-          orderCode: order.orderCode,
-          storeId: order.storeId,
-          storeSlug: order.store.slug,
-          buyerName: order.buyerName,
-          buyerWhatsapp: order.buyerWhatsapp,
-          productTitle: order.product.title,
-          productType: order.product.productType,
-          digitalFileUrl: order.product.digitalFileUrl,
-          amount: Number(order.amount),
-          currency: order.currency,
-          locale: order.store.locale,
-          paymentProvider: "PAYPAL",
-        });
-
-        // Fire-and-forget: Notify tenant on Telegram if linked
-        notifyTenantNewOrder(order.storeId, {
-          orderCode: order.orderCode,
-          productTitle: order.product.title,
-          amount: Number(order.amount),
-          buyerName: order.buyerName,
-          buyerWhatsapp: order.buyerWhatsapp,
-          paymentMethod: "PAYPAL",
-        }).catch(() => {});
-
-        if (order.store.tier !== "FREE" && order.store.metaPixelId && order.store.metaCapiToken) {
-          await sendMetaCapiEvent({
-            pixelId: order.store.metaPixelId,
-            accessToken: order.store.metaCapiToken,
-            eventName: "Purchase",
-            eventId: order.orderCode,
-            value: Number(order.amount),
-            currency: order.currency || "USD",
-            phone: order.buyerWhatsapp,
-            contentIds: [order.productId],
-            contentName: order.product.title,
-          });
-        }
-
+      if (settlement.status === "SETTLED" || settlement.status === "ALREADY_PAID") {
         return NextResponse.json({ success: true, type: "customer_order", received: true });
       }
     }

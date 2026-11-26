@@ -15,7 +15,9 @@ import {
   Compass,
 } from "lucide-react";
 import { actionCheckSlug, actionCreateStore } from "./actions";
+import { validateSubdomainFormat } from "@/lib/core/formatters";
 import { showServiceResultToast } from "@/components/ui/GlobalToast";
+import { trackGtmOnboardingStart, trackGtmSignUpComplete } from "@/lib/analytics/gtm";
 
 const SEA_COUNTRY_CODES = [
   { code: "+62", label: "🇮🇩 ID (+62)", name: "Indonesia" },
@@ -90,25 +92,46 @@ export function OnboardingClient() {
     }
 
     if (initialSlug) {
-      const clean = initialSlug.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-");
+      const clean = initialSlug.trim().toLowerCase().replace(/\s+/g, "-");
       setSlug(clean);
       performCheck(clean);
     }
+
+    trackGtmOnboardingStart({
+      claimedSlug: initialSlug || undefined,
+      selectedPlan: initialPlan || undefined,
+    });
   }, [searchParams]);
 
   const performCheck = async (val: string) => {
-    const clean = val.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-");
-    if (clean.length < 3) {
+    const clean = val.trim().toLowerCase();
+    if (!clean) {
       setSlugStatus("idle");
       setSlugMessage("");
       return;
     }
 
+    const formatCheck = validateSubdomainFormat(clean);
+    if (!formatCheck.valid) {
+      setSlugStatus("unavailable");
+      setSlugMessage(formatCheck.message || "Format subdomain belum valid (3–30 karakter).");
+      return;
+    }
+
     setSlugStatus("checking");
     const check = await actionCheckSlug(clean);
-    if (check.success && check.data.available) {
-      setSlugStatus("available");
-      setSlugMessage(`✓ ${check.data.slug}.etalase.online tersedia!`);
+    if (check.success && check.data) {
+      if (check.data.available) {
+        setSlugStatus("available");
+        setSlugMessage(`✓ ${check.data.slug}.etalase.online tersedia`);
+      } else {
+        setSlugStatus("unavailable");
+        setSlugMessage(
+          check.data.suggestion
+            ? `✗ ${check.data.slug} sudah dipakai, coba ${check.data.suggestion}`
+            : `✗ ${check.data.message || "Subdomain tidak tersedia."}`
+        );
+      }
     } else {
       setSlugStatus("unavailable");
       setSlugMessage(!check.success ? check.error : "Subdomain tidak tersedia.");
@@ -116,18 +139,19 @@ export function OnboardingClient() {
   };
 
   const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-");
+    const raw = e.target.value.toLowerCase().replace(/\s+/g, "-");
     setSlug(raw);
     performCheck(raw);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const cleanSlug = slug.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-");
+    const cleanSlug = slug.trim().toLowerCase();
+    const formatCheck = validateSubdomainFormat(cleanSlug);
 
-    if (cleanSlug.length < 3) {
+    if (!formatCheck.valid) {
       setSlugStatus("unavailable");
-      setSlugMessage("Subdomain minimal terdiri dari 3 karakter.");
+      setSlugMessage(formatCheck.message || "Subdomain harus 3–30 karakter (huruf kecil, angka, satu tanda hubung).");
       return;
     }
 
@@ -155,6 +179,12 @@ export function OnboardingClient() {
 
         const plan = selectedPlan || (searchParams.get("plan") || searchParams.get("tier") || "").toLowerCase();
         const cycle = selectedCycle || (searchParams.get("cycle") || "").toLowerCase();
+
+        trackGtmSignUpComplete({
+          storeSlug: cleanSlug,
+          businessCategory: category,
+          selectedPlan: plan || "free",
+        });
 
         if (plan === "pro" || plan === "dfy") {
           const query = new URLSearchParams();

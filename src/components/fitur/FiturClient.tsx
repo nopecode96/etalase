@@ -894,7 +894,11 @@ export function FiturClient({ locale }: { locale: SupportedLocale }) {
 
   // Helper to map URL hash or alias to actual tab id
   const resolveTabId = useCallback((hashString: string) => {
-    const clean = hashString.replace(/^#/, "").toLowerCase().trim();
+    const clean = hashString
+      .replace(/^#/, "")
+      .replace(/^(detail-|tab-link-)/, "")
+      .toLowerCase()
+      .trim();
     if (!clean) return null;
     if (clean === "chat" || clean === "whatsapp" || clean === "wa") return "chat-order";
     if (clean === "qris" || clean === "payment" || clean === "bayar") return "fintech";
@@ -952,17 +956,19 @@ export function FiturClient({ locale }: { locale: SupportedLocale }) {
       <GlobalHeader />
 
       {/* Header Halaman */}
-      <section className="pt-16 pb-12 px-4 sm:px-6 text-center max-w-4xl mx-auto">
-        <div className="inline-flex items-center gap-1.5 bg-[#FDF0EC] border border-[#FADCD3] text-[#D94E28] px-3.5 py-1.5 rounded-full text-xs font-semibold mb-4">
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>{currentLocaleData.badge}</span>
+      <section className="pt-16 pb-12 px-4 sm:px-6 text-center max-w-6xl mx-auto w-full">
+        <div className="max-w-3xl mx-auto">
+          <div className="inline-flex items-center gap-1.5 bg-[#FDF0EC] border border-[#FADCD3] text-[#D94E28] px-3.5 py-1.5 rounded-full text-xs font-semibold mb-4">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>{currentLocaleData.badge}</span>
+          </div>
+          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-[#1C1917] mb-4">
+            {currentLocaleData.h1}
+          </h1>
+          <p className="text-[#57534E] text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+            {currentLocaleData.subtitle}
+          </p>
         </div>
-        <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-[#1C1917] mb-4">
-          {currentLocaleData.h1}
-        </h1>
-        <p className="text-[#57534E] text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-          {currentLocaleData.subtitle}
-        </p>
       </section>
 
       {/* Split-Panel Interactive Showcase */}
@@ -1084,18 +1090,20 @@ export function FiturClient({ locale }: { locale: SupportedLocale }) {
             </div>
           </div>
 
-          {/* Panel Detail Kanan - render semua fitur di DOM agar ramah SEO & crawler */}
-          <div
-            ref={detailRef}
-            className="lg:col-span-7 bg-white border border-[#E7E5E4] rounded-3xl p-6 sm:p-10 shadow-xs scroll-mt-24 transition-all duration-300"
-          >
+          {/* Panel Detail Kanan - tampilkan hanya fitur yang dipilih secara visual, tetap indexable di DOM */}
+          <div ref={detailRef} className="lg:col-span-7 scroll-mt-24">
             {featureItems.map((item) => {
               const isSelected = activeTab === item.id;
               return (
-                <div
+                <article
                   key={item.id}
                   id={`detail-${item.id}`}
-                  className={isSelected ? "space-y-6" : "hidden"}
+                  aria-hidden={!isSelected}
+                  className={
+                    isSelected
+                      ? "bg-white border border-[#E7E5E4] rounded-3xl p-6 sm:p-10 shadow-xs space-y-6 transition-all duration-300"
+                      : "sr-only"
+                  }
                 >
                   <div>
                     <span className="text-xs font-bold uppercase tracking-wider text-[#D94E28] bg-[#FDF0EC] border border-[#FADCD3] px-3 py-1 rounded-full">
@@ -1154,7 +1162,7 @@ export function FiturClient({ locale }: { locale: SupportedLocale }) {
                       {currentLocaleData.ctaSecondary}
                     </Link>
                   </div>
-                </div>
+                </article>
               );
             })}
           </div>

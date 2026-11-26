@@ -48,7 +48,7 @@ export const SalesShowcase: React.FC<StoreTemplateProps> = ({
           Katalog Unit &amp; Promo Spesial
         </h2>
         <span className="text-[10px] font-semibold text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
-          12 Unit Terjual
+          Unit Ready Stock
         </span>
       </div>
 
@@ -150,9 +150,11 @@ export const SalesShowcase: React.FC<StoreTemplateProps> = ({
         })}
       </div>
 
-      <footer className={styles.footer}>
-        Showroom Online &bull; <span className="font-bold text-slate-900">etalase.online</span>
-      </footer>
+      {store.tier === "FREE" && (
+        <footer className={styles.footer}>
+          Showroom Online &bull; <span className="font-bold text-slate-900">etalase.online</span>
+        </footer>
+      )}
     </div>
   );
 };

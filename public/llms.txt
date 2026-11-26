@@ -1,0 +1,47 @@
+# etalase.online
+
+> Platform katalog online, bio-link visual, dan checkout WhatsApp/QRIS multi-tenant yang dikelola oleh PT Rafa Kreasindo Teknologi untuk kreator digital, UMKM, kafe F&B, sales showroom, dan konsultan di Asia Tenggara.
+
+## Identitas & Kredibilitas Resmi (E-E-A-T)
+- **Pengelola Resmi**: PT Rafa Kreasindo Teknologi
+- **Alamat Kantor**: Jl. Nias Dalam No. 14, Bandung, Jawa Barat 40115, Indonesia
+- **Dukungan Email**: support@etalase.online | halo@etalase.online
+- **Grup WhatsApp Support Resmi**: https://chat.whatsapp.com/GDoHkzW0dxXITWadlgJJ1r?mode=gi_t
+- **Instagram Resmi**: https://www.instagram.com/etalaseonline.official (@etalaseonline.official)
+- **Threads Resmi**: https://www.threads.net/@etalaseonline.official (@etalaseonline.official)
+- **Telegram CS Bot**: https://t.me/etalaseonline_bot
+
+## Fakta Produk, Paket & Biaya Terverifikasi
+- **Paket Gratis (Free Tier)**: Rp 0 selamanya; 1 subdomain (`namamu.etalase.online`); jumlah produk & link tanpa batas (Unlimited); 1 template dasar (`Clean Minimal`); 0% komisi order chat WhatsApp; checkout QRIS instan 4,5% (minimum transaksi Rp 15.000); opsi *Convenience Fee* (biaya transaksi ditanggung pembeli atau penjual); biaya pencairan saldo Rp 5.000 per penarikan (minimum pencairan Rp 50.000).
+- **Paket PRO**: Rp 49.000/bulan atau Rp 39.000/bulan bila ditagih tahunan (Rp 468.000/tahun); seluruh 14 variasi template dalam 4 arketipe desain (`Clean Minimal`, `Visual Menu Grid`, `Showroom Pro`, `Editorial Pastel`); custom domain pribadi + SSL HTTPS gratis; hapus watermark *Powered by etalase.online*; 0% komisi order chat WhatsApp; biaya transaksi QRIS 2% (minimum transaksi Rp 25.000); gratis pencairan saldo 4x/bulan (selanjutnya Rp 2.500/tarik, min. Rp 50.000); integrasi Meta Pixel (CAPI), TikTok Pixel, Google Analytics 4 (GA4), Flash Sale, Booking 1-on-1, Member Area E-Course, Content Blocks.
+- **Layanan Terima Beres (DFY Concierge)**: Rp 899.000 sekali bayar; termasuk langganan PRO 1 tahun penuh (senilai Rp 468.000), kapasitas produk Unlimited (tim bantu input awal hingga 25 produk), setup banner, copywriting, domain DNS, dan konsultasi 1-on-1.
+- **Keamanan & Pencairan**: Pembayaran QRIS diproses melalui mitra Payment Gateway berizin Penyelenggara Jasa Pembayaran (PJP) Bank Indonesia dengan enkripsi HTTPS/TLS dan verifikasi signature webhook kriptografis. Pencairan saldo diproses maksimal 1x24 jam di hari kerja ke rekening bank terverifikasi pemilik toko.
+- **Kebijakan Pembatalan & Refund**: Langganan PRO tanpa kontrak mengikat dan dapat dihentikan kapan saja sebelum periode berikutnya; tersedia jaminan refund 7 hari untuk langganan PRO baru sesuai halaman `/refund`.
+
+## Halaman Utama & Dokumentasi
+- [Beranda (ID / EN / MS / TH / VI)](https://etalase.online)
+- [Katalog Fitur Lengkap](https://etalase.online/fitur)
+- [Solusi Berdasarkan Industri](https://etalase.online/solusi)
+- [Solusi UMKM](https://etalase.online/solusi/umkm)
+- [Solusi Sales Showroom](https://etalase.online/solusi/showroom)
+- [Solusi Kreator Produk Digital](https://etalase.online/solusi/kreator)
+- [Solusi Cafe & Kuliner](https://etalase.online/solusi/cafe)
+- [Solusi Konsultan & Booking](https://etalase.online/solusi/konsultan)
+- [Solusi Afiliasi TikTok & Shopee](https://etalase.online/solusi/afiliasi)
+- [4 Arketipe Template Desain](https://etalase.online/template)
+- [Biaya & Paket Langganan](https://etalase.online/harga)
+- [Alternatif Lynk.id & Kalkulator Fee](https://etalase.online/alternatif-lynk-id)
+- [Free Growth Tools (WA Link & Kalkulator)](https://etalase.online/tools)
+- [Pusat Bantuan & 14 FAQ Lengkap](https://etalase.online/bantuan)
+- [Blog & Panduan Monetisasi](https://etalase.online/blog)
+- [Tentang Kami (PT Rafa Kreasindo Teknologi)](https://etalase.online/about)
+- [Kontak Resmi](https://etalase.online/kontak)
+- [Syarat & Ketentuan](https://etalase.online/syarat)
+- [Kebijakan Privasi (UU PDP No. 27/2022)](https://etalase.online/privasi)
+- [Kebijakan Pengembalian & Refund](https://etalase.online/refund)
+
+## Contoh Toko Demo Resmi (Bukan Toko Penjual Asli)
+- Kreator Digital (`Clean Minimal`): https://rafa.etalase.online
+- Cafe & Kuliner (`Visual Menu Grid`): https://kopisenja.etalase.online
+- Showroom Otomotif (`Showroom Pro`): https://bastianmobil.etalase.online
+- Beauty & Affiliate (`Editorial Pastel`): https://aisyahlook.etalase.online

@@ -143,9 +143,11 @@ export const EditorialPaper: React.FC<StoreTemplateProps> = ({
         })}
       </div>
 
-      <footer className={styles.footer}>
-        Diterbitkan melalui <span className="font-semibold text-[#2b2621]">etalase.online</span>
-      </footer>
+      {store.tier === "FREE" && (
+        <footer className={styles.footer}>
+          Diterbitkan melalui <span className="font-semibold text-[#2b2621]">etalase.online</span>
+        </footer>
+      )}
     </div>
   );
 };

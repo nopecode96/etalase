@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { PlayCircle, Lock, CheckCircle2, Phone, ShieldCheck, ArrowLeft } from "lucide-react";
 import { CourseAccessData, CourseModuleItem } from "@/services/creator-features";
+import { actionVerifyCourseAccess } from "@/lib/actions/creator-actions";
 
 interface LearnClientProps {
   storeSlug: string;
@@ -26,22 +27,19 @@ export default function LearnClient({ storeSlug, productSlug, initialData }: Lea
     setAuthError("");
 
     try {
-      const res = await fetch(
-        `/${storeSlug}/learn/${productSlug}?wa=${encodeURIComponent(whatsapp)}`,
-        { headers: { Accept: "application/json" } }
-      );
-      // Fallback client simulation if running pure mock
-      if (whatsapp.length >= 8) {
-        setData((prev) => ({
-          ...prev,
-          hasAccess: true,
-          modules: prev.modules.map((m) => ({
-            ...m,
-            videoUrl: m.videoUrl || "https://www.youtube.com/embed/dQw4w9WgXcQ",
-          })),
-        }));
+      const res = await actionVerifyCourseAccess({
+        storeSlug,
+        productSlug,
+        buyerWhatsapp: whatsapp,
+      });
+
+      if (res.success && res.data?.hasAccess) {
+        setData(res.data);
+        if (res.data.modules.length > 0) {
+          setActiveModule(res.data.modules[0]);
+        }
       } else {
-        setAuthError("Nomor WhatsApp tidak ditemukan pada daftar pesanan lunas.");
+        setAuthError("Nomor WhatsApp belum terdaftar sebagai pembeli lunas untuk kursus ini.");
       }
     } catch {
       setAuthError("Gagal memverifikasi akses. Pastikan nomor WhatsApp benar.");
@@ -149,6 +147,11 @@ export default function LearnClient({ storeSlug, productSlug, initialData }: Lea
           </div>
 
           <div className="space-y-2">
+            {data.modules.length === 0 && (
+              <p className="text-xs text-slate-400 py-4 text-center">
+                Belum ada modul video yang ditambahkan oleh kreator.
+              </p>
+            )}
             {data.modules.map((mod, idx) => {
               const isSelected = activeModule?.id === mod.id;
               const isPlayable = data.hasAccess || mod.isFreePreview;
