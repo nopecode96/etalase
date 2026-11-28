@@ -163,7 +163,11 @@ export function GlobalHeader() {
           </Link>
 
           <Link
-            href={getLocalizedHref("/register")}
+            href={
+              pathname.includes("/solusi/kue-hampers")
+                ? `${getLocalizedHref("/register")}?segmen=kue-hampers`
+                : getLocalizedHref("/register")
+            }
             className="bg-[#D94E28] hover:bg-[#B83E1D] text-white text-xs font-semibold px-4 py-2 rounded-xl transition shadow-xs flex items-center gap-1.5"
           >
             <span>{t.getStarted}</span>
@@ -208,7 +212,11 @@ export function GlobalHeader() {
         {/* Mobile (< lg): Logo + Mulai Gratis + Hamburger Menu */}
         <div className="flex lg:hidden items-center gap-2.5">
           <Link
-            href={getLocalizedHref("/register")}
+            href={
+              pathname.includes("/solusi/kue-hampers")
+                ? `${getLocalizedHref("/register")}?segmen=kue-hampers`
+                : getLocalizedHref("/register")
+            }
             className="bg-[#D94E28] hover:bg-[#B83E1D] text-white text-xs font-semibold px-3.5 py-2 rounded-xl shadow-xs transition"
           >
             {t.getStarted}

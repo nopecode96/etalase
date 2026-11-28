@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { prisma, serializePlain } from "@/lib/db/prisma";
 import { CheckoutClient } from "./CheckoutClient";
@@ -15,36 +16,40 @@ interface CheckoutPageProps {
   };
 }
 
-export default async function CheckoutPage({ params, searchParams }: CheckoutPageProps) {
+export async function generateMetadata({ params }: CheckoutPageProps): Promise<Metadata> {
   const { slug, productSlug } = params;
 
-  // Demo fallback
-  if (slug === "demo") {
-    return (
-      <CheckoutClient
-        store={{
-          slug: "demo",
-          name: "Studio Demo Creative",
-          currency: "IDR",
-          locale: "id",
-          tier: "FREE",
-          feeBorneBy: "CUSTOMER",
-          chatHandle: "6281234567890",
-        }}
-        product={{
-          id: "demo-p1",
-          slug: productSlug,
-          title: "Template Notion All-in-One Creator OS",
-          description: "Sistem operasional lengkap untuk kreator konten dan solopreneur.",
-          price: 79000,
-          productType: "DIGITAL",
-        }}
-        paypalStatus={searchParams?.paypal_status}
-        paypalToken={searchParams?.token}
-        paypalOrderCode={searchParams?.orderCode}
-      />
-    );
+  const store = await prisma.store.findUnique({
+    where: { slug },
+    select: { id: true, name: true },
+  });
+  if (!store) {
+    return { title: "Checkout | etalase.online", robots: { index: false, follow: false } };
   }
+
+  const product = await prisma.product.findUnique({
+    where: { storeId_slug: { storeId: store.id, slug: productSlug } },
+    select: { title: true, description: true },
+  });
+  if (!product) {
+    return { title: `Checkout | ${store.name}`, robots: { index: false, follow: false } };
+  }
+
+  const title = `Checkout ${product.title} | ${store.name}`;
+  const description = product.description || `Beli ${product.title} di ${store.name}.`;
+  return {
+    title,
+    description,
+    robots: { index: false, follow: false },
+    openGraph: {
+      title,
+      description,
+    },
+  };
+}
+
+export default async function CheckoutPage({ params, searchParams }: CheckoutPageProps) {
+  const { slug, productSlug } = params;
 
   const store = await prisma.store.findUnique({
     where: { slug },
@@ -56,6 +61,33 @@ export default async function CheckoutPage({ params, searchParams }: CheckoutPag
   });
 
   if (!store || store.products.length === 0) {
+    // Only fallback if demo and DB store doesn't exist
+    if (slug === "demo" && !store) {
+      return (
+        <CheckoutClient
+          store={{
+            slug: "demo",
+            name: "Studio Demo Creative",
+            currency: "IDR",
+            locale: "id",
+            tier: "FREE",
+            feeBorneBy: "CUSTOMER",
+            chatHandle: "6281234567890",
+          }}
+          product={{
+            id: "demo-p1",
+            slug: productSlug,
+            title: "Template Notion All-in-One Creator OS",
+            description: "Sistem operasional lengkap untuk kreator konten dan solopreneur.",
+            price: 79000,
+            productType: "DIGITAL",
+          }}
+          paypalStatus={searchParams?.paypal_status}
+          paypalToken={searchParams?.token}
+          paypalOrderCode={searchParams?.orderCode}
+        />
+      );
+    }
     notFound();
   }
 
@@ -97,6 +129,10 @@ export default async function CheckoutPage({ params, searchParams }: CheckoutPag
           compareAtPrice: serializedProduct.compareAtPrice ? Number(serializedProduct.compareAtPrice) : null,
           images: serializedProduct.images,
           productType: serializedProduct.productType,
+          stock: product.stock ?? null,
+          isPreOrder: Boolean((product as any).isPreOrder),
+          poNote: (product as any).poNote || null,
+          variants: Array.isArray((product as any).variants) ? (product as any).variants : null,
         }}
         paypalStatus={searchParams?.paypal_status}
         paypalToken={searchParams?.token}

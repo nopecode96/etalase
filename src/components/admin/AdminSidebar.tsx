@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -27,6 +27,7 @@ import {
   User,
 } from "lucide-react";
 import { EtalaseLogo } from "@/components/brand/EtalaseLogo";
+import { useAdminI18n } from "./AdminI18nContext";
 
 interface AdminSidebarProps {
   store: {
@@ -124,11 +125,59 @@ export function AdminSidebar({
   onCloseMobile,
 }: AdminSidebarProps) {
   const pathname = usePathname();
+  const { t } = useAdminI18n();
+  const [mounted, setMounted] = useState(false);
+
+  const navGroups: NavGroup[] = [
+    { id: "overview", label: t.nav.overview, icon: LayoutDashboard, href: "/admin", exact: true },
+    {
+      id: "storefront",
+      label: t.nav.storefront,
+      icon: Palette,
+      items: [
+        { href: "/admin/storefront/theme", label: t.nav.templatesTheme },
+        { href: "/admin/storefront/blocks", label: t.nav.contentBlocks },
+      ],
+    },
+    {
+      id: "products",
+      label: t.nav.productsPromos,
+      icon: Package,
+      items: [
+        { href: "/admin/products", label: t.nav.allProducts, exact: true },
+        { href: "/admin/products/promos", label: t.nav.flashSalePromos },
+      ],
+    },
+    {
+      id: "orders",
+      label: t.nav.ordersPayouts,
+      icon: ShoppingBag,
+      items: [
+        { href: "/admin/orders", label: t.nav.customerOrders, exact: true },
+        { href: "/admin/orders/payouts", label: t.nav.walletWithdrawals },
+      ],
+    },
+    { id: "analytics", label: t.nav.analyticsPixel, icon: BarChart3, href: "/admin/analytics" },
+    {
+      id: "settings",
+      label: t.nav.settings,
+      icon: Settings,
+      items: [
+        { href: "/admin/settings/profile", label: t.nav.storeProfile },
+        { href: "/admin/settings/domain", label: t.nav.customDomain },
+        { href: "/admin/settings/integrations", label: t.nav.integrations },
+      ],
+    },
+  ];
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Accordion open state for groups
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
     storefront: pathname.startsWith("/admin/storefront"),
-    products: pathname.startsWith("/admin/products"),
+    products: pathname.startsWith("/admin/products") || pathname.startsWith("/admin/boost"),
     orders: pathname.startsWith("/admin/orders"),
     settings: pathname.startsWith("/admin/settings"),
   });
@@ -145,6 +194,9 @@ export function AdminSidebar({
     : `/${store.slug}`;
 
   const isItemActive = (href: string, exact: boolean = false) => {
+    if (href === "/admin/products/promos" && pathname.startsWith("/admin/boost")) {
+      return true;
+    }
     if (exact) return pathname === href;
     return pathname === href || pathname.startsWith(href + "/");
   };
@@ -244,7 +296,7 @@ export function AdminSidebar({
 
         {/* Vertical Navigation Tree */}
         <nav className="flex-1 overflow-y-auto px-2 py-4 space-y-1.5">
-          {NAV_GROUPS.map((group) => {
+          {navGroups.map((group) => {
             const hasSubItems = Boolean(group.items && group.items.length > 0);
             const activeGroup = isGroupActive(group);
             const isOpen = openGroups[group.id] || activeGroup;
@@ -408,7 +460,7 @@ export function AdminSidebar({
                   {user.name || "Merchant"}
                 </p>
                 <p className="text-[10px] text-[#78716C] truncate">
-                  {user.email || "owner@etalase.online"}
+                  {mounted ? (user.email || "owner@etalase.online") : ""}
                 </p>
               </div>
             </div>
@@ -458,7 +510,7 @@ export function AdminSidebar({
             </div>
 
             <nav className="flex-1 overflow-y-auto p-3 space-y-2">
-              {NAV_GROUPS.map((group) => {
+              {navGroups.map((group) => {
                 const hasSubItems = Boolean(group.items && group.items.length > 0);
                 const Icon = group.icon;
 

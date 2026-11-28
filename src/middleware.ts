@@ -138,7 +138,9 @@ export default async function middleware(req: NextRequest) {
     }
 
     // D. Public storefront rewrite to dynamic tenant storefront /[slug]
-    return NextResponse.rewrite(new URL(`/${slug}${path}`, req.url));
+    const rewritePath =
+      path === `/${slug}` || path.startsWith(`/${slug}/`) ? path : `/${slug}${path}`;
+    return NextResponse.rewrite(new URL(rewritePath, req.url));
   }
 
   // 4. Custom Domain: namabrand.com (PRO Tier)

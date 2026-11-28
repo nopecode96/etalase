@@ -73,14 +73,62 @@ export default function LearnClient({ storeSlug, productSlug, initialData }: Lea
         <div className="lg:col-span-2 space-y-4">
           <div className="aspect-video bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden relative flex items-center justify-center">
             {activeModule?.videoUrl ? (
-              <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 to-slate-950 p-6 text-center">
-                <PlayCircle className="w-16 h-16 text-emerald-500 animate-pulse mb-3" />
-                <h3 className="text-lg font-bold text-white mb-1">{activeModule.title}</h3>
-                <p className="text-xs text-slate-400">Durasi Video: {activeModule.duration}</p>
-                <div className="mt-4 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs rounded-full">
-                  Materi Sedang Aktif
-                </div>
-              </div>
+              (() => {
+                const url = activeModule.videoUrl;
+                let embedUrl: string | null = null;
+                const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([A-Za-z0-9_-]{6,})/);
+                if (ytMatch) {
+                  embedUrl = `https://www.youtube.com/embed/${ytMatch[1]}`;
+                } else {
+                  const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
+                  if (vimeoMatch) {
+                    embedUrl = `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+                  } else {
+                    const driveMatch = url.match(/drive\.google\.com\/file\/d\/([^/]+)/);
+                    if (driveMatch) {
+                      embedUrl = `https://drive.google.com/file/d/${driveMatch[1]}/preview`;
+                    }
+                  }
+                }
+
+                if (embedUrl) {
+                  return (
+                    <iframe
+                      src={embedUrl}
+                      title={activeModule.title}
+                      className="w-full h-full border-0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  );
+                }
+
+                if (/\.(mp4|webm|ogg)(\?.*)?$/i.test(url)) {
+                  return (
+                    <video
+                      src={url}
+                      controls
+                      className="w-full h-full object-contain bg-black"
+                    />
+                  );
+                }
+
+                return (
+                  <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 to-slate-950 p-6 text-center">
+                    <PlayCircle className="w-16 h-16 text-emerald-500 mb-3" />
+                    <h3 className="text-lg font-bold text-white mb-1">{activeModule.title}</h3>
+                    <p className="text-xs text-slate-400 mb-4">Durasi Video: {activeModule.duration}</p>
+                    <a
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-5 py-2 rounded-xl text-xs transition"
+                    >
+                      Buka Materi Video
+                    </a>
+                  </div>
+                );
+              })()
             ) : (
               <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center space-y-3 bg-slate-900/80">
                 <div className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center text-slate-400">

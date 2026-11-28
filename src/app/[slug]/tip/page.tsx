@@ -11,16 +11,6 @@ interface TipPageProps {
 export default async function TipPage({ params }: TipPageProps) {
   const { slug } = params;
 
-  if (slug === "demo") {
-    return (
-      <TipClient
-        storeSlug={slug}
-        storeName="Studio Demo Creative"
-        avatarUrl="/images/demo/avatar-rafa.jpg"
-      />
-    );
-  }
-
   const store = await prisma.store.findUnique({
     where: { slug },
     select: {
@@ -32,6 +22,15 @@ export default async function TipPage({ params }: TipPageProps) {
   });
 
   if (!store || !store.isActive) {
+    if (slug === "demo") {
+      return (
+        <TipClient
+          storeSlug={slug}
+          storeName="Studio Demo Creative"
+          avatarUrl="/images/demo/avatar-rafa.jpg"
+        />
+      );
+    }
     notFound();
   }
 

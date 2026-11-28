@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React, { useState, useTransition, useMemo } from "react";
 import Link from "next/link";
 import {
   BarChart3,
@@ -15,6 +15,9 @@ import {
   Loader2,
   ExternalLink,
   ShieldAlert,
+  Calendar,
+  RotateCcw,
+  Filter,
 } from "lucide-react";
 import { actionUpdatePixels } from "@/app/admin/actions";
 import { showToast } from "@/components/ui/GlobalToast";
@@ -23,6 +26,8 @@ interface AdminAnalyticsClientProps {
   store: any;
   tier: "FREE" | "PRO" | "DFY";
 }
+
+type DateRangeOption = "all" | "7d" | "30d" | "month" | "custom";
 
 export function AdminAnalyticsClient({ store, tier }: AdminAnalyticsClientProps) {
   const isFree = tier === "FREE";
@@ -34,16 +39,103 @@ export function AdminAnalyticsClient({ store, tier }: AdminAnalyticsClientProps)
   const [tiktokPixelId, setTiktokPixelId] = useState(store.tiktokPixelId || "");
   const [gaMeasurementId, setGaMeasurementId] = useState(store.gaMeasurementId || "");
 
-  // Analytics Aggregation
-  const products = store.products || [];
-  const totalViews = products.reduce((acc: number, p: any) => acc + (p.views || 0), 0);
-  const totalClicks = products.reduce((acc: number, p: any) => acc + (p.clicks || 0), 0);
-  const orders = store.orders || [];
-  const paidOrders = orders.filter((o: any) => o.status === "PAID" || o.status === "COMPLETED");
-  const totalRevenue = paidOrders.reduce((acc: number, o: any) => acc + Number(o.amount || 0), 0);
+  // Date Filtering State
+  const [dateFilter, setDateFilter] = useState<DateRangeOption>("all");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
+  const rawProducts = store.products || [];
+  const rawOrders = store.orders || [];
+
+  // Filter Orders & Products by Date
+  const { filteredOrders, filteredProducts, dateLabel } = useMemo(() => {
+    const now = new Date();
+
+    if (dateFilter === "all") {
+      return {
+        filteredOrders: rawOrders,
+        filteredProducts: rawProducts,
+        dateLabel: "Semua Waktu",
+      };
+    }
+
+    let minDate: Date | null = null;
+    let maxDate: Date | null = null;
+    let label = "";
+
+    if (dateFilter === "7d") {
+      minDate = new Date();
+      minDate.setDate(now.getDate() - 7);
+      minDate.setHours(0, 0, 0, 0);
+      label = "7 Hari Terakhir";
+    } else if (dateFilter === "30d") {
+      minDate = new Date();
+      minDate.setDate(now.getDate() - 30);
+      minDate.setHours(0, 0, 0, 0);
+      label = "30 Hari Terakhir";
+    } else if (dateFilter === "month") {
+      minDate = new Date(now.getFullYear(), now.getMonth(), 1);
+      minDate.setHours(0, 0, 0, 0);
+      label = "Bulan Ini";
+    } else if (dateFilter === "custom") {
+      if (startDate) {
+        minDate = new Date(startDate);
+        minDate.setHours(0, 0, 0, 0);
+      }
+      if (endDate) {
+        maxDate = new Date(endDate);
+        maxDate.setHours(23, 59, 59, 999);
+      }
+      label = `${startDate || "Awal"} s/d ${endDate || "Sekarang"}`;
+    }
+
+    const oFiltered = rawOrders.filter((o: any) => {
+      if (!o.createdAt) return true;
+      const d = new Date(o.createdAt);
+      if (minDate && d < minDate) return false;
+      if (maxDate && d > maxDate) return false;
+      return true;
+    });
+
+    const pFiltered = rawProducts.filter((p: any) => {
+      if (!p.createdAt) return true;
+      const d = new Date(p.createdAt);
+      if (minDate && d < minDate) return false;
+      if (maxDate && d > maxDate) return false;
+      return true;
+    });
+
+    return {
+      filteredOrders: oFiltered,
+      filteredProducts: pFiltered,
+      dateLabel: label,
+    };
+  }, [dateFilter, startDate, endDate, rawOrders, rawProducts]);
+
+  // Aggregated Metrics
+  const totalViews = useMemo(() => {
+    // If user filtered by date, calculate views of products active/created in that period, or all products if "all"
+    const targetProducts = dateFilter === "all" ? rawProducts : filteredProducts;
+    return targetProducts.reduce((acc: number, p: any) => acc + (p.views || 0), 0);
+  }, [dateFilter, rawProducts, filteredProducts]);
+
+  const totalClicks = useMemo(() => {
+    const targetProducts = dateFilter === "all" ? rawProducts : filteredProducts;
+    return targetProducts.reduce((acc: number, p: any) => acc + (p.clicks || 0), 0);
+  }, [dateFilter, rawProducts, filteredProducts]);
+
+  const paidOrders = useMemo(() => {
+    return filteredOrders.filter(
+      (o: any) => o.status === "PAID" || o.status === "COMPLETED"
+    );
+  }, [filteredOrders]);
+
+  const totalRevenue = useMemo(() => {
+    return paidOrders.reduce((acc: number, o: any) => acc + Number(o.amount || 0), 0);
+  }, [paidOrders]);
 
   const ctr = totalViews > 0 ? ((totalClicks / totalViews) * 100).toFixed(1) : "0.0";
-  const conversionRate = totalViews > 0 ? ((orders.length / totalViews) * 100).toFixed(1) : "0.0";
+  const conversionRate = totalViews > 0 ? ((filteredOrders.length / totalViews) * 100).toFixed(1) : "0.0";
 
   // Handle Save Pixels
   const handleSavePixels = (e: React.FormEvent) => {
@@ -68,7 +160,7 @@ export function AdminAnalyticsClient({ store, tier }: AdminAnalyticsClientProps)
   };
 
   return (
-    <div className="space-y-10 animate-fade-in w-full">
+    <div className="space-y-8 animate-fade-in w-full">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#E7E5E4]">
         <div>
@@ -89,6 +181,115 @@ export function AdminAnalyticsClient({ store, tier }: AdminAnalyticsClientProps)
         >
           {tier} Plan Tracking
         </span>
+      </div>
+
+      {/* Date Filter Bar */}
+      <div className="bg-white rounded-2xl border border-[#E7E5E4] p-4 shadow-xs space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold text-[#1C1917] flex items-center gap-1.5">
+              <Calendar className="w-4 h-4 text-[#D94E28]" />
+              <span>Filter Periode:</span>
+            </span>
+            <span className="text-xs text-[#78716C] bg-[#FAF8F5] px-2.5 py-0.5 rounded-full border border-[#E7E5E4] font-medium">
+              {dateLabel}
+            </span>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-1.5">
+            <div className="flex items-center gap-1 bg-[#FAF8F5] p-1 rounded-xl border border-[#E7E5E4] text-xs">
+              <button
+                type="button"
+                onClick={() => setDateFilter("all")}
+                className={`px-2.5 py-1 rounded-lg font-medium transition ${
+                  dateFilter === "all"
+                    ? "bg-white text-[#1C1917] font-bold shadow-2xs"
+                    : "text-[#78716C] hover:text-[#1C1917]"
+                }`}
+              >
+                Semua
+              </button>
+              <button
+                type="button"
+                onClick={() => setDateFilter("7d")}
+                className={`px-2.5 py-1 rounded-lg font-medium transition ${
+                  dateFilter === "7d"
+                    ? "bg-white text-[#1C1917] font-bold shadow-2xs"
+                    : "text-[#78716C] hover:text-[#1C1917]"
+                }`}
+              >
+                7 Hari
+              </button>
+              <button
+                type="button"
+                onClick={() => setDateFilter("30d")}
+                className={`px-2.5 py-1 rounded-lg font-medium transition ${
+                  dateFilter === "30d"
+                    ? "bg-white text-[#1C1917] font-bold shadow-2xs"
+                    : "text-[#78716C] hover:text-[#1C1917]"
+                }`}
+              >
+                30 Hari
+              </button>
+              <button
+                type="button"
+                onClick={() => setDateFilter("month")}
+                className={`px-2.5 py-1 rounded-lg font-medium transition ${
+                  dateFilter === "month"
+                    ? "bg-white text-[#1C1917] font-bold shadow-2xs"
+                    : "text-[#78716C] hover:text-[#1C1917]"
+                }`}
+              >
+                Bulan Ini
+              </button>
+              <button
+                type="button"
+                onClick={() => setDateFilter("custom")}
+                className={`px-2.5 py-1 rounded-lg font-medium transition ${
+                  dateFilter === "custom"
+                    ? "bg-white text-[#D94E28] font-bold shadow-2xs"
+                    : "text-[#78716C] hover:text-[#1C1917]"
+                }`}
+              >
+                Kustom
+              </button>
+            </div>
+
+            {dateFilter !== "all" && (
+              <button
+                type="button"
+                onClick={() => {
+                  setDateFilter("all");
+                  setStartDate("");
+                  setEndDate("");
+                }}
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-[#78716C] hover:text-stone-900 bg-stone-100 hover:bg-stone-200 transition"
+              >
+                <RotateCcw className="w-3 h-3" />
+                <span>Reset</span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {dateFilter === "custom" && (
+          <div className="pt-2 border-t border-[#E7E5E4] flex flex-wrap items-center gap-3 text-xs">
+            <span className="text-[#78716C] font-medium">Dari:</span>
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="px-2.5 py-1 rounded-lg border border-[#E7E5E4] bg-white text-[#1C1917] outline-none focus:border-[#D94E28]"
+            />
+            <span className="text-[#78716C] font-medium">Sampai:</span>
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="px-2.5 py-1 rounded-lg border border-[#E7E5E4] bg-white text-[#1C1917] outline-none focus:border-[#D94E28]"
+            />
+          </div>
+        )}
       </div>
 
       {/* 1. Core Conversion Metrics */}
@@ -123,7 +324,7 @@ export function AdminAnalyticsClient({ store, tier }: AdminAnalyticsClientProps)
             <ShoppingBag className="w-4 h-4 text-purple-600" />
           </div>
           <p className="text-2xl font-bold text-[#1C1917]">
-            {orders.length}
+            {filteredOrders.length}
           </p>
           <p className="text-[11px] text-[#78716C] mt-1">
             {conversionRate}% Store Conversion
@@ -155,11 +356,11 @@ export function AdminAnalyticsClient({ store, tier }: AdminAnalyticsClientProps)
           </p>
         </div>
 
-        {products.length === 0 ? (
+        {rawProducts.length === 0 ? (
           <p className="text-xs text-[#78716C] py-4">No product data available yet.</p>
         ) : (
           <div className="divide-y divide-[#E7E5E4]">
-            {products.slice(0, 5).map((p: any) => {
+            {rawProducts.slice(0, 5).map((p: any) => {
               const productCtr =
                 p.views > 0 ? (((p.clicks || 0) / p.views) * 100).toFixed(1) : "0.0";
               const percentBar = totalViews > 0 ? Math.round(((p.views || 0) / totalViews) * 100) : 0;
@@ -199,133 +400,139 @@ export function AdminAnalyticsClient({ store, tier }: AdminAnalyticsClientProps)
               <h2 className="text-base font-bold text-[#1C1917]">
                 Marketing Pixels &amp; Ad Retargeting
               </h2>
-              {isFree ? (
-                <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FDF0EC] text-[#D94E28] border border-[#FADCD3]">
+              {isFree && (
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
                   <Lock className="w-3 h-3" />
                   <span>PRO Feature</span>
                 </span>
-              ) : (
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700">
-                  Active
-                </span>
               )}
             </div>
-            <p className="text-xs text-[#57534E] mt-0.5">
-              Inject Meta Pixel (Facebook &amp; Instagram), TikTok Pixel, and Google Analytics 4 tracking.
+            <p className="text-xs text-[#57534E] mt-1">
+              Fire standard PageView, ViewContent, InitiateCheckout, and Purchase events automatically.
             </p>
           </div>
+
+          {isFree && (
+            <Link
+              href="/admin/billing"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#D94E28] text-white text-xs font-bold hover:bg-[#B83E1D] transition shadow-xs self-start sm:self-auto"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Upgrade to PRO</span>
+            </Link>
+          )}
         </div>
 
         {isFree ? (
-          /* FREE Plan Lock Card */
-          <div className="p-6 rounded-2xl bg-gradient-to-br from-[#FAF8F5] to-white border border-[#FADCD3] text-center space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-[#FDF0EC] text-[#D94E28] flex items-center justify-center mx-auto">
-              <Sparkles className="w-6 h-6" />
+          <div className="p-6 rounded-2xl bg-[#FAF8F5] border border-[#E7E5E4] text-center space-y-3">
+            <div className="w-12 h-12 rounded-2xl bg-stone-100 text-stone-500 mx-auto flex items-center justify-center">
+              <Lock className="w-6 h-6" />
             </div>
-
-            <div className="max-w-md mx-auto">
+            <div className="max-w-md mx-auto space-y-1">
               <h3 className="text-sm font-bold text-[#1C1917]">
-                Unlock Pixel Tracking on PRO
+                Unlock Server-Side Conversions &amp; Retargeting
               </h3>
-              <p className="text-xs text-[#57534E] mt-1 leading-relaxed">
-                Ad pixels let you track <em>ViewContent</em>, <em>InitiateCheckout</em>, and <em>Purchase</em> events to build high-ROAS Lookalike and Retargeting audiences on TikTok and Meta Ads.
+              <p className="text-xs text-[#78716C] leading-relaxed">
+                Track ad return on ad spend (ROAS) and retarget dropped checkouts with Meta Conversions API (CAPI), TikTok Events API, and Google Analytics 4.
               </p>
             </div>
-
             <Link
-              href="/admin/billing/upgrade?plan=pro&returnTo=/admin/analytics"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#D94E28] hover:bg-[#B83E1D] text-white text-xs font-bold shadow-xs transition"
+              href="/admin/billing"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#D94E28] hover:bg-[#B83E1D] text-white text-xs font-bold transition shadow-xs"
             >
-              <span>Upgrade to PRO (Rp 49.000/mo)</span>
+              <span>Unlock Pixel Tracking</span>
               <ExternalLink className="w-3.5 h-3.5" />
             </Link>
           </div>
         ) : (
-          /* PRO / DFY Pixel Input Form */
-          <form onSubmit={handleSavePixels} className="space-y-5">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              {/* Meta Pixel */}
+          <form onSubmit={handleSavePixels} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Meta Pixel ID */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-[#1C1917]">
-                  Meta Pixel ID (Facebook / IG Ads)
+                <label className="text-xs font-bold text-[#1C1917]">
+                  Meta (Facebook) Pixel ID
                 </label>
                 <input
                   type="text"
+                  placeholder="e.g. 123456789012345"
                   value={metaPixelId}
                   onChange={(e) => setMetaPixelId(e.target.value)}
-                  placeholder="e.g. 123456789012345"
-                  className="w-full px-3.5 py-2 text-xs rounded-xl border border-[#E7E5E4] font-mono"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E5E4] text-xs text-[#1C1917] font-mono bg-white focus:border-[#D94E28] outline-none transition"
                 />
                 <p className="text-[10px] text-[#78716C]">
-                  Find in Meta Events Manager &gt; Data Sources.
+                  Required for browser pixel tracking on your storefront.
                 </p>
               </div>
 
-              {/* TikTok Pixel */}
+              {/* TikTok Pixel ID */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-[#1C1917]">
+                <label className="text-xs font-bold text-[#1C1917]">
                   TikTok Pixel ID
                 </label>
                 <input
                   type="text"
+                  placeholder="e.g. C5XXXXXXXXXXXXXX"
                   value={tiktokPixelId}
                   onChange={(e) => setTiktokPixelId(e.target.value)}
-                  placeholder="e.g. C1234567890ABCDEF"
-                  className="w-full px-3.5 py-2 text-xs rounded-xl border border-[#E7E5E4] font-mono"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E5E4] text-xs text-[#1C1917] font-mono bg-white focus:border-[#D94E28] outline-none transition"
                 />
                 <p className="text-[10px] text-[#78716C]">
-                  Find in TikTok Ads Manager &gt; Assets &gt; Events.
+                  Fires TikTok Ads standard eCommerce events.
                 </p>
               </div>
 
-              {/* GA4 ID */}
+              {/* Google Analytics Measurement ID */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-[#1C1917]">
-                  Google Analytics 4 (GA4) ID
+                <label className="text-xs font-bold text-[#1C1917]">
+                  Google Analytics 4 Measurement ID
                 </label>
                 <input
                   type="text"
+                  placeholder="e.g. G-XXXXXXXXXX"
                   value={gaMeasurementId}
                   onChange={(e) => setGaMeasurementId(e.target.value)}
-                  placeholder="e.g. G-XXXXXXXXXX"
-                  className="w-full px-3.5 py-2 text-xs rounded-xl border border-[#E7E5E4] font-mono"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E5E4] text-xs text-[#1C1917] font-mono bg-white focus:border-[#D94E28] outline-none transition"
                 />
                 <p className="text-[10px] text-[#78716C]">
-                  Measurement ID starting with G-.
+                  Tracks storefront traffic and conversion funnels in Google Analytics.
                 </p>
               </div>
-            </div>
 
-            {/* Meta Conversions API (CAPI) Server-Side Token */}
-            <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#E7E5E4] space-y-2">
-              <div className="flex items-center justify-between gap-2">
-                <label className="block text-xs font-bold text-[#1C1917]">
-                  Meta Conversions API (CAPI) Access Token (Optional — Server-Side)
+              {/* Meta CAPI Token */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-[#1C1917]">
+                  Meta Conversions API (CAPI) Access Token
                 </label>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
-                  Anti-AdBlock
-                </span>
+                <input
+                  type="password"
+                  placeholder="EAAG..."
+                  value={metaCapiToken}
+                  onChange={(e) => setMetaCapiToken(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#E7E5E4] text-xs text-[#1C1917] font-mono bg-white focus:border-[#D94E28] outline-none transition"
+                />
+                <p className="text-[10px] text-[#78716C]">
+                  Server-side tracking to bypass iOS 14+ and browser adblockers.
+                </p>
               </div>
-              <input
-                type="password"
-                value={metaCapiToken}
-                onChange={(e) => setMetaCapiToken(e.target.value)}
-                placeholder="EAA..."
-                className="w-full px-3.5 py-2 text-xs rounded-xl border border-[#E7E5E4] bg-white font-mono"
-              />
-              <p className="text-[10px] text-[#78716C]">
-                Paste your token from Meta Events Manager &gt; Settings &gt; Generate access token so <strong>Purchase</strong> events are automatically sent server-side when QRIS/PayPal payments settle.
-              </p>
             </div>
 
             <div className="flex justify-end pt-2">
               <button
                 type="submit"
                 disabled={isPending}
-                className="px-5 py-2.5 rounded-xl bg-[#D94E28] hover:bg-[#B83E1D] text-white text-xs font-bold shadow-xs transition flex items-center gap-2 disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#D94E28] hover:bg-[#B83E1D] text-white text-xs font-bold transition shadow-xs disabled:opacity-50"
               >
-                {isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
-                <span>Save Pixel Configuration</span>
+                {isPending ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Saving Pixels...</span>
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-3.5 h-3.5" />
+                    <span>Save Pixel Configurations</span>
+                  </>
+                )}
               </button>
             </div>
           </form>

@@ -40,8 +40,8 @@ interface WalkthroughCopy {
 
 const COPY: Record<SupportedLocale, WalkthroughCopy> = {
   id: {
-    badge: "Preview Alur 45 Detik",
-    title: "Dari Daftar Sampai Toko Live dalam ±45 Detik",
+    badge: "Preview Alur Cepat",
+    title: "Dari Daftar Sampai Toko Siap Pakai",
     subtitle: "Tanpa install aplikasi atau coding—cukup klaim nama, login Google, tambah produk pertama, dan sebar link ke bio.",
     totalDuration: "00:45",
     cta: "Coba Sekarang — Gratis",

@@ -160,6 +160,16 @@ export const CleanMinimal: React.FC<StoreTemplateProps> = ({
                     compareAtPrice={featuredProduct.compareAtPrice}
                     size="lg"
                     accentColor={accent}
+                    isPreOrder={featuredProduct.isPreOrder}
+                    poNote={
+                      featuredProduct.poNote
+                        ? featuredProduct.stock !== null && featuredProduct.stock !== undefined
+                          ? `${featuredProduct.poNote} • Sisa ${featuredProduct.stock}`
+                          : featuredProduct.poNote
+                        : featuredProduct.stock !== null && featuredProduct.stock !== undefined
+                        ? `Sisa ${featuredProduct.stock}`
+                        : null
+                    }
                   />
                   <span className="text-[10px] text-stone-700 bg-stone-100 border border-stone-200 font-bold px-2 py-0.5 rounded-md">
                     {featuredProduct.checkoutMode === "CHAT_ORDER"
@@ -298,8 +308,30 @@ export const CleanMinimal: React.FC<StoreTemplateProps> = ({
                             compareAtPrice={item.compareAtPrice}
                             size="sm"
                             accentColor={accent}
+                            isPreOrder={item.isPreOrder}
+                            poNote={
+                              item.poNote
+                                ? item.stock !== null && item.stock !== undefined
+                                  ? `${item.poNote} • Sisa ${item.stock}`
+                                  : item.poNote
+                                : item.stock !== null && item.stock !== undefined
+                                ? `Sisa ${item.stock}`
+                                : null
+                            }
                           />
                         </div>
+                        {Array.isArray(item.variants) && item.variants.length > 0 && (
+                          <div className="mt-1.5 flex flex-wrap gap-1">
+                            {item.variants.slice(0, 3).map((v, idx) => (
+                              <span
+                                key={idx}
+                                className="text-[9px] font-semibold bg-stone-100 text-stone-700 px-1.5 py-0.5 rounded border border-stone-200"
+                              >
+                                {v.name}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
 
                       <a
@@ -310,7 +342,7 @@ export const CleanMinimal: React.FC<StoreTemplateProps> = ({
                         className={`w-full py-2 px-2 text-center text-[11px] font-bold text-white bg-stone-900 hover:bg-black transition flex items-center justify-center gap-1 ${btnRadiusClass} cursor-pointer`}
                       >
                         <span>
-                          {item.checkoutMode === "EXTERNAL_LINK" ? "Beli di Toko" : "Detail"}
+                          {item.checkoutMode === "EXTERNAL_LINK" ? "Beli di Toko" : "Pesan Sekarang"}
                         </span>
                         {item.checkoutMode === "EXTERNAL_LINK" ? (
                           <ExternalLink className="w-3 h-3" />

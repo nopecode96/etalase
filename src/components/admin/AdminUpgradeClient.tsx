@@ -79,6 +79,19 @@ export function AdminUpgradeClient({
   const [paypalOrderId, setPaypalOrderId] = useState<string>("");
   const [amountUsd, setAmountUsd] = useState<number>(29.99);
 
+  // Clear stale pending invoice when user switches plan or billing cycle
+  useEffect(() => {
+    if (!activeOrder || activeOrder.status === "APPROVED") return;
+    const expectedCycle = selectedPlan === "DFY" ? "ONE_TIME" : billingCycle;
+    if (activeOrder.planCode !== selectedPlan || activeOrder.billingCycle !== expectedCycle) {
+      setActiveOrder(null);
+      setQrString("");
+      setPaymentUrl("");
+      setPaypalApproveUrl("");
+      setPaypalOrderId("");
+    }
+  }, [selectedPlan, billingCycle, activeOrder]);
+
   // Status & Verification state
   const [isApproved, setIsApproved] = useState<boolean>(existingOrder?.status === "APPROVED");
   const [isVerifying, setIsVerifying] = useState<boolean>(false);

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import "./globals.css";
 import { GlobalToast } from "@/components/ui/GlobalToast";
 import { CookieConsentBanner } from "@/components/tracking/CookieConsentBanner";
@@ -79,43 +80,56 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headersList = await headers();
+  const host = (headersList.get("host") || "").toLowerCase();
+  const isMabesHost = host.startsWith("mabes.");
+
   return (
     <html lang="id" suppressHydrationWarning>
       <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){window.dataLayer.push(arguments);}
-              window.gtag = window.gtag || gtag;
-              var consentMatch = document.cookie.match(/(?:^|; )etalase_cookie_consent=([^;]*)/);
-              var isRejected = consentMatch && consentMatch[1] === 'essential_only';
-              window.gtag('consent', 'default', {
-                ad_storage: isRejected ? 'denied' : 'granted',
-                ad_user_data: isRejected ? 'denied' : 'granted',
-                ad_personalization: isRejected ? 'denied' : 'granted',
-                analytics_storage: isRejected ? 'denied' : 'granted',
-                wait_for_update: 500
-              });
-              window.gtag('js', new Date());
-              window.gtag('config', 'GTM-WM3KQKB6');
-            `,
-          }}
-        />
-        <script
-          async
-          src="https://www.googletagmanager.com/gtm.js?id=GTM-WM3KQKB6"
-        />
+        {!isMabesHost && (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function() {
+                  var h = window.location.hostname.toLowerCase();
+                  var p = window.location.pathname.toLowerCase();
+                  if (h.indexOf('mabes.') === 0 || p === '/mabes' || p.indexOf('/mabes/') === 0) {
+                    return;
+                  }
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){window.dataLayer.push(arguments);}
+                  window.gtag = window.gtag || gtag;
+                  var consentMatch = document.cookie.match(/(?:^|; )etalase_cookie_consent=([^;]*)/);
+                  var isAccepted = consentMatch && consentMatch[1] === 'accepted';
+                  window.gtag('consent', 'default', {
+                    ad_storage: isAccepted ? 'granted' : 'denied',
+                    ad_user_data: isAccepted ? 'granted' : 'denied',
+                    ad_personalization: isAccepted ? 'granted' : 'denied',
+                    analytics_storage: isAccepted ? 'granted' : 'denied',
+                    wait_for_update: 500
+                  });
+                  window.gtag('js', new Date());
+                  window.gtag('config', 'GTM-WM3KQKB6');
+                  var s = document.createElement('script');
+                  s.async = true;
+                  s.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-WM3KQKB6';
+                  document.head.appendChild(s);
+                })();
+              `,
+            }}
+          />
+        )}
         <link rel="alternate" type="text/plain" title="LLMs Context" href="/llms.txt" />
       </head>
       <body className="antialiased min-h-screen bg-[#FAF8F5] text-[#1C1917]" suppressHydrationWarning>
         {children}
-        <CookieConsentBanner />
+        {!isMabesHost && <CookieConsentBanner />}
         <GlobalToast />
       </body>
     </html>

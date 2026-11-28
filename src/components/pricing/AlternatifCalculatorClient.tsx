@@ -9,7 +9,7 @@ import { PAYMENT_RULES } from "@/lib/constants/pricing";
 export function AlternatifCalculatorClient({ locale = "id" }: { locale?: SupportedLocale }) {
   const [monthlyGmv, setMonthlyGmv] = useState<number>(10000000);
   const [competitorFeePercent, setCompetitorFeePercent] = useState<number>(5);
-  const [etalaseChannel, setEtalaseChannel] = useState<"CHAT" | "QRIS_PRO" | "QRIS_FREE">("CHAT");
+  const [etalaseChannel, setEtalaseChannel] = useState<"CHAT" | "QRIS_PRO" | "QRIS_FREE">("QRIS_PRO");
   const [passConvenienceFee, setPassConvenienceFee] = useState<boolean>(false);
 
   const etalaseRate =

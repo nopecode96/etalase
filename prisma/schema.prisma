@@ -247,6 +247,9 @@ model Product {
   digitalFileUrl   String?
   chatMessage      String?
   stock            Int?
+  isPreOrder       Boolean           @default(false)
+  poNote           String?
+  variants         Json?             // [{ name: string, price: number }]
 
   isFeatured       Boolean           @default(false)
   isActive         Boolean           @default(true)

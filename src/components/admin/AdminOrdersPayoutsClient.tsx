@@ -552,6 +552,7 @@ export function AdminOrdersPayoutsClient({
                   <tr key={w.id}>
                     <td className="py-3 px-4 text-[#78716C]">
                       {new Date(w.createdAt).toLocaleDateString("id-ID", {
+                        timeZone: "Asia/Jakarta",
                         day: "numeric",
                         month: "short",
                         year: "numeric",

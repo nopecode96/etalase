@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, ShieldCheck, Zap, QrCode, CheckCircle2, Loader2, MessageSquare, AlertCircle, CreditCard } from "lucide-react";
 import {
@@ -38,6 +38,10 @@ interface CheckoutClientProps {
     compareAtPrice?: number | null;
     images?: string[];
     productType: string;
+    stock?: number | null;
+    isPreOrder?: boolean;
+    poNote?: string | null;
+    variants?: Array<{ name: string; price: number }> | null;
   };
   paypalStatus?: string;
   paypalToken?: string;
@@ -51,9 +55,14 @@ export function CheckoutClient({
   paypalToken,
   paypalOrderCode,
 }: CheckoutClientProps) {
+  const formRef = useRef<HTMLFormElement | null>(null);
   const [buyerName, setBuyerName] = useState("");
   const [buyerWhatsapp, setBuyerWhatsapp] = useState("");
   const [buyerEmail, setBuyerEmail] = useState("");
+  const [selectedVariantIdx, setSelectedVariantIdx] = useState<number>(0);
+  const [quantity, setQuantity] = useState<number>(1);
+  const [shippingAddress, setShippingAddress] = useState("");
+  const [buyerNote, setBuyerNote] = useState("");
   const [paymentProvider, setPaymentProvider] = useState<"BORDERPAY_QRIS" | "PAYPAL">("BORDERPAY_QRIS");
   const [loading, setLoading] = useState(false);
   const [paypalCapturing, setPaypalCapturing] = useState(false);
@@ -177,13 +186,19 @@ export function CheckoutClient({
 
   const tierKey = store.tier === "PRO" ? "PRO" : store.tier === "DFY_BUSINESS" ? "DFY" : "FREE";
   const rules = PAYMENT_RULES[tierKey];
-  const isBelowMinQris = product.price < rules.minQrisAmountIdr;
+  const isPhysical = product.productType === "PHYSICAL";
+  const hasVariants = Array.isArray(product.variants) && product.variants.length > 0;
+  const activeVariant = hasVariants ? product.variants![selectedVariantIdx] || product.variants![0] : null;
+  const unitPrice = activeVariant ? Number(activeVariant.price) : Number(product.price);
+  const subtotalPrice = unitPrice * Math.max(1, quantity);
 
-  const isCustomerBorne = store.feeBorneBy !== "MERCHANT";
+  const isBelowMinQris = subtotalPrice < rules.minQrisAmountIdr;
+
+  const isCustomerBorne = store.feeBorneBy === "CUSTOMER";
   const convenienceFee = isCustomerBorne
-    ? Math.ceil((product.price * rules.directCheckoutFeePercent) / 100)
+    ? Math.ceil((subtotalPrice * rules.directCheckoutFeePercent) / 100)
     : 0;
-  const totalAmountToPay = product.price + convenienceFee;
+  const totalAmountToPay = subtotalPrice + convenienceFee;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -253,6 +268,14 @@ export function CheckoutClient({
           <p className="text-xs text-slate-600">
             Pesanan <strong className="font-mono">{paidOrderCode}</strong> telah terkonfirmasi. Akses dan detail pesanan telah diproses oleh toko {store.name}.
           </p>
+          {product.productType === "COURSE" && (
+            <Link
+              href={`/${store.slug}/learn/${product.slug}?order=${encodeURIComponent(paidOrderCode || "")}`}
+              className="inline-block w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition"
+            >
+              Buka Member Area Kursus
+            </Link>
+          )}
           <Link
             href={`/${store.slug}`}
             className="inline-block w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition"
@@ -379,16 +402,68 @@ export function CheckoutClient({
                 <h1 className="text-xl font-bold text-slate-900 mt-1">
                   {product.title}
                 </h1>
-                <p className="text-xs text-slate-500">Dijual oleh {store.name}</p>
+                {product.isPreOrder && (
+                  <span className="inline-flex items-center mt-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                    {product.poNote ? `PO • ${product.poNote}` : "Pre-Order (PO)"}
+                  </span>
+                )}
+                <p className="text-xs text-slate-500 mt-0.5">Dijual oleh {store.name}</p>
               </div>
               <div className="text-right">
                 <div className="text-xl font-extrabold text-slate-900">
-                  {formatCurrency(product.price, store.currency as any, store.locale as any)}
+                  {formatCurrency(unitPrice, store.currency as any, store.locale as any)}
                 </div>
               </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
+              {hasVariants && (
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                    Pilih Varian
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {product.variants!.map((v, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => setSelectedVariantIdx(idx)}
+                        className={`px-3 py-2 rounded-xl text-xs font-semibold border transition ${
+                          selectedVariantIdx === idx
+                            ? "border-[#D94E28] bg-[#FDF0EC] text-[#D94E28]"
+                            : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                        }`}
+                      >
+                        {v.name} • {formatCurrency(v.price, store.currency as any, store.locale as any)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {isPhysical && (
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                    Jumlah Pesanan (Qty)
+                    {product.stock && product.stock > 0 ? (
+                      <span className="ml-1.5 font-normal normal-case text-slate-500">
+                        (Sisa stok: {product.stock})
+                      </span>
+                    ) : null}
+                  </label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={product.stock && product.stock > 0 ? product.stock : 99}
+                    value={quantity}
+                    onChange={(e) => {
+                      const maxQty = product.stock && product.stock > 0 ? product.stock : 99;
+                      setQuantity(Math.min(maxQty, Math.max(1, Number(e.target.value) || 1)));
+                    }}
+                    className="w-28 px-3.5 py-2 rounded-xl border border-slate-200 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              )}
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
                   Nama Lengkap
@@ -405,7 +480,9 @@ export function CheckoutClient({
 
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Nomor WhatsApp (Untuk Struk &amp; Akses Produk)
+                  {isPhysical
+                    ? "Nomor WhatsApp (Untuk Konfirmasi & Pengiriman)"
+                    : "Nomor WhatsApp (Untuk Struk & Akses Produk)"}
                 </label>
                 <input
                   type="tel"
@@ -416,9 +493,41 @@ export function CheckoutClient({
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
                 />
                 <span className="text-[11px] text-slate-400 mt-1 block">
-                  Link file atau detail pesanan akan otomatis dikirimkan ke nomor ini.
+                  {isPhysical
+                    ? "Detail pesanan & jadwal pengiriman akan dikonfirmasi melalui WhatsApp ini."
+                    : "Link file atau detail pesanan akan otomatis dikirimkan ke nomor ini."}
                 </span>
               </div>
+
+              {isPhysical && (
+                <>
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                      Alamat Pengiriman Lengkap
+                    </label>
+                    <textarea
+                      required
+                      rows={2}
+                      value={shippingAddress}
+                      onChange={(e) => setShippingAddress(e.target.value)}
+                      placeholder="Jalan, Nomor Rumah, Kecamatan, Kota, Kode Pos"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                      Catatan / Kartu Ucapan (Opsional)
+                    </label>
+                    <input
+                      type="text"
+                      value={buyerNote}
+                      onChange={(e) => setBuyerNote(e.target.value)}
+                      placeholder="Misal: Ucapan Selamat Natal dari Keluarga Budi"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </>
+              )}
 
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
@@ -476,19 +585,25 @@ export function CheckoutClient({
               {/* Rincian Transaksi & Convenience Fee */}
               <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2 text-xs">
                 <div className="flex justify-between text-slate-600">
-                  <span>Harga Produk</span>
-                  <span>{formatCurrency(product.price, store.currency as any, store.locale as any)}</span>
+                  <span>
+                    {activeVariant
+                      ? `${activeVariant.name} × ${quantity}`
+                      : isPhysical
+                      ? `Harga Produk (× ${quantity})`
+                      : "Harga Produk"}
+                  </span>
+                  <span>{formatCurrency(subtotalPrice, store.currency as any, store.locale as any)}</span>
                 </div>
                 {isCustomerBorne ? (
                   <div className="flex justify-between text-slate-600">
                     <span>
-                      {paymentProvider === "PAYPAL" ? "Biaya Layanan PayPal" : "Biaya Layanan QRIS"} ({rules.directCheckoutFeePercent}%)
+                      {paymentProvider === "PAYPAL" ? "Biaya Layanan PayPal" : "Biaya layanan checkout otomatis"} ({rules.directCheckoutFeePercent}%)
                     </span>
                     <span>+{formatCurrency(convenienceFee, store.currency as any, store.locale as any)}</span>
                   </div>
                 ) : (
                   <div className="flex justify-between text-emerald-700 font-medium">
-                    <span>{paymentProvider === "PAYPAL" ? "Biaya Layanan PayPal" : "Biaya Layanan QRIS"}</span>
+                    <span>{paymentProvider === "PAYPAL" ? "Biaya Layanan PayPal" : "Biaya layanan checkout otomatis"}</span>
                     <span>Ditanggung Penjual (Gratis)</span>
                   </div>
                 )}
@@ -514,7 +629,17 @@ export function CheckoutClient({
                   </div>
 
                   <a
-                    href={`https://wa.me/${store.chatHandle || "6281234567890"}?text=Halo%20${encodeURIComponent(store.name)},%20saya%20tertarik%20membeli%20${encodeURIComponent(product.title)}%20seharga%20${encodeURIComponent(formatCurrency(product.price, store.currency as any, store.locale as any))}`}
+                    href={`https://wa.me/${store.chatHandle || "6281234567890"}?text=${encodeURIComponent(
+                      `Halo ${store.name}, saya pesan ${product.title}${
+                        activeVariant ? ` — ${activeVariant.name}` : ""
+                      } × ${quantity}${
+                        product.isPreOrder && product.poNote ? ` (${product.poNote})` : ""
+                      }\n• Total: ${formatCurrency(subtotalPrice, store.currency as any, store.locale as any)}${
+                        buyerName ? `\n• Nama: ${buyerName}` : ""
+                      }${shippingAddress ? `\n• Alamat: ${shippingAddress}` : ""}${
+                        buyerNote ? `\n• Catatan: ${buyerNote}` : ""
+                      }`
+                    )}`}
                     target="_blank"
                     rel="noreferrer"
                     onClick={() =>
@@ -548,6 +673,40 @@ export function CheckoutClient({
                       <span>Bayar Sekarang &bull; {formatCurrency(totalAmountToPay, store.currency as any, store.locale as any)}</span>
                     </>
                   )}
+                </button>
+              )}
+
+              {!(isBelowMinQris && paymentProvider === "BORDERPAY_QRIS") && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (formRef.current && !formRef.current.reportValidity()) {
+                      return;
+                    }
+                    const waUrl = `https://wa.me/${store.chatHandle || "6281234567890"}?text=${encodeURIComponent(
+                      `Halo ${store.name}, saya pesan ${product.title}${
+                        activeVariant ? ` — ${activeVariant.name}` : ""
+                      } × ${quantity}${
+                        product.isPreOrder && product.poNote ? ` (${product.poNote})` : ""
+                      }\n• Total: ${formatCurrency(subtotalPrice, store.currency as any, store.locale as any)}${
+                        buyerName ? `\n• Nama: ${buyerName}` : ""
+                      }${buyerWhatsapp ? `\n• No. WA: ${buyerWhatsapp}` : ""}${
+                        shippingAddress ? `\n• Alamat: ${shippingAddress}` : ""
+                      }${buyerNote ? `\n• Catatan: ${buyerNote}` : ""}`
+                    )}`;
+                    trackGtmGenerateLead({
+                      currency: store.currency,
+                      value: subtotalPrice,
+                      leadSource: "checkout_whatsapp_direct",
+                      storeSlug: store.slug,
+                      itemName: product.title,
+                    });
+                    window.open(waUrl, "_blank", "noopener,noreferrer");
+                  }}
+                  className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl text-xs sm:text-sm transition cursor-pointer"
+                >
+                  <MessageSquare className="w-4 h-4" />
+                  <span>Kirim Pesanan via WhatsApp (0% Komisi)</span>
                 </button>
               )}
             </form>

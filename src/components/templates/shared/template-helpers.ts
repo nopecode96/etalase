@@ -47,11 +47,7 @@ export function getTemplateProductUrl(
     return `/${store.slug}/book/${item.slug}`;
   }
   if (item.checkoutMode === "CHAT_ORDER") {
-    const wa = (store.chatHandle || "").replace(/[^0-9]/g, "");
-    if (!wa) return `/${store.slug}/checkout/${item.slug}`;
-    return `https://wa.me/${wa}?text=${encodeURIComponent(
-      `Halo ${store.name}, saya tertarik dengan ${item.title}`
-    )}`;
+    return `/${store.slug}/checkout/${item.slug}`;
   }
   return `/${store.slug}/checkout/${item.slug}`;
 }
@@ -67,7 +63,7 @@ export function getTemplateProductCtaLabel(item: StoreTemplateProduct): string {
     return "Kirim Dukungan";
   }
   if (item.checkoutMode === "CHAT_ORDER") {
-    return "Order via WhatsApp";
+    return "Pesan Sekarang";
   }
   return "Beli Sekarang — QRIS";
 }

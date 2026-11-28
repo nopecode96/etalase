@@ -29,6 +29,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: "/", changeFrequency: "daily", priority: 1.0, localize: true },
     { path: "/fitur", changeFrequency: "weekly", priority: 0.9, localize: true },
     { path: "/solusi", changeFrequency: "weekly", priority: 0.9, localize: true },
+    { path: "/solusi/kue-hampers", changeFrequency: "weekly", priority: 0.9, localize: true },
     { path: "/template", changeFrequency: "weekly", priority: 0.85, localize: true },
     { path: "/harga", changeFrequency: "weekly", priority: 0.9, localize: true },
     { path: "/tools", changeFrequency: "weekly", priority: 0.8, localize: true },

@@ -9,17 +9,19 @@ interface CoursePageProps {
   };
   searchParams?: {
     wa?: string;
+    order?: string;
   };
 }
 
 export default async function CoursePage({ params, searchParams }: CoursePageProps) {
   const { slug, productSlug } = params;
   const buyerWa = searchParams?.wa;
+  const orderNumber = searchParams?.order;
 
   let courseData = null;
 
   try {
-    const res = await getCourseContent(slug, productSlug, buyerWa);
+    const res = await getCourseContent(slug, productSlug, buyerWa, orderNumber);
     if (res.success && res.data) {
       courseData = res.data;
     }

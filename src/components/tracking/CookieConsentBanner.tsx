@@ -90,6 +90,14 @@ export function CookieConsentBanner() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    const host = window.location.hostname.toLowerCase();
+    const isMainDomain =
+      host === "etalase.online" ||
+      host === "www.etalase.online" ||
+      host === "localhost" ||
+      host === "127.0.0.1";
+    if (!isMainDomain) return;
+
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved === "accepted") {

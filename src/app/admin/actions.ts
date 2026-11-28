@@ -280,6 +280,10 @@ export async function actionSaveProduct(input: {
   externalUrl?: string | null;
   digitalFileUrl?: string | null;
   chatMessage?: string | null;
+  stock?: number | null;
+  isPreOrder?: boolean;
+  poNote?: string | null;
+  variants?: Array<{ name: string; price: number }> | null;
   isFeatured?: boolean;
   isActive?: boolean;
   promoActive?: boolean;
@@ -393,6 +397,10 @@ export async function actionSaveProduct(input: {
           ...(input.externalUrl !== undefined ? { externalUrl: input.externalUrl || null } : {}),
           ...(input.digitalFileUrl !== undefined ? { digitalFileUrl: input.digitalFileUrl || null } : {}),
           ...(input.chatMessage !== undefined ? { chatMessage: input.chatMessage || null } : {}),
+          ...(input.stock !== undefined ? { stock: input.stock } : {}),
+          ...(input.isPreOrder !== undefined ? { isPreOrder: Boolean(input.isPreOrder) } : {}),
+          ...(input.poNote !== undefined ? { poNote: input.poNote?.trim() || null } : {}),
+          ...(input.variants !== undefined ? { variants: input.variants && input.variants.length > 0 ? (input.variants as any) : null } : {}),
           ...(input.isFeatured !== undefined ? { isFeatured: input.isFeatured } : {}),
           ...(input.isActive !== undefined ? { isActive: input.isActive } : {}),
           ...(input.courseModules !== undefined ? { courseModules: input.courseModules } : {}),
@@ -419,6 +427,10 @@ export async function actionSaveProduct(input: {
           externalUrl: input.externalUrl || null,
           digitalFileUrl: input.digitalFileUrl || null,
           chatMessage: input.chatMessage || null,
+          stock: input.stock ?? null,
+          isPreOrder: Boolean(input.isPreOrder),
+          poNote: input.poNote?.trim() || null,
+          variants: input.variants && input.variants.length > 0 ? (input.variants as any) : null,
           isFeatured: input.isFeatured ?? false,
           isActive: input.isActive ?? true,
           courseModules: input.courseModules ?? undefined,

@@ -116,8 +116,22 @@ export async function generateMetadata({ params }: StorePageProps): Promise<Meta
 export default async function StorefrontPage({ params }: StorePageProps) {
   const { slug } = params;
 
+  const store = await prisma.store.findUnique({
+    where: { slug },
+    include: {
+      products: {
+        where: { isActive: true },
+        orderBy: [{ isFeatured: "desc" }, { createdAt: "desc" }],
+      },
+      storeBlocks: {
+        where: { isActive: true },
+        orderBy: { sortOrder: "asc" },
+      },
+    },
+  });
+
   // Provide mock fallback for "demo" slug if DB is not yet populated
-  if (slug === "demo") {
+  if (!store && slug === "demo") {
     return (
       <TemplateRenderer
         store={{
@@ -172,20 +186,6 @@ export default async function StorefrontPage({ params }: StorePageProps) {
     );
   }
 
-  const store = await prisma.store.findUnique({
-    where: { slug },
-    include: {
-      products: {
-        where: { isActive: true },
-        orderBy: [{ isFeatured: "desc" }, { createdAt: "desc" }],
-      },
-      storeBlocks: {
-        where: { isActive: true },
-        orderBy: { sortOrder: "asc" },
-      },
-    },
-  });
-
   if (!store || !store.isActive) {
     notFound();
   }
@@ -210,6 +210,10 @@ export default async function StorefrontPage({ params }: StorePageProps) {
     isFeatured: p.isFeatured,
     category: p.category,
     productType: p.productType,
+    stock: p.stock ?? null,
+    isPreOrder: Boolean((p as any).isPreOrder),
+    poNote: (p as any).poNote || null,
+    variants: Array.isArray((p as any).variants) ? ((p as any).variants as any) : null,
     secondaryModes: p.secondaryModes as any,
   }));
 

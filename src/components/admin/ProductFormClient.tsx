@@ -109,7 +109,7 @@ export function ProductFormClient({
     "DIRECT_CHECKOUT" | "CHAT_ORDER" | "EXTERNAL_LINK"
   >(initialProduct?.checkoutMode || "CHAT_ORDER");
   const [chatMessage, setChatMessage] = useState(
-    initialProduct?.chatMessage || "Hi, I want to order this item from your storefront!"
+    initialProduct?.chatMessage || "Halo, saya mau pesan produk ini dari etalase Anda!"
   );
   const [externalPlatform, setExternalPlatform] = useState(
     initialProduct?.externalPlatform || "TIKTOK_SHOP"
@@ -128,6 +128,22 @@ export function ProductFormClient({
   );
   const [isFeatured, setIsFeatured] = useState<boolean>(
     initialProduct ? Boolean(initialProduct.isFeatured) : false
+  );
+  const [stock, setStock] = useState<string>(
+    initialProduct?.stock !== null && initialProduct?.stock !== undefined
+      ? String(initialProduct.stock)
+      : ""
+  );
+  const [isPreOrder, setIsPreOrder] = useState<boolean>(
+    Boolean((initialProduct as any)?.isPreOrder)
+  );
+  const [poNote, setPoNote] = useState<string>(
+    (initialProduct as any)?.poNote || ""
+  );
+  const [variants, setVariants] = useState<Array<{ name: string; price: number }>>(
+    Array.isArray((initialProduct as any)?.variants)
+      ? (initialProduct as any).variants
+      : []
   );
 
   // Flash Sale / Promo
@@ -192,6 +208,10 @@ export function ProductFormClient({
         chatMessage: checkoutMode === "CHAT_ORDER" ? chatMessage.trim() : null,
         isActive,
         isFeatured,
+        stock: stock.trim() !== "" ? Number(stock) : null,
+        isPreOrder,
+        poNote: isPreOrder ? poNote.trim() || null : null,
+        variants: variants.filter((v) => v.name.trim().length > 0 && Number(v.price) >= 0),
         promoActive,
         promoPrice: promoActive && promoPrice ? Number(promoPrice) : null,
         promoDurationNote,
@@ -308,7 +328,21 @@ export function ProductFormClient({
                   </label>
                   <select
                     value={category}
-                    onChange={(e) => setCategory(e.target.value)}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setCategory(val);
+                      const CATEGORY_TO_FULFILLMENT: [string, string][] = [
+                        ["Digital Product", "DIGITAL"],
+                        ["Physical Goods", "PHYSICAL"],
+                        ["Service / Consultation", "APPOINTMENT"],
+                        ["Course / Video", "COURSE"],
+                        ["Event / Ticket", "EVENT_WEBINAR"],
+                      ];
+                      const match = CATEGORY_TO_FULFILLMENT.find(([p]) =>
+                        val.startsWith(p)
+                      );
+                      if (match) setProductType(match[1]);
+                    }}
                     className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#E7E5E4] bg-white font-semibold text-[#1C1917] focus:border-[#D94E28] outline-none cursor-pointer"
                   >
                     {CATEGORIES.map((cat) => (
@@ -453,7 +487,7 @@ export function ProductFormClient({
                   value={compareAtPrice}
                   onChange={(e) => setCompareAtPrice(e.target.value)}
                   placeholder="e.g. 150000"
-                  className="w-full px-3.5 py-2.5 text-xs sm:text-sm font-mono text-[#78716C] rounded-xl border border-[#E7E5E4] focus:border-[#D94E28] outline-none"
+                  className="w-full px-3.5 py-2.5 text-xs sm:text-sm font-mono font-bold text-[#1C1917] placeholder:font-normal placeholder:text-[#A8A29E] rounded-xl border border-[#E7E5E4] focus:border-[#D94E28] outline-none"
                 />
               </div>
             </div>
@@ -566,7 +600,7 @@ export function ProductFormClient({
                     type="text"
                     value={chatMessage}
                     onChange={(e) => setChatMessage(e.target.value)}
-                    placeholder="Hi, I want to order this item from your storefront!"
+                    placeholder="Halo, saya mau pesan produk ini dari etalase Anda!"
                     className="w-full px-3.5 py-2 text-xs rounded-xl border border-emerald-300 bg-white font-medium text-[#1C1917] outline-none"
                   />
                   <p className="text-[11px] text-emerald-700">
@@ -706,6 +740,110 @@ export function ProductFormClient({
                   </div>
                 </div>
               )}
+
+              {/* Pre-Order (PO), Kuota Stok & Varian Ukuran */}
+              <div className="p-4 bg-[#FAF8F5] border border-[#E7E5E4] rounded-2xl space-y-4">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <div className="text-xs font-bold text-[#1C1917]">
+                      Pre-Order (PO), Kuota &amp; Varian Produk
+                    </div>
+                    <p className="text-[11px] text-[#57534E]">
+                      Opsional: cocok untuk jualan kue kering, hampers, atau produk dengan ukuran/batch kirim.
+                    </p>
+                  </div>
+                  <label className="inline-flex items-center gap-2 cursor-pointer text-xs font-semibold text-[#1C1917]">
+                    <input
+                      type="checkbox"
+                      checked={isPreOrder}
+                      onChange={(e) => setIsPreOrder(e.target.checked)}
+                      className="rounded border-[#D6D3D1] text-[#D94E28] focus:ring-[#D94E28]"
+                    />
+                    <span>Produk Pre-Order (PO)</span>
+                  </label>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-bold text-[#57534E] mb-1">
+                      Kuota / Stok Tersedia (opsional)
+                    </label>
+                    <input
+                      type="number"
+                      min={0}
+                      value={stock}
+                      onChange={(e) => setStock(e.target.value)}
+                      placeholder="Kosongkan jika unlimited"
+                      className="w-full px-3 py-2 text-xs rounded-xl border border-[#E7E5E4] bg-white text-[#1C1917]"
+                    />
+                  </div>
+                  {isPreOrder && (
+                    <div>
+                      <label className="block text-[11px] font-bold text-[#57534E] mb-1">
+                        Jadwal / Estimasi Kirim PO
+                      </label>
+                      <input
+                        type="text"
+                        value={poNote}
+                        onChange={(e) => setPoNote(e.target.value)}
+                        placeholder="Contoh: Batch 1 kirim 18 Des / PO H-3"
+                        className="w-full px-3 py-2 text-xs rounded-xl border border-[#E7E5E4] bg-white text-[#1C1917]"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-2 pt-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-[#57534E]">
+                      Varian Ukuran / Paket (opsional)
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setVariants([...variants, { name: "", price: Number(price) || 0 }])
+                      }
+                      className="text-[11px] font-bold text-[#D94E28] hover:underline"
+                    >
+                      + Tambah Varian
+                    </button>
+                  </div>
+                  {variants.map((v, idx) => (
+                    <div key={idx} className="grid grid-cols-12 gap-2 items-center">
+                      <input
+                        type="text"
+                        value={v.name}
+                        onChange={(e) => {
+                          const next = [...variants];
+                          next[idx] = { ...next[idx], name: e.target.value };
+                          setVariants(next);
+                        }}
+                        placeholder="Misal: Toples 500gr"
+                        className="col-span-6 px-3 py-1.5 text-xs rounded-xl border border-[#E7E5E4] bg-white text-[#1C1917]"
+                      />
+                      <input
+                        type="number"
+                        min={0}
+                        value={v.price}
+                        onChange={(e) => {
+                          const next = [...variants];
+                          next[idx] = { ...next[idx], price: Number(e.target.value) };
+                          setVariants(next);
+                        }}
+                        placeholder="Harga"
+                        className="col-span-4 px-3 py-1.5 text-xs rounded-xl border border-[#E7E5E4] bg-white font-mono text-[#1C1917]"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setVariants(variants.filter((_, i) => i !== idx))}
+                        className="col-span-2 text-[11px] text-rose-600 hover:underline font-semibold"
+                      >
+                        Hapus
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
               {/* Event / Webinar Date & Location */}
               {productType === "EVENT_WEBINAR" && (

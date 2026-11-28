@@ -254,7 +254,7 @@ export function AdminOverviewClient({
                       </p>
                       <p className="text-[11px] text-[#78716C]">
                         {order.product?.title || "Store Item"} &bull;{" "}
-                        {new Date(order.createdAt).toLocaleDateString("en-US", {
+                        {new Date(order.createdAt).toLocaleDateString("id-ID", {
                           month: "short",
                           day: "numeric",
                           timeZone: "Asia/Jakarta",

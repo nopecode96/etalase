@@ -26,7 +26,8 @@ export interface CourseAccessData {
 export async function getCourseContent(
   storeSlug: string,
   productSlug: string,
-  buyerWhatsapp?: string
+  buyerWhatsapp?: string,
+  orderNumber?: string
 ): Promise<ServiceResult<CourseAccessData>> {
   try {
     const store = await prisma.store.findUnique({
@@ -53,7 +54,21 @@ export async function getCourseContent(
 
     let hasAccess = false;
 
-    if (buyerWhatsapp) {
+    if (orderNumber) {
+      const paidByOrder = await prisma.order.findFirst({
+        where: {
+          storeId: store.id,
+          productId: product.id,
+          orderCode: orderNumber.trim(),
+          status: { in: ["PAID", "COMPLETED"] },
+        },
+      });
+      if (paidByOrder) {
+        hasAccess = true;
+      }
+    }
+
+    if (!hasAccess && buyerWhatsapp) {
       const cleanPhone = buyerWhatsapp.replace(/[^0-9]/g, "");
       const paidOrder = await prisma.order.findFirst({
         where: {

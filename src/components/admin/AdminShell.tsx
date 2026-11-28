@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import { AdminSidebar } from "./AdminSidebar";
 import { OnboardingTour } from "./OnboardingTour";
+import { useAdminI18n } from "./AdminI18nContext";
+import { ADMIN_LOCALE_OPTIONS, AdminLocale } from "@/lib/admin/admin-i18n";
 
 interface AdminShellProps {
   store: any;
@@ -37,10 +39,26 @@ const BREADCRUMB_MAP: Record<string, { parent?: string; title: string }> = {
 
 export function AdminShell({ store, user, children }: AdminShellProps) {
   const pathname = usePathname();
+  const { locale, t, setLocale } = useAdminI18n();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const breadcrumb = BREADCRUMB_MAP[pathname] || { title: "Tenant Console" };
+  const translatedBreadcrumbs: Record<string, { parent?: string; title: string }> = {
+    "/admin": { title: t.nav.overview },
+    "/admin/storefront/theme": { parent: t.nav.storefront, title: t.nav.templatesTheme },
+    "/admin/storefront/blocks": { parent: t.nav.storefront, title: t.nav.contentBlocks },
+    "/admin/products": { parent: t.nav.productsPromos, title: t.nav.allProducts },
+    "/admin/products/promos": { parent: t.nav.productsPromos, title: t.nav.flashSalePromos },
+    "/admin/orders": { parent: t.nav.ordersPayouts, title: t.nav.customerOrders },
+    "/admin/orders/payouts": { parent: t.nav.ordersPayouts, title: t.nav.walletWithdrawals },
+    "/admin/analytics": { title: t.nav.analyticsPixel },
+    "/admin/settings/profile": { parent: t.nav.settings, title: t.nav.storeProfile },
+    "/admin/settings/domain": { parent: t.nav.settings, title: t.nav.customDomain },
+    "/admin/settings/integrations": { parent: t.nav.settings, title: t.nav.integrations },
+    "/admin/billing/upgrade": { title: t.nav.upgradePlan },
+  };
+
+  const breadcrumb = translatedBreadcrumbs[pathname] || BREADCRUMB_MAP[pathname] || { title: t.shell.tenantConsole };
 
   const isFree = store.tier === "FREE";
   const tierLabel = isFree ? "FREE" : store.tier === "PRO" ? "PRO" : "DFY";
@@ -124,19 +142,33 @@ export function AdminShell({ store, user, children }: AdminShellProps) {
               rel="noopener noreferrer"
               className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#E7E5E4] hover:bg-[#FAF8F5] text-xs font-semibold text-[#1C1917] transition shadow-2xs"
             >
-              <span>Live Storefront</span>
+              <span>{t.shell.liveStorefront}</span>
               <ExternalLink className="w-3 h-3 text-[#78716C]" />
             </a>
+
+            {/* 5-Language Switcher (Cookie-based, Free & Pro) */}
+            <select
+              aria-label="Admin Language"
+              value={locale}
+              onChange={(e) => setLocale(e.target.value as AdminLocale)}
+              className="px-2 py-1.5 rounded-xl bg-white border border-[#E7E5E4] text-xs font-semibold text-[#1C1917] focus:border-[#D94E28] outline-none cursor-pointer"
+            >
+              {ADMIN_LOCALE_OPTIONS.map((opt) => (
+                <option key={opt.code} value={opt.code}>
+                  {opt.flag} {opt.code.toUpperCase()}
+                </option>
+              ))}
+            </select>
 
             {/* Replay Onboarding Tour Button */}
             <button
               type="button"
               onClick={() => window.dispatchEvent(new CustomEvent("open-onboarding-tour"))}
               className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-amber-50/80 border border-amber-200 text-amber-800 hover:bg-amber-100 text-xs font-semibold transition cursor-pointer"
-              title="Open Store Onboarding Tour"
+              title={t.shell.storeGuide}
             >
               <HelpCircle className="w-3.5 h-3.5 text-amber-600" />
-              <span className="hidden sm:inline">Store Guide</span>
+              <span className="hidden sm:inline">{t.shell.storeGuide}</span>
             </button>
 
             {/* Logout Button */}

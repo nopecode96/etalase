@@ -9,6 +9,8 @@ export function PriceDisplay({
   size = "normal",
   accentColor,
   zeroPriceLabel,
+  isPreOrder,
+  poNote,
 }: {
   price: number | string;
   compareAtPrice?: number | string | null;
@@ -17,6 +19,8 @@ export function PriceDisplay({
   size?: "sm" | "normal" | "lg";
   accentColor?: string;
   zeroPriceLabel?: string;
+  isPreOrder?: boolean;
+  poNote?: string | null;
 }) {
   const numPrice = typeof price === "number" ? price : parseFloat(String(price));
   const numCompare = compareAtPrice ? (typeof compareAtPrice === "number" ? compareAtPrice : parseFloat(String(compareAtPrice))) : null;
@@ -46,7 +50,7 @@ export function PriceDisplay({
   }[size];
 
   return (
-    <div className="inline-flex items-baseline gap-2">
+    <div className="inline-flex flex-wrap items-baseline gap-2">
       <span
         className={`${sizeClasses} text-stone-900 tracking-tight`}
         style={accentColor ? { color: accentColor } : undefined}
@@ -56,6 +60,11 @@ export function PriceDisplay({
       {formattedCompare && (
         <span className="text-[11px] sm:text-xs text-stone-400 line-through font-normal">
           {formattedCompare}
+        </span>
+      )}
+      {isPreOrder && (
+        <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+          {poNote ? `PO • ${poNote}` : "Pre-Order"}
         </span>
       )}
     </div>

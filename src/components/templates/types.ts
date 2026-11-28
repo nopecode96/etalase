@@ -50,6 +50,10 @@ export interface StoreTemplateProduct {
   isFeatured?: boolean;
   category?: string | null;
   productType?: string | null;
+  stock?: number | null;
+  isPreOrder?: boolean;
+  poNote?: string | null;
+  variants?: Array<{ name: string; price: number }> | null;
   secondaryModes?: Array<{
     mode: string;
     label?: string;

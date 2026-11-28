@@ -82,7 +82,7 @@ export default function HomePage({ searchParams }: HomePageProps) {
   });
   const howToJsonLd = generateHowToJsonLd({
     name: "Cara Membuat Toko Online & Katalog WhatsApp di etalase.online",
-    description: "Langkah praktis dari klaim subdomain hingga toko online live dalam ±45 detik.",
+    description: "Langkah praktis dari klaim subdomain hingga toko online siap pakai.",
     totalTime: "PT1M",
     steps: [
       { name: "Klaim Subdomain", text: "Ketik nama bisnis dan cek ketersediaannya secara real-time (3–30 karakter)." },
@@ -122,7 +122,7 @@ export default function HomePage({ searchParams }: HomePageProps) {
       ctaPrimaryBtn: "Buat Etalase Gratis Sekarang",
       ctaSecondaryBtn: "Lihat 4 Arketipe Template",
       ctaTrust:
-        "Gratis Selamanya • Setup Kurang dari 3 Menit • Subdomain Mandiri Siap Pakai",
+        "Gratis Selamanya • Setup Cepat & Praktis • Subdomain Mandiri Siap Pakai",
     },
     en: {
       heroBadge: "Visual Storefront & WhatsApp Closing",
